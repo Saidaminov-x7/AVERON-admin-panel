@@ -17,6 +17,7 @@ import GeneralSettingsPage from './pages/settings/GeneralSettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import AuditLogPage from './pages/AuditLogPage';
 import SystemHealthPage from './pages/system/SystemHealthPage';
+import MediaLibraryPage from './pages/MediaLibraryPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const Guard = ({ children, role }: { children: ReactNode; role?: 'SUPER_ADMIN' }) => <ProtectedRoute requiredAdminRole={role}>{children}</ProtectedRoute>;
@@ -30,6 +31,7 @@ export default function App() {
     <Route path="/imports" element={<Guard><ImportsPage/></Guard>}/>
     <Route path="/orders" element={<Guard><OrdersPage/></Guard>}/>
     <Route path="/finance" element={<Guard><FinancePage/></Guard>}/>
+    <Route path="/media" element={<Guard><MediaLibraryPage/></Guard>}/>
     <Route path="/users" element={<Guard><UsersPage/></Guard>}/>
     <Route path="/users/:id" element={<Guard><UserProfilePage/></Guard>}/>
     <Route path="/audit-log" element={<Guard><AuditLogPage/></Guard>}/>
