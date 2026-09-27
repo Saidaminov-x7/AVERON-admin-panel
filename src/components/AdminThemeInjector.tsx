@@ -16,22 +16,22 @@ interface AdminThemeData {
 }
 
 const DEFAULT_ADMIN_THEME: AdminThemeData = {
-  primaryColor: '#2563eb',
-  secondaryColor: '#1d4ed8',
+  primaryColor: '#7c3aed',
+  secondaryColor: '#5b21b6',
   backgroundColor: '#0f0f0f',
   textColor: '#f1f5f9',
-  borderRadius: '0.5rem',
+  borderRadius: '0.75rem',
   fontFamily: 'Inter, sans-serif',
 };
 
 const getAdminThemeApi = async (): Promise<AdminThemeData> => {
-  const { data } = await api.get('/admin/admin-theme');
+  const { data } = await api.get('/site-settings/public/theme');
   return data;
 };
 
 export default function AdminThemeInjector() {
-  const { data } = useQuery({
-    queryKey: ['admin', 'admin-theme'],
+  const { data, isLoading } = useQuery({
+    queryKey: ['site', 'shared-theme'],
     queryFn: getAdminThemeApi,
     // Не показываем ошибку если нет доступа (ещё не залогинились)
     retry: false,
@@ -52,5 +52,6 @@ export default function AdminThemeInjector() {
     }
   }, [data]);
 
+  if (isLoading) return <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0b0e13] text-white"><div className="text-center"><div className="text-2xl font-black tracking-[.24em]">AVERON</div><div className="mx-auto mt-5 h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-violet-500"/><p className="mt-3 text-xs text-slate-500">Загружаем оформление</p></div></div>;
   return null;
 }
