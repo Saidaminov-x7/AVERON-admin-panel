@@ -24,6 +24,7 @@ export interface MediaListResponse {
     page: number;
     limit: number;
     totalPages: number;
+    totalBytes: number;
   };
 }
 

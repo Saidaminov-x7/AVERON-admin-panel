@@ -133,6 +133,9 @@ export const MediaLibraryPage: React.FC = () => {
               <Badge variant="primary" size="sm">
                 {total} файлов
               </Badge>
+              <Badge variant="neutral" size="sm">
+                {formatFileSize(data?.meta?.totalBytes || 0)} занято
+              </Badge>
             </h1>
             <p className="text-xs text-muted mt-0.5">
               Хранилище загруженных изображений и медиаресурсов платформы
