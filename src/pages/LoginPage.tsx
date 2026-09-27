@@ -28,12 +28,6 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const codeInputRef = useRef<HTMLInputElement>(null);
 
-  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotLoading, setForgotLoading] = useState(false);
-  const [forgotSuccess, setForgotSuccess] = useState(false);
-  const [forgotError, setForgotError] = useState('');
-
   // Загружаем сохранённый email при монтировании
   useEffect(() => {
     const saved = localStorage.getItem(REMEMBER_EMAIL_KEY);
@@ -62,29 +56,6 @@ const LoginPage: React.FC = () => {
       }, 100);
     }
   }, [step]);
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setForgotError('');
-    setForgotLoading(true);
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: forgotEmail.trim(), locale: 'ru' }),
-      });
-      if (response.ok) {
-        setForgotSuccess(true);
-      } else {
-        const data = await response.json().catch(() => ({}));
-        setForgotError(data.message || 'Ошибка отправки запроса на сброс пароля');
-      }
-    } catch {
-      setForgotError('Не удалось связаться с сервером');
-    } finally {
-      setForgotLoading(false);
-    }
-  };
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -299,8 +270,7 @@ const LoginPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Чекбокс "Запомнить меня" и "Забыли пароль?" */}
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center text-sm">
                 <label className="flex items-center gap-2 cursor-pointer select-none text-app">
                   <input
                     type="checkbox"
@@ -311,19 +281,6 @@ const LoginPage: React.FC = () => {
                   />
                   <span className="text-xs text-muted hover:text-app transition-colors">Запомнить меня</span>
                 </label>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setForgotEmail(email);
-                    setIsForgotModalOpen(true);
-                    setForgotSuccess(false);
-                    setForgotError('');
-                  }}
-                  className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 hover:underline cursor-pointer"
-                >
-                  Забыли пароль?
-                </button>
               </div>
 
               {/* Ошибка */}
@@ -462,85 +419,6 @@ const LoginPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Модальное окно восстановления пароля */}
-      {isForgotModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-surface border border-app rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-app">Восстановление пароля</h3>
-              <button
-                type="button"
-                onClick={() => setIsForgotModalOpen(false)}
-                className="text-muted hover:text-app p-1 rounded-lg transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            {forgotSuccess ? (
-              <div className="space-y-4 text-center py-2">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-500 mx-auto">
-                  ✓
-                </div>
-                <p className="text-sm text-app font-medium">Ссылка для сброса пароля отправлена!</p>
-                <p className="text-xs text-muted">
-                  Если аккаунт с email <span className="font-semibold text-app">{forgotEmail}</span> существует, на него отправлена инструкция по сбросу пароля.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setIsForgotModalOpen(false)}
-                  className="w-full py-2 px-4 rounded-xl bg-primary-600 hover:bg-primary-500 text-white text-sm font-semibold transition-all cursor-pointer"
-                >
-                  Закрыть
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleForgotPassword} className="space-y-4">
-                <p className="text-xs text-muted">
-                  Введите ваш рабочий email администратора. Мы отправим вам ссылку для установки нового пароля.
-                </p>
-
-                <div>
-                  <label className="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    placeholder="admin@averon.uz"
-                    required
-                    className="input w-full"
-                  />
-                </div>
-
-                {forgotError && (
-                  <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-xs text-red-600 dark:text-red-400">
-                    {forgotError}
-                  </div>
-                )}
-
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsForgotModalOpen(false)}
-                    className="px-4 py-2 text-xs font-medium text-muted hover:text-app transition-colors cursor-pointer"
-                  >
-                    Отмена
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={forgotLoading || !forgotEmail.trim()}
-                    className="px-4 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white text-xs font-semibold shadow-md transition-all cursor-pointer"
-                  >
-                    {forgotLoading ? 'Отправка...' : 'Отправить ссылку'}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

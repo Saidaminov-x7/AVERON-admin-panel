@@ -307,7 +307,7 @@ const StaffPage: React.FC = () => {
                   </label>
                   <input
                     type="email"
-                    placeholder="colleague@ijarauz.uz"
+                    placeholder="colleague@averon.uz"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required

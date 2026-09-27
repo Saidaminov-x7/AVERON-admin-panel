@@ -6,12 +6,7 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
-const API_URL = import.meta.env.VITE_API_URL;
-if (!API_URL) {
-  throw new Error(
-    'VITE_API_URL не задан. Укажи переменную окружения перед сборкой — без неё админ-панель не может обратиться к backend API.',
-  );
-}
+const API_URL = import.meta.env.VITE_API_URL || 'https://averon-backend-production-128zjje.up.railway.app';
 export { API_URL };
 const PROACTIVE_REFRESH_BEFORE_MS = 5 * 60 * 1000; // 5 минут
 

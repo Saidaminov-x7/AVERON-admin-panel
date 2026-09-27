@@ -374,7 +374,7 @@ export const StaffPage: React.FC = () => {
               required
               value={formEmail}
               onChange={(e) => setFormEmail(e.target.value)}
-              placeholder="admin@ijarauz.uz"
+              placeholder="admin@averon.uz"
               leftIcon={<Mail size={16} />}
             />
 
@@ -458,7 +458,7 @@ export const StaffPage: React.FC = () => {
             if (revokeConfirmId) revokeMutation.mutate(revokeConfirmId);
           }}
           title="Отозвать права доступа?"
-          message="Сотрудник потеряет доступ к панели управления ijarauz. Его аккаунт больше не сможет входить в админ-панель."
+          message="Сотрудник потеряет доступ к панели управления AVERON. Его аккаунт больше не сможет входить в админ-панель."
           confirmLabel="Отозвать доступ"
           variant="danger"
           loading={revokeMutation.isPending}

@@ -26,7 +26,7 @@ const BackupsPage: React.FC = () => {
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `ijarauz-snapshot-${Date.now()}.json`);
+      link.setAttribute('download', `averon-snapshot-${Date.now()}.json`);
       document.body.appendChild(link);
       link.click();
       link.remove();

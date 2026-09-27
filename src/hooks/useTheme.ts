@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 
 type Theme = 'light' | 'dark';
 
-const STORAGE_KEY = 'ijarauz-admin-theme';
+const STORAGE_KEY = 'averon-admin-theme';
 
 // Определяем начальную тему: из localStorage или системных настроек
 const getInitialTheme = (): Theme => {

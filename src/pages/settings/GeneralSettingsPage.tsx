@@ -34,7 +34,7 @@ const GeneralSettingsPage: React.FC = () => {
   });
 
   const [siteName, setSiteName] = useState('Ijarauz');
-  const [contactEmail, setContactEmail] = useState('support@ijarauz.uz');
+  const [contactEmail, setContactEmail] = useState('support@averon.uz');
   const [contactPhone, setContactPhone] = useState('+998 71 200-00-00');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState('');
@@ -56,7 +56,7 @@ const GeneralSettingsPage: React.FC = () => {
   useEffect(() => {
     if (settings) {
       setSiteName(settings.siteName || 'Ijarauz');
-      setContactEmail(settings.contactEmail || 'support@ijarauz.uz');
+      setContactEmail(settings.contactEmail || 'support@averon.uz');
       setContactPhone(settings.contactPhone || '+998 71 200-00-00');
       setMaintenanceMode(settings.maintenanceMode ?? false);
       setMaintenanceMessage(settings.maintenanceMessage || '');
