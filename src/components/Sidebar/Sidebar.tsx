@@ -1,0 +1,15 @@
+import type { ComponentType } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { ClipboardCheck, Gauge, HeartHandshake, LogOut, PackageCheck, ReceiptText, Settings, ShieldCheck, ShoppingBag, Users } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
+import { logoutApi } from '../../lib/authApi';
+import { useAuthStore } from '../../store/authStore';
+interface SidebarProps { onCloseMobile?: () => void }
+type Item = { to:string; label:string; icon:ComponentType<{size?:number}> };
+const sections:Array<{title:string;items:Item[]}>= [
+ {title:'COMMAND CENTER',items:[{to:'/',label:'Обзор бизнеса',icon:Gauge}]},
+ {title:'ТОВАРЫ',items:[{to:'/imports',label:'Ожидают проверки',icon:ClipboardCheck},{to:'/products',label:'Каталог товаров',icon:ShoppingBag}]},
+ {title:'ОПЕРАЦИИ',items:[{to:'/orders',label:'Заказы',icon:PackageCheck},{to:'/finance',label:'Финансы и прибыль',icon:ReceiptText}]},
+ {title:'УПРАВЛЕНИЕ',items:[{to:'/users',label:'Пользователи',icon:Users},{to:'/audit-log',label:'Журнал действий',icon:ShieldCheck},{to:'/settings/general',label:'Настройки',icon:Settings},{to:'/system/health',label:'Состояние системы',icon:HeartHandshake}]},
+];
+export default function Sidebar({onCloseMobile}:SidebarProps){const{user}=useAuth();const navigate=useNavigate();const logout=async()=>{try{await logoutApi()}finally{useAuthStore.getState().logout();navigate('/login')}};return <aside className="flex h-screen w-72 flex-col border-r border-slate-800 bg-[#0b0e13] text-white"><div className="flex h-20 items-center justify-between border-b border-white/10 px-6"><button onClick={()=>navigate('/')} className="text-left"><div className="text-xl font-black tracking-[0.2em]">AVERON</div><div className="text-[10px] font-bold tracking-[0.24em] text-amber-400">COMMAND CENTER</div></button>{onCloseMobile&&<button onClick={onCloseMobile} className="lg:hidden">×</button>}</div><nav className="flex-1 space-y-6 overflow-y-auto px-4 py-6">{sections.map(section=><div key={section.title}><p className="mb-2 px-3 text-[10px] font-bold tracking-[0.16em] text-slate-500">{section.title}</p><div className="space-y-1">{section.items.map(({to,label,icon:Icon})=><NavLink key={to} to={to} end={to==='/'} onClick={onCloseMobile} className={({isActive})=>`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${isActive?'bg-amber-400 text-black':'text-slate-300 hover:bg-white/5 hover:text-white'}`}><Icon size={18}/><span>{label}</span></NavLink>)}</div></div>)}</nav><div className="border-t border-white/10 p-4"><div className="mb-3 rounded-xl bg-white/5 p-3"><p className="text-sm font-bold">{user?.name||'Администратор'}</p><p className="text-xs text-slate-400">{user?.adminRole||'ADMIN'}</p></div><button onClick={logout} className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-400 hover:bg-red-500/10 hover:text-red-300"><LogOut size={17}/>Выйти</button></div></aside>}

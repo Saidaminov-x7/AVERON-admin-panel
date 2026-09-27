@@ -1,0 +1,305 @@
+// src/pages/AnalyticsPage.tsx
+// Страница расширенной аналитики с поддержкой произвольного диапазона дат
+
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+import Layout from '../components/Layout';
+import { getRangeAnalyticsApi, getFunnelAnalyticsApi, exportReportUrl } from '../lib/analyticsApi';
+
+const PERIODS = [
+  { label: '7 дней', value: 7 },
+  { label: '30 дней', value: 30 },
+  { label: '90 дней', value: 90 },
+  { label: 'Произвольный', value: -1 },
+];
+
+const AnalyticsPage: React.FC = () => {
+  const [periodDays, setPeriodDays] = useState(30);
+
+  // Произвольные даты
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const monthAgoStr = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+  const [dateFrom, setDateFrom] = useState(monthAgoStr);
+  const [dateTo, setDateTo] = useState(todayStr);
+
+  const isCustom = periodDays === -1;
+
+  const queryParams = isCustom
+    ? { from: dateFrom, to: dateTo }
+    : { days: periodDays };
+
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ['admin', 'analytics', 'range', queryParams],
+    queryFn: () => getRangeAnalyticsApi(queryParams),
+  });
+
+  const { data: funnel } = useQuery({
+    queryKey: ['admin', 'analytics', 'funnel', queryParams],
+    queryFn: () => getFunnelAnalyticsApi(queryParams),
+  });
+
+  const chartData = analytics?.chartData || [];
+  const byCity = analytics?.byCity || [];
+  const summary = analytics?.summary || { totalVisitors: 0, totalListings: 0, totalUsers: 0 };
+
+  return (
+    <Layout title="Аналитика платформы">
+      <div className="space-y-6 max-w-7xl mx-auto">
+        {/* Фильтры периода и экспорт */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            {PERIODS.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => setPeriodDays(p.value)}
+                className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${periodDays === p.value
+                    ? 'bg-primary-500 text-white shadow-sm'
+                    : 'border border-app text-muted hover:text-app hover:bg-gray-100 dark:hover:bg-white/5'
+                  }`}
+              >
+                {p.label}
+              </button>
+            ))}
+
+            {isCustom && (
+              <div className="flex items-center gap-2 ml-2">
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="input py-1 px-2.5 text-xs w-36"
+                />
+                <span className="text-xs text-muted">—</span>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="input py-1 px-2.5 text-xs w-36"
+                />
+              </div>
+            )}
+          </div>
+
+          <a
+            href={exportReportUrl({
+              from: isCustom ? dateFrom : undefined,
+              to: isCustom ? dateTo : undefined,
+              type: 'traffic',
+            })}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 text-xs font-semibold rounded-lg border border-app text-app hover:bg-gray-100 dark:hover:bg-white/5 flex items-center gap-2 transition-colors cursor-pointer"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Скачать отчёт (CSV)
+          </a>
+        </div>
+
+        {/* Метрики за период */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="card p-5">
+            <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
+              Уникальные посетители
+            </div>
+            <div className="text-2xl font-extrabold text-app">
+              {isLoading ? '...' : summary.totalVisitors.toLocaleString()}
+            </div>
+            <p className="text-[11px] text-muted mt-1">Без повторных подсчетов за день</p>
+          </div>
+
+          <div className="card p-5">
+            <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
+              Новые объявления
+            </div>
+            <div className="text-2xl font-extrabold text-app">
+              {isLoading ? '...' : summary.totalListings.toLocaleString()}
+            </div>
+            <p className="text-[11px] text-muted mt-1">Опубликовано за указанный период</p>
+          </div>
+
+          <div className="card p-5">
+            <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
+              Новые пользователи
+            </div>
+            <div className="text-2xl font-extrabold text-app">
+              {isLoading ? '...' : summary.totalUsers.toLocaleString()}
+            </div>
+            <p className="text-[11px] text-muted mt-1">Зарегистрировано за период</p>
+          </div>
+        </div>
+
+        {/* График динамики */}
+        <div className="card">
+          <h3 className="text-base font-semibold text-app mb-4">Динамика активности за период</h3>
+          {isLoading ? (
+            <div className="h-72 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />
+          ) : chartData.length === 0 ? (
+            <div className="h-72 flex items-center justify-center text-muted text-sm">
+              Нет данных за выбранный период
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+                  tickFormatter={(v) =>
+                    new Date(v).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+                  }
+                  axisLine={false}
+                  tickLine={false}
+                  interval={Math.max(0, Math.floor(chartData.length / 6))}
+                />
+                <YAxis
+                  tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+                  axisLine={false}
+                  tickLine={false}
+                  allowDecimals={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '0.75rem',
+                    fontSize: '12px',
+                    color: 'var(--color-text)',
+                  }}
+                  labelFormatter={(v) =>
+                    new Date(String(v)).toLocaleDateString('ru-RU', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })
+                  }
+                />
+                <Legend wrapperStyle={{ fontSize: '12px' }} />
+                <Line
+                  type="monotone"
+                  dataKey="visitors"
+                  name="Уникальные посетители"
+                  stroke="#14b8a6"
+                  strokeWidth={2.5}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="registrations"
+                  name="Регистрации"
+                  stroke="#8b5cf6"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="listings"
+                  name="Объявления"
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        {/* Воронка конверсии */}
+        {funnel && (
+          <div className="card">
+            <h3 className="text-base font-semibold text-app mb-4">Воронка конверсии пользователей</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="p-4 rounded-xl bg-primary-500/10 border border-primary-500/20">
+                <div className="text-xs font-semibold text-primary-600 dark:text-primary-400">1. Просмотры страниц</div>
+                <div className="text-2xl font-bold text-app mt-1">{funnel.views}</div>
+                <div className="text-[11px] text-muted mt-1">Визиты за период</div>
+              </div>
+              <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                <div className="text-xs font-semibold text-purple-600 dark:text-purple-400">2. Добавления в избранное</div>
+                <div className="text-2xl font-bold text-app mt-1">{funnel.favorites}</div>
+                <div className="text-[11px] text-muted mt-1">Конверсия: {(funnel.favoriteRate * 100).toFixed(1)}%</div>
+              </div>
+              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">3. Заявки на просмотр</div>
+                <div className="text-2xl font-bold text-app mt-1">{funnel.viewingRequests}</div>
+                <div className="text-[11px] text-muted mt-1">Из избранного в заявку: {(funnel.viewingRate * 100).toFixed(1)}%</div>
+              </div>
+            </div>
+
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart
+                layout="vertical"
+                data={[
+                  { stage: '1. Просмотры', count: funnel.views },
+                  { stage: '2. Избранное', count: funnel.favorites },
+                  { stage: '3. Заявки', count: funnel.viewingRequests },
+                ]}
+                margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 11, fill: 'var(--color-text-muted)' }} />
+                <YAxis dataKey="stage" type="category" tick={{ fontSize: 11, fill: 'var(--color-text-muted)' }} />
+                <Tooltip />
+                <Bar dataKey="count" fill="#14b8a6" radius={[0, 6, 6, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Разбивка по городам */}
+        <div className="card">
+          <h3 className="text-base font-semibold text-app mb-4">Объявления по городам (Топ-10)</h3>
+          {byCity.length === 0 ? (
+            <p className="text-muted text-sm text-center py-8">Нет данных по городам за период</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={byCity} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                <XAxis
+                  dataKey="city"
+                  tick={{ fontSize: 11, fill: 'var(--color-text-muted)' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+                  axisLine={false}
+                  tickLine={false}
+                  allowDecimals={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '0.75rem',
+                    fontSize: '12px',
+                    color: 'var(--color-text)',
+                  }}
+                />
+                <Bar dataKey="count" name="Объявлений" fill="#14b8a6" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default AnalyticsPage;
