@@ -149,13 +149,13 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
       "
     >
       {/* Заголовок страницы + Гамбургер на мобилке */}
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
         {onToggleMobileMenu && (
           <button
             type="button"
             onClick={onToggleMobileMenu}
             aria-label="Открыть боковое меню"
-            className="lg:hidden inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 transition-all duration-200 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900 dark:border-white/10 dark:bg-stone-900 dark:text-stone-300 dark:hover:border-white/20 dark:hover:bg-stone-800 dark:hover:text-white cursor-pointer shadow-xs"
+            className="order-last ml-auto inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 shadow-xs transition-all duration-200 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900 dark:border-white/10 dark:bg-stone-900 dark:text-stone-300 dark:hover:border-white/20 dark:hover:bg-stone-800 dark:hover:text-white lg:hidden"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="4" x2="20" y1="12" y2="12" />
@@ -164,7 +164,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
             </svg>
           </button>
         )}
-        {title && <h1 className="text-lg sm:text-xl font-bold text-app truncate">{title}</h1>}
+        {title && <h1 className="min-w-0 truncate text-base font-bold text-app sm:text-xl">{title}</h1>}
         <div
           className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 dark:bg-white/5 border border-app"
           title={

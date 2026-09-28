@@ -181,7 +181,7 @@ const UserProfilePage: React.FC = () => {
 
         {/* Вкладки */}
         <div className="border-b border-app">
-          <nav className="flex gap-6">
+          <nav className="flex gap-5 overflow-x-auto pb-1">
             <button
               onClick={() => setActiveTab('info')}
               className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
@@ -204,7 +204,7 @@ const UserProfilePage: React.FC = () => {
                 activeTab === 'chats' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
               }`}
             >
-              <MessageSquare size={14} /> Все чаты ({userChatsData?.messages?.length || 0})
+              <MessageSquare size={14} /> Все чаты ({(userChatsData?.messages?.length || 0) + (userChatsData?.aiSessions?.length || 0)})
             </button>
             <button
               onClick={() => setActiveTab('activity')}
@@ -257,8 +257,9 @@ const UserProfilePage: React.FC = () => {
 
         {/* Все чаты пользователя */}
         {activeTab === 'chats' && (
-          <div className="card p-0 overflow-hidden">
-            {!userChatsData?.messages || userChatsData.messages.length === 0 ? (
+          <div className="card min-w-0 overflow-hidden p-0">
+            {userChatsData?.aiSessions?.length ? <div className="border-b border-app p-4"><h3 className="mb-3 font-semibold text-app">История AVERON AI</h3><div className="space-y-3">{userChatsData.aiSessions.map((session: any) => <div key={session.id} className="rounded-xl border border-app bg-surface p-3"><div className="mb-2 flex flex-wrap items-center justify-between gap-2"><strong className="text-sm text-app">{session.title || 'Диалог с AI'}</strong><span className="text-xs text-muted">{format(new Date(session.updatedAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</span></div><div className="space-y-2">{session.messages.map((message: any) => <div key={message.id} className={`max-w-full break-words rounded-lg px-3 py-2 text-xs ${message.role === 'user' ? 'ml-auto bg-primary-500 text-white' : 'bg-gray-100 text-app dark:bg-white/5'}`}><span className="mb-1 block font-semibold">{message.role === 'user' ? 'Пользователь' : 'AVERON AI'}</span>{message.content}</div>)}</div></div>)}</div></div> : null}
+            {(!userChatsData?.messages || userChatsData.messages.length === 0) && (!userChatsData?.aiSessions || userChatsData.aiSessions.length === 0) ? (
               <div className="p-8 text-center text-muted">У пользователя нет истории переписок</div>
             ) : (
               <div className="divide-y divide-app">

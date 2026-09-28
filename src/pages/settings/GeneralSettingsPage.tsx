@@ -33,9 +33,9 @@ const GeneralSettingsPage: React.FC = () => {
     queryFn: getSiteSettingsApi,
   });
 
-  const [siteName, setSiteName] = useState('Ijarauz');
-  const [contactEmail, setContactEmail] = useState('support@averon.uz');
-  const [contactPhone, setContactPhone] = useState('+998 71 200-00-00');
+  const [siteName, setSiteName] = useState('AVERON');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState('');
   const [maintenancePasswordEnabled, setMaintenancePasswordEnabled] = useState(false);
@@ -47,17 +47,16 @@ const GeneralSettingsPage: React.FC = () => {
   const [navLinks, setNavLinks] = useState<
     Array<{ label: string; href: string; position: 'header' | 'footer' }>
   >([
-  { label: 'Товары', href: '/catalog', position: 'header' },
-    { label: 'Разместить', href: '/add-listing', position: 'header' },
-  { label: 'AI', href: '/ai', position: 'header' },
+    { label: 'Товары', href: '/catalog', position: 'header' },
+    { label: 'AI', href: '/ai', position: 'header' },
     { label: 'О нас', href: '/about', position: 'header' },
   ]);
 
   useEffect(() => {
     if (settings) {
-      setSiteName(settings.siteName || 'Ijarauz');
-      setContactEmail(settings.contactEmail || 'support@averon.uz');
-      setContactPhone(settings.contactPhone || '+998 71 200-00-00');
+      setSiteName(settings.siteName?.toLowerCase().includes('ijara') ? 'AVERON' : settings.siteName || 'AVERON');
+      setContactEmail(settings.contactEmail?.toLowerCase().includes('ijarauz') ? '' : settings.contactEmail || '');
+      setContactPhone(settings.contactPhone === '+998 71 200-00-00' ? '' : settings.contactPhone || '');
       setMaintenanceMode(settings.maintenanceMode ?? false);
       setMaintenanceMessage(settings.maintenanceMessage || '');
       setMaintenanceBypassPassword((settings as any).maintenanceBypassPassword || '');
@@ -65,7 +64,7 @@ const GeneralSettingsPage: React.FC = () => {
       setMobilePinchZoomEnabled((settings as any).mobilePinchZoomEnabled ?? true);
       setLogoPreview(settings.logoUrl || null);
       if (settings.navLinks && Array.isArray(settings.navLinks) && settings.navLinks.length > 0) {
-        setNavLinks(settings.navLinks);
+        setNavLinks(settings.navLinks.filter((link) => !['/add-listing', '/chat'].includes(link.href)));
       }
     }
   }, [settings]);

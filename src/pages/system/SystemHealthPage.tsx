@@ -8,7 +8,7 @@ import { Activity, Database, Cpu, RefreshCw, CheckCircle2, AlertTriangle } from 
 
 const SystemHealthPage: React.FC = () => {
   const { t } = useTranslation();
-  const { data, refetch } = useQuery({
+  const { data, refetch, isFetching, isError } = useQuery({
     queryKey: ['admin', 'system-health'],
     queryFn: getSystemHealthApi,
     refetchInterval: 10000,
@@ -31,11 +31,14 @@ const SystemHealthPage: React.FC = () => {
           <button
             type="button"
             onClick={() => refetch()}
-            className="btn btn-secondary flex items-center gap-2"
+            disabled={isFetching}
+            className="btn btn-secondary flex items-center gap-2 disabled:opacity-60"
           >
-            <RefreshCw size={16} /> {t('common.refresh', 'Обновить')}
+            <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} /> {t('common.refresh', 'Обновить')}
           </button>
         </div>
+
+        {isError && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-500">Не удалось получить состояние сервисов. Проверьте соединение с API и повторите обновление.</div>}
 
         {/* Общий статус */}
         <div className="card p-5 flex items-center justify-between">

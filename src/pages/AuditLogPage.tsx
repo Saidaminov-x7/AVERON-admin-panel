@@ -127,7 +127,7 @@ export const AuditLogPage: React.FC = () => {
         </div>
 
         {/* Фильтры */}
-        <Card className="p-4 border-app bg-surface">
+        <Card className="border-stone-300/70 bg-surface p-4 dark:border-stone-700/80">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <Input
               placeholder={t('auditLog.searchPlaceholder', 'Поиск по пользователю, ресурсу или ID...')}
@@ -162,7 +162,7 @@ export const AuditLogPage: React.FC = () => {
             description={debouncedSearch || actionFilter ? 'Попробуйте изменить параметры поиска или фильтр' : 'Журнал действий пока пуст'}
           />
         ) : (
-          <Card className="overflow-hidden p-0 border-app bg-surface shadow-xs">
+          <Card className="overflow-hidden border-stone-300/70 bg-surface p-0 shadow-xs dark:border-stone-700/80">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>

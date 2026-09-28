@@ -34,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
       </div>
 
       {/* Основная область */}
-      <div className="flex flex-col flex-1 overflow-hidden min-w-0">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Верхняя панель */}
         <Header
           title={title}
@@ -42,7 +42,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         />
 
         {/* Контент страницы */}
-        <main className="admin-scroll flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
+        <main className="admin-scroll flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
           <div className="mx-auto w-full max-w-[1440px] space-y-6">
             {children}
           </div>

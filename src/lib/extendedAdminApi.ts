@@ -254,7 +254,7 @@ export const getUserAllListingsApi = async (userId: string): Promise<{ listings:
   return data;
 };
 
-export const getUserAllChatsApi = async (userId: string): Promise<{ messages: any[] }> => {
-  const { data } = await api.get<{ messages: any[] }>(`/admin/users/${userId}/all-chats`);
+export const getUserAllChatsApi = async (userId: string): Promise<{ messages: any[]; aiSessions: any[] }> => {
+  const { data } = await api.get<{ messages: any[]; aiSessions: any[] }>(`/admin/users/${userId}/all-chats`);
   return data;
 };
