@@ -4,7 +4,7 @@
 import { api } from './axios';
 import type { PaginatedResponse } from './listingsApi';
 
-export type UserRole = 'USER' | 'LANDLORD' | 'ADMIN';
+export type UserRole = 'USER' | 'ADMIN';
 
 export interface AdminUser {
   id: string;

@@ -1,10 +1,9 @@
 // src/lib/searchApi.ts
 import { api } from './axios';
 
-export interface QuickListingResult {
+export interface QuickProductResult {
   id: string;
   title: string;
-  city?: string;
   price?: number;
   status?: string;
 }
@@ -13,13 +12,14 @@ export interface QuickUserResult {
   id: string;
   name: string;
   email: string;
+  phone?: string | null;
   role?: string;
 }
 
-export async function searchListingsApi(q: string): Promise<QuickListingResult[]> {
+export async function searchProductsApi(q: string): Promise<QuickProductResult[]> {
   if (!q || q.trim().length < 2) return [];
-  const { data } = await api.get<QuickListingResult[]>('/admin/search/quick', {
-    params: { q: q.trim(), type: 'listings' },
+  const { data } = await api.get<QuickProductResult[]>('/admin/search/quick', {
+    params: { q: q.trim(), type: 'products' },
   });
   return data;
 }

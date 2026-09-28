@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Header/Header';
+import { CommandPalette } from './CommandPalette/CommandPalette';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-app">
+      <CommandPalette />
       {/* Глобальная командная строка / Поиск */}
       {/* Затемнение фона для мобильного меню (Backdrop) */}
       {isMobileMenuOpen && (

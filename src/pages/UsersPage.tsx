@@ -104,11 +104,17 @@ export const UsersPage: React.FC = () => {
   };
 
   // Bulk state
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>(() => {
+    try { return JSON.parse(sessionStorage.getItem('averon-selected-users') || '[]'); } catch { return []; }
+  });
   const [blockUser, setBlockUser] = useState<AdminUser | null>(null);
   const [blockReason, setBlockReason] = useState('');
   const [isBulkBlockOpen, setIsBulkBlockOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+
+  useEffect(() => {
+    sessionStorage.setItem('averon-selected-users', JSON.stringify(selectedIds));
+  }, [selectedIds]);
 
   const [sortByField, sortDirection] = sortOption.split('-') as [
     'createdAt' | 'name' | 'email' | 'listingsCount',
@@ -288,10 +294,8 @@ export const UsersPage: React.FC = () => {
     switch (role) {
       case 'ADMIN':
         return <Badge variant="danger">ADMIN</Badge>;
-      case 'LANDLORD':
-        return <Badge variant="primary">Арендодатель</Badge>;
       default:
-        return <Badge variant="info">Арендатор</Badge>;
+        return <Badge variant="info">ПОКУПАТЕЛЬ</Badge>;
     }
   };
 

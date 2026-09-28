@@ -4,7 +4,7 @@ import { Command } from 'cmdk';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { searchListingsApi, searchUsersApi } from '../../lib/searchApi';
+import { searchProductsApi, searchUsersApi } from '../../lib/searchApi';
 import {
   Home,
   List,
@@ -44,7 +44,7 @@ interface StaticRoute {
 
 const STATIC_ROUTES: StaticRoute[] = [
   { label: 'Главная', labelKey: 'nav.dashboard', path: '/', keywords: ['главная', 'dashboard', 'bosh', 'stats', 'статистика'], icon: <Home size={16} /> },
-  { label: 'Товары', labelKey: 'nav.listings', path: '/listings', keywords: ['товары', 'products', 'listings', 'каталог'], icon: <List size={16} /> },
+  { label: 'Товары', labelKey: 'nav.listings', path: '/products', keywords: ['товары', 'products', 'каталог'], icon: <List size={16} /> },
   { label: 'Канбан модерации', labelKey: 'nav.kanban', path: '/moderation/kanban', keywords: ['канбан', 'kanban', 'модерация', 'доска'], icon: <Kanban size={16} /> },
   { label: 'Жалобы', labelKey: 'nav.reports', path: '/reports', keywords: ['жалобы', 'reports', 'shikoyat', 'нарушения'], icon: <AlertTriangle size={16} /> },
   { label: 'Заявки на просмотр', labelKey: 'nav.viewingRequests', path: '/viewing-requests', keywords: ['заявки', 'просмотр', 'viewing', 'bron'], icon: <Calendar size={16} /> },
@@ -71,6 +71,11 @@ const STATIC_ROUTES: StaticRoute[] = [
   { label: 'Мой профиль', labelKey: 'nav.profile', path: '/profile', keywords: ['профиль', 'profile', 'пароль', 'аккаунт'], icon: <User size={16} /> },
   { label: 'Журнал аудита', labelKey: 'nav.audit', path: '/audit-log', keywords: ['аудит', 'audit', 'журнал', 'безопасность'], icon: <History size={16} /> },
 ];
+
+const ACTIVE_PATHS = new Set([
+  '/', '/products', '/imports', '/orders', '/finance', '/media', '/users',
+  '/audit-log', '/profile', '/settings/general', '/settings/staff', '/system/health',
+]);
 
 export const CommandPalette: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -107,8 +112,8 @@ export const CommandPalette: React.FC = () => {
 
   // Поиск по объявлениям и пользователям при длине запроса >= 2
   const { data: listingResults = [], isLoading: isListingsLoading } = useQuery({
-    queryKey: ['cmdk-listings', deferredQuery],
-    queryFn: () => searchListingsApi(deferredQuery),
+    queryKey: ['cmdk-products', deferredQuery],
+    queryFn: () => searchProductsApi(deferredQuery),
     enabled: deferredQuery.length >= 2,
   });
 
@@ -127,7 +132,7 @@ export const CommandPalette: React.FC = () => {
     [navigate],
   );
 
-  const filteredRoutes = STATIC_ROUTES.filter((r) => {
+  const filteredRoutes = STATIC_ROUTES.filter((r) => ACTIVE_PATHS.has(r.path)).filter((r) => {
     if (!deferredQuery) return true;
     const q = deferredQuery.toLowerCase();
     const translated = t(r.labelKey, r.label).toLowerCase();
@@ -232,7 +237,7 @@ export const CommandPalette: React.FC = () => {
                   {listingResults.map((l) => (
                     <Command.Item
                       key={l.id}
-                      onSelect={() => go(`/listings?highlight=${l.id}`)}
+                      onSelect={() => go(`/products?highlight=${l.id}`)}
                       className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -242,7 +247,7 @@ export const CommandPalette: React.FC = () => {
                         <div className="min-w-0">
                           <p className="text-sm font-medium truncate">{l.title}</p>
                           <p className="text-xs text-muted">
-                            {l.city || 'Узбекистан'} • {(l.price || 0).toLocaleString()} сум
+                            {(l.price || 0).toLocaleString('ru-RU')} сум
                           </p>
                         </div>
                       </div>
@@ -265,7 +270,7 @@ export const CommandPalette: React.FC = () => {
                   {userResults.map((u) => (
                     <Command.Item
                       key={u.id}
-                      onSelect={() => go(`/users?highlight=${u.id}`)}
+                      onSelect={() => go(`/users/${u.id}`)}
                       className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -298,7 +303,7 @@ export const CommandPalette: React.FC = () => {
                 <kbd className="font-mono bg-surface px-1.5 py-0.5 rounded border border-app">↵</kbd> Выбрать
               </span>
             </div>
-            <span>Командная строка Ijarauz</span>
+            <span>AVERON Command Center</span>
           </div>
         </Command>
       </div>
