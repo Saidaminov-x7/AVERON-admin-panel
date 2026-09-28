@@ -30,3 +30,8 @@ export const getUserAuditLogsApi = async (userId: string): Promise<AuditLogItem[
   const { data } = await api.get(`/admin/audit-logs`, { params: { userId } });
   return data;
 };
+
+export const clearAuditLogsApi = async (): Promise<{ success: boolean; count: number }> => {
+  const { data } = await api.delete('/admin/audit-logs');
+  return data;
+};

@@ -2,15 +2,15 @@
 // Страница профиля пользователя в админке: контакты, история действий, объявления
 
 import React, { useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
-import { getAdminUserByIdApi, blockUserApi, unblockUserApi, getUserActivityApi } from '../lib/usersApi';
+import { getAdminUserByIdApi, blockUserApi, unblockUserApi, getUserActivityApi, getUserSessionsApi, revokeUserSessionApi } from '../lib/usersApi';
 import { getUserAuditLogsApi } from '../lib/auditLogApi';
 import { getUserAllChatsApi, getUserAllListingsApi } from '../lib/extendedAdminApi';
 import Badge from '../components/Badge/Badge';
-import { ArrowLeft, Shield, Lock, Unlock, Mail, Phone, Calendar, Home, Clock, Activity, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, Unlock, Mail, Phone, Calendar, Home, Clock, Activity, MessageSquare, MonitorSmartphone, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru, enUS } from 'date-fns/locale';
 
@@ -18,7 +18,8 @@ const UserProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const [activeTab, setActiveTab] = useState<'info' | 'listings' | 'chats' | 'activity' | 'history'>('info');
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<'info' | 'listings' | 'chats' | 'activity' | 'history' | 'sessions'>('info');
 
   const { data: user, isLoading: isUserLoading } = useQuery({
     queryKey: ['admin', 'user', id],
@@ -44,6 +45,8 @@ const UserProfilePage: React.FC = () => {
     queryKey: ['admin', 'user', id, 'audit-logs'],
     queryFn: () => getUserAuditLogsApi(id!),
   });
+  const { data: sessions = [], isLoading: isSessionsLoading } = useQuery({ queryKey: ['admin','user',id,'sessions'], queryFn: () => getUserSessionsApi(id!) });
+  const revokeSession = useMutation({ mutationFn: (sessionId: string) => revokeUserSessionApi(id!, sessionId), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin','user',id,'sessions'] }) });
 
   const blockMutation = useMutation({
     mutationFn: (reason: string) => blockUserApi(id!, reason),
@@ -218,6 +221,9 @@ const UserProfilePage: React.FC = () => {
               }`}
             >
               {t('auditLog.title', 'Админ-аудит')} ({auditLogs?.length || 0})
+            </button>
+            <button onClick={() => setActiveTab('sessions')} className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-1.5 ${activeTab === 'sessions' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'}`}>
+              <MonitorSmartphone size={14}/> Сессии ({sessions.length})
             </button>
           </nav>
         </div>
@@ -428,6 +434,7 @@ const UserProfilePage: React.FC = () => {
             )}
           </div>
         )}
+        {activeTab === 'sessions' && <div className="card p-5"><h2 className="text-lg font-semibold text-app">Активные сессии</h2><p className="mt-1 text-sm text-muted">Устройства, на которых пользователь сейчас авторизован.</p><div className="mt-4 divide-y divide-app">{isSessionsLoading ? <div className="py-8 text-center text-muted">Загрузка…</div> : sessions.map((session) => <div key={session.id} className="flex items-center gap-3 py-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500"><MonitorSmartphone size={18}/></div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-app">{session.userAgent || 'Неизвестное устройство'}</p><p className="mt-1 text-xs text-muted">{session.ipAddress || 'IP скрыт'} · {format(new Date(session.lastSeenAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</p></div><button onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app text-muted hover:text-red-500" title="Завершить сессию"><X size={16}/></button></div>)}{!isSessionsLoading && !sessions.length ? <div className="py-8 text-center text-muted">Активных сессий нет.</div> : null}</div></div>}
       </div>
     </Layout>
   );

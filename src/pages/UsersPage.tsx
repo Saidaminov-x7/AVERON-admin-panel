@@ -29,7 +29,6 @@ import {
   unblockUserApi,
   exportUsersApi,
   deleteUserApi,
-  purgeUsersExceptSuperAdminApi,
   type UserRole,
   type AdminUser,
 } from '../lib/usersApi';
@@ -53,8 +52,7 @@ export const UsersPage: React.FC = () => {
 
   const ROLE_OPTIONS = [
     { value: '', label: t('users.allRoles', 'Все роли') },
-    { value: 'TENANT', label: `${t('users.tenants', 'Арендаторы')} (TENANT)` },
-    { value: 'LANDLORD', label: `${t('users.landlords', 'Собственники')} (LANDLORD)` },
+    { value: 'USER', label: `${t('users.buyers', 'Покупатели')} (USER)` },
     { value: 'ADMIN', label: `${t('users.administrators', 'Администраторы')} (ADMIN)` },
   ];
 
@@ -261,19 +259,6 @@ export const UsersPage: React.FC = () => {
     }
   };
 
-  const handlePurgeExceptSuperAdmin = async () => {
-    if (!window.confirm('⚠️ ВНИМАНИЕ: Вы действительно хотите удалить ВСЕХ пользователей, кроме супер-администратора vosilhojasaidaminov@gmail.com?')) {
-      return;
-    }
-    try {
-      const res = await purgeUsersExceptSuperAdminApi();
-      invalidateUsers();
-      toast.success(res.message || 'Очистка пользователей завершена');
-    } catch (e: any) {
-      toast.error(e?.response?.data?.message || 'Ошибка очистки базы пользователей');
-    }
-  };
-
   const handleExportCSV = async () => {
     try {
       setIsExporting(true);
@@ -328,14 +313,6 @@ export const UsersPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2.5">
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={handlePurgeExceptSuperAdmin}
-              icon={<Trash2 size={14} />}
-            >
-              Удалить всех (кроме супер-админа)
-            </Button>
             <Button
               variant="outline"
               size="sm"

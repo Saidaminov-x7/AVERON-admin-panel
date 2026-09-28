@@ -13,10 +13,11 @@ import {
   Activity,
   User as UserIcon,
   Info,
+  Trash2,
 } from 'lucide-react';
 import Layout from '../components/Layout';
 import { Card, Badge, Skeleton, EmptyState, Pagination, Input, Select, Button, Modal } from '../components/ui';
-import { getAuditLogsApi, type AuditLogItem } from '../lib/auditLogApi';
+import { clearAuditLogsApi, getAuditLogsApi, type AuditLogItem } from '../lib/auditLogApi';
 import { useDebounce } from '../hooks/useDebounce';
 
 const ACTION_LABELS: Record<string, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'primary' | 'neutral' }> = {
@@ -117,15 +118,12 @@ export const AuditLogPage: React.FC = () => {
               {t('auditLog.subtitle', 'Аудит всех изменений, модераторских решений и событий безопасности')}
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            loading={isRefetching}
-            leftIcon={<RotateCcw size={14} />}
-          >
-            {t('common.refresh', 'Обновить')}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="danger" size="sm" onClick={async () => { if (window.confirm('Очистить журнал действий? Это действие необратимо.')) { await clearAuditLogsApi(); await refetch(); } }} leftIcon={<Trash2 size={14}/>}>Очистить журнал</Button>
+            <Button variant="outline" size="sm" onClick={() => refetch()} loading={isRefetching} leftIcon={<RotateCcw size={14} />}>
+              {t('common.refresh', 'Обновить')}
+            </Button>
+          </div>
         </div>
 
         {/* Фильтры */}

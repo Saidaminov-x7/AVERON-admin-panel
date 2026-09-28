@@ -122,9 +122,7 @@ export const deleteUserApi = async (id: string): Promise<{ success: boolean; mes
   return data;
 };
 
-// Удалить всех пользователей кроме супер-администратора
-export const purgeUsersExceptSuperAdminApi = async (): Promise<{ success: boolean; message: string; count: number }> => {
-  const { data } = await api.post('/admin/users/purge-except-superadmin');
-  return data;
-};
+export interface UserAuthSession { id: string; userAgent?: string; ipAddress?: string; createdAt: string; lastSeenAt: string; expiresAt: string }
+export const getUserSessionsApi = async (id: string): Promise<UserAuthSession[]> => (await api.get(`/admin/users/${id}/sessions`)).data;
+export const revokeUserSessionApi = async (id: string, sessionId: string): Promise<void> => { await api.delete(`/admin/users/${id}/sessions/${sessionId}`); };
 
