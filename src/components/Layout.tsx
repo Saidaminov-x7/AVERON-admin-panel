@@ -40,8 +40,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         />
 
         {/* Контент страницы */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <main className="admin-scroll flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
+          <div className="mx-auto w-full max-w-[1440px] space-y-6">
             {children}
           </div>
         </main>

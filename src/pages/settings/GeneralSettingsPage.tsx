@@ -47,9 +47,9 @@ const GeneralSettingsPage: React.FC = () => {
   const [navLinks, setNavLinks] = useState<
     Array<{ label: string; href: string; position: 'header' | 'footer' }>
   >([
-    { label: 'Объявления', href: '/catalog', position: 'header' },
+  { label: 'Товары', href: '/catalog', position: 'header' },
     { label: 'Разместить', href: '/add-listing', position: 'header' },
-    { label: 'Чат', href: '/chat', position: 'header' },
+  { label: 'AI', href: '/ai', position: 'header' },
     { label: 'О нас', href: '/about', position: 'header' },
   ]);
 

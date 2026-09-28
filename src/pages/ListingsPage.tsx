@@ -494,8 +494,8 @@ export const ListingsPage: React.FC = () => {
         ) : filteredItems.length === 0 ? (
           <EmptyState
             icon={<Home size={32} />}
-            title="Объявления не найдены"
-            description="В выбранной категории сейчас нет объявлений, соответствующих заданным критериям фильтра"
+            title="Товары не найдены"
+            description="В выбранной категории сейчас нет товаров, соответствующих заданным критериям фильтра"
           />
         ) : (
           <div className="space-y-3">

@@ -44,7 +44,7 @@ interface StaticRoute {
 
 const STATIC_ROUTES: StaticRoute[] = [
   { label: 'Главная', labelKey: 'nav.dashboard', path: '/', keywords: ['главная', 'dashboard', 'bosh', 'stats', 'статистика'], icon: <Home size={16} /> },
-  { label: 'Объявления', labelKey: 'nav.listings', path: '/listings', keywords: ['объявления', 'listings', 'elonlar', 'каталог'], icon: <List size={16} /> },
+  { label: 'Товары', labelKey: 'nav.listings', path: '/listings', keywords: ['товары', 'products', 'listings', 'каталог'], icon: <List size={16} /> },
   { label: 'Канбан модерации', labelKey: 'nav.kanban', path: '/moderation/kanban', keywords: ['канбан', 'kanban', 'модерация', 'доска'], icon: <Kanban size={16} /> },
   { label: 'Жалобы', labelKey: 'nav.reports', path: '/reports', keywords: ['жалобы', 'reports', 'shikoyat', 'нарушения'], icon: <AlertTriangle size={16} /> },
   { label: 'Заявки на просмотр', labelKey: 'nav.viewingRequests', path: '/viewing-requests', keywords: ['заявки', 'просмотр', 'viewing', 'bron'], icon: <Calendar size={16} /> },
@@ -222,10 +222,10 @@ export const CommandPalette: React.FC = () => {
               </Command.Group>
             )}
 
-            {/* Группа: Объявления */}
+            {/* Группа: Товары */}
             {listingResults.length > 0 && (
               <Command.Group
-                heading="Объявления"
+                heading="Товары"
                 className="text-xs font-semibold text-muted px-2 py-1 select-none border-t border-app pt-3"
               >
                 <div className="space-y-1 mt-1">
