@@ -347,7 +347,7 @@ export const ReportsPage: React.FC = () => {
                           )}
 
                           <a
-                            href={`https://ijara.uz/catalog/${report.listingId}`}
+                            href={`${(import.meta.env.VITE_SITE_URL || 'https://averon.uz').replace(/\/$/, '')}/catalog/${report.listingId}`}
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl border border-app bg-surface hover:bg-gray-50 dark:hover:bg-white/5 text-muted hover:text-app transition-colors"

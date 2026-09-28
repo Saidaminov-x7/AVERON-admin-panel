@@ -188,15 +188,7 @@ const LoginPage: React.FC = () => {
         {/* Логотип */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <img
-              src="/logotip.png"
-              alt="AVERON"
-              className="h-10 w-auto object-contain"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = '/logo.png';
-              }}
-            />
+            <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-violet-700 text-lg font-black text-white shadow-[0_10px_28px_rgba(124,58,237,.28)]" aria-hidden="true">A</div>
             <div className="flex items-center gap-1.5">
               <span className="font-bold text-app text-xl tracking-[0.18em]">AVERON</span>
               <span className="text-[10px] font-semibold bg-primary-500 text-white px-1.5 py-0.5 rounded uppercase tracking-wider">

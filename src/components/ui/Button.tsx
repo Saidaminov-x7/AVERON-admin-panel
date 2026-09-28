@@ -52,7 +52,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={[
-          'inline-flex items-center justify-center rounded-theme font-theme font-semibold whitespace-nowrap transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none cursor-pointer outline-none select-none',
+          'inline-flex items-center justify-center rounded-theme font-theme font-semibold whitespace-nowrap transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer outline-none select-none',
           variantClasses[variant],
           sizeClasses[size],
           className,

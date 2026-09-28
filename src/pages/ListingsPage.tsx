@@ -238,7 +238,7 @@ export const ListingsPage: React.FC = () => {
       toast.error('Не удалось обновить статус верификации');
     },
     onSuccess: (_, variables) => {
-      toast.success(variables.isVerified ? 'Объявление верифицировано ("Проверено Ijarauz")' : 'Верификация снята');
+      toast.success(variables.isVerified ? 'Товар проверен командой AVERON' : 'Статус проверки снят');
     },
     onSettled: () => {
       invalidateListings();
@@ -618,7 +618,7 @@ export const ListingsPage: React.FC = () => {
                             ? 'text-emerald-600 border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
                             : 'text-muted hover:text-app'
                         }
-                        title={item.isVerified ? 'Снять статус проверки' : 'Подтвердить (Проверено Ijarauz)'}
+                        title={item.isVerified ? 'Снять статус проверки' : 'Подтвердить проверку AVERON'}
                         leftIcon={<ShieldCheck size={14} />}
                       >
                         {item.isVerified ? 'Проверено' : 'Подтвердить'}

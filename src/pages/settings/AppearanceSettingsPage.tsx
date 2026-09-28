@@ -270,7 +270,7 @@ const AppearanceSettingsPage: React.FC = () => {
                     >
                       I
                     </div>
-                    <span className="font-bold text-sm">Ijarauz</span>
+                    <span className="font-bold text-sm">AVERON</span>
                   </div>
                 </div>
 

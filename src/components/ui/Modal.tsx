@@ -48,10 +48,10 @@ export function Modal({ isOpen, onClose, title, subtitle, size = 'md', children,
           />
           <motion.div
             className={`relative w-full ${sizeClasses[size]} rounded-theme font-theme bg-surface shadow-2xl border border-app z-10 max-h-[90vh] flex flex-col`}
-            initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.96 }}
-            transition={{ duration: 0.15 }}
+            initial={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}
+            animate={{ opacity: 1, transform: 'scale(1)' }}
+            exit={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}
+            transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
           >
             {(title || subtitle) && (
               <div className="flex items-start justify-between gap-4 p-5 border-b border-app shrink-0">

@@ -120,7 +120,7 @@ export default function Sidebar({
     }
   };
   return (
-    <aside className="sidebar-bg flex h-screen w-72 flex-col border-r sidebar-border text-app">
+    <aside className="sidebar-bg safe-top safe-bottom flex h-dvh w-72 flex-col border-r sidebar-border text-app shadow-[18px_0_50px_rgba(15,23,42,.08)] lg:shadow-none">
       <div className="flex h-20 items-center justify-between border-b border-app px-6">
         <button onClick={() => navigate("/")} className="text-left">
           <div className="text-xl font-black tracking-[.2em]">AVERON</div>
@@ -148,7 +148,7 @@ export default function Sidebar({
                   end={to === "/"}
                   onClick={onCloseMobile}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${isActive ? "bg-violet-600 text-white" : "text-app hover:bg-violet-500/10"}`
+                    `flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-[transform,background-color,color,box-shadow] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] ${isActive ? "bg-violet-600 text-white shadow-[0_8px_24px_rgba(124,58,237,.22)]" : "text-app hover:bg-violet-500/10"}`
                   }
                 >
                   <Icon size={18} />

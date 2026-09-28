@@ -345,6 +345,21 @@ const GeneralSettingsPage: React.FC = () => {
                       placeholder="Например: Каталог"
                     />
                   </div>
+                  <label className="w-full text-xs font-semibold text-muted sm:w-36">
+                    Размещение
+                    <select
+                      value={link.position}
+                      onChange={(e) => {
+                        const updated = [...navLinks];
+                        updated[idx] = { ...updated[idx], position: e.target.value as 'header' | 'footer' };
+                        setNavLinks(updated);
+                      }}
+                      className="input mt-1 w-full"
+                    >
+                      <option value="header">Шапка</option>
+                      <option value="footer">Подвал</option>
+                    </select>
+                  </label>
                   <div className="flex-1 w-full sm:w-auto">
                     <Input
                       label="Ссылка (URL или относительный путь)"

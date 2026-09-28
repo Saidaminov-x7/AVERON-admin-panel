@@ -137,12 +137,14 @@ export const getRevenueStatsApi = async (): Promise<RevenueStatsData> => {
 export interface SystemHealthData {
   status: 'HEALTHY' | 'DEGRADED';
   uptimeSeconds: number;
+  backend: { status: string; latencyMs: number };
   database: { status: string; latencyMs: number };
   redis: { status: string; latencyMs: number };
   memory: {
     rssMb: number;
     heapUsedMb: number;
     heapTotalMb: number;
+    heapUsagePercent: number;
   };
   nodeVersion: string;
   timestamp: string;

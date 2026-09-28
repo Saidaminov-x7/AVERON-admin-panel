@@ -4,11 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import { getSystemHealthApi } from '../../lib/extendedAdminApi';
-import { Activity, Database, Cpu, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Activity, Database, Cpu, RefreshCw, CheckCircle2, AlertTriangle, Server } from 'lucide-react';
 
 const SystemHealthPage: React.FC = () => {
   const { t } = useTranslation();
-  const { data, refetch, isFetching, isError } = useQuery({
+  const { data, refetch, isFetching, isLoading, isError } = useQuery({
     queryKey: ['admin', 'system-health'],
     queryFn: getSystemHealthApi,
     refetchInterval: 10000,
@@ -40,6 +40,12 @@ const SystemHealthPage: React.FC = () => {
 
         {isError && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-500">Не удалось получить состояние сервисов. Проверьте соединение с API и повторите обновление.</div>}
 
+        {isLoading && (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Загрузка состояния системы">
+            {[0, 1, 2, 3].map((item) => <div key={item} className="card h-36 animate-pulse bg-gray-100 dark:bg-white/5" />)}
+          </div>
+        )}
+
         {/* Общий статус */}
         <div className="card p-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -68,7 +74,15 @@ const SystemHealthPage: React.FC = () => {
         </div>
 
         {/* Компоненты */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="card p-5 space-y-3">
+            <div className="flex items-center justify-between text-muted">
+              <span className="text-xs font-semibold uppercase flex items-center gap-1.5"><Server size={16} className="text-emerald-500" /> Backend API</span>
+              <span className={`px-2 py-0.5 rounded text-xs font-bold ${data?.backend.status === 'UP' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40' : 'bg-rose-100 text-rose-600 dark:bg-rose-950/40'}`}>{data?.backend.status ?? 'DOWN'}</span>
+            </div>
+            <div className="text-2xl font-mono font-bold text-app">{data?.backend.latencyMs ?? 0} ms</div>
+            <div className="text-xs text-muted">Время выполнения полной серверной проверки</div>
+          </div>
           {/* PostgreSQL */}
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
@@ -125,6 +139,8 @@ const SystemHealthPage: React.FC = () => {
               {data?.memory.heapUsedMb ?? 0} / {data?.memory.heapTotalMb ?? 0} MB
             </div>
             <div className="text-xs text-muted">RSS: {data?.memory.rssMb ?? 0} MB</div>
+            <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10"><div className={`h-full rounded-full ${(data?.memory.heapUsagePercent ?? 0) > 85 ? 'bg-rose-500' : (data?.memory.heapUsagePercent ?? 0) > 70 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(data?.memory.heapUsagePercent ?? 0, 100)}%` }} /></div>
+            <div className="text-xs text-muted">Использовано heap: {data?.memory.heapUsagePercent ?? 0}%</div>
           </div>
         </div>
       </div>
