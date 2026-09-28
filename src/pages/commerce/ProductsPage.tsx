@@ -1,11 +1,12 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, X } from "lucide-react";
+import { ImageOff, LoaderCircle, Plus, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import Layout from "../../components/Layout";
 import { createManualProduct, getProducts } from "../../lib/commerceApi";
+import { uploadMediaApi } from "../../lib/mediaApi";
 const words = {
   ru: {
     page: "Товары",
@@ -78,6 +79,8 @@ export default function ProductsPage() {
   const { i18n } = useTranslation();
   const t = words[i18n.language?.slice(0, 2) as keyof typeof words] ?? words.ru;
   const [open, setOpen] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageError, setImageError] = useState(false);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["commerce-products"],
@@ -88,9 +91,20 @@ export default function ProductsPage() {
     onSuccess: () => {
       toast.success(t.done);
       setOpen(false);
+      setImageUrl("");
+      setImageError(false);
       qc.invalidateQueries({ queryKey: ["commerce-products"] });
     },
     onError: () => toast.error("Не удалось создать товар"),
+  });
+  const uploadMutation = useMutation({
+    mutationFn: (file: File) => uploadMediaApi(file),
+    onSuccess: (media) => {
+      setImageUrl(media.url);
+      setImageError(false);
+      toast.success("Изображение загружено");
+    },
+    onError: () => toast.error("Не удалось загрузить изображение"),
   });
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -101,7 +115,7 @@ export default function ProductsPage() {
       titleEn: String(f.get("titleEn") || ""),
       description: String(f.get("description") || ""),
       sourceUrl: String(f.get("sourceUrl")),
-      imageUrl: String(f.get("imageUrl") || "") || undefined,
+      imageUrl: imageUrl || String(f.get("imageUrl") || "") || undefined,
       sourcePriceCny: Number(f.get("sourcePriceCny")),
       exchangeRate: Number(f.get("exchangeRate")),
       salePriceUzs: Number(f.get("salePriceUzs")),
@@ -151,10 +165,46 @@ export default function ProductsPage() {
               {t.source}
               <input required type="url" name="sourceUrl" className={field} />
             </label>
-            <label>
-              {t.image}
-              <input type="url" name="imageUrl" className={field} />
-            </label>
+            <div className="md:col-span-2 rounded-xl border border-app p-4">
+              <div className="grid gap-4 sm:grid-cols-[160px_1fr]">
+                <div className="flex h-36 items-center justify-center overflow-hidden rounded-xl bg-stone-100 dark:bg-stone-800">
+                  {imageUrl && !imageError ? (
+                    <img src={imageUrl} alt="Предпросмотр товара" className="h-full w-full object-cover" onError={() => setImageError(true)} />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-muted"><ImageOff size={24} /><span className="text-xs">Нет изображения</span></div>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  <label className="block">
+                    {t.image}
+                    <input
+                      type="url"
+                      name="imageUrl"
+                      value={imageUrl}
+                      onChange={(event) => { setImageUrl(event.target.value); setImageError(false); }}
+                      className={field}
+                      placeholder="https://..."
+                    />
+                  </label>
+                  <label className="btn-ghost w-fit border border-app">
+                    {uploadMutation.isPending ? <LoaderCircle size={17} className="animate-spin" /> : <Upload size={17} />}
+                    {uploadMutation.isPending ? "Загрузка…" : "Загрузить файл"}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      className="sr-only"
+                      disabled={uploadMutation.isPending}
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        if (file) uploadMutation.mutate(file);
+                        event.currentTarget.value = "";
+                      }}
+                    />
+                  </label>
+                  <p className="text-xs text-muted">JPG, PNG, WebP или AVIF. После загрузки ссылка подставится автоматически.</p>
+                </div>
+              </div>
+            </div>
             <label>
               {t.cost}
               <input
@@ -204,8 +254,9 @@ export default function ProductsPage() {
               {t.publish}
             </label>
             <div className="flex gap-3 md:col-span-2">
-              <button disabled={mutation.isPending} className="btn-primary">
-                {t.save}
+              <button disabled={mutation.isPending || uploadMutation.isPending} className="btn-primary">
+                {mutation.isPending && <LoaderCircle size={17} className="animate-spin" />}
+                {mutation.isPending ? "Создаём товар…" : t.save}
               </button>
               <button
                 type="button"
@@ -224,14 +275,16 @@ export default function ProductsPage() {
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {products.map((p: any) => (
             <article className="card overflow-hidden p-0" key={p.id}>
-              <div className="aspect-[4/3] bg-stone-100 dark:bg-stone-800">
+              <div className="flex h-48 items-center justify-center bg-stone-100 dark:bg-stone-800">
                 {p.images?.[0]?.url && (
                   <img
                     src={p.images[0].url}
-                    alt=""
+                    alt={p.translations?.ru?.title || p.slug}
                     className="h-full w-full object-cover"
+                    onError={(event) => { event.currentTarget.style.display = "none"; }}
                   />
                 )}
+                {!p.images?.[0]?.url && <div className="flex flex-col items-center gap-2 text-muted"><ImageOff size={24} /><span className="text-xs">AVERON</span></div>}
               </div>
               <div className="p-4">
                 <h2 className="font-bold">

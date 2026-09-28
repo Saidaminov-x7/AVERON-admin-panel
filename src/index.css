@@ -1,7 +1,5 @@
 /* AVERON Command Center design system */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,7 +17,7 @@
   --color-primary-hover: #6d28d9;
   --radius:            0.75rem;
   --border-radius:     0.75rem;
-  --font-family:       'Inter', system-ui, sans-serif;
+  --font-family:       Calibri, 'Segoe UI', Arial, sans-serif;
   --ease-out-ui:       cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-ui:    cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer:       cubic-bezier(0.32, 0.72, 0, 1);
@@ -40,7 +38,7 @@
   --color-primary-hover: #8b5cf6;
   --radius:            0.75rem;
   --border-radius:     0.75rem;
-  --font-family:       'Inter', system-ui, sans-serif;
+  --font-family:       Calibri, 'Segoe UI', Arial, sans-serif;
 }
 
 /* ─── Base Styles ─────────────────────────────────────────────────────────── */
@@ -56,7 +54,7 @@ html {
 }
 
 body {
-  font-family: var(--font-family, 'Inter', system-ui, sans-serif);
+  font-family: var(--font-family, Calibri, 'Segoe UI', Arial, sans-serif);
   background-color: var(--color-bg);
   color: var(--color-text);
   min-height: 100dvh;
@@ -75,7 +73,7 @@ body {
   .sidebar-bg   { background-color: var(--color-sidebar-bg); }
   .sidebar-border { border-color: var(--color-sidebar-border); }
   .rounded-theme { border-radius: var(--radius, var(--border-radius, 0.5rem)) !important; }
-  .font-theme   { font-family: var(--font-family, 'Inter', system-ui, sans-serif) !important; }
+  .font-theme   { font-family: var(--font-family, Calibri, 'Segoe UI', Arial, sans-serif) !important; }
 }
 
 /* ─── Компонент: карточка ─────────────────────────────────────────────────── */
