@@ -3,7 +3,6 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useInitAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
 import ProtectedRoute from './components/ProtectedRoute';
-import AdminThemeInjector from './components/AdminThemeInjector';
 import LoginPage from './pages/LoginPage';
 import CommerceDashboardPage from './pages/commerce/CommerceDashboardPage';
 import ProductsPage from './pages/commerce/ProductsPage';
@@ -24,7 +23,7 @@ const Guard = ({ children, role }: { children: ReactNode; role?: 'SUPER_ADMIN' }
 
 export default function App() {
   useTheme(); useInitAuth();
-  return <BrowserRouter><AdminThemeInjector/><Routes>
+  return <BrowserRouter><Routes>
     <Route path="/login" element={<LoginPage/>}/>
     <Route path="/" element={<Guard><CommerceDashboardPage/></Guard>}/>
     <Route path="/products" element={<Guard><ProductsPage/></Guard>}/>
