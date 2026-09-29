@@ -85,7 +85,7 @@ const ErrorLogsPage: React.FC = () => {
                   setPage(1);
                 }}
                 options={[
-                  { value: '', label: 'Все уровни (Severity)' },
+                  { value: '', label: t('system.allSeverities', 'Все уровни (Severity)') },
                   { value: 'error', label: 'Error' },
                   { value: 'warning', label: 'Warning' },
                   { value: 'info', label: 'Info' },
@@ -197,7 +197,7 @@ const ErrorLogsPage: React.FC = () => {
         {data?.meta && data.meta.totalPages > 1 && (
           <div className="flex items-center justify-between text-sm text-muted">
             <div>
-              Страница {data.meta.page} из {data.meta.totalPages}
+              {t('common.page', 'Страница')} {data.meta.page} {t('common.of', 'из')} {data.meta.totalPages}
             </div>
             <div className="flex gap-2">
               <button
@@ -206,7 +206,7 @@ const ErrorLogsPage: React.FC = () => {
                 onClick={() => setPage((p) => p - 1)}
                 className="btn-ghost py-1 px-3 disabled:opacity-40"
               >
-                Назад
+                {t('common.back', 'Назад')}
               </button>
               <button
                 type="button"
@@ -214,7 +214,7 @@ const ErrorLogsPage: React.FC = () => {
                 onClick={() => setPage((p) => p + 1)}
                 className="btn-ghost py-1 px-3 disabled:opacity-40"
               >
-                Вперёд
+                {t('common.next', 'Вперёд')}
               </button>
             </div>
           </div>
@@ -257,7 +257,7 @@ const ErrorLogsPage: React.FC = () => {
 
               <div className="p-5 overflow-y-auto space-y-4 text-sm flex-1">
                 <div>
-                  <div className="text-xs text-muted mb-1 font-medium">Сообщение:</div>
+                  <div className="text-xs text-muted mb-1 font-medium">{t('system.errorMessage', 'Сообщение')}:</div>
                   <div className="font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/20 p-3 rounded-xl border border-rose-200 dark:border-rose-900/30 break-words">
                     {selectedError.message}
                   </div>
@@ -310,11 +310,11 @@ const ErrorLogsPage: React.FC = () => {
                       disabled={resolveMutation.isPending}
                       className="btn-primary text-xs py-2 px-4 cursor-pointer"
                     >
-                      Пометить как решённую
+                      {t('system.markAsResolved', 'Пометить как решённую')}
                     </button>
                   ) : (
                     <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
-                      <CheckCircle size={14} /> Ошибка помечена как решённая
+                      <CheckCircle size={14} /> {t('system.errorResolved', 'Ошибка помечена как решённая')}
                     </span>
                   )}
                 </div>

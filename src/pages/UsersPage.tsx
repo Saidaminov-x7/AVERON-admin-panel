@@ -59,8 +59,8 @@ export const UsersPage: React.FC = () => {
   const SORT_OPTIONS = [
     { value: 'createdAt-desc', label: t('users.newestFirst', 'Сначала новые') },
     { value: 'createdAt-asc', label: t('users.oldestFirst', 'Сначала старые') },
-    { value: 'name-asc', label: 'По имени (А-Я)' },
-    { value: 'listingsCount-desc', label: 'По количеству объявлений' },
+    { value: 'name-asc', label: t('users.sortByName', 'По имени (А-Я)') },
+    { value: 'listingsCount-desc', label: t('users.sortByListings', 'По количеству объявлений') },
   ];
 
   const roleFilter = (searchParams.get('role') as UserRole) || '';
@@ -165,12 +165,12 @@ export const UsersPage: React.FC = () => {
           queryClient.setQueryData(key, val);
         }
       }
-      toast.error(err.response?.data?.message || 'Ошибка блокировки пользователя');
+      toast.error(err.response?.data?.message || t('users.errorBlock', 'Ошибка блокировки пользователя'));
     },
     onSuccess: () => {
       setBlockUser(null);
       setBlockReason('');
-      toast.success('Пользователь заблокирован');
+      toast.success(t('users.blockedSuccess', 'Пользователь заблокирован'));
     },
     onSettled: () => {
       invalidateUsers();
@@ -203,10 +203,10 @@ export const UsersPage: React.FC = () => {
           queryClient.setQueryData(key, val);
         }
       }
-      toast.error(err.response?.data?.message || 'Ошибка разблокировки пользователя');
+      toast.error(err.response?.data?.message || t('users.errorUnblock', 'Ошибка разблокировки пользователя'));
     },
     onSuccess: () => {
-      toast.success('Пользователь разблокирован');
+      toast.success(t('users.unblockedSuccess', 'Пользователь разблокирован'));
     },
     onSettled: () => {
       invalidateUsers();
@@ -233,16 +233,16 @@ export const UsersPage: React.FC = () => {
       await unblockUserApi(id);
     }
     invalidateUsers();
-    toast.success(`Разблокировано пользователей: ${selectedIds.length}`);
+    toast.success(t('users.bulkUnblockedSuccess', { count: selectedIds.length, defaultValue: `Разблокировано пользователей: ${selectedIds.length}` }));
     setSelectedIds([]);
   };
 
   const handleBulkBlockSubmit = async () => {
     for (const id of selectedIds) {
-      await blockUserApi(id, blockReason.trim() || 'Массовая блокировка администратором');
+      await blockUserApi(id, blockReason.trim() || t('users.bulkBlockReason', 'Массовая блокировка администратором'));
     }
     invalidateUsers();
-    toast.success(`Заблокировано пользователей: ${selectedIds.length}`);
+    toast.success(t('users.bulkBlockedSuccess', { count: selectedIds.length, defaultValue: `Заблокировано пользователей: ${selectedIds.length}` }));
     setSelectedIds([]);
     setIsBulkBlockOpen(false);
     setBlockReason('');
@@ -250,18 +250,18 @@ export const UsersPage: React.FC = () => {
 
   const handleDeleteUser = async (id: string, email: string) => {
     if (email === 'vosilhojasaidaminov@gmail.com') {
-      toast.error('Нельзя удалить главного супер-администратора');
+      toast.error(t('users.cannotDeleteSuperAdmin', 'Нельзя удалить главного супер-администратора'));
       return;
     }
-    if (!window.confirm(`Вы уверены, что хотите удалить пользователя ${email}?`)) {
+    if (!window.confirm(t('users.deleteConfirm', { email, defaultValue: `Вы уверены, что хотите удалить пользователя ${email}?` }))) {
       return;
     }
     try {
       await deleteUserApi(id);
       invalidateUsers();
-      toast.success('Пользователь удален');
+      toast.success(t('users.deletedSuccess', 'Пользователь удален'));
     } catch (e: any) {
-      toast.error(e?.response?.data?.message || 'Не удалось удалить пользователя');
+      toast.error(e?.response?.data?.message || t('users.errorDelete', 'Не удалось удалить пользователя'));
     }
   };
 
@@ -278,9 +278,9 @@ export const UsersPage: React.FC = () => {
       document.body.appendChild(a);
       a.click();
       a.remove();
-      toast.success('Экспорт пользователей завершен');
+      toast.success(t('users.exportSuccess', 'Экспорт пользователей завершен'));
     } catch {
-      toast.error('Ошибка экспорта данных');
+      toast.error(t('users.exportError', 'Ошибка экспорта данных'));
     } finally {
       setIsExporting(false);
     }
@@ -295,7 +295,7 @@ export const UsersPage: React.FC = () => {
       case 'ADMIN':
         return <Badge variant="danger">ADMIN</Badge>;
       default:
-        return <Badge variant="info">ПОКУПАТЕЛЬ</Badge>;
+        return <Badge variant="info">{t('users.buyers', 'ПОКУПАТЕЛЬ')}</Badge>;
     }
   };
 
@@ -372,7 +372,7 @@ export const UsersPage: React.FC = () => {
         {selectedIds.length > 0 && (
           <div className="p-3.5 rounded-2xl bg-primary-50 dark:bg-primary-950/40 border border-primary-200 dark:border-primary-800/40 flex items-center justify-between gap-4 animate-fade-in">
             <span className="text-xs font-bold text-primary-900 dark:text-primary-200">
-              Выбрано пользователей: {selectedIds.length}
+              {t('users.selectedCount', { count: selectedIds.length, defaultValue: `Выбрано пользователей: ${selectedIds.length}` })}
             </span>
             <div className="flex items-center gap-2">
               <Button
@@ -381,7 +381,7 @@ export const UsersPage: React.FC = () => {
                 onClick={handleBulkUnblock}
                 icon={<Unlock size={14} />}
               >
-                Разблокировать
+                {t('users.unblock', 'Разблокировать')}
               </Button>
               <Button
                 variant="danger"
@@ -389,7 +389,7 @@ export const UsersPage: React.FC = () => {
                 onClick={() => setIsBulkBlockOpen(true)}
                 icon={<Lock size={14} />}
               >
-                Заблокировать выбранных
+                {t('users.blockSelected', 'Заблокировать выбранных')}
               </Button>
             </div>
           </div>
@@ -478,7 +478,7 @@ export const UsersPage: React.FC = () => {
                                   onClick={() => navigate(`/users/${user.id}`)}
                                   className="font-bold text-app cursor-pointer hover:text-primary-600 truncate max-w-[180px]"
                                 >
-                                  {user.name || 'Без имени'}
+                                  {user.name || t('users.noName', 'Без имени')}
                                 </div>
                                 <span className="text-[10px] text-muted font-mono block">
                                   ID: {user.id.slice(-6).toUpperCase()}
@@ -563,7 +563,7 @@ export const UsersPage: React.FC = () => {
                                   size="icon"
                                   onClick={() => handleDeleteUser(user.id, user.email)}
                                   className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
-                                  title="Удалить пользователя навсегда"
+                                  title={t('users.deleteUser', 'Удалить пользователя навсегда')}
                                 >
                                   <Trash2 size={15} />
                                 </Button>
@@ -649,9 +649,9 @@ export const UsersPage: React.FC = () => {
           isOpen={isBulkBlockOpen}
           onClose={() => setIsBulkBlockOpen(false)}
           onConfirm={handleBulkBlockSubmit}
-          title="Заблокировать выбранных пользователей?"
-          message={`Вы уверены, что хотите заблокировать ${selectedIds.length} пользователей? Они не смогут входить в свои аккаунты.`}
-          confirmLabel={t('users.block', 'Заблокировать всех')}
+          title={t('users.bulkBlockTitle', 'Заблокировать выбранных пользователей?')}
+          message={t('users.bulkBlockMessage', { count: selectedIds.length, defaultValue: `Вы уверены, что хотите заблокировать ${selectedIds.length} пользователей? Они не смогут входить в свои аккаунты.` })}
+          confirmLabel={t('users.blockAll', 'Заблокировать всех')}
           variant="danger"
         />
       </div>

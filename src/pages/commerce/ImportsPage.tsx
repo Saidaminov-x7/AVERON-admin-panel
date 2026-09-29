@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, ExternalLink, X, Package, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import { approveImport, getImports, rejectImport, type ImportedProduct } from '../../lib/commerceApi';
 import { EmptyState, Modal, Input, Button, Textarea } from '../../components/ui';
 
 export default function ImportsPage() {
+  const { t, i18n } = useTranslation();
   const client = useQueryClient();
   const [approveItem, setApproveItem] = useState<ImportedProduct | null>(null);
   const [rejectItem, setRejectItem] = useState<ImportedProduct | null>(null);
@@ -24,24 +26,24 @@ export default function ImportsPage() {
     mutationFn: ({ id, price }: { id: string; price: number }) =>
       approveImport(id, price, 1800),
     onSuccess: () => {
-      toast.success('Товар опубликован');
+      toast.success(t('imports.toastPublished', 'Товар опубликован'));
       setApproveItem(null);
       setPriceInput('');
       refresh();
     },
-    onError: () => toast.error('Ошибка публикации'),
+    onError: () => toast.error(t('imports.toastPublishError', 'Ошибка публикации')),
   });
 
   const rejectMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       rejectImport(id, reason),
     onSuccess: () => {
-      toast.success('Импорт отклонён');
+      toast.success(t('imports.toastRejected', 'Импорт отклонён'));
       setRejectItem(null);
       setRejectReason('');
       refresh();
     },
-    onError: () => toast.error('Ошибка отклонения'),
+    onError: () => toast.error(t('imports.toastRejectError', 'Ошибка отклонения')),
   });
 
   const openApprove = (item: ImportedProduct) => {
@@ -49,17 +51,19 @@ export default function ImportsPage() {
     setPriceInput(item.suggestedPriceUzs ? String(Math.round(Number(item.suggestedPriceUzs))) : '');
   };
 
+  const currencyLocale = i18n.language?.startsWith('en') ? 'en-US' : 'ru-RU';
+
   return (
-    <Layout title="Импорт · Очередь проверки">
+    <Layout title={t('imports.title', 'Импорт · Очередь проверки')}>
       <div className="space-y-6">
         {/* Заголовок */}
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-xs font-bold tracking-widest text-amber-500">AI IMPORT QUEUE</p>
-            <h1 className="text-2xl font-black text-app">Ожидают проверки</h1>
+            <p className="text-xs font-bold tracking-widest text-amber-500">{t('imports.queueSubtitle', 'AI IMPORT QUEUE')}</p>
+            <h1 className="text-2xl font-black text-app">{t('imports.queueTitle', 'Ожидают проверки')}</h1>
           </div>
           {data.length > 0 && (
-            <span className="badge-warning">{data.length} товаров</span>
+            <span className="badge-warning">{t('imports.itemsCount', { count: data.length, defaultValue: `${data.length} товаров` })}</span>
           )}
         </div>
 
@@ -72,8 +76,8 @@ export default function ImportsPage() {
         ) : data.length === 0 ? (
           <EmptyState
             icon={<Package size={32} />}
-            title="Очередь пуста"
-            description="Новые товары из парсера появятся здесь автоматически"
+            title={t('imports.emptyTitle', 'Очередь пуста')}
+            description={t('imports.emptyDesc', 'Новые товары из парсера появятся здесь автоматически')}
           />
         ) : (
           <div className="grid gap-4">
@@ -100,11 +104,11 @@ export default function ImportsPage() {
                     </div>
                     <h2 className="font-bold text-app truncate">{item.originalTitle}</h2>
                     <div className="mt-2 text-sm text-muted">
-                      Закупка: <strong className="text-app">¥{item.sourcePriceCny}</strong>
+                      {t('imports.cost', 'Закупка')}: <strong className="text-app">¥{item.sourcePriceCny}</strong>
                       {' · '}
-                      Рекомендуемая цена:{' '}
+                      {t('imports.suggestedPrice', 'Рекомендуемая цена')}:{' '}
                       <strong className="text-app">
-                        {Number(item.suggestedPriceUzs || 0).toLocaleString('ru-RU')} сум
+                        {Number(item.suggestedPriceUzs || 0).toLocaleString(currencyLocale)} {t('commerce.currencySuffix', 'сум')}
                       </strong>
                     </div>
                     <a
@@ -113,7 +117,7 @@ export default function ImportsPage() {
                       rel="noreferrer"
                       className="mt-2 inline-flex items-center gap-1 text-sm text-primary-500 hover:underline"
                     >
-                      Источник <ExternalLink size={14} />
+                      {t('imports.source', 'Источник')} <ExternalLink size={14} />
                     </a>
                   </div>
 
@@ -125,7 +129,7 @@ export default function ImportsPage() {
                       leftIcon={<Check size={15} />}
                       onClick={() => openApprove(item)}
                     >
-                      Одобрить
+                      {t('imports.approve', 'Одобрить')}
                     </Button>
                     <Button
                       variant="outline"
@@ -134,7 +138,7 @@ export default function ImportsPage() {
                       className="text-red-500 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20"
                       onClick={() => { setRejectItem(item); setRejectReason(''); }}
                     >
-                      Отклонить
+                      {t('imports.reject', 'Отклонить')}
                     </Button>
                   </div>
                 </div>
@@ -148,12 +152,12 @@ export default function ImportsPage() {
       <Modal
         isOpen={!!approveItem}
         onClose={() => { setApproveItem(null); setPriceInput(''); }}
-        title="Одобрить товар"
+        title={t('imports.approveModalTitle', 'Одобрить товар')}
         subtitle={approveItem?.originalTitle}
         footer={
           <div className="flex gap-2 justify-end">
             <Button variant="ghost" onClick={() => { setApproveItem(null); setPriceInput(''); }}>
-              Отмена
+              {t('common.cancel', 'Отмена')}
             </Button>
             <Button
               loading={approveMutation.isPending}
@@ -165,7 +169,7 @@ export default function ImportsPage() {
                 }
               }}
             >
-              Опубликовать
+              {t('imports.publishAction', 'Опубликовать')}
             </Button>
           </div>
         }
@@ -173,15 +177,20 @@ export default function ImportsPage() {
         <div className="space-y-4">
           <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 text-xs flex items-start gap-2">
             <AlertCircle size={15} className="shrink-0 mt-0.5" />
-            <span>Укажите финальную цену продажи в сумах. Рекомендованная: <strong>{approveItem ? Number(approveItem.suggestedPriceUzs || 0).toLocaleString('ru-RU') : 0} сум</strong></span>
+            <span>
+              {t('imports.approveHint', {
+                price: approveItem ? Number(approveItem.suggestedPriceUzs || 0).toLocaleString(currencyLocale) : 0,
+                defaultValue: `Укажите финальную цену продажи в сумах. Рекомендованная: ${approveItem ? Number(approveItem.suggestedPriceUzs || 0).toLocaleString(currencyLocale) : 0} сум`,
+              })}
+            </span>
           </div>
           <Input
-            label="Цена продажи (UZS)"
+            label={t('imports.salePriceLabel', 'Цена продажи (UZS)')}
             type="number"
             min={1}
             value={priceInput}
             onChange={(e) => setPriceInput(e.target.value)}
-            placeholder="Например: 450000"
+            placeholder={t('imports.salePricePlaceholder', 'Например: 450000')}
           />
         </div>
       </Modal>
@@ -190,12 +199,12 @@ export default function ImportsPage() {
       <Modal
         isOpen={!!rejectItem}
         onClose={() => { setRejectItem(null); setRejectReason(''); }}
-        title="Отклонить импорт"
+        title={t('imports.rejectModalTitle', 'Отклонить импорт')}
         subtitle={rejectItem?.originalTitle}
         footer={
           <div className="flex gap-2 justify-end">
             <Button variant="ghost" onClick={() => { setRejectItem(null); setRejectReason(''); }}>
-              Отмена
+              {t('common.cancel', 'Отмена')}
             </Button>
             <Button
               variant="danger"
@@ -208,18 +217,18 @@ export default function ImportsPage() {
                 }
               }}
             >
-              Отклонить
+              {t('imports.reject', 'Отклонить')}
             </Button>
           </div>
         }
       >
         <Textarea
-          label="Причина отклонения"
+          label={t('imports.rejectReasonLabel', 'Причина отклонения')}
           value={rejectReason}
           onChange={(e) => setRejectReason(e.target.value)}
-          placeholder="Укажите причину (минимум 3 символа)..."
+          placeholder={t('imports.rejectReasonPlaceholder', 'Укажите причину (минимум 3 символа)...')}
           rows={3}
-          helperText="Минимум 3 символа"
+          helperText={t('imports.rejectReasonHelper', 'Минимум 3 символа')}
         />
       </Modal>
     </Layout>

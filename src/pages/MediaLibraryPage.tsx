@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
   Image as ImageIcon,
@@ -36,6 +37,7 @@ import {
 } from '../components/ui';
 
 export const MediaLibraryPage: React.FC = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(24);
@@ -61,10 +63,10 @@ export const MediaLibraryPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media-library'] });
       setIsUploadModalOpen(false);
-      toast.success('Изображения успешно загружены');
+      toast.success(t('media.uploadSuccess', 'Изображения успешно загружены'));
     },
     onError: (err: any) => {
-      toast.error(err.response?.data?.message || 'Ошибка загрузки файлов');
+      toast.error(err.response?.data?.message || t('media.uploadError', 'Ошибка загрузки файлов'));
     },
   });
 
@@ -72,19 +74,19 @@ export const MediaLibraryPage: React.FC = () => {
     mutationFn: (id: string) => deleteMediaApi(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media-library'] });
-      toast.success('Файл успешно удалён');
+      toast.success(t('media.deleteSuccess', 'Файл успешно удалён'));
       if (selectedImage?.id === deleteConfirmId) setSelectedImage(null);
       setDeleteConfirmId(null);
     },
     onError: (err: any) => {
-      toast.error(err.response?.data?.message || 'Ошибка удаления файла');
+      toast.error(err.response?.data?.message || t('media.deleteError', 'Ошибка удаления файла'));
     },
   });
 
   const handleCopyUrl = (url: string, id: string) => {
     navigator.clipboard.writeText(url);
     setCopiedId(id);
-    toast.success('Ссылка скопирована в буфер обмена');
+    toast.success(t('media.copySuccess', 'Ссылка скопирована в буфер обмена'));
     setTimeout(() => setCopiedId(null), 2000);
   };
 
@@ -107,7 +109,7 @@ export const MediaLibraryPage: React.FC = () => {
       await deleteMediaApi(id);
     }
     queryClient.invalidateQueries({ queryKey: ['media-library'] });
-    toast.success(`Удалено файлов: ${selectedIds.length}`);
+    toast.success(t('media.bulkDeleteSuccess', { count: selectedIds.length, defaultValue: `Удалено файлов: ${selectedIds.length}` }));
     setSelectedIds([]);
     setIsBulkDeleteOpen(false);
   };
@@ -123,22 +125,22 @@ export const MediaLibraryPage: React.FC = () => {
   const totalPages = data?.meta?.totalPages || 1;
 
   return (
-    <Layout title="Медиа-библиотека">
+    <Layout title={t('media.title', 'Медиа-библиотека')}>
       <div className="space-y-6 animate-fade-in max-w-7xl mx-auto pb-12">
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-app tracking-tight flex items-center gap-2.5">
-              <span>Медиа-библиотека</span>
+              <span>{t('media.title', 'Медиа-библиотека')}</span>
               <Badge variant="primary" size="sm">
-                {total} файлов
+                {t('media.filesCount', { count: total, defaultValue: `${total} файлов` })}
               </Badge>
               <Badge variant="neutral" size="sm">
-                {formatFileSize(data?.meta?.totalBytes || 0)} занято
+                {formatFileSize(data?.meta?.totalBytes || 0)} {t('media.used', 'занято')}
               </Badge>
             </h1>
             <p className="text-xs text-muted mt-0.5">
-              Хранилище загруженных изображений и медиаресурсов платформы
+              {t('media.subtitle', 'Хранилище загруженных изображений и медиаресурсов платформы')}
             </p>
           </div>
 
@@ -149,7 +151,7 @@ export const MediaLibraryPage: React.FC = () => {
               onClick={() => refetch()}
               icon={<RotateCcw size={14} />}
             >
-              Обновить
+              {t('common.refresh', 'Обновить')}
             </Button>
             <Button
               variant="primary"
@@ -157,7 +159,7 @@ export const MediaLibraryPage: React.FC = () => {
               onClick={() => setIsUploadModalOpen(true)}
               icon={<Plus size={16} />}
             >
-              Загрузить файлы
+              {t('media.uploadFiles', 'Загрузить файлы')}
             </Button>
           </div>
         </div>
@@ -175,7 +177,7 @@ export const MediaLibraryPage: React.FC = () => {
               ) : (
                 <Square size={16} className="text-muted" />
               )}
-              <span>Выбрать все ({items.length})</span>
+              <span>{t('media.selectAll', 'Выбрать все')} ({items.length})</span>
             </button>
 
             {selectedIds.length > 0 && (
@@ -185,7 +187,7 @@ export const MediaLibraryPage: React.FC = () => {
                 onClick={() => setIsBulkDeleteOpen(true)}
                 icon={<Trash2 size={14} />}
               >
-                Удалить выбранные ({selectedIds.length})
+                {t('media.deleteSelected', 'Удалить выбранные')} ({selectedIds.length})
               </Button>
             )}
           </div>
@@ -199,7 +201,7 @@ export const MediaLibraryPage: React.FC = () => {
                   ? 'bg-primary-500 text-white border-primary-500'
                   : 'bg-surface border-app text-muted hover:text-app'
               }`}
-              title="Сетка"
+              title={t('media.gridView', 'Сетка')}
             >
               <Grid size={16} />
             </button>
@@ -211,7 +213,7 @@ export const MediaLibraryPage: React.FC = () => {
                   ? 'bg-primary-500 text-white border-primary-500'
                   : 'bg-surface border-app text-muted hover:text-app'
               }`}
-              title="Список"
+              title={t('media.listView', 'Список')}
             >
               <List size={16} />
             </button>
@@ -228,9 +230,9 @@ export const MediaLibraryPage: React.FC = () => {
         ) : items.length === 0 ? (
           <EmptyState
             icon={<ImageIcon size={32} />}
-            title="Библиотека пуста"
-            description="Загрузите ваши первые изображения или баннеры для использования в конструкторе страниц"
-            actionLabel="Загрузить изображения"
+            title={t('media.emptyTitle', 'Библиотека пуста')}
+            description={t('media.emptyDesc', 'Загрузите ваши первые изображения или баннеры')}
+            actionLabel={t('media.uploadFiles', 'Загрузить изображения')}
             onAction={() => setIsUploadModalOpen(true)}
           />
         ) : viewMode === 'grid' ? (
@@ -286,7 +288,7 @@ export const MediaLibraryPage: React.FC = () => {
                           handleCopyUrl(item.url, item.id);
                         }}
                         className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-muted hover:text-app transition-colors"
-                        title="Скопировать ссылку"
+                        title={t('media.copyLink', 'Скопировать ссылку')}
                       >
                         {isCopied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
                       </button>
@@ -297,7 +299,7 @@ export const MediaLibraryPage: React.FC = () => {
                           setDeleteConfirmId(item.id);
                         }}
                         className="p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500 transition-colors"
-                        title="Удалить"
+                        title={t('common.delete', 'Удалить')}
                       >
                         <Trash2 size={12} />
                       </button>
@@ -353,14 +355,14 @@ export const MediaLibraryPage: React.FC = () => {
                     onClick={() => handleCopyUrl(item.url, item.id)}
                     icon={copiedId === item.id ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
                   >
-                    {copiedId === item.id ? 'Скопировано' : 'Ссылка'}
+                    {copiedId === item.id ? t('media.copied', 'Скопировано') : t('media.copyLink', 'Ссылка')}
                   </Button>
                   <a
                     href={item.url}
                     target="_blank"
                     rel="noreferrer"
                     className="p-2 rounded-xl border border-app text-muted hover:text-app hover:bg-gray-100 dark:hover:bg-white/10"
-                    title="Открыть в новой вкладке"
+                    title={t('media.openNewTab', 'Открыть в новой вкладке')}
                   >
                     <ExternalLink size={14} />
                   </a>
@@ -395,8 +397,8 @@ export const MediaLibraryPage: React.FC = () => {
         <Modal
           isOpen={isUploadModalOpen}
           onClose={() => setIsUploadModalOpen(false)}
-          title="Загрузка медиафайлов"
-          subtitle="Выберите или перетащите изображения для загрузки в хранилище"
+          title={t('media.uploadModalTitle', 'Загрузка медиафайлов')}
+          subtitle={t('media.uploadModalSubtitle', 'Выберите или перетащите изображения для загрузки в хранилище')}
           size="lg"
         >
           <FileUpload
@@ -413,7 +415,7 @@ export const MediaLibraryPage: React.FC = () => {
           <Modal
             isOpen={!!selectedImage}
             onClose={() => setSelectedImage(null)}
-            title="Сведения о файле"
+            title={t('media.fileDetails', 'Сведения о файле')}
             size="lg"
             footer={
               <div className="flex items-center justify-between w-full">
@@ -423,7 +425,7 @@ export const MediaLibraryPage: React.FC = () => {
                   onClick={() => setDeleteConfirmId(selectedImage.id)}
                   icon={<Trash2 size={14} />}
                 >
-                  Удалить
+                  {t('common.delete', 'Удалить')}
                 </Button>
                 <div className="flex items-center gap-2">
                   <Button
@@ -432,7 +434,7 @@ export const MediaLibraryPage: React.FC = () => {
                     onClick={() => handleCopyUrl(selectedImage.url, selectedImage.id)}
                     icon={<Copy size={14} />}
                   >
-                    Скопировать URL
+                    {t('media.copyUrl', 'Скопировать URL')}
                   </Button>
                   <a
                     href={selectedImage.url}
@@ -440,7 +442,7 @@ export const MediaLibraryPage: React.FC = () => {
                     rel="noreferrer"
                     className="btn-primary text-xs flex items-center gap-1.5"
                   >
-                    Открыть в новой вкладке <ExternalLink size={14} />
+                    {t('media.openNewTab', 'Открыть в новой вкладке')} <ExternalLink size={14} />
                   </a>
                 </div>
               </div>
@@ -457,19 +459,19 @@ export const MediaLibraryPage: React.FC = () => {
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">Размер файла:</span>
+                  <span className="text-muted block text-[10px]">{t('media.fileSize', 'Размер файла')}:</span>
                   <strong className="text-app">{formatFileSize(selectedImage.size)}</strong>
                 </Card>
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">MIME-тип:</span>
+                  <span className="text-muted block text-[10px]">MIME-{t('media.type', 'тип')}:</span>
                   <strong className="text-app font-mono">{selectedImage.mimeType}</strong>
                 </Card>
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">Дата создания:</span>
+                  <span className="text-muted block text-[10px]">{t('media.createdAt', 'Дата создания')}:</span>
                   <strong className="text-app">{new Date(selectedImage.createdAt).toLocaleDateString()}</strong>
                 </Card>
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">ID файла:</span>
+                  <span className="text-muted block text-[10px]">{t('media.fileId', 'ID файла')}:</span>
                   <strong className="text-app font-mono text-[10px] truncate block">{selectedImage.id}</strong>
                 </Card>
               </div>
@@ -482,7 +484,7 @@ export const MediaLibraryPage: React.FC = () => {
                   onClick={() => handleCopyUrl(selectedImage.url, selectedImage.id)}
                   icon={<Copy size={12} />}
                 >
-                  Копировать
+                  {t('media.copy', 'Копировать')}
                 </Button>
               </div>
             </div>
@@ -496,9 +498,9 @@ export const MediaLibraryPage: React.FC = () => {
           onConfirm={() => {
             if (deleteConfirmId) deleteMutation.mutate(deleteConfirmId);
           }}
-          title="Удалить файл из библиотеки?"
-          message="Вы уверены, что хотите удалить этот файл? Если он используется в объявлениях или на страницах, ссылка перестанет работать."
-          confirmLabel="Удалить"
+          title={t('media.deleteConfirmTitle', 'Удалить файл из библиотеки?')}
+          message={t('media.deleteConfirmMsg', 'Вы уверены, что хотите удалить этот файл? Если он используется в объявлениях или на страницах, ссылка перестанет работать.')}
+          confirmLabel={t('common.delete', 'Удалить')}
           variant="danger"
           loading={deleteMutation.isPending}
         />
@@ -508,9 +510,9 @@ export const MediaLibraryPage: React.FC = () => {
           isOpen={isBulkDeleteOpen}
           onClose={() => setIsBulkDeleteOpen(false)}
           onConfirm={handleBulkDelete}
-          title="Удалить выбранные файлы?"
-          message={`Вы уверены, что хотите удалить ${selectedIds.length} файлов? Это действие необратимо.`}
-          confirmLabel="Удалить все"
+          title={t('media.bulkDeleteTitle', 'Удалить выбранные файлы?')}
+          message={t('media.bulkDeleteMsg', { count: selectedIds.length, defaultValue: `Вы уверены, что хотите удалить ${selectedIds.length} файлов? Это действие необратимо.` })}
+          confirmLabel={t('media.deleteAll', 'Удалить все')}
           variant="danger"
         />
       </div>

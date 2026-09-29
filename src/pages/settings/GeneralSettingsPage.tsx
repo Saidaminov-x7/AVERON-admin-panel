@@ -24,8 +24,10 @@ import {
   getMediaUrl,
 } from '../../lib/siteSettingsApi';
 import { Button, Input, Textarea, Switch, Card } from '../../components/ui';
+import { useTranslation } from 'react-i18next';
 
 const GeneralSettingsPage: React.FC = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data: settings, isLoading } = useQuery({
@@ -73,11 +75,11 @@ const GeneralSettingsPage: React.FC = () => {
     mutationFn: updateSiteSettingsApi,
     onSuccess: (updated) => {
       queryClient.setQueryData(['admin', 'site-settings'], updated);
-      toast.success('Основные настройки и меню успешно сохранены');
+      toast.success(t('settings.savedSuccess', 'Основные настройки и меню успешно сохранены'));
     },
     onError: (err: unknown) => {
       const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error.response?.data?.message || 'Ошибка сохранения настроек');
+      toast.error(error.response?.data?.message || t('settings.saveError', 'Ошибка сохранения настроек'));
     },
   });
 
@@ -88,11 +90,11 @@ const GeneralSettingsPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'site-settings'] });
       setLogoPreview(updated.logoUrl || null);
       setLogoFile(null);
-      toast.success('Логотип успешно загружен и сохранён');
+      toast.success(t('settings.logoUploaded', 'Логотип успешно загружен и сохранён'));
     },
     onError: (err: unknown) => {
       const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error.response?.data?.message || 'Ошибка загрузки логотипа');
+      toast.error(error.response?.data?.message || t('settings.logoUploadError', 'Ошибка загрузки логотипа'));
     },
   });
 
@@ -103,11 +105,11 @@ const GeneralSettingsPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'site-settings'] });
       setLogoPreview(null);
       setLogoFile(null);
-      toast.success('Логотип удалён (используется стандартный)');
+      toast.success(t('settings.logoDeleted', 'Логотип удалён (используется стандартный)'));
     },
     onError: (err: unknown) => {
       const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error.response?.data?.message || 'Ошибка удаления логотипа');
+      toast.error(error.response?.data?.message || t('settings.logoDeleteError', 'Ошибка удаления логотипа'));
     },
   });
 
@@ -138,7 +140,7 @@ const GeneralSettingsPage: React.FC = () => {
     if (!file) return;
 
     if (!file.type.startsWith('image/') && !file.type.includes('svg')) {
-      toast.error('Можно загружать только изображения (PNG, JPG, SVG, WebP)');
+      toast.error(t('settings.logoTypeError', 'Можно загружать только изображения (PNG, JPG, SVG, WebP)'));
       return;
     }
 
@@ -172,10 +174,10 @@ const GeneralSettingsPage: React.FC = () => {
               <Switch checked={mobilePinchZoomEnabled} onChange={setMobilePinchZoomEnabled} />
             </div>
           </Card>
-          {/* Режим обслуживания */}
+          {/* Maintenance Mode */}
           <Card
-            title="Режим технического обслуживания"
-            description="Если включено, публичная часть сайта будет недоступна для посетителей"
+            title={t('settings.maintenanceMode', 'Режим технического обслуживания')}
+            description={t('settings.maintenanceModeDesc', 'Если включено, публичная часть сайта будет недоступна для посетителей')}
             className="border-amber-500/20 bg-amber-500/5"
           >
             <div className="space-y-4 pt-2">
@@ -185,9 +187,11 @@ const GeneralSettingsPage: React.FC = () => {
                     <AlertTriangle size={20} />
                   </div>
                   <div>
-                    <p className="font-semibold text-app">Статус техобслуживания</p>
+                    <p className="font-semibold text-app">{t('settings.maintenanceStatus', 'Статус техобслуживания')}</p>
                     <p className="text-xs text-muted">
-                      {maintenanceMode ? 'Сайт переведен в режим обслуживания' : 'Сайт работает в обычном режиме'}
+                      {maintenanceMode
+                        ? t('settings.maintenanceOn', 'Сайт переведен в режим обслуживания')
+                        : t('settings.maintenanceOff', 'Сайт работает в обычном режиме')}
                     </p>
                   </div>
                 </div>
@@ -197,27 +201,27 @@ const GeneralSettingsPage: React.FC = () => {
               {maintenanceMode && (
                 <div className="pt-3 border-t border-app">
                   <Textarea
-                    label="Сообщение для посетителей при техобслуживании"
+                    label={t('settings.maintenanceMsg', 'Сообщение для посетителей при техобслуживании')}
                     value={maintenanceMessage}
                     onChange={(e) => setMaintenanceMessage(e.target.value)}
                     rows={3}
-                    placeholder="Сайт временно недоступен. Мы проводим плановые технические работы..."
+                    placeholder={t('settings.maintenanceMsgPlaceholder', 'Сайт временно недоступен. Мы проводим плановые технические работы...')}
                   />
                   <div className="pt-3 border-t border-app mt-4 flex items-center justify-between">
-                    <span className="text-sm text-muted">Требовать пароль при техобслуживании</span>
+                    <span className="text-sm text-muted">{t('settings.requirePasswordMaintenance', 'Требовать пароль при техобслуживании')}</span>
                     <Switch checked={maintenancePasswordEnabled} onChange={setMaintenancePasswordEnabled} />
                   </div>
                   {maintenancePasswordEnabled && (
                     <div className="pt-3 border-t border-app mt-4">
-                      <label className="block text-xs font-semibold text-muted mb-1">Пароль для обхода техобслуживании</label>
+                      <label className="block text-xs font-semibold text-muted mb-1">{t('settings.bypassPassword', 'Пароль для обхода техобслуживания')}</label>
                       <input
                         type="password"
                         value={maintenanceBypassPassword}
                         onChange={(e) => setMaintenanceBypassPassword(e.target.value)}
-                        placeholder="Введите пароль"
+                        placeholder={t('common.enterPassword', 'Введите пароль')}
                         className="input max-w-xs"
                       />
-                      <p className="text-xs text-muted mt-1">Пароль позволит входить в сайт, когда включён режим обслуживания.</p>
+                      <p className="text-xs text-muted mt-1">{t('settings.bypassPasswordHint', 'Пароль позволит входить в сайт, когда включён режим обслуживания.')}</p>
                     </div>
                   )}
                 </div>
@@ -225,10 +229,10 @@ const GeneralSettingsPage: React.FC = () => {
             </div>
           </Card>
 
-          {/* Логотип платформы */}
+          {/* Platform Logo */}
           <Card
-            title="Логотип платформы"
-            description="Загруженный логотип будет отображаться в шапке сайта и административной панели"
+            title={t('settings.logoTitle', 'Логотип платформы')}
+            description={t('settings.logoDesc', 'Загруженный логотип будет отображаться в шапке сайта и административной панели')}
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 pt-2">
               {logoPreview ? (
@@ -236,7 +240,7 @@ const GeneralSettingsPage: React.FC = () => {
                   <div className="h-20 w-44 rounded-xl border border-app bg-surface p-2 flex items-center justify-center overflow-hidden">
                     <img
                       src={getMediaUrl(logoPreview)}
-                      alt="Логотип платформы"
+                      alt={t('settings.logoAlt', 'Логотип платформы')}
                       className="max-h-full max-w-full object-contain"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
@@ -248,7 +252,7 @@ const GeneralSettingsPage: React.FC = () => {
                     type="button"
                     onClick={handleLogoDelete}
                     className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Удалить логотип"
+                    title={t('settings.deleteLogo', 'Удалить логотип')}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -256,13 +260,13 @@ const GeneralSettingsPage: React.FC = () => {
               ) : (
                 <div className="h-20 w-44 rounded-xl border-2 border-dashed border-app flex flex-col items-center justify-center text-muted gap-1 bg-surface">
                   <ImageIcon size={20} />
-                  <span className="text-xs">Стандартный логотип</span>
+                  <span className="text-xs">{t('settings.defaultLogo', 'Стандартный логотип')}</span>
                 </div>
               )}
 
               <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-app bg-surface hover:bg-gray-50 dark:hover:bg-white/5 text-app text-sm font-medium cursor-pointer transition-colors">
                 <Upload size={16} />
-                <span>Загрузить новый логотип</span>
+                <span>{t('settings.uploadNewLogo', 'Загрузить новый логотип')}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -273,11 +277,11 @@ const GeneralSettingsPage: React.FC = () => {
             </div>
           </Card>
 
-          {/* Общая информация */}
-          <Card title="Информация о сайте и контакты" description="Название и контактные данные, отображаемые в подвале">
+          {/* Site Info & Contacts */}
+          <Card title={t('settings.siteInfoTitle', 'Информация о сайте и контакты')} description={t('settings.siteInfoDesc', 'Название и контактные данные, отображаемые в подвале')}>
             <div className="space-y-4 pt-2">
               <Input
-                label="Название платформы"
+                label={t('settings.siteName', 'Название платформы')}
                 value={siteName}
                 onChange={(e) => setSiteName(e.target.value)}
                 required
@@ -286,7 +290,7 @@ const GeneralSettingsPage: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Контактный Email"
+                  label={t('settings.supportEmail', 'Контактный Email')}
                   type="email"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
@@ -295,7 +299,7 @@ const GeneralSettingsPage: React.FC = () => {
                 />
 
                 <Input
-                  label="Контактный телефон"
+                  label={t('settings.supportPhone', 'Контактный телефон')}
                   type="text"
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
@@ -306,10 +310,10 @@ const GeneralSettingsPage: React.FC = () => {
             </div>
           </Card>
 
-          {/* Навигационное меню сайта */}
+          {/* Nav Menu */}
           <Card
-            title="Навигационное меню сайта"
-            description="Управляйте пунктами меню в шапке сайта: добавляйте ссылки, меняйте названия и адреса"
+            title={t('settings.navMenuTitle', 'Навигационное меню сайта')}
+            description={t('settings.navMenuDesc', 'Управляйте пунктами меню: добавляйте ссылки, меняйте названия и адреса')}
             headerAction={
               <Button
                 type="button"
@@ -319,11 +323,11 @@ const GeneralSettingsPage: React.FC = () => {
                 onClick={() =>
                   setNavLinks((prev) => [
                     ...prev,
-                    { label: 'Новая ссылка', href: '/catalog', position: 'header' },
+                    { label: t('settings.newLink', 'Новая ссылка'), href: '/catalog', position: 'header' },
                   ])
                 }
               >
-                Добавить пункт
+                {t('settings.addMenuItem', 'Добавить пункт')}
               </Button>
             }
           >
@@ -335,18 +339,18 @@ const GeneralSettingsPage: React.FC = () => {
                 >
                   <div className="flex-1 w-full sm:w-auto">
                     <Input
-                      label="Название пункта"
+                      label={t('settings.menuItemLabel', 'Название пункта')}
                       value={link.label}
                       onChange={(e) => {
                         const updated = [...navLinks];
                         updated[idx] = { ...updated[idx], label: e.target.value };
                         setNavLinks(updated);
                       }}
-                      placeholder="Например: Каталог"
+                      placeholder={t('settings.menuItemPlaceholder', 'Например: Каталог')}
                     />
                   </div>
                   <label className="w-full text-xs font-semibold text-muted sm:w-36">
-                    Размещение
+                    {t('settings.menuItemPosition', 'Размещение')}
                     <select
                       value={link.position}
                       onChange={(e) => {
@@ -356,13 +360,13 @@ const GeneralSettingsPage: React.FC = () => {
                       }}
                       className="input mt-1 w-full"
                     >
-                      <option value="header">Шапка</option>
-                      <option value="footer">Подвал</option>
+                      <option value="header">{t('settings.header', 'Шапка')}</option>
+                      <option value="footer">{t('settings.footer', 'Подвал')}</option>
                     </select>
                   </label>
                   <div className="flex-1 w-full sm:w-auto">
                     <Input
-                      label="Ссылка (URL или относительный путь)"
+                      label={t('settings.menuItemUrl', 'Ссылка (URL или относительный путь)')}
                       value={link.href}
                       onChange={(e) => {
                         const updated = [...navLinks];
@@ -377,7 +381,7 @@ const GeneralSettingsPage: React.FC = () => {
                       type="button"
                       onClick={() => setNavLinks((prev) => prev.filter((_, i) => i !== idx))}
                       className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
-                      title="Удалить пункт меню"
+                      title={t('settings.removeMenuItem', 'Удалить пункт меню')}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -395,7 +399,7 @@ const GeneralSettingsPage: React.FC = () => {
               leftIcon={<Save size={18} />}
               loading={isLoading || mutation.isPending}
             >
-              Сохранить основные настройки
+              {t('settings.saveGeneral', 'Сохранить основные настройки')}
             </Button>
           </div>
         </form>

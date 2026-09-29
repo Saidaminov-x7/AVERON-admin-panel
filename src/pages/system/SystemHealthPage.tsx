@@ -18,7 +18,7 @@ const SystemHealthPage: React.FC = () => {
     const d = Math.floor(seconds / (3600 * 24));
     const h = Math.floor((seconds % (3600 * 24)) / 3600);
     const m = Math.floor((seconds % 3600) / 60);
-    return `${d}д ${h}ч ${m}м`;
+    return `${d}${t('system.unitDay', 'д')} ${h}${t('system.unitHour', 'ч')} ${m}${t('system.unitMin', 'м')}`;
   };
 
   return (
@@ -26,7 +26,7 @@ const SystemHealthPage: React.FC = () => {
       <div className="space-y-6 max-w-7xl mx-auto pb-12">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <p className="text-xs sm:text-sm text-muted">
-            Статус критических сервисов бэкенда, latency базы данных PostgreSQL, Redis и потребление оперативной памяти.
+            {t('system.healthSubtitle', 'Статус критических сервисов бэкенда, latency базы данных PostgreSQL, Redis и потребление оперативной памяти.')}
           </p>
           <button
             type="button"
@@ -38,10 +38,14 @@ const SystemHealthPage: React.FC = () => {
           </button>
         </div>
 
-        {isError && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-500">Не удалось получить состояние сервисов. Проверьте соединение с API и повторите обновление.</div>}
+        {isError && (
+          <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-500">
+            {t('system.healthError', 'Не удалось получить состояние сервисов. Проверьте соединение с API и повторите обновление.')}
+          </div>
+        )}
 
         {isLoading && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Загрузка состояния системы">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label={t('common.loading', 'Загрузка...')}>
             {[0, 1, 2, 3].map((item) => <div key={item} className="card h-36 animate-pulse bg-gray-100 dark:bg-white/5" />)}
           </div>
         )}
@@ -59,14 +63,16 @@ const SystemHealthPage: React.FC = () => {
               {data?.status === 'HEALTHY' ? <CheckCircle2 size={28} /> : <AlertTriangle size={28} />}
             </div>
             <div>
-              <div className="text-sm text-muted">Общее состояние системы</div>
+              <div className="text-sm text-muted">{t('system.serverStatus', 'Общее состояние системы')}</div>
               <div className="text-xl font-bold text-app">
-                {data?.status === 'HEALTHY' ? 'Все системы работают штатно' : 'Обнаружена деградация сервисов'}
+                {data?.status === 'HEALTHY'
+                  ? t('system.statusHealthy', 'Все системы работают штатно')
+                  : t('system.statusDegraded', 'Обнаружена деградация сервисов')}
               </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-muted">Аптайм сервера</div>
+            <div className="text-xs text-muted">{t('system.uptime', 'Аптайм сервера')}</div>
             <div className="text-lg font-mono font-bold text-primary-600 dark:text-primary-400">
               {data ? formatUptime(data.uptimeSeconds) : '...'}
             </div>
@@ -77,12 +83,17 @@ const SystemHealthPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
-              <span className="text-xs font-semibold uppercase flex items-center gap-1.5"><Server size={16} className="text-emerald-500" /> Backend API</span>
-              <span className={`px-2 py-0.5 rounded text-xs font-bold ${data?.backend.status === 'UP' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40' : 'bg-rose-100 text-rose-600 dark:bg-rose-950/40'}`}>{data?.backend.status ?? 'DOWN'}</span>
+              <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
+                <Server size={16} className="text-emerald-500" /> Backend API
+              </span>
+              <span className={`px-2 py-0.5 rounded text-xs font-bold ${data?.backend.status === 'UP' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40' : 'bg-rose-100 text-rose-600 dark:bg-rose-950/40'}`}>
+                {data?.backend.status ?? 'DOWN'}
+              </span>
             </div>
             <div className="text-2xl font-mono font-bold text-app">{data?.backend.latencyMs ?? 0} ms</div>
-            <div className="text-xs text-muted">Время выполнения полной серверной проверки</div>
+            <div className="text-xs text-muted">{t('system.backendDesc', 'Время выполнения серверной проверки')}</div>
           </div>
+
           {/* PostgreSQL */}
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
@@ -102,7 +113,7 @@ const SystemHealthPage: React.FC = () => {
             <div className="text-2xl font-mono font-bold text-app">
               {data?.database.latencyMs ?? 0} ms
             </div>
-            <div className="text-xs text-muted">Задержка выполнения ping-запроса к БД</div>
+            <div className="text-xs text-muted">{t('system.databaseDesc', 'Задержка ping-запроса к БД')}</div>
           </div>
 
           {/* Redis */}
@@ -124,14 +135,14 @@ const SystemHealthPage: React.FC = () => {
             <div className="text-2xl font-mono font-bold text-app">
               {data?.redis.latencyMs ?? 0} ms
             </div>
-            <div className="text-xs text-muted">Задержка ответа кэша и очереди</div>
+            <div className="text-xs text-muted">{t('system.redisDesc', 'Задержка ответа кэша и очереди')}</div>
           </div>
 
           {/* Node.js Memory */}
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
               <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
-                <Cpu size={16} className="text-purple-500" /> Память Node.js
+                <Cpu size={16} className="text-purple-500" /> {t('system.nodeMemory', 'Память Node.js')}
               </span>
               <span className="text-xs font-mono text-muted">{data?.nodeVersion}</span>
             </div>
@@ -139,8 +150,15 @@ const SystemHealthPage: React.FC = () => {
               {data?.memory.heapUsedMb ?? 0} / {data?.memory.heapTotalMb ?? 0} MB
             </div>
             <div className="text-xs text-muted">RSS: {data?.memory.rssMb ?? 0} MB</div>
-            <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10"><div className={`h-full rounded-full ${(data?.memory.heapUsagePercent ?? 0) > 85 ? 'bg-rose-500' : (data?.memory.heapUsagePercent ?? 0) > 70 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(data?.memory.heapUsagePercent ?? 0, 100)}%` }} /></div>
-            <div className="text-xs text-muted">Использовано heap: {data?.memory.heapUsagePercent ?? 0}%</div>
+            <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
+              <div
+                className={`h-full rounded-full ${(data?.memory.heapUsagePercent ?? 0) > 85 ? 'bg-rose-500' : (data?.memory.heapUsagePercent ?? 0) > 70 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                style={{ width: `${Math.min(data?.memory.heapUsagePercent ?? 0, 100)}%` }}
+              />
+            </div>
+            <div className="text-xs text-muted">
+              {t('system.heapUsed', 'Использовано heap')}: {data?.memory.heapUsagePercent ?? 0}%
+            </div>
           </div>
         </div>
       </div>

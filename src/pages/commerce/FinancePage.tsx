@@ -3,35 +3,38 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { CircleDollarSign, TrendingDown, TrendingUp } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import { getCommerceDashboard } from '../../lib/commerceApi';
 
-const fmt = (v: unknown) => `${Number(v || 0).toLocaleString('ru-RU')} сум`;
-
 export default function FinancePage() {
+  const { t, i18n } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['commerce-dashboard'],
     queryFn: getCommerceDashboard,
     refetchInterval: 60_000,
   });
 
+  const currencyLocale = i18n.language?.startsWith('en') ? 'en-US' : 'ru-RU';
+  const fmt = (v: unknown) => `${Number(v || 0).toLocaleString(currencyLocale)} ${t('finance.currencySuffix', 'сум')}`;
+
   const cards = [
     {
-      label: 'Выручка',
+      label: t('finance.revenue', 'Выручка'),
       value: fmt(data?.finance.revenue),
       Icon: CircleDollarSign,
       color: 'text-emerald-500',
       border: '',
     },
     {
-      label: 'Все расходы',
+      label: t('finance.expenses', 'Все расходы'),
       value: fmt(data?.finance.expenses),
       Icon: TrendingDown,
       color: 'text-red-500',
       border: '',
     },
     {
-      label: 'Чистая прибыль',
+      label: t('finance.netProfit', 'Чистая прибыль'),
       value: fmt(data?.finance.netProfit),
       Icon: TrendingUp,
       color: 'text-amber-500',
@@ -40,12 +43,12 @@ export default function FinancePage() {
   ];
 
   return (
-    <Layout title="Финансы">
+    <Layout title={t('finance.title', 'Финансы')}>
       <div className="space-y-6">
         {/* Заголовок */}
         <div>
-          <p className="text-xs font-bold tracking-widest text-amber-500">ACTUAL ECONOMICS</p>
-          <h1 className="text-2xl font-black text-app">Реальная прибыль</h1>
+          <p className="text-xs font-bold tracking-widest text-amber-500">{t('finance.section', 'ACTUAL ECONOMICS')}</p>
+          <h1 className="text-2xl font-black text-app">{t('finance.heroTitle', 'Реальная прибыль')}</h1>
         </div>
 
         {/* Карточки */}
@@ -61,17 +64,6 @@ export default function FinancePage() {
               </strong>
             </div>
           ))}
-        </div>
-
-        {/* Формула */}
-        <div className="card">
-          <h2 className="font-bold text-app">Формула AVERON</h2>
-          <p className="mt-2 text-sm text-muted">
-            Выручка − закупка − cargo − комиссия − доставка − прочие расходы − возвраты.
-          </p>
-          <div className="mt-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-xs text-amber-700 dark:text-amber-400 font-mono">
-            Прибыль = Выручка − (Закупка + Cargo + Комиссии + Доставка + Возвраты)
-          </div>
         </div>
       </div>
     </Layout>

@@ -20,24 +20,6 @@ import { Card, Badge, Skeleton, EmptyState, Pagination, Input, Select, Button, M
 import { clearAuditLogsApi, getAuditLogsApi, type AuditLogItem } from '../lib/auditLogApi';
 import { useDebounce } from '../hooks/useDebounce';
 
-const ACTION_LABELS: Record<string, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'primary' | 'neutral' }> = {
-  SECURITY_DENIED: { label: 'Отказ в доступе (401/403)', variant: 'danger' },
-  USER_BLOCKED: { label: 'Пользователь заблокирован', variant: 'danger' },
-  USER_UNBLOCKED: { label: 'Пользователь разблокирован', variant: 'success' },
-  USER_ROLE_CHANGED: { label: 'Изменена роль пользователя', variant: 'warning' },
-  LISTING_APPROVED: { label: 'Объявление одобрено', variant: 'success' },
-  LISTING_REJECTED: { label: 'Объявление отклонено', variant: 'warning' },
-  LISTING_CHANGES_REQUESTED: { label: 'Запрошены правки', variant: 'warning' },
-  LISTING_VERIFIED: { label: 'Верификация объявления', variant: 'primary' },
-  LISTING_DELETED: { label: 'Объявление удалено', variant: 'danger' },
-  SETTINGS_UPDATED: { label: 'Настройки сайта обновлены', variant: 'primary' },
-  THEME_SETTINGS_UPDATED: { label: 'Дизайн-токены обновлены', variant: 'primary' },
-  SITE_LOGO_UPLOADED: { label: 'Логотип обновлён', variant: 'info' },
-  SITE_LOGO_REMOVED: { label: 'Логотип удалён', variant: 'warning' },
-  ADMIN_PASSWORD_CHANGED: { label: 'Смена пароля администратора', variant: 'warning' },
-  ADMIN_PROFILE_UPDATED: { label: 'Профиль администратора обновлён', variant: 'info' },
-};
-
 export const AuditLogPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [searchInput, setSearchInput] = useState('');
@@ -47,18 +29,36 @@ export const AuditLogPage: React.FC = () => {
   const [pageSize, setPageSize] = useState(15);
   const [selectedMeta, setSelectedMeta] = useState<{ action: string; meta: Record<string, unknown> } | null>(null);
 
+  const ACTION_LABELS: Record<string, { label: string; variant: 'success' | 'warning' | 'danger' | 'info' | 'primary' | 'neutral' }> = {
+    SECURITY_DENIED: { label: t('auditLog.actions.securityDenied', 'Отказ в доступе (401/403)'), variant: 'danger' },
+    USER_BLOCKED: { label: t('auditLog.actions.userBlocked', 'Пользователь заблокирован'), variant: 'danger' },
+    USER_UNBLOCKED: { label: t('auditLog.actions.userUnblocked', 'Пользователь разблокирован'), variant: 'success' },
+    USER_ROLE_CHANGED: { label: t('auditLog.actions.userRoleChanged', 'Изменена роль пользователя'), variant: 'warning' },
+    LISTING_APPROVED: { label: t('auditLog.actions.listingApproved', 'Объявление одобрено'), variant: 'success' },
+    LISTING_REJECTED: { label: t('auditLog.actions.listingRejected', 'Объявление отклонено'), variant: 'warning' },
+    LISTING_CHANGES_REQUESTED: { label: t('auditLog.actions.listingChangesRequested', 'Запрошены правки'), variant: 'warning' },
+    LISTING_VERIFIED: { label: t('auditLog.actions.listingVerified', 'Верификация объявления'), variant: 'primary' },
+    LISTING_DELETED: { label: t('auditLog.actions.listingDeleted', 'Объявление удалено'), variant: 'danger' },
+    SETTINGS_UPDATED: { label: t('auditLog.actions.settingsUpdated', 'Настройки сайта обновлены'), variant: 'primary' },
+    THEME_SETTINGS_UPDATED: { label: t('auditLog.actions.themeSettingsUpdated', 'Дизайн-токены обновлены'), variant: 'primary' },
+    SITE_LOGO_UPLOADED: { label: t('auditLog.actions.siteLogoUploaded', 'Логотип обновлён'), variant: 'info' },
+    SITE_LOGO_REMOVED: { label: t('auditLog.actions.siteLogoRemoved', 'Логотип удалён'), variant: 'warning' },
+    ADMIN_PASSWORD_CHANGED: { label: t('auditLog.actions.adminPasswordChanged', 'Смена пароля администратора'), variant: 'warning' },
+    ADMIN_PROFILE_UPDATED: { label: t('auditLog.actions.adminProfileUpdated', 'Профиль администратора обновлён'), variant: 'info' },
+  };
+
   const ACTION_FILTER_OPTIONS = [
     { value: '', label: t('common.all', 'Все действия') },
-    { value: 'SECURITY_DENIED', label: 'Отказы в доступе (401/403)' },
-    { value: 'LISTING_APPROVED', label: 'Одобрение объявлений' },
-    { value: 'LISTING_REJECTED', label: 'Отклонение объявлений' },
-    { value: 'LISTING_CHANGES_REQUESTED', label: 'Запросы правок' },
-    { value: 'LISTING_VERIFIED', label: 'Верификация объявлений' },
-    { value: 'LISTING_DELETED', label: 'Удаление объявлений' },
-    { value: 'USER_BLOCKED', label: 'Блокировки пользователей' },
-    { value: 'USER_UNBLOCKED', label: 'Разблокировки пользователей' },
-    { value: 'SETTINGS_UPDATED', label: 'Изменения настроек' },
-    { value: 'THEME_SETTINGS_UPDATED', label: 'Обновление темы' },
+    { value: 'SECURITY_DENIED', label: t('auditLog.actions.securityDenied', 'Отказы в доступе (401/403)') },
+    { value: 'LISTING_APPROVED', label: t('auditLog.actions.listingApproved', 'Одобрение объявлений') },
+    { value: 'LISTING_REJECTED', label: t('auditLog.actions.listingRejected', 'Отклонение объявлений') },
+    { value: 'LISTING_CHANGES_REQUESTED', label: t('auditLog.actions.listingChangesRequested', 'Запросы правок') },
+    { value: 'LISTING_VERIFIED', label: t('auditLog.actions.listingVerified', 'Верификация объявлений') },
+    { value: 'LISTING_DELETED', label: t('auditLog.actions.listingDeleted', 'Удаление объявлений') },
+    { value: 'USER_BLOCKED', label: t('auditLog.actions.userBlocked', 'Блокировки пользователей') },
+    { value: 'USER_UNBLOCKED', label: t('auditLog.actions.userUnblocked', 'Разблокировки пользователей') },
+    { value: 'SETTINGS_UPDATED', label: t('auditLog.actions.settingsUpdated', 'Изменения настроек') },
+    { value: 'THEME_SETTINGS_UPDATED', label: t('auditLog.actions.themeSettingsUpdated', 'Обновление темы') },
   ];
 
   const { data: logs = [], isLoading, refetch, isRefetching } = useQuery({
@@ -119,8 +119,26 @@ export const AuditLogPage: React.FC = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="danger" size="sm" onClick={async () => { if (window.confirm('Очистить журнал действий? Это действие необратимо.')) { await clearAuditLogsApi(); await refetch(); } }} leftIcon={<Trash2 size={14}/>}>Очистить журнал</Button>
-            <Button variant="outline" size="sm" onClick={() => refetch()} loading={isRefetching} leftIcon={<RotateCcw size={14} />}>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={async () => {
+                if (window.confirm(t('auditLog.clearConfirm', 'Очистить журнал действий? Это действие необратимо.'))) {
+                  await clearAuditLogsApi();
+                  await refetch();
+                }
+              }}
+              leftIcon={<Trash2 size={14} />}
+            >
+              {t('auditLog.clearButton', 'Очистить журнал')}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              loading={isRefetching}
+              leftIcon={<RotateCcw size={14} />}
+            >
               {t('common.refresh', 'Обновить')}
             </Button>
           </div>
@@ -159,7 +177,7 @@ export const AuditLogPage: React.FC = () => {
           <EmptyState
             icon={<ShieldCheck size={36} />}
             title={t('common.noData', 'Записей не найдено')}
-            description={debouncedSearch || actionFilter ? 'Попробуйте изменить параметры поиска или фильтр' : 'Журнал действий пока пуст'}
+            description={debouncedSearch || actionFilter ? t('auditLog.noResultsFilter', 'Попробуйте изменить параметры поиска или фильтр') : t('auditLog.emptyLog', 'Журнал действий пока пуст')}
           />
         ) : (
           <Card className="overflow-hidden border-stone-300/70 bg-surface p-0 shadow-xs dark:border-stone-700/80">
@@ -188,7 +206,7 @@ export const AuditLogPage: React.FC = () => {
                           </div>
                           <div>
                             <div className="font-semibold text-app">
-                              {log.user?.name || (log.action === 'SECURITY_DENIED' ? 'Неавторизованный запрос' : 'Система')}
+                              {log.user?.name || (log.action === 'SECURITY_DENIED' ? t('auditLog.unauthorizedRequest', 'Неавторизованный запрос') : t('auditLog.system', 'Система'))}
                             </div>
                             {log.user?.email && (
                               <div className="text-[11px] text-muted">{log.user.email}</div>
@@ -222,7 +240,7 @@ export const AuditLogPage: React.FC = () => {
                             onClick={() => setSelectedMeta({ action: log.action, meta: log.meta! })}
                             className="inline-flex items-center gap-1 text-[11px] font-medium text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
                           >
-                            <Info size={12} /> {t('common.view', 'Посмотреть')}
+                            <Info size={12} /> {t('common.details', 'Детали')}
                           </button>
                         ) : (
                           <span className="text-muted text-[11px]">—</span>
@@ -235,7 +253,7 @@ export const AuditLogPage: React.FC = () => {
                           {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true, locale: currentLocale })}
                         </div>
                         <div className="text-[11px]">
-                          {new Date(log.timestamp).toLocaleString('ru-RU')}
+                          {new Date(log.timestamp).toLocaleString(i18n.language?.startsWith('en') ? 'en-US' : 'ru-RU')}
                         </div>
                       </td>
                     </tr>
