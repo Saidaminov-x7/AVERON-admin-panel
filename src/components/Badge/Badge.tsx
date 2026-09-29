@@ -73,8 +73,8 @@ export const getRoleBadge = (role: string, adminRole?: string | null): { variant
   }
   switch (role) {
     case 'ADMIN':    return { variant: 'teal',    label: 'Администратор' };
-    case 'LANDLORD': return { variant: 'info',    label: 'Арендодатель' };
-    case 'USER':     return { variant: 'neutral', label: 'Арендатор' };
+    case 'SELLER':   return { variant: 'info',    label: 'Продавец' };
+    case 'USER':     return { variant: 'neutral', label: 'Покупатель' };
     default:         return { variant: 'neutral', label: role };
   }
 };

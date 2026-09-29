@@ -82,9 +82,9 @@ export default function ProductsPage() {
   const [imageUrl, setImageUrl] = useState("");
   const [imageError, setImageError] = useState(false);
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<{ items: any[]; pagination: any }>({
     queryKey: ["commerce-products"],
-    queryFn: getProducts,
+    queryFn: () => getProducts(),
   });
   const mutation = useMutation({
     mutationFn: createManualProduct,

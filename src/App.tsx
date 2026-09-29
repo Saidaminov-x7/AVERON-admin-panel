@@ -19,7 +19,7 @@ import SystemHealthPage from './pages/system/SystemHealthPage';
 import MediaLibraryPage from './pages/MediaLibraryPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import ErrorLogsPage from './pages/ErrorLogsPage';
-import PagesPage from './pages/PagesPage';
+
 import NotFoundPage from './pages/NotFoundPage';
 
 const Guard = ({ children, role }: { children: ReactNode; role?: 'SUPER_ADMIN' }) => <ProtectedRoute requiredAdminRole={role}>{children}</ProtectedRoute>;
@@ -39,7 +39,7 @@ export default function App() {
     <Route path="/audit-log" element={<Guard><AuditLogPage/></Guard>}/>
     <Route path="/analytics" element={<Guard><AnalyticsPage/></Guard>}/>
     <Route path="/error-logs" element={<Guard><ErrorLogsPage/></Guard>}/>
-    <Route path="/pages" element={<Guard><PagesPage/></Guard>}/>
+
     <Route path="/profile" element={<Guard><ProfilePage/></Guard>}/>
     <Route path="/settings" element={<Navigate to="/settings/general" replace/>}/>
     <Route path="/settings/general" element={<Guard><GeneralSettingsPage/></Guard>}/>
