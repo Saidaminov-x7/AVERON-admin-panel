@@ -77,7 +77,8 @@
     "markAllRead": "Barchasini o'qilgan deb belgilash",
     "noNotifications": "Yangi bildirishnomalar yo'q",
     "apiOnline": "API tarmoqda",
-    "apiOffline": "API ishlamayapti"
+    "apiOffline": "API ishlamayapti",
+    "goToSite": "Saytga o'tish"
   },
   "dashboard": {
     "title": "Boshqaruv paneli",
@@ -268,5 +269,27 @@
     "resource": "Ob'ekt / Resurs",
     "timestamp": "Vaqt",
     "details": "Harakat tafsilotlari"
+  },
+  "sidebar": {
+    "section": {
+      "command": "BOSHQARUV MARKAZI",
+      "products": "MAHSULOTLAR",
+      "operations": "OPERATSIYALAR",
+      "management": "BOSHQARUV"
+    },
+    "dashboard": "Biznes sharhi",
+    "review": "Tekshiruv kutilmoqda",
+    "catalog": "Mahsulotlar katalogi",
+    "media": "Media kutubxona",
+    "orders": "Buyurtmalar",
+    "finance": "Moliya va foyda",
+    "users": "Foydalanuvchilar",
+    "analytics": "Tahlil",
+    "audit": "Harakatlar jurnali",
+    "errorLogs": "Xatoliklar jurnali",
+    "settings": "Sozlamalar",
+    "health": "Tizim holati",
+    "admin": "Administrator",
+    "logout": "Chiqish"
   }
 }

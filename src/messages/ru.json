@@ -77,7 +77,8 @@
     "markAllRead": "Прочитать все",
     "noNotifications": "Нет новых уведомлений",
     "apiOnline": "API в сети",
-    "apiOffline": "API недоступен"
+    "apiOffline": "API недоступен",
+    "goToSite": "Перейти на сайт"
   },
   "dashboard": {
     "title": "Панель управления",
@@ -268,5 +269,27 @@
     "resource": "Объект / Ресурс",
     "timestamp": "Время",
     "details": "Детали действия"
+  },
+  "sidebar": {
+    "section": {
+      "command": "COMMAND CENTER",
+      "products": "ТОВАРЫ",
+      "operations": "ОПЕРАЦИИ",
+      "management": "УПРАВЛЕНИЕ"
+    },
+    "dashboard": "Обзор бизнеса",
+    "review": "Ожидают проверки",
+    "catalog": "Каталог товаров",
+    "media": "Медиа-библиотека",
+    "orders": "Заказы",
+    "finance": "Финансы и прибыль",
+    "users": "Пользователи",
+    "analytics": "Аналитика",
+    "audit": "Журнал действий",
+    "errorLogs": "Логи ошибок",
+    "settings": "Настройки",
+    "health": "Состояние системы",
+    "admin": "Администратор",
+    "logout": "Выйти"
   }
 }

@@ -77,7 +77,8 @@
     "markAllRead": "Mark all as read",
     "noNotifications": "No new notifications",
     "apiOnline": "API Online",
-    "apiOffline": "API Offline"
+    "apiOffline": "API Offline",
+    "goToSite": "Go to Website"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -268,5 +269,27 @@
     "resource": "Target Resource",
     "timestamp": "Timestamp",
     "details": "Action Details"
+  },
+  "sidebar": {
+    "section": {
+      "command": "COMMAND CENTER",
+      "products": "PRODUCTS",
+      "operations": "OPERATIONS",
+      "management": "MANAGEMENT"
+    },
+    "dashboard": "Business overview",
+    "review": "Pending review",
+    "catalog": "Product catalog",
+    "media": "Media library",
+    "orders": "Orders",
+    "finance": "Finance and profit",
+    "users": "Users",
+    "analytics": "Analytics",
+    "audit": "Audit log",
+    "errorLogs": "Error logs",
+    "settings": "Settings",
+    "health": "System health",
+    "admin": "Administrator",
+    "logout": "Sign out"
   }
 }

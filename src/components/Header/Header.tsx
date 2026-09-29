@@ -249,10 +249,10 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
               {/* Шапка уведомлений */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-app bg-gray-50/50 dark:bg-white/5">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-app">Уведомления</span>
+                  <span className="font-semibold text-sm text-app">{t('header.notifications', 'Уведомления')}</span>
                   {unreadCount > 0 && (
                     <span className="text-xs bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 px-2 py-0.5 rounded-full font-medium">
-                      {unreadCount} новых
+                      {t('header.newNotifications', { count: unreadCount, defaultValue: `${unreadCount} новых` })}
                     </span>
                   )}
                 </div>
@@ -263,7 +263,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
                     className="text-xs text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1 font-medium cursor-pointer"
                   >
                     <CheckAllIcon />
-                    Прочитать все
+                    {t('header.markAllRead', 'Прочитать все')}
                   </button>
                 )}
               </div>
@@ -272,7 +272,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
               <div className="max-h-80 overflow-y-auto divide-y divide-app">
                 {notifications.length === 0 ? (
                   <div className="py-8 text-center text-muted text-sm">
-                    Нет новых уведомлений
+                    {t('header.noNotifications', 'Нет новых уведомлений')}
                   </div>
                 ) : (
                   notifications.map((n) => (
@@ -295,7 +295,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
                         <div className="flex items-center justify-between gap-1 mb-1">
                           <h4 className="text-xs font-semibold text-app truncate">{n.title}</h4>
                           <span className="text-[10px] text-muted whitespace-nowrap">
-                            {new Date(n.createdAt).toLocaleTimeString('ru-RU', {
+                            {new Date(n.createdAt).toLocaleTimeString(i18n.language?.startsWith('en') ? 'en-US' : i18n.language?.startsWith('uz') ? 'uz-UZ' : 'ru-RU', {
                               hour: '2-digit',
                               minute: '2-digit',
                             })}
@@ -325,7 +325,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
             transition-all duration-150 cursor-pointer
           "
         >
-          Перейти на сайт
+          {t('header.goToSite', 'Перейти на сайт')}
           <ExternalLinkIcon />
         </a>
       </div>

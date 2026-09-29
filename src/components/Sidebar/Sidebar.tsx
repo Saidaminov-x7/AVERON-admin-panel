@@ -4,7 +4,6 @@ import {
   AlertCircle,
   BarChart2,
   ClipboardCheck,
-  FileText,
   Gauge,
   HeartHandshake,
   Images,
@@ -21,103 +20,42 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../../hooks/useAuth";
 import { logoutApi } from "../../lib/authApi";
 import { useAuthStore } from "../../store/authStore";
-type Item = { to: string; key: string; icon: ComponentType<{ size?: number }> };
-const sections = [
-  { key: "command", items: [{ to: "/", key: "dashboard", icon: Gauge }] },
-  {
-    key: "products",
-    items: [
-      { to: "/imports", key: "review", icon: ClipboardCheck },
-      { to: "/products", key: "catalog", icon: ShoppingBag },
-      { to: "/media", key: "media", icon: Images },
-    ],
-  },
-  {
-    key: "operations",
-    items: [
-      { to: "/orders", key: "orders", icon: PackageCheck },
-      { to: "/finance", key: "finance", icon: ReceiptText },
-    ],
-  },
-  {
-    key: "management",
-    items: [
-      { to: "/users", key: "users", icon: Users },
-      { to: "/analytics", key: "analytics", icon: BarChart2 },
-      { to: "/audit-log", key: "audit", icon: ShieldCheck },
-      { to: "/error-logs", key: "errorLogs", icon: AlertCircle },
-      { to: "/pages", key: "pages", icon: FileText },
-      { to: "/settings/general", key: "settings", icon: Settings },
-      { to: "/system/health", key: "health", icon: HeartHandshake },
-    ],
-  },
-] as const;
-const words = {
-  ru: {
 
-    command: "COMMAND CENTER",
-    products: "ТОВАРЫ",
-    operations: "ОПЕРАЦИИ",
-    management: "УПРАВЛЕНИЕ",
-    dashboard: "Обзор бизнеса",
-    review: "Ожидают проверки",
-    catalog: "Каталог товаров",
-    media: "Медиа-библиотека",
-    orders: "Заказы",
-    finance: "Финансы и прибыль",
-    users: "Пользователи",
-    analytics: "Аналитика",
-    audit: "Журнал действий",
-    errorLogs: "Логи ошибок",
-    pages: "Страницы сайта",
-    settings: "Настройки",
-    health: "Состояние системы",
-    admin: "Администратор",
-    logout: "Выйти",
+type Item = { to: string; labelKey: string; icon: ComponentType<{ size?: number }> };
+
+const sections: { sectionKey: string; items: Item[] }[] = [
+  {
+    sectionKey: "sidebar.section.command",
+    items: [{ to: "/", labelKey: "sidebar.dashboard", icon: Gauge }],
   },
-  uz: {
-    command: "BOSHQARUV MARKAZI",
-    products: "MAHSULOTLAR",
-    operations: "OPERATSIYALAR",
-    management: "BOSHQARUV",
-    dashboard: "Biznes sharhi",
-    review: "Tekshiruv kutilmoqda",
-    catalog: "Mahsulotlar katalogi",
-    media: "Media kutubxona",
-    orders: "Buyurtmalar",
-    finance: "Moliya va foyda",
-    users: "Foydalanuvchilar",
-    analytics: "Tahlil",
-    audit: "Harakatlar jurnali",
-    errorLogs: "Xatoliklar jurnali",
-    pages: "Sayt sahifalari",
-    settings: "Sozlamalar",
-    health: "Tizim holati",
-    admin: "Administrator",
-    logout: "Chiqish",
+  {
+    sectionKey: "sidebar.section.products",
+    items: [
+      { to: "/imports", labelKey: "sidebar.review", icon: ClipboardCheck },
+      { to: "/products", labelKey: "sidebar.catalog", icon: ShoppingBag },
+      { to: "/media", labelKey: "sidebar.media", icon: Images },
+    ],
   },
-  en: {
-    command: "COMMAND CENTER",
-    products: "PRODUCTS",
-    operations: "OPERATIONS",
-    management: "MANAGEMENT",
-    dashboard: "Business overview",
-    review: "Pending review",
-    catalog: "Product catalog",
-    media: "Media library",
-    orders: "Orders",
-    finance: "Finance and profit",
-    users: "Users",
-    analytics: "Analytics",
-    audit: "Audit log",
-    errorLogs: "Error logs",
-    pages: "Site pages",
-    settings: "Settings",
-    health: "System health",
-    admin: "Administrator",
-    logout: "Sign out",
+  {
+    sectionKey: "sidebar.section.operations",
+    items: [
+      { to: "/orders", labelKey: "sidebar.orders", icon: PackageCheck },
+      { to: "/finance", labelKey: "sidebar.finance", icon: ReceiptText },
+    ],
   },
-} as const;
+  {
+    sectionKey: "sidebar.section.management",
+    items: [
+      { to: "/users", labelKey: "sidebar.users", icon: Users },
+      { to: "/analytics", labelKey: "sidebar.analytics", icon: BarChart2 },
+      { to: "/audit-log", labelKey: "sidebar.audit", icon: ShieldCheck },
+      { to: "/error-logs", labelKey: "sidebar.errorLogs", icon: AlertCircle },
+      { to: "/settings/general", labelKey: "sidebar.settings", icon: Settings },
+      { to: "/system/health", labelKey: "sidebar.health", icon: HeartHandshake },
+    ],
+  },
+];
+
 export default function Sidebar({
   onCloseMobile,
 }: {
@@ -125,8 +63,8 @@ export default function Sidebar({
 }) {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
-  const w = words[i18n.language?.slice(0, 2) as keyof typeof words] ?? words.ru;
+  const { t } = useTranslation();
+
   const logout = async () => {
     try {
       await logoutApi();
@@ -135,6 +73,7 @@ export default function Sidebar({
       navigate("/login");
     }
   };
+
   return (
     <aside className="sidebar-bg safe-top safe-bottom flex h-dvh w-72 flex-col border-r sidebar-border text-app shadow-[18px_0_50px_rgba(15,23,42,.08)] lg:shadow-none">
       <div className="flex h-20 items-center justify-between border-b border-app px-6">
@@ -152,12 +91,12 @@ export default function Sidebar({
       </div>
       <nav className="flex-1 space-y-6 overflow-y-auto px-4 py-6">
         {sections.map((s) => (
-          <div key={s.key}>
+          <div key={s.sectionKey}>
             <p className="mb-2 px-3 text-[10px] font-bold tracking-[.16em] text-muted">
-              {w[s.key]}
+              {t(s.sectionKey)}
             </p>
             <div className="space-y-1">
-              {s.items.map(({ to, key, icon: Icon }: Item) => (
+              {s.items.map(({ to, labelKey, icon: Icon }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -168,7 +107,7 @@ export default function Sidebar({
                   }
                 >
                   <Icon size={18} />
-                  <span>{w[key as keyof typeof w]}</span>
+                  <span>{t(labelKey)}</span>
                 </NavLink>
               ))}
             </div>
@@ -177,7 +116,7 @@ export default function Sidebar({
       </nav>
       <div className="border-t border-app p-4">
         <div className="mb-3 rounded-xl bg-violet-500/10 p-3">
-          <p className="text-sm font-bold">{user?.name || w.admin}</p>
+          <p className="text-sm font-bold">{user?.name || t("sidebar.admin")}</p>
           <p className="text-xs text-muted">{user?.adminRole || "ADMIN"}</p>
         </div>
         <button
@@ -185,7 +124,7 @@ export default function Sidebar({
           className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted hover:bg-red-500/10 hover:text-red-500"
         >
           <LogOut size={17} />
-          {w.logout}
+          {t("sidebar.logout")}
         </button>
       </div>
     </aside>
