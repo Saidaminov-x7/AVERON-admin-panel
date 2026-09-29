@@ -2,6 +2,7 @@ import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Select } from './Select';
 
 export interface PaginationProps {
   currentPage: number;
@@ -69,17 +70,14 @@ export const Pagination: React.FC<PaginationProps> = ({
         {onPageSizeChange && (
           <div className="flex items-center gap-1.5 ml-2">
             <span>Показывать:</span>
-            <select
-              value={pageSize}
-              onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="px-2 py-1 rounded-lg bg-surface border border-app text-app text-xs font-semibold cursor-pointer hover:border-primary-500 transition-colors outline-none"
-            >
-              {pageSizeOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
+            <div className="w-20">
+              <Select
+                value={String(pageSize)}
+                onChange={(val) => onPageSizeChange(Number(val))}
+                options={pageSizeOptions.map((opt) => ({ value: String(opt), label: String(opt) }))}
+                className="h-8 text-xs py-1"
+              />
+            </div>
           </div>
         )}
       </div>

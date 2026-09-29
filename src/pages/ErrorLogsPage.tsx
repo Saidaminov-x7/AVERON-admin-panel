@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
 import { getErrorReportsApi, resolveErrorReportApi, type ClientErrorReportItem } from '../lib/errorReportsApi';
 import Badge from '../components/Badge/Badge';
+import { Select } from '../components/ui/Select';
 import { AlertTriangle, CheckCircle, Clock, Globe, Laptop, Terminal } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru, enUS } from 'date-fns/locale';
@@ -76,19 +77,22 @@ const ErrorLogsPage: React.FC = () => {
               </button>
             </div>
 
-            <select
-              value={severity || ''}
-              onChange={(e) => {
-                setSeverity((e.target.value as any) || undefined);
-                setPage(1);
-              }}
-              className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-app bg-surface text-app cursor-pointer outline-none"
-            >
-              <option value="">Все уровни (Severity)</option>
-              <option value="error">Error</option>
-              <option value="warning">Warning</option>
-              <option value="info">Info</option>
-            </select>
+            <div className="w-56">
+              <Select
+                value={severity || ''}
+                onChange={(val) => {
+                  setSeverity((val as any) || undefined);
+                  setPage(1);
+                }}
+                options={[
+                  { value: '', label: 'Все уровни (Severity)' },
+                  { value: 'error', label: 'Error' },
+                  { value: 'warning', label: 'Warning' },
+                  { value: 'info', label: 'Info' },
+                ]}
+                className="h-9 text-xs"
+              />
+            </div>
           </div>
 
           <div className="text-xs text-muted">
