@@ -36,3 +36,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </ErrorBoundary>
   </React.StrictMode>,
 );
+
+// Скрываем статический HTML-лоадер после монтирования React
+const staticLoader = document.getElementById('static-loader');
+if (staticLoader) {
+  staticLoader.style.opacity = '0';
+  staticLoader.style.transition = 'opacity 0.25s ease';
+  setTimeout(() => staticLoader.remove(), 280);
+}

@@ -39,6 +39,48 @@
   </head>
   <body>
     <noscript><div><img src="https://mc.yandex.ru/watch/112059980" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- Статический лоадер — отображается до инициализации React бандла, скрывается автоматически -->
+    <div id="static-loader" style="
+      position:fixed;inset:0;z-index:99999;
+      display:flex;align-items:center;justify-content:center;
+      background-color:var(--sl-bg,#fafafa);
+      transition:opacity 0.25s ease;
+    ">
+      <div style="text-align:center;display:flex;flex-direction:column;align-items:center">
+        <div style="
+          width:56px;height:56px;border-radius:16px;
+          background:linear-gradient(135deg,#7c3aed,#5b21b6);
+          display:flex;align-items:center;justify-content:center;
+          font-size:24px;font-weight:900;color:#fff;
+          box-shadow:0 12px 32px rgba(124,58,237,.35);
+        ">A</div>
+        <div style="margin-top:16px;font-size:18px;font-weight:900;letter-spacing:.24em;color:inherit;font-family:Calibri,system-ui,sans-serif">AVERON</div>
+        <div style="
+          margin-top:16px;width:28px;height:28px;border-radius:50%;
+          border:2px solid #d6d3d1;border-top-color:#7c3aed;
+          animation:sl-spin .7s linear infinite;
+        "></div>
+      </div>
+    </div>
+    <style>
+      @keyframes sl-spin{to{transform:rotate(360deg)}}
+      .dark #static-loader{--sl-bg:#0f0f10;color:#fafaf9}
+      #static-loader{color:#1c1917}
+    </style>
+    <script>
+      // Удаляем статический лоадер после монтирования React
+      (function(){
+        var el=document.getElementById('static-loader');
+        if(!el)return;
+        // React вызывает hydrate/render → DOM меняется → слушаем DOMContentLoaded + небольшую задержку
+        function hide(){el.style.opacity='0';setTimeout(function(){el.remove()},260);}
+        if(document.readyState==='loading'){
+          document.addEventListener('DOMContentLoaded',function(){setTimeout(hide,50)});
+        }else{setTimeout(hide,50);}
+        // Гарантированно удаляем через 5 секунд в случае ошибки
+        setTimeout(function(){if(el.parentNode)el.remove()},5000);
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
