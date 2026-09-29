@@ -52,7 +52,6 @@ const AnalyticsPage: React.FC = () => {
   });
 
   const chartData = analytics?.chartData || [];
-  const byCity = analytics?.byCity || [];
   const summary = analytics?.summary || { totalVisitors: 0, totalProducts: 0, totalListings: 0, totalUsers: 0 };
 
   return (
@@ -261,42 +260,6 @@ const AnalyticsPage: React.FC = () => {
             </ResponsiveContainer>
           </div>
         )}
-
-        {/* Разбивка по городам */}
-        <div className="card">
-          <h3 className="text-base font-semibold text-app mb-4">Объявления по городам (Топ-10)</h3>
-          {byCity.length === 0 ? (
-            <p className="text-muted text-sm text-center py-8">Нет данных по городам за период</p>
-          ) : (
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={byCity} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis
-                  dataKey="city"
-                  tick={{ fontSize: 11, fill: 'var(--color-text-muted)' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
-                  axisLine={false}
-                  tickLine={false}
-                  allowDecimals={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'var(--color-surface)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '0.75rem',
-                    fontSize: '12px',
-                    color: 'var(--color-text)',
-                  }}
-                />
-                <Bar dataKey="count" name="Объявлений" fill="#14b8a6" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </div>
       </div>
     </Layout>
   );

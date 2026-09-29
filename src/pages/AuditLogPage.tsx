@@ -166,7 +166,7 @@ export const AuditLogPage: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-app bg-gray-50/60 dark:bg-white/[0.02] text-muted font-semibold uppercase tracking-wider">
+                  <tr className="border-b border-stone-200 dark:border-stone-800 bg-gray-50/60 dark:bg-white/[0.02] text-muted font-semibold uppercase tracking-wider">
                     <th className="py-3.5 px-4">{t('auditLog.actor', 'Инициатор')}</th>
                     <th className="py-3.5 px-4">{t('auditLog.action', 'Действие')}</th>
                     <th className="py-3.5 px-4">{t('auditLog.resource', 'Объект / Ресурс')}</th>
@@ -174,7 +174,7 @@ export const AuditLogPage: React.FC = () => {
                     <th className="py-3.5 px-4 text-right">{t('auditLog.timestamp', 'Время')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-app">
+                <tbody className="divide-y divide-stone-200 dark:divide-stone-800">
                   {paginatedLogs.map((log: AuditLogItem) => (
                     <tr
                       key={log.id}
