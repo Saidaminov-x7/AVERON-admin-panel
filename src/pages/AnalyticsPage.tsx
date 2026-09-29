@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   LineChart,
   Line,
@@ -18,15 +19,16 @@ import {
 import Layout from '../components/Layout';
 import { getRangeAnalyticsApi, getFunnelAnalyticsApi, exportReportUrl } from '../lib/analyticsApi';
 
-const PERIODS = [
-  { label: '7 дней', value: 7 },
-  { label: '30 дней', value: 30 },
-  { label: '90 дней', value: 90 },
-  { label: 'Произвольный', value: -1 },
-];
-
 const AnalyticsPage: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [periodDays, setPeriodDays] = useState(30);
+
+  const PERIODS = [
+    { label: t('analyticsPage.period7'), value: 7 },
+    { label: t('analyticsPage.period30'), value: 30 },
+    { label: t('analyticsPage.period90'), value: 90 },
+    { label: t('analyticsPage.periodCustom'), value: -1 },
+  ];
 
   // Произвольные даты
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -54,8 +56,10 @@ const AnalyticsPage: React.FC = () => {
   const chartData = analytics?.chartData || [];
   const summary = analytics?.summary || { totalVisitors: 0, totalProducts: 0, totalListings: 0, totalUsers: 0 };
 
+  const dateLocale = i18n.language === 'uz' ? 'uz-UZ' : i18n.language === 'en' ? 'en-US' : 'ru-RU';
+
   return (
-    <Layout title="Аналитика платформы">
+    <Layout title={t('analytics.title')}>
       <div className="space-y-6 max-w-7xl mx-auto">
         {/* Фильтры периода и экспорт */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -107,7 +111,7 @@ const AnalyticsPage: React.FC = () => {
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            Скачать отчёт (CSV)
+            {t('analyticsPage.exportCsv')}
           </a>
         </div>
 
@@ -115,43 +119,43 @@ const AnalyticsPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="card p-5">
             <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
-              Уникальные посетители
+              {t('analyticsPage.uniqueVisitors')}
             </div>
             <div className="text-2xl font-extrabold text-app">
               {isLoading ? '...' : summary.totalVisitors.toLocaleString()}
             </div>
-            <p className="text-[11px] text-muted mt-1">Без повторных подсчетов за день</p>
+            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.dedupeNote')}</p>
           </div>
 
           <div className="card p-5">
             <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
-              Новые товары
+              {t('analyticsPage.newProducts')}
             </div>
             <div className="text-2xl font-extrabold text-app">
               {isLoading ? '...' : (summary.totalProducts ?? summary.totalListings ?? 0).toLocaleString()}
             </div>
-            <p className="text-[11px] text-muted mt-1">Добавлено за указанный период</p>
+            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.addedNote')}</p>
           </div>
 
           <div className="card p-5">
             <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
-              Новые пользователи
+              {t('analyticsPage.newUsers')}
             </div>
             <div className="text-2xl font-extrabold text-app">
               {isLoading ? '...' : summary.totalUsers.toLocaleString()}
             </div>
-            <p className="text-[11px] text-muted mt-1">Зарегистрировано за период</p>
+            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.registeredNote')}</p>
           </div>
         </div>
 
         {/* График динамики */}
         <div className="card">
-          <h3 className="text-base font-semibold text-app mb-4">Динамика активности за период</h3>
+          <h3 className="text-base font-semibold text-app mb-4">{t('analyticsPage.chartTitle')}</h3>
           {isLoading ? (
             <div className="h-72 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />
           ) : chartData.length === 0 ? (
             <div className="h-72 flex items-center justify-center text-muted text-sm">
-              Нет данных за выбранный период
+              {t('analyticsPage.noData')}
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={280}>
@@ -161,7 +165,7 @@ const AnalyticsPage: React.FC = () => {
                   dataKey="date"
                   tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
                   tickFormatter={(v) =>
-                    new Date(v).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+                    new Date(v).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short' })
                   }
                   axisLine={false}
                   tickLine={false}
@@ -182,7 +186,7 @@ const AnalyticsPage: React.FC = () => {
                     color: 'var(--color-text)',
                   }}
                   labelFormatter={(v) =>
-                    new Date(String(v)).toLocaleDateString('ru-RU', {
+                    new Date(String(v)).toLocaleDateString(dateLocale, {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',
@@ -193,7 +197,7 @@ const AnalyticsPage: React.FC = () => {
                 <Line
                   type="monotone"
                   dataKey="visitors"
-                  name="Уникальные посетители"
+                  name={t('analyticsPage.lineVisitors')}
                   stroke="#14b8a6"
                   strokeWidth={2.5}
                   dot={false}
@@ -201,7 +205,7 @@ const AnalyticsPage: React.FC = () => {
                 <Line
                   type="monotone"
                   dataKey="registrations"
-                  name="Регистрации"
+                  name={t('analyticsPage.lineRegistrations')}
                   stroke="#8b5cf6"
                   strokeWidth={2}
                   dot={false}
@@ -209,7 +213,7 @@ const AnalyticsPage: React.FC = () => {
                 <Line
                   type="monotone"
                   dataKey="listings"
-                  name="Объявления"
+                  name={t('analyticsPage.lineListings')}
                   stroke="#f59e0b"
                   strokeWidth={2}
                   dot={false}
@@ -222,22 +226,22 @@ const AnalyticsPage: React.FC = () => {
         {/* Воронка конверсии */}
         {funnel && (
           <div className="card">
-            <h3 className="text-base font-semibold text-app mb-4">Воронка конверсии пользователей</h3>
+            <h3 className="text-base font-semibold text-app mb-4">{t('analyticsPage.funnelTitle')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="p-4 rounded-xl bg-primary-500/10 border border-primary-500/20">
-                <div className="text-xs font-semibold text-primary-600 dark:text-primary-400">1. Просмотры страниц</div>
+                <div className="text-xs font-semibold text-primary-600 dark:text-primary-400">{t('analyticsPage.funnelViews')}</div>
                 <div className="text-2xl font-bold text-app mt-1">{funnel.views}</div>
-                <div className="text-[11px] text-muted mt-1">Визиты за период</div>
+                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelVisits')}</div>
               </div>
               <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                <div className="text-xs font-semibold text-purple-600 dark:text-purple-400">2. Добавления в избранное</div>
+                <div className="text-xs font-semibold text-purple-600 dark:text-purple-400">{t('analyticsPage.funnelFavorites')}</div>
                 <div className="text-2xl font-bold text-app mt-1">{funnel.favorites}</div>
-                <div className="text-[11px] text-muted mt-1">Конверсия: {(funnel.favoriteRate * 100).toFixed(1)}%</div>
+                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: (funnel.favoriteRate * 100).toFixed(1) })}</div>
               </div>
               <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">3. Заявки на просмотр</div>
+                <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{t('analyticsPage.funnelRequests')}</div>
                 <div className="text-2xl font-bold text-app mt-1">{funnel.viewingRequests}</div>
-                <div className="text-[11px] text-muted mt-1">Из избранного в заявку: {(funnel.viewingRate * 100).toFixed(1)}%</div>
+                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelFromFav', { rate: (funnel.viewingRate * 100).toFixed(1) })}</div>
               </div>
             </div>
 
@@ -245,9 +249,9 @@ const AnalyticsPage: React.FC = () => {
               <BarChart
                 layout="vertical"
                 data={[
-                  { stage: '1. Просмотры', count: funnel.views },
-                  { stage: '2. Избранное', count: funnel.favorites },
-                  { stage: '3. Заявки', count: funnel.viewingRequests },
+                  { stage: t('analyticsPage.funnelViews'), count: funnel.views },
+                  { stage: t('analyticsPage.funnelFavorites'), count: funnel.favorites },
+                  { stage: t('analyticsPage.funnelRequests'), count: funnel.viewingRequests },
                 ]}
                 margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
               >
