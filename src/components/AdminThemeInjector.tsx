@@ -21,7 +21,7 @@ const DEFAULT_ADMIN_THEME: AdminThemeData = {
   backgroundColor: '#0f0f0f',
   textColor: '#f1f5f9',
   borderRadius: '0.75rem',
-  fontFamily: 'Inter, sans-serif',
+  fontFamily: 'Calibri, system-ui, sans-serif',
 };
 
 const getAdminThemeApi = async (): Promise<AdminThemeData> => {

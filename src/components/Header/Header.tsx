@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ThemeToggle from '../ThemeToggle/ThemeToggle';
+import Dropdown from '../Dropdown/Dropdown';
 import { CountBadge } from '../ui/CountBadge';
 import {
   getNotificationsApi,
@@ -13,22 +14,6 @@ import {
   markAllNotificationsReadApi,
 } from '../../lib/notificationsApi';
 import type { AdminNotificationItem } from '../../lib/notificationsApi';
-import { API_URL } from '../../lib/axios';
-
-function useBackendHealth() {
-  const [isHealthy, setIsHealthy] = useState<boolean | null>(null);
-  useEffect(() => {
-    const apiUrl = API_URL;
-    const check = () =>
-      fetch(`${apiUrl}/health`)
-        .then((r) => setIsHealthy(r.ok))
-        .catch(() => setIsHealthy(false));
-    check();
-    const id = setInterval(check, 30000);
-    return () => clearInterval(id);
-  }, []);
-  return isHealthy;
-}
 
 const SearchIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -138,8 +123,6 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
     }
   };
 
-  const isBackendHealthy = useBackendHealth();
-
   return (
     <header
       className="
@@ -165,29 +148,6 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
           </button>
         )}
         {title && <h1 className="min-w-0 truncate text-base font-bold text-app sm:text-xl">{title}</h1>}
-        <div
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 dark:bg-white/5 border border-app"
-          title={
-            isBackendHealthy === null
-              ? 'Проверка API...'
-              : isBackendHealthy
-              ? 'API в сети'
-              : 'API недоступен'
-          }
-        >
-          <span
-            className={`w-2 h-2 rounded-full ${
-              isBackendHealthy === null
-                ? 'bg-amber-400 animate-pulse'
-                : isBackendHealthy
-                ? 'bg-emerald-500'
-                : 'bg-red-500'
-            }`}
-          />
-          <span className="text-muted hidden sm:inline">
-            {isBackendHealthy ? 'API OK' : 'API'}
-          </span>
-        </div>
       </div>
 
       {/* Правая часть */}
@@ -198,7 +158,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
           onClick={() => window.dispatchEvent(new CustomEvent('open-command-palette'))}
           id="header-search-btn"
           className="
-            hidden sm:flex items-center gap-2 pl-9 pr-3 py-2 text-sm rounded-lg w-52 md:w-64
+            hidden sm:flex items-center gap-2 pl-9 pr-3 h-10 text-sm rounded-xl w-52 md:w-64
             bg-gray-50 dark:bg-white/5
             border border-app hover:border-primary-500/50 dark:hover:border-primary-500/50
             text-muted hover:text-app
@@ -214,28 +174,48 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
           </kbd>
         </button>
 
-        {/* Языковой переключатель (RU / UZ / EN) */}
-        <div className="relative group">
-          <select
-            value={i18n.language?.slice(0, 2) || 'ru'}
-            onChange={(e) => {
-              const newLang = e.target.value;
-              i18n.changeLanguage(newLang);
-              localStorage.setItem('i18nextLng', newLang);
-            }}
-            aria-label="Сменить язык"
-            className="
-              h-9 px-2.5 rounded-lg text-xs font-semibold
-              bg-gray-50 dark:bg-white/5 border border-app
-              text-app outline-none cursor-pointer
-              hover:border-primary-500 transition-colors
-            "
-          >
-            <option value="ru" className="bg-surface text-app">🇷🇺 RU</option>
-            <option value="uz" className="bg-surface text-app">🇺🇿 UZ</option>
-            <option value="en" className="bg-surface text-app">🇬🇧 EN</option>
-          </select>
-        </div>
+        {/* Языковой переключатель (RU / UZ / EN) через кастомный Dropdown */}
+        <Dropdown
+          align="right"
+          trigger={
+            <div className="flex items-center justify-between gap-1.5 h-10 px-3 rounded-xl text-xs font-semibold bg-surface border border-app text-app hover:border-primary-500 transition-colors cursor-pointer select-none">
+              <span>
+                {i18n.language?.startsWith('uz')
+                  ? '🇺🇿 UZ'
+                  : i18n.language?.startsWith('en')
+                  ? '🇬🇧 EN'
+                  : '🇷🇺 RU'}
+              </span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-muted">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+          }
+          contentClassName="w-32 p-1 border border-app rounded-xl bg-surface shadow-xl"
+        >
+          {[
+            { code: 'ru', label: '🇷🇺 Русский' },
+            { code: 'uz', label: '🇺🇿 Oʻzbek' },
+            { code: 'en', label: '🇬🇧 English' },
+          ].map((lang) => {
+            const active = (i18n.language?.slice(0, 2) || 'ru') === lang.code;
+            return (
+              <button
+                key={lang.code}
+                type="button"
+                onClick={() => {
+                  i18n.changeLanguage(lang.code);
+                  localStorage.setItem('i18nextLng', lang.code);
+                }}
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-left transition-colors cursor-pointer ${
+                  active ? 'bg-primary-500 text-white font-semibold' : 'text-app hover:bg-gray-100 dark:hover:bg-white/5'
+                }`}
+              >
+                <span>{lang.label}</span>
+              </button>
+            );
+          })}
+        </Dropdown>
 
         {/* Переключатель темы */}
         <ThemeToggle />

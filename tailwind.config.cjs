@@ -42,8 +42,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-family, Inter)', 'Inter', 'system-ui', 'sans-serif'],
-        theme: ['var(--font-family, Inter)', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-family, Calibri)', 'Calibri', 'system-ui', 'sans-serif'],
+        theme: ['var(--font-family, Calibri)', 'Calibri', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         theme: 'var(--radius, var(--border-radius, 0.5rem))',

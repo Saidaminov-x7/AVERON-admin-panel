@@ -46,7 +46,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 
       {isOpen && (
         <div
-          className={`absolute z-50 mt-1 w-48 rounded-lg border border-app bg-surface shadow-lg animate-in fade-in zoom-in-95 ${align === 'right' ? 'right-0' : 'left-0'} ${contentClassName}`}
+          className={`absolute z-50 mt-1.5 w-48 rounded-xl border border-app bg-surface shadow-xl animate-fade-in ${align === 'right' ? 'right-0' : 'left-0'} ${contentClassName}`}
         >
           {children}
         </div>
