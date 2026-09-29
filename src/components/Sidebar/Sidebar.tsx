@@ -1,7 +1,10 @@
 import type { ComponentType } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
+  AlertCircle,
+  BarChart2,
   ClipboardCheck,
+  FileText,
   Gauge,
   HeartHandshake,
   Images,
@@ -40,7 +43,10 @@ const sections = [
     key: "management",
     items: [
       { to: "/users", key: "users", icon: Users },
+      { to: "/analytics", key: "analytics", icon: BarChart2 },
       { to: "/audit-log", key: "audit", icon: ShieldCheck },
+      { to: "/error-logs", key: "errorLogs", icon: AlertCircle },
+      { to: "/pages", key: "pages", icon: FileText },
       { to: "/settings/general", key: "settings", icon: Settings },
       { to: "/system/health", key: "health", icon: HeartHandshake },
     ],
@@ -48,6 +54,7 @@ const sections = [
 ] as const;
 const words = {
   ru: {
+
     command: "COMMAND CENTER",
     products: "ТОВАРЫ",
     operations: "ОПЕРАЦИИ",
@@ -59,7 +66,10 @@ const words = {
     orders: "Заказы",
     finance: "Финансы и прибыль",
     users: "Пользователи",
+    analytics: "Аналитика",
     audit: "Журнал действий",
+    errorLogs: "Логи ошибок",
+    pages: "Страницы сайта",
     settings: "Настройки",
     health: "Состояние системы",
     admin: "Администратор",
@@ -77,7 +87,10 @@ const words = {
     orders: "Buyurtmalar",
     finance: "Moliya va foyda",
     users: "Foydalanuvchilar",
+    analytics: "Tahlil",
     audit: "Harakatlar jurnali",
+    errorLogs: "Xatoliklar jurnali",
+    pages: "Sayt sahifalari",
     settings: "Sozlamalar",
     health: "Tizim holati",
     admin: "Administrator",
@@ -95,7 +108,10 @@ const words = {
     orders: "Orders",
     finance: "Finance and profit",
     users: "Users",
+    analytics: "Analytics",
     audit: "Audit log",
+    errorLogs: "Error logs",
+    pages: "Site pages",
     settings: "Settings",
     health: "System health",
     admin: "Administrator",

@@ -6,7 +6,8 @@ import { api } from './axios';
 export interface DailyStatItem {
   date: string;
   visitors: number;
-  listings: number;
+  listings?: number;
+  products?: number;
   registrations: number;
 }
 
@@ -20,7 +21,8 @@ export interface RangeAnalyticsResponse {
   to: string;
   summary: {
     totalVisitors: number;
-    totalListings: number;
+    totalListings?: number;
+    totalProducts?: number;
     totalUsers: number;
   };
   chartData: DailyStatItem[];

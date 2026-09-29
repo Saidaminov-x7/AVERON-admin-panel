@@ -2,7 +2,7 @@
 // API функции для управления динамическими страницами
 
 import { api } from './axios';
-import type { PaginatedResponse } from './listingsApi';
+import type { PaginatedResponse } from './usersApi';
 
 export interface DynamicPage {
   id:          string;

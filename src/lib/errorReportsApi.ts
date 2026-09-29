@@ -1,6 +1,7 @@
 // src/lib/errorReportsApi.ts
 import { api } from './axios';
-import type { PaginatedResponse } from './listingsApi';
+import type { PaginatedResponse } from './usersApi';
+
 
 export interface ClientErrorReportItem {
   id: string;

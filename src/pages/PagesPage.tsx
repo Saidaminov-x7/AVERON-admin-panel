@@ -21,19 +21,25 @@ interface SitePageRoute {
 
 const SITE_ROUTES: SitePageRoute[] = [
   // Основные страницы
-  { path: '/',              label: 'Главная',            description: 'Каталог объявлений, баннер, преимущества',    pageKey: 'home',          category: 'main',     icon: '🏠' },
-  { path: '/catalog',       label: 'Каталог',             description: 'Список всех объявлений с фильтрами',         pageKey: 'catalog',       category: 'catalog',  icon: '📋' },
-  { path: '/catalog/[id]',  label: 'Объявление',          description: 'Детальная страница объявления',              pageKey: 'listing',       category: 'catalog',  icon: '📄' },
-  { path: '/add-listing',   label: 'Создать объявление',  description: 'Форма создания нового объявления',           pageKey: 'add-listing',   category: 'user',     icon: '✏️' },
+  { path: '/',              label: 'Главная',            description: 'Витрина товаров, баннер, преимущества',      pageKey: 'home',          category: 'main',     icon: '🏠' },
+  { path: '/catalog',       label: 'Каталог',             description: 'Список всех товаров с фильтрами',            pageKey: 'catalog',       category: 'catalog',  icon: '📋' },
+  { path: '/catalog/[id]',  label: 'Карточка товара',     description: 'Детальная страница товара',                  pageKey: 'listing',       category: 'catalog',  icon: '📄' },
   // Личный кабинет
   { path: '/profile',       label: 'Профиль',             description: 'Личный кабинет пользователя',                pageKey: 'profile',       category: 'user',     icon: '👤' },
-  { path: '/favorites',     label: 'Избранное',           description: 'Сохранённые объявления',                     pageKey: 'favorites',     category: 'user',     icon: '❤️' },
+  { path: '/favorites',     label: 'Избранное',           description: 'Сохранённые товары',                         pageKey: 'favorites',     category: 'user',     icon: '❤️' },
+  { path: '/compare',       label: 'Сравнение',           description: 'Сравнение выбранных товаров',                pageKey: 'compare',       category: 'user',     icon: '⚖️' },
   // AI и коммуникации
   { path: '/chat',          label: 'AI-помощник',         description: 'Чат с AI ассистентом',                       pageKey: 'chat',          category: 'content',  icon: '🤖' },
   // Информационные страницы
   { path: '/about',         label: 'О нас',               description: 'Информация о платформе',                     pageKey: 'about',         category: 'content',  icon: 'ℹ️' },
+  { path: '/delivery',      label: 'Доставка',            description: 'Информация о доставке',                      pageKey: 'delivery',      category: 'content',  icon: '🚚' },
+  { path: '/returns',       label: 'Возвраты',            description: 'Политика возврата товаров',                  pageKey: 'returns',       category: 'content',  icon: '↩️' },
+  { path: '/size-guide',    label: 'Размеры',             description: 'Таблица размеров одежды',                    pageKey: 'size-guide',    category: 'content',  icon: '📏' },
+  { path: '/how-to-order',  label: 'Как заказать',        description: 'Инструкция по оформлению заказа',            pageKey: 'how-to-order',  category: 'content',  icon: '🛒' },
+  { path: '/support',       label: 'Поддержка',           description: 'Обращение в службу поддержки',               pageKey: 'support',       category: 'content',  icon: '💬' },
+  { path: '/public-offer',  label: 'Публичная оферта',    description: 'Договор публичной оферты',                   pageKey: 'public-offer',  category: 'content',  icon: '📜' },
   { path: '/privacy',       label: 'Конфиденциальность',  description: 'Политика обработки персональных данных',     pageKey: 'privacy',       category: 'content',  icon: '🔒' },
-  { path: '/terms',         label: 'Условия использования', description: 'Пользовательское соглашение',              pageKey: 'terms',         category: 'content',  icon: '📜' },
+  { path: '/terms',         label: 'Условия использования', description: 'Пользовательское соглашение',              pageKey: 'terms',         category: 'content',  icon: '📃' },
   // Системные страницы
   { path: '/maintenance',   label: 'Тех. работы',         description: 'Страница режима обслуживания',               pageKey: 'maintenance',   category: 'main',     icon: '🔧' },
 ];

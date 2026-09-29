@@ -53,7 +53,7 @@ const AnalyticsPage: React.FC = () => {
 
   const chartData = analytics?.chartData || [];
   const byCity = analytics?.byCity || [];
-  const summary = analytics?.summary || { totalVisitors: 0, totalListings: 0, totalUsers: 0 };
+  const summary = analytics?.summary || { totalVisitors: 0, totalProducts: 0, totalListings: 0, totalUsers: 0 };
 
   return (
     <Layout title="Аналитика платформы">
@@ -126,12 +126,12 @@ const AnalyticsPage: React.FC = () => {
 
           <div className="card p-5">
             <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
-              Новые объявления
+              Новые товары
             </div>
             <div className="text-2xl font-extrabold text-app">
-              {isLoading ? '...' : summary.totalListings.toLocaleString()}
+              {isLoading ? '...' : (summary.totalProducts ?? summary.totalListings ?? 0).toLocaleString()}
             </div>
-            <p className="text-[11px] text-muted mt-1">Опубликовано за указанный период</p>
+            <p className="text-[11px] text-muted mt-1">Добавлено за указанный период</p>
           </div>
 
           <div className="card p-5">

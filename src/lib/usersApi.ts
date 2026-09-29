@@ -2,7 +2,15 @@
 // API функции для управления пользователями (admin)
 
 import { api } from './axios';
-import type { PaginatedResponse } from './listingsApi';
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  /** Nested alias kept for backward compat with older pages */
+  meta?: { total: number; totalPages: number; page?: number; limit?: number };
+}
 
 export type UserRole = 'USER' | 'ADMIN';
 
