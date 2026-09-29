@@ -30,7 +30,7 @@ const getAdminThemeApi = async (): Promise<AdminThemeData> => {
 };
 
 export default function AdminThemeInjector() {
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ['site', 'shared-theme'],
     queryFn: getAdminThemeApi,
     // Не показываем ошибку если нет доступа (ещё не залогинились)
@@ -52,6 +52,5 @@ export default function AdminThemeInjector() {
     }
   }, [data]);
 
-  if (isLoading) return <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0b0e13] text-white"><div className="text-center"><div className="text-2xl font-black tracking-[.24em]">AVERON</div><div className="mx-auto mt-5 h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-violet-500"/><p className="mt-3 text-xs text-slate-500">Загружаем оформление</p></div></div>;
   return null;
 }

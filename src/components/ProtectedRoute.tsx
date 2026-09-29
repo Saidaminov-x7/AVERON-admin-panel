@@ -7,6 +7,8 @@ import { useAuth } from '../hooks/useAuth';
 import type { AdminRoleType } from '../store/authStore';
 import NotFoundPage from '../pages/NotFoundPage';
 
+import FullScreenLoader from './ui/FullScreenLoader';
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredAdminRole?: AdminRoleType;
@@ -17,20 +19,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredAdmin
 
   // Пока идёт инициализация (проверка refresh token) — показываем лоадер
   if (!isInitialized) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-app">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-primary-500 flex items-center justify-center text-white font-bold text-2xl animate-pulse-teal">
-            i
-          </div>
-          <div className="flex gap-1.5">
-            <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-          </div>
-        </div>
-      </div>
-    );
+    return <FullScreenLoader label="Проверка сессии..." />;
   }
 
   // Не авторизован — редирект на /login
