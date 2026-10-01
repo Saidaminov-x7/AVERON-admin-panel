@@ -153,6 +153,17 @@ body {
   }
 }
 
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /* ─── Скролл ────────────────────────────────────────────────────────────────── */
 * { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--color-primary) 70%, transparent) transparent; }
 ::-webkit-scrollbar { width: 9px; height: 9px; }

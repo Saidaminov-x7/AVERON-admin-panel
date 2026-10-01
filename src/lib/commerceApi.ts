@@ -256,6 +256,63 @@ export type CommerceOrderStatus =
   | 'COMPLETED'
   | 'REFUNDED';
 
+export type CommerceOrderTransition =
+  | 'CONFIRMED'
+  | 'CANCELLED'
+  | 'PAID'
+  | 'ORDERED_FROM_SUPPLIER'
+  | 'SUPPLIER_CONFIRMED'
+  | 'IN_TRANSIT_CHINA'
+  | 'CARGO_WAREHOUSE'
+  | 'INTERNATIONAL_TRANSIT'
+  | 'ARRIVED_UZBEKISTAN'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'COMPLETED';
+
+export type CommerceDeliveryStatus =
+  | 'PENDING'
+  | 'PREPARING'
+  | 'SHIPPED'
+  | 'IN_TRANSIT'
+  | 'READY_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'CANCELLED';
+
+export interface CommerceOrderStatusHistoryEntry {
+  status: CommerceOrderStatus;
+  note: string | null;
+  createdAt: string;
+}
+
+export interface CommerceDeliveryHistoryEntry {
+  status: CommerceDeliveryStatus;
+  note?: string | null;
+  createdAt: string;
+}
+
+export interface CommerceOrderDelivery {
+  method: 'COURIER' | 'PICKUP';
+  recipient: string;
+  phone: string;
+  destination: Record<string, unknown>;
+  status: CommerceDeliveryStatus;
+  trackingNumber: string | null;
+  provider: string | null;
+  estimatedDeliveryAt: string | null;
+  shippedAt: string | null;
+  deliveredAt: string | null;
+  history: CommerceDeliveryHistoryEntry[];
+}
+
+export interface CommerceOrderShipment {
+  provider: string;
+  trackingNumber: string;
+  status: string;
+  sentAt: string | null;
+  arrivedAt: string | null;
+}
+
 export interface CommerceOrderItem {
   id: string;
   title: string;
@@ -263,6 +320,8 @@ export interface CommerceOrderItem {
   unitPrice: string | number;
   totalPrice: string | number;
   variantSnapshot?: { color: string | null; size: string | null; sku: string } | null;
+  isPreorder?: boolean;
+  preorderEstimatedAt?: string | null;
 }
 
 export interface CommerceOrder {
@@ -276,6 +335,9 @@ export interface CommerceOrder {
   contact: unknown;
   deliveryAddress: unknown;
   items: CommerceOrderItem[];
+  statusHistory: CommerceOrderStatusHistoryEntry[];
+  shipments: CommerceOrderShipment[];
+  delivery?: CommerceOrderDelivery | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -288,7 +350,26 @@ export const getOrder = (orderNumber: string) =>
 
 export const updateOrderStatus = (
   orderNumber: string,
-  status: 'CONFIRMED' | 'CANCELLED',
+  status: CommerceOrderTransition,
+  note?: string,
 ) =>
-  api.patch<CommerceOrder>(`/api/v1/admin/orders/${encodeURIComponent(orderNumber)}/status`, { status })
+  api.patch<CommerceOrder>(
+    `/api/v1/admin/orders/${encodeURIComponent(orderNumber)}/status`,
+    { status, ...(note?.trim() ? { note: note.trim() } : {}) },
+  )
     .then((r) => r.data);
+
+export const updateOrderShipping = (
+  orderNumber: string,
+  payload: {
+    status: CommerceDeliveryStatus;
+    trackingNumber?: string | null;
+    provider?: string | null;
+    estimatedDeliveryAt?: string | null;
+    note?: string;
+  },
+) =>
+  api.patch<CommerceOrder>(
+    `/api/v1/admin/orders/${encodeURIComponent(orderNumber)}/shipping`,
+    payload,
+  ).then((r) => r.data);
