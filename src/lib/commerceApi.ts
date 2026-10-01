@@ -14,9 +14,23 @@ export const PRODUCT_COUNTRIES = [
 ] as const;
 
 export type ProductCountry = typeof PRODUCT_COUNTRIES[number]['code'];
+export type ProductLocale = 'ru' | 'uz' | 'en';
 
 export const isProductCountry = (value: unknown): value is ProductCountry =>
   PRODUCT_COUNTRIES.some(({ code }) => code === value);
+
+export const getProductCountryDisplay = (country: string) => {
+  const knownCountry = PRODUCT_COUNTRIES.find(({ code }) => code === country);
+  return knownCountry
+    ? { flag: knownCountry.flag, translationKey: knownCountry.translationKey, code: null }
+    : { flag: '🏳️', translationKey: 'products.unknownCountryWithCode', code: country };
+};
+
+export interface ProductCategory {
+  id: string;
+  slug: string;
+  name: Record<string, string> | string;
+}
 
 export interface DashboardData {
   products: {
@@ -53,11 +67,14 @@ export interface ImportedProduct {
 export interface ProductListItem {
   id: string;
   slug: string;
-  country: ProductCountry;
-  translations?: {
-    ru?: { title?: string };
-  };
+  country: string;
+  source: string;
+  sourceUrl: string;
+  categoryId?: string | null;
+  translations?: Partial<Record<ProductLocale, { title?: string } | string>>;
+  description?: Partial<Record<ProductLocale, string>> | null;
   images?: Array<{ url: string }>;
+  variants?: Array<{ id: string; color?: string | null; size?: string | null }>;
   salePriceUzs: string | number;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 }
@@ -78,20 +95,40 @@ export interface ProductPayload {
   titleUz?: string;
   titleEn?: string;
   description?: string;
+  descriptionUz?: string;
+  descriptionEn?: string;
   sourceUrl: string;
   imageUrl?: string;
-  sourcePriceCny: number;
-  exchangeRate: number;
   salePriceUzs: number;
+  categoryId?: string;
   color?: string;
   size?: string;
   publish: boolean;
+}
+
+export interface ProductUpdatePayload {
+  title: string;
+  titleUz?: string;
+  titleEn?: string;
+  description?: string;
+  descriptionUz?: string;
+  descriptionEn?: string;
+  sourceUrl: string;
+  imageUrl?: string;
+  salePriceUzs: number;
+  country?: ProductCountry;
+  categoryId?: string | null;
+  color?: string;
+  size?: string;
 }
 
 // ─── Дашборд ──────────────────────────────────────────────────────────────────
 
 export const getCommerceDashboard = () =>
   api.get<DashboardData>('/api/v1/admin/dashboard').then((r) => r.data);
+
+export const getProductCategories = () =>
+  api.get<ProductCategory[]>('/api/v1/categories').then((r) => r.data);
 
 // ─── Импорты (AI-парсер) ──────────────────────────────────────────────────────
 
@@ -130,6 +167,9 @@ export const getProducts = (params?: {
 
 export const createManualProduct = (payload: ProductPayload) =>
   api.post('/api/v1/admin/products', payload).then((r) => r.data);
+
+export const updateManualProduct = (id: string, payload: ProductUpdatePayload) =>
+  api.put<ProductListItem>(`/api/v1/admin/products/${id}`, payload).then((r) => r.data);
 
 export const updateProductCountry = (id: string, country: ProductCountry) =>
   api.put<ProductListItem>(`/api/v1/admin/products/${id}`, { country }).then((r) => r.data);
