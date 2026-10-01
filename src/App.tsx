@@ -1,35 +1,36 @@
+import { lazy, Suspense } from 'react';
 import type { ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { useInitAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
 import ProtectedRoute from './components/ProtectedRoute';
-import LoginPage from './pages/LoginPage';
-import CommerceDashboardPage from './pages/commerce/CommerceDashboardPage';
-import ProductsPage from './pages/commerce/ProductsPage';
-import CategoriesPage from './pages/commerce/CategoriesPage';
-import NotificationsPage from './pages/NotificationsPage';
-import ImportsPage from './pages/commerce/ImportsPage';
-import OrdersPage from './pages/commerce/OrdersPage';
-import FinancePage from './pages/commerce/FinancePage';
-import UsersPage from './pages/UsersPage';
-import UserProfilePage from './pages/UserProfilePage';
-import StaffPage from './pages/settings/StaffPage';
-import GeneralSettingsPage from './pages/settings/GeneralSettingsPage';
-import ProfilePage from './pages/ProfilePage';
-import AuditLogPage from './pages/AuditLogPage';
-import SystemHealthPage from './pages/system/SystemHealthPage';
-import MediaLibraryPage from './pages/MediaLibraryPage';
-import AnalyticsPage from './pages/AnalyticsPage';
-import ErrorLogsPage from './pages/ErrorLogsPage';
-import VisualSearchAuditPage from './pages/VisualSearchAuditPage';
 
-import NotFoundPage from './pages/NotFoundPage';
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const CommerceDashboardPage = lazy(() => import('./pages/commerce/CommerceDashboardPage'));
+const ProductsPage = lazy(() => import('./pages/commerce/ProductsPage'));
+const CategoriesPage = lazy(() => import('./pages/commerce/CategoriesPage'));
+const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
+const ImportsPage = lazy(() => import('./pages/commerce/ImportsPage'));
+const OrdersPage = lazy(() => import('./pages/commerce/OrdersPage'));
+const FinancePage = lazy(() => import('./pages/commerce/FinancePage'));
+const UsersPage = lazy(() => import('./pages/UsersPage'));
+const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
+const StaffPage = lazy(() => import('./pages/settings/StaffPage'));
+const GeneralSettingsPage = lazy(() => import('./pages/settings/GeneralSettingsPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const AuditLogPage = lazy(() => import('./pages/AuditLogPage'));
+const SystemHealthPage = lazy(() => import('./pages/system/SystemHealthPage'));
+const MediaLibraryPage = lazy(() => import('./pages/MediaLibraryPage'));
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
+const ErrorLogsPage = lazy(() => import('./pages/ErrorLogsPage'));
+const VisualSearchAuditPage = lazy(() => import('./pages/VisualSearchAuditPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 const Guard = ({ children, role }: { children: ReactNode; role?: 'SUPER_ADMIN' }) => <ProtectedRoute requiredAdminRole={role}>{children}</ProtectedRoute>;
 
 export default function App() {
   useTheme(); useInitAuth();
-  return <BrowserRouter><Routes>
+  return <BrowserRouter><Suspense fallback={<div className="p-6" role="status" aria-label="Loading page" />}><Routes>
     <Route path="/login" element={<LoginPage/>}/>
     <Route path="/" element={<Guard><CommerceDashboardPage/></Guard>}/>
     <Route path="/products" element={<Guard><ProductsPage/></Guard>}/>
@@ -52,5 +53,5 @@ export default function App() {
     <Route path="/settings/staff" element={<Guard role="SUPER_ADMIN"><StaffPage/></Guard>}/>
     <Route path="/system/health" element={<Guard><SystemHealthPage/></Guard>}/>
     <Route path="*" element={<NotFoundPage/>}/>
-  </Routes></BrowserRouter>;
+  </Routes></Suspense></BrowserRouter>;
 }

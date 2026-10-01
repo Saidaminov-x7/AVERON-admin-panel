@@ -240,5 +240,55 @@ export const updateProductCountry = (id: string, country: ProductCountry) =>
 
 // ─── Заказы ────────────────────────────────────────────────────────────────────
 
+export type CommerceOrderStatus =
+  | 'CREATED'
+  | 'CONFIRMED'
+  | 'CANCELLED'
+  | 'PAID'
+  | 'ORDERED_FROM_SUPPLIER'
+  | 'SUPPLIER_CONFIRMED'
+  | 'IN_TRANSIT_CHINA'
+  | 'CARGO_WAREHOUSE'
+  | 'INTERNATIONAL_TRANSIT'
+  | 'ARRIVED_UZBEKISTAN'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'COMPLETED'
+  | 'REFUNDED';
+
+export interface CommerceOrderItem {
+  id: string;
+  title: string;
+  quantity: number;
+  unitPrice: string;
+  totalPrice: string;
+  variantSnapshot?: { color: string | null; size: string | null; sku: string } | null;
+}
+
+export interface CommerceOrder {
+  orderNumber: string;
+  status: CommerceOrderStatus;
+  currency: 'UZS';
+  subtotal: string;
+  discount: string;
+  deliveryCost: string;
+  totalRevenue: string;
+  contact: unknown;
+  deliveryAddress: unknown;
+  items: CommerceOrderItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const getOrders = () =>
-  api.get('/api/v1/admin/orders').then((r) => r.data);
+  api.get<CommerceOrder[]>('/api/v1/admin/orders').then((r) => r.data);
+
+export const getOrder = (orderNumber: string) =>
+  api.get<CommerceOrder>(`/api/v1/admin/orders/${encodeURIComponent(orderNumber)}`).then((r) => r.data);
+
+export const updateOrderStatus = (
+  orderNumber: string,
+  status: 'CONFIRMED' | 'CANCELLED',
+) =>
+  api.patch<CommerceOrder>(`/api/v1/admin/orders/${encodeURIComponent(orderNumber)}/status`, { status })
+    .then((r) => r.data);
