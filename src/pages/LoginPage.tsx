@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { loginApi, verify2faApi, resend2faApi } from '../lib/authApi';
+import { loginApi, verify2faApi, resend2faApi, verifyAdminTotpLoginApi } from '../lib/authApi';
 
 const REMEMBER_EMAIL_KEY = 'admin_remembered_email';
 
@@ -12,7 +12,7 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
 
-  const [step, setStep] = useState<'credentials' | '2fa'>('credentials');
+  const [step, setStep] = useState<'credentials' | 'telegram' | 'totp'>('credentials');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -20,6 +20,7 @@ const LoginPage: React.FC = () => {
 
   // 2FA state
   const [tempToken, setTempToken] = useState('');
+  const [challengeToken, setChallengeToken] = useState('');
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
   const [infoMessage, setInfoMessage] = useState('');
@@ -50,7 +51,7 @@ const LoginPage: React.FC = () => {
 
   // Фокус на инпут кода при переходе на 2FA
   useEffect(() => {
-    if (step === '2fa') {
+    if (step !== 'credentials') {
       setTimeout(() => {
         codeInputRef.current?.focus();
       }, 100);
@@ -66,10 +67,18 @@ const LoginPage: React.FC = () => {
     try {
       const data = await loginApi({ email, password });
 
+      if (data.requireTotp && data.challengeToken) {
+        setChallengeToken(data.challengeToken);
+        setTwoFactorCode('');
+        setStep('totp');
+        setInfoMessage('');
+        return;
+      }
+
       // Если требуется 2FA подтверждение через Telegram
       if (data.require2fa && data.tempToken) {
         setTempToken(data.tempToken);
-        setStep('2fa');
+        setStep('telegram');
         setResendCooldown(60); // 60 секунд до повторной отправки
         setInfoMessage(data.message || 'Одноразовый код отправлен в ваш Telegram бот.');
         return;
@@ -151,6 +160,28 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleTotpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const data = await verifyAdminTotpLoginApi(challengeToken, twoFactorCode.trim());
+      if (data.user.role !== 'ADMIN' && !data.user.adminRole) {
+        setError('Доступ запрещён. Эта панель предназначена только для администраторов.');
+        return;
+      }
+      setAuth(data.accessToken, data.user);
+      if (rememberMe) localStorage.setItem(REMEMBER_EMAIL_KEY, email);
+      else localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      navigate('/', { replace: true });
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } } };
+      setError(errorObj.response?.data?.message || 'Неверный код или срок действия запроса истёк.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleResendCode = async () => {
     if (resendCooldown > 0 || !tempToken || loading) return;
     setError('');
@@ -171,6 +202,8 @@ const LoginPage: React.FC = () => {
 
   const handleBackToLogin = () => {
     setStep('credentials');
+    setTempToken('');
+    setChallengeToken('');
     setTwoFactorCode('');
     setError('');
     setInfoMessage('');
@@ -197,10 +230,10 @@ const LoginPage: React.FC = () => {
             </div>
           </div>
           <h1 className="text-2xl font-bold text-app">
-            {step === '2fa' ? 'Подтверждение входа' : 'Вход в панель'}
+            {step !== 'credentials' ? 'Подтверждение входа' : 'Вход в панель'}
           </h1>
           <p className="text-muted text-sm mt-1">
-            {step === '2fa' ? 'Введите код из Telegram бота' : 'Введите данные администратора'}
+            {step === 'telegram' ? 'Введите код из Telegram бота' : step === 'totp' ? 'Введите код приложения-аутентификатора или резервный код' : 'Введите данные администратора'}
           </p>
         </div>
 
@@ -311,7 +344,7 @@ const LoginPage: React.FC = () => {
                 ) : 'Войти в панель'}
               </button>
             </form>
-          ) : (
+          ) : step === 'telegram' ? (
             <form onSubmit={handle2faSubmit} className="space-y-4">
               {/* Уведомление о Telegram */}
               <div className="flex items-center gap-3 p-3 bg-primary-50 dark:bg-primary-950/40 border border-primary-200 dark:border-primary-800/60 rounded-xl text-xs text-primary-900 dark:text-primary-200">
@@ -403,11 +436,45 @@ const LoginPage: React.FC = () => {
                 </button>
               </div>
             </form>
+          ) : (
+            <form onSubmit={handleTotpSubmit} className="space-y-4">
+              <div className="rounded-xl border border-primary-200 bg-primary-50 p-3 text-sm text-primary-900 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-200">
+                Подтвердите вход кодом из приложения-аутентификатора. Вместо него можно использовать резервный код.
+              </div>
+              <div>
+                <label htmlFor="totp-code" className="mb-1.5 block text-sm font-medium text-app">
+                  Код подтверждения
+                </label>
+                <input
+                  ref={codeInputRef}
+                  id="totp-code"
+                  type="text"
+                  inputMode="text"
+                  value={twoFactorCode}
+                  onChange={(event) => setTwoFactorCode(event.target.value.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 40))}
+                  placeholder="123456 или резервный код"
+                  required
+                  autoComplete="one-time-code"
+                  className="input text-center font-mono font-bold tracking-widest"
+                />
+              </div>
+              {error && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">{error}</div>}
+              <button
+                type="submit"
+                disabled={loading || twoFactorCode.trim().length < 6}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading ? 'Проверка…' : 'Подтвердить и войти'}
+              </button>
+              <button type="button" onClick={handleBackToLogin} className="w-full pt-2 text-xs text-muted transition-colors hover:text-app">
+                ← Назад к паролю
+              </button>
+            </form>
           )}
         </div>
 
         <p className="text-center text-xs text-muted mt-6">
-          Двухфакторная защита супер-администратора через Telegram Bot
+          Защищённый вход в панель администратора
         </p>
       </div>
 

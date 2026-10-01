@@ -1,6 +1,7 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useId } from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { fieldContainerClass, fieldControlClass, fieldErrorClass, fieldLabelClass, fieldMessageClass } from './fieldStyles';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -27,14 +28,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     },
     ref,
   ) => {
-    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+    const generatedId = useId();
+    const inputId = id || generatedId;
+    const errorId = `${inputId}-error`;
+    const helperTextId = `${inputId}-help`;
 
     return (
-      <div className={twMerge('w-full space-y-1.5', containerClassName)}>
+      <div className={twMerge(fieldContainerClass, containerClassName)}>
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-xs font-semibold text-app select-none tracking-wide"
+            className={fieldLabelClass}
           >
             {label}
           </label>
@@ -50,15 +54,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             disabled={disabled}
             aria-invalid={Boolean(error)}
+            aria-describedby={error ? errorId : helperText ? helperTextId : undefined}
             className={twMerge(
               clsx(
-                'w-full h-10 px-3.5 text-sm rounded-theme font-theme transition-all duration-150 outline-none',
-                'bg-surface border border-app text-app placeholder:text-muted',
-                'focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20',
-                'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-white/5',
+                fieldControlClass,
+                'h-10 font-theme',
                 leftIcon ? 'pl-9' : '',
                 rightIcon ? 'pr-9' : '',
-                error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
+                error && fieldErrorClass,
               ),
               className,
             )}
@@ -71,9 +74,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error ? (
-          <p className="text-xs text-red-500 font-medium animate-fade-in">{error}</p>
+          <p id={errorId} className={`${fieldMessageClass} text-red-500`}>{error}</p>
         ) : helperText ? (
-          <p className="text-xs text-muted">{helperText}</p>
+          <p id={helperTextId} className="text-xs text-muted">{helperText}</p>
         ) : null}
       </div>
     );

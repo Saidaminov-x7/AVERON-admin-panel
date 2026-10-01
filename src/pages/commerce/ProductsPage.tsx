@@ -4,6 +4,7 @@ import { ImageOff, Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import Layout from "../../components/Layout";
+import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { Pagination, Select } from "../../components/ui";
 import {
   createManualProduct,
@@ -152,12 +153,17 @@ export default function ProductsPage() {
   const products = data?.items ?? [];
   const countryOptions = [
     { value: ALL_COUNTRIES, label: `🌍 ${t("products.allCountries")}` },
-    ...PRODUCT_COUNTRIES.map(({ code, flag, translationKey }) => ({
+    ...PRODUCT_COUNTRIES.map(({ code, translationKey }) => ({
       value: code,
-      label: `${flag} ${t(translationKey)}`,
+      label: t(translationKey),
+      icon: <CountryFlag country={code} />,
     })),
   ];
   const getCountryLabel = (productCountry: string) => {
+    const knownCountry = PRODUCT_COUNTRIES.find(({ code }) => code === productCountry);
+    if (knownCountry) {
+      return <span className="inline-flex items-center gap-2"><CountryFlag country={knownCountry.code} />{t(knownCountry.translationKey)}</span>;
+    }
     const display = getProductCountryDisplay(productCountry);
     return `${display.flag} ${t(display.translationKey, display.code ? { code: display.code } : undefined)}`;
   };

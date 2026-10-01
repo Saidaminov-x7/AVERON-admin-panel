@@ -1,5 +1,6 @@
 export * from './Button';
 export * from './Input';
+export * from './fieldStyles';
 export * from './Textarea';
 export * from './Select';
 export * from './Checkbox';

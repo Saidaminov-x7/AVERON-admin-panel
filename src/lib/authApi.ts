@@ -14,7 +14,10 @@ export interface LoginResponse {
   refreshToken?: string;
   user?: AdminUser;
   require2fa?: boolean;
+  requireTotp?: boolean;
   tempToken?: string;
+  challengeToken?: string;
+  expiresInSeconds?: number;
   message?: string;
 }
 
@@ -26,6 +29,23 @@ export interface Verify2faCredentials {
 export interface Verify2faResponse {
   accessToken: string;
   user: AdminUser;
+}
+
+export interface AdminTotpSetup {
+  setupToken: string;
+  secret: string;
+  otpauthUri: string;
+  qrCodeDataUrl: string;
+  expiresInSeconds: number;
+}
+
+export interface AdminTotpStatus {
+  enabled: boolean;
+  unusedRecoveryCodes: number;
+}
+
+export interface AdminRecoveryCodeResponse {
+  recoveryCodes: string[];
 }
 
 // Вход в систему
@@ -44,6 +64,35 @@ export const verify2faApi = async (credentials: Verify2faCredentials): Promise<V
 export const resend2faApi = async (tempToken: string): Promise<{ ok: boolean; message: string }> => {
   const { data } = await api.post<{ ok: boolean; message: string }>('/auth/resend-2fa', { tempToken });
   return data;
+};
+
+export const verifyAdminTotpLoginApi = async (challengeToken: string, code: string): Promise<Verify2faResponse> => {
+  const { data } = await api.post<Verify2faResponse>('/auth/login/verify-totp', { challengeToken, code });
+  return data;
+};
+
+export const getAdminTotpStatusApi = async (): Promise<AdminTotpStatus> => {
+  const { data } = await api.get<AdminTotpStatus>('/auth/admin/totp/status');
+  return data;
+};
+
+export const setupAdminTotpApi = async (): Promise<AdminTotpSetup> => {
+  const { data } = await api.post<AdminTotpSetup>('/auth/admin/totp/setup');
+  return data;
+};
+
+export const enableAdminTotpApi = async (setupToken: string, code: string): Promise<AdminRecoveryCodeResponse> => {
+  const { data } = await api.post<AdminRecoveryCodeResponse>('/auth/admin/totp/enable', { setupToken, code });
+  return data;
+};
+
+export const regenerateAdminRecoveryCodesApi = async (currentPassword: string, code: string): Promise<AdminRecoveryCodeResponse> => {
+  const { data } = await api.post<AdminRecoveryCodeResponse>('/auth/admin/totp/recovery-codes', { currentPassword, code });
+  return data;
+};
+
+export const disableAdminTotpApi = async (currentPassword: string, code: string): Promise<void> => {
+  await api.post('/auth/admin/totp/disable', { currentPassword, code });
 };
 
 // Выход

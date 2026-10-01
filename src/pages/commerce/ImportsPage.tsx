@@ -4,6 +4,7 @@ import { Check, ExternalLink, X, Package, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
+import { CountryFlag } from '../../components/commerce/CountryFlag';
 import {
   approveImport,
   getImports,
@@ -63,9 +64,10 @@ export default function ImportsPage() {
   };
 
   const currencyLocale = i18n.language?.startsWith('en') ? 'en-US' : 'ru-RU';
-  const countryOptions = PRODUCT_COUNTRIES.map(({ code, flag, translationKey }) => ({
+  const countryOptions = PRODUCT_COUNTRIES.map(({ code, translationKey }) => ({
     value: code,
-    label: `${flag} ${t(translationKey)}`,
+    label: t(translationKey),
+    icon: <CountryFlag country={code} />,
   }));
 
   return (

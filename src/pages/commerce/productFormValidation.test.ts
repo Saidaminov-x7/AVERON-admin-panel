@@ -10,7 +10,6 @@ import {
 const validDraft: ProductDraftValidationInput = {
   titles: { ru: "Товар", uz: "Mahsulot", en: "Product" },
   country: "CN",
-  sourceUrl: "",
   salePriceUzs: "180000",
   photoCount: 1,
   photoSizes: [324 * 1024],
@@ -41,17 +40,12 @@ describe("product form validation", () => {
     });
   });
 
-  it("allows an empty source URL and leaves an unchanged unknown country alone", () => {
+  it("allows an omitted source URL and leaves an unchanged unknown country alone", () => {
     expect(validateProductDraft({
       ...validDraft,
       country: "XX",
       existingCountry: "XX",
     }, isProductCountry)).toEqual({});
-  });
-
-  it("validates optional source URLs when entered", () => {
-    const errors = validateProductDraft({ ...validDraft, sourceUrl: "not a url" }, isProductCountry);
-    expect(errors).toMatchObject({ sourceUrl: "sourceUrl" });
   });
 
   it("enforces configured photo count and size limits", () => {

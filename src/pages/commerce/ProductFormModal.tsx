@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
 import { ImageOff, MoveDown, MoveUp, Star, Trash2, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button, Input, Modal, Select, Textarea } from "../../components/ui";
+import { CountryFlag } from "../../components/commerce/CountryFlag";
 import {
   getProductCountryDisplay,
   isProductCountry,
@@ -33,7 +34,6 @@ type ProductFormValues = {
   translations: Record<ProductLocale, LocalizedContent>;
   country: string;
   categoryId: string;
-  sourceUrl: string;
   salePriceUzs: string;
   color: string;
   size: string;
@@ -99,7 +99,6 @@ const getInitialValues = (product: ProductListItem | null): ProductFormValues =>
   },
   country: product?.country ?? "",
   categoryId: product?.categoryId ?? "",
-  sourceUrl: product?.sourceUrl ?? "",
   salePriceUzs: product ? String(product.salePriceUzs) : "",
   color: product?.source === "MANUAL" ? product.variants?.[0]?.color ?? "" : "",
   size: product?.source === "MANUAL" ? product.variants?.[0]?.size ?? "" : "",
@@ -260,7 +259,6 @@ export function ProductFormModal({
       },
       country: values.country,
       existingCountry: product?.country,
-      sourceUrl: values.sourceUrl,
       salePriceUzs: values.salePriceUzs,
       photoCount: photos.length,
       photoSizes: photos.flatMap((photo) => photo.file ? [photo.file.size] : []),
@@ -270,7 +268,6 @@ export function ProductFormModal({
     const validationMessages = {
       title: t("products.validationTitleLocale"),
       country: t("products.countryRequired"),
-      sourceUrl: t("products.validationSourceUrl"),
       salePriceUzs: t("products.validationSalePrice"),
       photos: t("products.validationPhotos"),
       photoCount: t("products.photoLimitReached", { max: Math.min(15, maxProductPhotos) }),
@@ -295,7 +292,6 @@ export function ProductFormModal({
       description: values.translations.ru.description.trim(),
       descriptionUz: values.translations.uz.description.trim(),
       descriptionEn: values.translations.en.description.trim(),
-      ...(values.sourceUrl.trim() ? { sourceUrl: values.sourceUrl.trim() } : {}),
       salePriceUzs: Number(values.salePriceUzs),
       country: isProductCountry(values.country) ? values.country : undefined,
       categoryId: values.categoryId || null,
@@ -317,7 +313,11 @@ export function ProductFormModal({
     ...(!isProductCountry(values.country) && product
       ? [{ value: values.country, label: `${countryDisplay.flag} ${t("products.unknownCountry")}` }]
       : []),
-    ...PRODUCT_COUNTRIES.map(({ code, flag, translationKey }) => ({ value: code, label: `${flag} ${t(translationKey)}` })),
+    ...PRODUCT_COUNTRIES.map(({ code, translationKey }) => ({
+      value: code,
+      label: t(translationKey),
+      icon: <CountryFlag country={code} />,
+    })),
   ];
   const categoryOptions = [
     { value: "", label: t("products.noCategory") },
@@ -331,7 +331,6 @@ export function ProductFormModal({
     titleUz: `${t("products.titleLabel")} (UZ)`,
     titleEn: `${t("products.titleLabel")} (EN)`,
     country: t("products.countryLabel"),
-    sourceUrl: t("products.sourceLabel"),
     salePriceUzs: t("products.salePriceLabel"),
     photos: t("products.photoSection"),
   };
@@ -405,15 +404,6 @@ export function ProductFormModal({
         <section className="space-y-4">
           <h4 className="text-sm font-bold text-app">{t("products.mainInformation")}</h4>
           <div className="grid gap-4 md:grid-cols-2">
-            <Input
-              label={t("products.sourceLabel")}
-              type="url"
-              value={values.sourceUrl}
-              onChange={(event) => updateValue("sourceUrl", event.target.value)}
-              className={errors.sourceUrl ? "border-red-500" : ""}
-              placeholder={t("products.sourceOptional")}
-              error={errors.sourceUrl}
-            />
             <Select
               label={t("products.countryLabel")}
               placeholder={t("products.countryPlaceholder")}

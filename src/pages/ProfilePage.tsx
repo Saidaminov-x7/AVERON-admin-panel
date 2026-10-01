@@ -13,6 +13,7 @@ import {
   uploadMediaApi,
 } from '../lib/profileApi';
 import { logoutApi } from '../lib/authApi';
+import { AdminSecuritySection } from '../components/security/AdminSecuritySection';
 
 const roleTitles: Record<string, string> = {
   SUPER_ADMIN: 'Супер Администратор',
@@ -282,6 +283,8 @@ const ProfilePage: React.FC = () => {
             </button>
           </form>
         </div>
+
+        <AdminSecuritySection />
 
         {/* Секция смены пароля */}
         <div className="card">

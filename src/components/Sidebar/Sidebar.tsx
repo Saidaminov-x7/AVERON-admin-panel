@@ -63,8 +63,10 @@ const sections: { sectionKey: string; items: Item[] }[] = [
 
 export default function Sidebar({
   onCloseMobile,
+  mobileMenuOpen = false,
 }: {
   onCloseMobile?: () => void;
+  mobileMenuOpen?: boolean;
 }) {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -81,7 +83,12 @@ export default function Sidebar({
   };
 
   return (
-    <aside className="sidebar-bg safe-top safe-bottom flex h-dvh w-72 flex-col border-r sidebar-border text-app shadow-[18px_0_50px_rgba(15,23,42,.08)] lg:shadow-none">
+    <aside
+      role={mobileMenuOpen ? "dialog" : undefined}
+      aria-modal={mobileMenuOpen ? true : undefined}
+      aria-label={mobileMenuOpen ? t("header.mobileNavigation") : undefined}
+      className="sidebar-bg safe-top safe-bottom flex h-dvh w-72 flex-col border-r sidebar-border text-app shadow-[18px_0_50px_rgba(15,23,42,.08)] lg:shadow-none"
+    >
       <div className="flex h-20 items-center justify-between border-b border-app px-6">
         <button onClick={() => navigate("/")} className="text-left">
           <div className="text-xl font-black tracking-[.2em]">AVERON</div>
@@ -156,6 +163,9 @@ export default function Sidebar({
             {t("header.goToSite")}
           </a>
         </div>
+        <NavLink to="/profile" onClick={onCloseMobile} className="block min-h-10 py-2 text-sm font-semibold text-app">
+          {t("header.account")}
+        </NavLink>
       </div>
       <div className="border-t border-app p-4">
         <div className="mb-3 rounded-xl bg-violet-500/10 p-3">

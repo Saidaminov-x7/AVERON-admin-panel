@@ -1,6 +1,8 @@
 import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { useId } from 'react';
+import { fieldContainerClass, fieldControlClass, fieldErrorClass, fieldLabelClass, fieldMessageClass } from './fieldStyles';
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -28,7 +30,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     ref,
   ) => {
     const internalRef = useRef<HTMLTextAreaElement | null>(null);
-    const textareaId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
+    const generatedId = useId();
+    const textareaId = id || generatedId;
+    const errorId = `${textareaId}-error`;
+    const helperTextId = `${textareaId}-help`;
 
     const handleResize = useCallback(() => {
       const el = internalRef.current;
@@ -43,11 +48,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     }, [handleResize, props.value]);
 
     return (
-      <div className={twMerge('w-full space-y-1.5', containerClassName)}>
+      <div className={twMerge(fieldContainerClass, containerClassName)}>
         {label && (
           <label
             htmlFor={textareaId}
-            className="block text-xs font-semibold text-app select-none tracking-wide"
+            className={fieldLabelClass}
           >
             {label}
           </label>
@@ -67,21 +72,20 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           }}
           className={twMerge(
             clsx(
-              'w-full px-3.5 py-3 text-sm leading-relaxed rounded-xl transition-all duration-150 outline-none resize-y',
-              'bg-surface border border-app text-app placeholder:text-muted',
-              'focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20',
-              'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-white/5',
-              error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',
+              fieldControlClass,
+              'min-h-[70px] py-3 leading-relaxed resize-y',
+              error && fieldErrorClass,
             ),
             className,
           )}
           aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : helperText ? helperTextId : undefined}
           {...props}
         />
         {error ? (
-          <p className="text-xs text-red-500 font-medium animate-fade-in">{error}</p>
+          <p id={errorId} className={`${fieldMessageClass} text-red-500`}>{error}</p>
         ) : helperText ? (
-          <p className="text-xs text-muted">{helperText}</p>
+          <p id={helperTextId} className="text-xs text-muted">{helperText}</p>
         ) : null}
       </div>
     );

@@ -3,7 +3,6 @@ export const PRODUCT_VALIDATION_FIELDS = [
   "titleUz",
   "titleEn",
   "country",
-  "sourceUrl",
   "salePriceUzs",
   "photos",
 ] as const;
@@ -12,7 +11,6 @@ export type ProductValidationField = typeof PRODUCT_VALIDATION_FIELDS[number];
 export type ProductValidationCode =
   | "title"
   | "country"
-  | "sourceUrl"
   | "salePriceUzs"
   | "photos"
   | "photoCount"
@@ -23,7 +21,6 @@ export interface ProductDraftValidationInput {
   titles: Record<"ru" | "uz" | "en", string>;
   country: string;
   existingCountry?: string;
-  sourceUrl: string;
   salePriceUzs: string;
   photoCount: number;
   photoSizes: number[];
@@ -52,15 +49,6 @@ export function validateProductDraft(
   const salePriceUzs = Number(input.salePriceUzs);
   if (!Number.isFinite(salePriceUzs) || salePriceUzs <= 0) {
     errors.salePriceUzs = "salePriceUzs";
-  }
-
-  const sourceUrl = input.sourceUrl.trim();
-  if (sourceUrl) {
-    try {
-      if (!new URL(sourceUrl).host) errors.sourceUrl = "sourceUrl";
-    } catch {
-      errors.sourceUrl = "sourceUrl";
-    }
   }
 
   const maxPhotos = Math.min(15, Math.max(1, input.maxPhotos));

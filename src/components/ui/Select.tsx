@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { ChevronDown, Check, Search, X } from 'lucide-react';
+import { fieldContainerClass, fieldControlClass, fieldErrorClass, fieldLabelClass, fieldMessageClass } from './fieldStyles';
 
 export interface SelectOption {
   value: string;
@@ -58,6 +59,8 @@ export const Select: React.FC<SelectProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const selectId = useId();
   const menuId = `${selectId}-options`;
+  const errorId = `${selectId}-error`;
+  const helperTextId = `${selectId}-help`;
   const [menuPosition, setMenuPosition] = useState<{
     left: number;
     top: number;
@@ -164,11 +167,11 @@ export const Select: React.FC<SelectProps> = ({
   };
 
   return (
-    <div ref={containerRef} className={twMerge('w-full space-y-1.5 relative', containerClassName)}>
+    <div ref={containerRef} className={twMerge(`${fieldContainerClass} relative`, containerClassName)}>
       {label && (
         <label
           htmlFor={selectId}
-          className="block text-xs font-semibold text-app select-none tracking-wide"
+          className={fieldLabelClass}
         >
           {label}
         </label>
@@ -197,16 +200,15 @@ export const Select: React.FC<SelectProps> = ({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : helperText ? helperTextId : undefined}
         aria-controls={isOpen ? menuId : undefined}
         className={twMerge(
           clsx(
-            'w-full h-10 px-3.5 text-sm rounded-xl transition-[transform,border-color,box-shadow,background-color] duration-150 [transition-timing-function:var(--ease-out-ui)] outline-none flex items-center justify-between gap-2 active:scale-[.99]',
-            'bg-surface border border-app text-app text-left cursor-pointer',
-            'focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20',
+            fieldControlClass,
+            'h-10 flex items-center justify-between gap-2 text-left cursor-pointer transition-[transform,border-color,box-shadow,background-color] [transition-timing-function:var(--ease-out-ui)] active:scale-[.99]',
             'focus-visible:ring-2 focus-visible:ring-primary-500/30',
-            'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-white/5',
             isOpen && 'border-primary-500 ring-2 ring-primary-500/20',
-            error && 'border-red-500 focus:border-red-500',
+            error && fieldErrorClass,
           ),
           className,
         )}
@@ -319,9 +321,9 @@ export const Select: React.FC<SelectProps> = ({
       , document.body)}
 
       {error ? (
-        <p className="text-xs text-red-500 font-medium animate-fade-in">{error}</p>
+        <p id={errorId} className={`${fieldMessageClass} text-red-500`}>{error}</p>
       ) : helperText ? (
-        <p className="text-xs text-muted">{helperText}</p>
+        <p id={helperTextId} className="text-xs text-muted">{helperText}</p>
       ) : null}
     </div>
   );

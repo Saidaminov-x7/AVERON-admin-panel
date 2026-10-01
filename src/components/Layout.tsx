@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Header/Header';
 import { CommandPalette } from './CommandPalette/CommandPalette';
+import { useTranslation } from 'react-i18next';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,7 +10,52 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, title }) => {
+  const { t } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    document.body.style.overflow = 'hidden';
+    const frame = requestAnimationFrame(() => {
+      drawerRef.current?.querySelector<HTMLElement>('a[href], button:not(:disabled)')?.focus();
+    });
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsMobileMenuOpen(false);
+        return;
+      }
+      if (event.key !== 'Tab' || !drawerRef.current) return;
+      const focusable = Array.from(drawerRef.current.querySelectorAll<HTMLElement>(
+        'a[href]:not([tabindex="-1"]), button:not(:disabled):not([tabindex="-1"]), input:not(:disabled):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
+      ));
+      if (!focusable.length) {
+        event.preventDefault();
+        drawerRef.current.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || !drawerRef.current.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !drawerRef.current.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      if (previouslyFocused?.isConnected) previouslyFocused.focus();
+    };
+  }, [isMobileMenuOpen]);
 
   return (
     <div className="flex h-dvh overflow-hidden bg-app">
@@ -17,20 +63,23 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
       {/* Глобальная командная строка / Поиск */}
       {/* Затемнение фона для мобильного меню (Backdrop) */}
       {isMobileMenuOpen && (
-        <div
+        <button
+          type="button"
+          aria-label={t('header.closeMenu')}
           onClick={() => setIsMobileMenuOpen(false)}
-          className="fixed inset-0 z-40 bg-black/55 backdrop-blur-sm lg:hidden transition-opacity duration-200 ease-out"
+          className="fixed inset-0 z-40 cursor-default bg-black/55 backdrop-blur-sm transition-opacity duration-200 ease-out lg:hidden"
         />
       )}
 
       {/* Боковое меню (Sidebar) с поддержкой мобильного Drawer */}
       <div
-        className={`
-          fixed inset-y-0 left-0 z-50 transform lg:relative lg:translate-x-0 transition-transform duration-[280ms] [transition-timing-function:var(--ease-drawer)]
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}
+        ref={drawerRef}
+        id="admin-mobile-navigation"
+        className={`invisible fixed inset-y-0 left-0 z-50 -translate-x-full transform transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:translate-x-0 ${
+          isMobileMenuOpen ? 'visible translate-x-0' : ''
+        }`}
       >
-        <Sidebar onCloseMobile={() => setIsMobileMenuOpen(false)} />
+        <Sidebar onCloseMobile={() => setIsMobileMenuOpen(false)} mobileMenuOpen={isMobileMenuOpen} />
       </div>
 
       {/* Основная область */}
@@ -39,6 +88,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         <Header
           title={title}
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          isMobileMenuOpen={isMobileMenuOpen}
         />
 
         {/* Контент страницы */}
