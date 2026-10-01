@@ -49,6 +49,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             disabled={disabled}
+            aria-invalid={Boolean(error)}
             className={twMerge(
               clsx(
                 'w-full h-10 px-3.5 text-sm rounded-theme font-theme transition-all duration-150 outline-none',

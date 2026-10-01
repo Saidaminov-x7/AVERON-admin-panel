@@ -196,6 +196,7 @@ export const Select: React.FC<SelectProps> = ({
         }}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
+        aria-invalid={Boolean(error)}
         aria-controls={isOpen ? menuId : undefined}
         className={twMerge(
           clsx(

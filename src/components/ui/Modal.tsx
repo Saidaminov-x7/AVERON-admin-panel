@@ -120,24 +120,30 @@ export function Modal({
             exit={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}
             transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
           >
-            <div className={`relative shrink-0 border-b border-app bg-surface px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))] sm:p-5 ${
-              headerContent ? 'sm:flex sm:items-center sm:justify-between sm:gap-4' : ''
+            <div className={`relative grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 border-b border-app bg-surface px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))] sm:gap-x-4 sm:p-5 ${
+              headerContent ? 'sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]' : ''
             }`}>
-              <div className="flex min-w-0 items-start justify-between gap-3">
+              <div className="col-start-1 row-start-1 min-w-0">
                 <div className="min-w-0">
                   <h3 id={`${dialogId}-title`} className="text-base font-bold text-app truncate">{title}</h3>
                   {subtitle && <p className="text-xs text-muted truncate mt-0.5">{subtitle}</p>}
                 </div>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-gray-100 hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/5 cursor-pointer transition-colors"
-                  aria-label={closeLabel}
-                >
-                  <X size={18} />
-                </button>
               </div>
-              {headerContent && <div className="mt-3 sm:mt-0 sm:absolute sm:left-1/2 sm:-translate-x-1/2">{headerContent}</div>}
+              {headerContent && (
+                <div className="col-span-2 row-start-2 min-w-0 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:justify-self-center">
+                  {headerContent}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-gray-100 hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/5 cursor-pointer transition-colors ${
+                  headerContent ? 'col-start-2 row-start-1 sm:col-start-3 sm:justify-self-end' : 'col-start-2 row-start-1'
+                }`}
+                aria-label={closeLabel}
+              >
+                <X size={18} />
+              </button>
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">{children}</div>
             {footer && (

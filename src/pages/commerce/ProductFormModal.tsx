@@ -12,6 +12,14 @@ import {
   type ProductListItem,
   type ProductLocale,
 } from "../../lib/commerceApi";
+import {
+  fileIdentity,
+  formatPhotoSize,
+  PRODUCT_VALIDATION_FIELDS,
+  reorderItem,
+  validateProductDraft,
+  type ProductValidationField,
+} from "./productFormValidation";
 
 type LocalizedContent = { title: string; description: string };
 type PhotoDraft = {
@@ -31,7 +39,7 @@ type ProductFormValues = {
   size: string;
   publish: boolean;
 };
-type FormErrors = Partial<Record<"titleRu" | "titleUz" | "titleEn" | "country" | "sourceUrl" | "salePriceUzs" | "photos", string>>;
+type FormErrors = Partial<Record<ProductValidationField, string>>;
 
 export type ProductFormSubmission = {
   title: string;
@@ -56,6 +64,7 @@ interface ProductFormModalProps {
   categories: ProductCategory[];
   categoriesError: boolean;
   isSaving: boolean;
+  submissionError: string | null;
   settingsLoading: boolean;
   maxProductPhotos: number;
   maxProductPhotoSizeMb: number;
@@ -97,19 +106,13 @@ const getInitialValues = (product: ProductListItem | null): ProductFormValues =>
   publish: product ? product.status === "PUBLISHED" : true,
 });
 
-const formatFileSize = (size: number): string =>
-  size >= 1024 * 1024
-    ? `${(size / (1024 * 1024)).toFixed(1)} MB`
-    : `${Math.max(1, Math.round(size / 1024))} KB`;
-
-const fileIdentity = (file: File) => `${file.name.toLowerCase()}-${file.size}-${file.lastModified}`;
-
 export function ProductFormModal({
   isOpen,
   product,
   categories,
   categoriesError,
   isSaving,
+  submissionError,
   settingsLoading,
   maxProductPhotos,
   maxProductPhotoSizeMb,
@@ -136,6 +139,31 @@ export function ProductFormModal({
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     objectUrlsRef.current.clear();
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      releaseObjectUrls();
+      setValues(getInitialValues(null));
+      setPhotos([]);
+      setErrors({});
+      setPhotoInputErrors([]);
+      setSubmitAttempted(false);
+      setActiveLocale("ru");
+      return;
+    }
+    releaseObjectUrls();
+    setActiveLocale("ru");
+    setValues(getInitialValues(product));
+    setPhotos((product?.images ?? []).map((image) => ({
+      key: `existing-${image.id}`,
+      id: image.id,
+      mediaId: image.mediaId,
+      url: image.url,
+    })));
+    setErrors({});
+    setPhotoInputErrors([]);
+    setSubmitAttempted(false);
+  }, [isOpen, product, releaseObjectUrls]);
 
   useEffect(() => () => releaseObjectUrls(), [releaseObjectUrls]);
 
@@ -217,46 +245,40 @@ export function ProductFormModal({
   };
 
   const movePhoto = (index: number, offset: -1 | 1) => {
-    setPhotos((current) => {
-      const nextIndex = index + offset;
-      if (nextIndex < 0 || nextIndex >= current.length) return current;
-      const reordered = [...current];
-      [reordered[index], reordered[nextIndex]] = [reordered[nextIndex], reordered[index]];
-      return reordered;
-    });
+    setPhotos((current) => reorderItem(current, index, offset));
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitAttempted(true);
     const nextErrors: FormErrors = {};
-    for (const locale of locales) {
-      if (values.translations[locale].title.trim().length < 2) {
-        nextErrors[localeErrorKeys[locale]] = t("products.validationTitleLocale");
-      }
-    }
-    const unknownCountryIsUnchanged = Boolean(product) && values.country === product?.country && !isProductCountry(values.country);
-    if (!isProductCountry(values.country) && !unknownCountryIsUnchanged) {
-      nextErrors.country = t("products.countryRequired");
-    }
-    const salePriceUzs = Number(values.salePriceUzs);
-    if (!Number.isFinite(salePriceUzs) || salePriceUzs <= 0) {
-      nextErrors.salePriceUzs = t("products.validationSalePrice");
-    }
-    const sourceUrl = values.sourceUrl.trim();
-    if (sourceUrl) {
-      try {
-        if (!new URL(sourceUrl).host) nextErrors.sourceUrl = t("products.validationSourceUrl");
-      } catch {
-        nextErrors.sourceUrl = t("products.validationSourceUrl");
-      }
-    }
-    if (!photos.length) nextErrors.photos = t("products.validationPhotos");
-    if (photos.length > Math.min(15, maxProductPhotos)) {
-      nextErrors.photos = t("products.photoLimitReached", { max: Math.min(15, maxProductPhotos) });
-    }
-    if (photos.some((photo) => photo.file && photo.file.size > maxProductPhotoSizeMb * 1024 * 1024)) {
-      nextErrors.photos = t("products.photoSizeLimit", { size: maxProductPhotoSizeMb });
+    const validationCodes = validateProductDraft({
+      titles: {
+        ru: values.translations.ru.title,
+        uz: values.translations.uz.title,
+        en: values.translations.en.title,
+      },
+      country: values.country,
+      existingCountry: product?.country,
+      sourceUrl: values.sourceUrl,
+      salePriceUzs: values.salePriceUzs,
+      photoCount: photos.length,
+      photoSizes: photos.flatMap((photo) => photo.file ? [photo.file.size] : []),
+      maxPhotos: maxProductPhotos,
+      maxPhotoSizeMb: maxProductPhotoSizeMb,
+    }, isProductCountry);
+    const validationMessages = {
+      title: t("products.validationTitleLocale"),
+      country: t("products.countryRequired"),
+      sourceUrl: t("products.validationSourceUrl"),
+      salePriceUzs: t("products.validationSalePrice"),
+      photos: t("products.validationPhotos"),
+      photoCount: t("products.photoLimitReached", { max: Math.min(15, maxProductPhotos) }),
+      photoSize: t("products.photoSizeLimit", { size: maxProductPhotoSizeMb }),
+    };
+    for (const field of PRODUCT_VALIDATION_FIELDS) {
+      const code = validationCodes[field];
+      if (code) nextErrors[field] = validationMessages[code];
     }
 
     setErrors(nextErrors);
@@ -273,8 +295,8 @@ export function ProductFormModal({
       description: values.translations.ru.description.trim(),
       descriptionUz: values.translations.uz.description.trim(),
       descriptionEn: values.translations.en.description.trim(),
-      ...(sourceUrl ? { sourceUrl } : {}),
-      salePriceUzs,
+      ...(values.sourceUrl.trim() ? { sourceUrl: values.sourceUrl.trim() } : {}),
+      salePriceUzs: Number(values.salePriceUzs),
       country: isProductCountry(values.country) ? values.country : undefined,
       categoryId: values.categoryId || null,
       color: values.color.trim(),
@@ -365,6 +387,11 @@ export function ProductFormModal({
       }
     >
       <form id={formId} noValidate onSubmit={handleSubmit} className="space-y-6">
+        {submissionError && (
+          <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
+            {submissionError}
+          </div>
+        )}
         {submitAttempted && Object.keys(errors).length > 0 && (
           <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
             <p className="font-semibold">{t("products.formHasErrors")}</p>
@@ -470,7 +497,7 @@ export function ProductFormModal({
                   </div>
                   <div className="space-y-2 p-3">
                     <p className="truncate text-xs text-app">{photo.file?.name ?? t("products.existingPhoto")}</p>
-                    <p className="text-xs text-muted">{photo.file ? formatFileSize(photo.file.size) : t("products.alreadyUploaded")}</p>
+                    <p className="text-xs text-muted">{photo.file ? formatPhotoSize(photo.file.size) : t("products.alreadyUploaded")}</p>
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex gap-1">
                         <button type="button" disabled={index === 0} onClick={() => movePhoto(index, -1)} aria-label={t("products.movePhotoUp")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveUp size={16} /></button>

@@ -23,7 +23,7 @@ import {
   deleteSiteLogoApi,
   getMediaUrl,
 } from '../../lib/siteSettingsApi';
-import { Button, Input, Textarea, Switch, Card } from '../../components/ui';
+import { Button, Input, Textarea, Switch, Card, Select } from '../../components/ui';
 import { useTranslation } from 'react-i18next';
 
 const GeneralSettingsPage: React.FC = () => {
@@ -160,7 +160,7 @@ const GeneralSettingsPage: React.FC = () => {
   };
 
   return (
-    <Layout title="Основные настройки">
+    <Layout title={t('settings.generalTitle', 'Основные настройки')}>
       <div className="w-full space-y-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card
@@ -384,21 +384,22 @@ const GeneralSettingsPage: React.FC = () => {
                       placeholder={t('settings.menuItemPlaceholder', 'Например: Каталог')}
                     />
                   </div>
-                  <label className="w-full text-xs font-semibold text-muted sm:w-36">
-                    {t('settings.menuItemPosition', 'Размещение')}
-                    <select
+                  <div className="w-full sm:w-36">
+                    <Select
+                      label={t('settings.menuItemPosition', 'Размещение')}
                       value={link.position}
-                      onChange={(e) => {
+                      options={[
+                        { value: 'header', label: t('settings.header', 'Шапка') },
+                        { value: 'footer', label: t('settings.footer', 'Подвал') },
+                      ]}
+                      onChange={(position) => {
+                        if (position !== 'header' && position !== 'footer') return;
                         const updated = [...navLinks];
-                        updated[idx] = { ...updated[idx], position: e.target.value as 'header' | 'footer' };
+                        updated[idx] = { ...updated[idx], position };
                         setNavLinks(updated);
                       }}
-                      className="input mt-1 w-full"
-                    >
-                      <option value="header">{t('settings.header', 'Шапка')}</option>
-                      <option value="footer">{t('settings.footer', 'Подвал')}</option>
-                    </select>
-                  </label>
+                    />
+                  </div>
                   <div className="flex-1 w-full sm:w-auto">
                     <Input
                       label={t('settings.menuItemUrl', 'Ссылка (URL или относительный путь)')}

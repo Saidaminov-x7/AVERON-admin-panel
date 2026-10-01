@@ -31,6 +31,7 @@ export default function ProductsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(15);
   const [editingProduct, setEditingProduct] = useState<ProductListItem | null>(null);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
   const qc = useQueryClient();
 
   const { data, isLoading, isError, refetch } = useQuery({
@@ -113,23 +114,38 @@ export default function ProductsPage() {
       }
     },
     onSuccess: (_result, variables) => {
+      setSubmissionError(null);
       toast.success(t(variables.productId ? "products.productUpdated" : "products.done"));
       closeForm();
       void qc.invalidateQueries({ queryKey: ["commerce-products"] });
     },
     onError: (error: unknown) => {
-      const responseError = error as { response?: { data?: { message?: unknown } } };
-      const message = responseError.response?.data?.message;
-      toast.error(typeof message === "string" ? message : t("products.serverError"));
+      const responseError = error as {
+        response?: {
+          status?: number;
+          data?: { message?: unknown; requestId?: unknown };
+        };
+      };
+      const { status, data: response } = responseError.response ?? {};
+      const message = status !== undefined && status < 500 && typeof response?.message === "string"
+        ? response.message
+        : t("products.serverError");
+      const requestId = status !== undefined && status >= 500 && typeof response?.requestId === "string"
+        ? ` (${response.requestId})`
+        : "";
+      setSubmissionError(`${message}${requestId}`);
+      toast.error(`${message}${requestId}`);
     },
   });
 
   const closeForm = () => {
+    setSubmissionError(null);
     setIsFormOpen(false);
     setEditingProduct(null);
   };
 
   const handleFormSubmit = (values: ProductFormSubmission) => {
+    setSubmissionError(null);
     mutation.mutate({ productId: editingProduct?.id ?? null, values });
   };
 
@@ -268,6 +284,7 @@ export default function ProductsPage() {
           maxProductPhotoSizeMb={settingsQuery.data?.maxProductPhotoSizeMb ?? 10}
           settingsLoading={settingsQuery.isLoading}
           isSaving={mutation.isPending}
+          submissionError={submissionError}
           onClose={closeForm}
           onSubmit={handleFormSubmit}
         />
