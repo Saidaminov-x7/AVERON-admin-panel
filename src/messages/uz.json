@@ -82,7 +82,12 @@
     "noNotifications": "Yangi bildirishnomalar yo'q",
     "apiOnline": "API tarmoqda",
     "apiOffline": "API ishlamayapti",
-    "goToSite": "Saytga o'tish"
+    "goToSite": "Saytga o'tish",
+    "openMenu": "Yon menyuni ochish",
+    "switchToLightTheme": "Yorug' mavzuga o'tish",
+    "switchToDarkTheme": "Qorong'i mavzuga o'tish",
+    "lightTheme": "Yorug' mavzu",
+    "darkTheme": "Qorong'i mavzu"
   },
   "dashboard": {
     "title": "Boshqaruv paneli",
@@ -483,6 +488,14 @@
     "countryTurkey": "Turkiya",
     "countryItaly": "Italiya",
     "countryUnitedKingdom": "Buyuk Britaniya",
+    "unknownCountry": "Noma'lum mamlakat",
+    "loadError": "Mahsulotlarni yuklab bo'lmadi. Server bilan aloqani tekshiring.",
+    "emptyAll": "Mahsulotlar topilmadi",
+    "status": {
+      "draft": "Qoralama",
+      "published": "E'lon qilingan",
+      "archived": "Arxivlangan"
+    },
     "titleLabel": "Nomi (RU)",
     "titleUzLabel": "Nomi (UZ)",
     "titleEnLabel": "Nomi (EN)",

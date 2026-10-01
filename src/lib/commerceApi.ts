@@ -59,7 +59,7 @@ export interface ProductListItem {
   };
   images?: Array<{ url: string }>;
   salePriceUzs: string | number;
-  status: string;
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 }
 
 export interface ProductListResponse {
@@ -124,7 +124,7 @@ export const getProducts = (params?: {
       limit: params?.limit ?? 15,
       page: params?.page ?? 1,
       q: params?.q,
-      ...(params?.country ? { country: params.country } : {}),
+      ...(isProductCountry(params?.country) ? { country: params.country } : {}),
     },
   }).then((r) => r.data);
 

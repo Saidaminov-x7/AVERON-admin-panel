@@ -82,7 +82,12 @@
     "noNotifications": "Нет новых уведомлений",
     "apiOnline": "API в сети",
     "apiOffline": "API недоступен",
-    "goToSite": "Перейти на сайт"
+    "goToSite": "Перейти на сайт",
+    "openMenu": "Открыть боковое меню",
+    "switchToLightTheme": "Переключить на светлую тему",
+    "switchToDarkTheme": "Переключить на тёмную тему",
+    "lightTheme": "Светлая тема",
+    "darkTheme": "Тёмная тема"
   },
   "dashboard": {
     "title": "Панель управления",
@@ -440,6 +445,14 @@
     "countryTurkey": "Турция",
     "countryItaly": "Италия",
     "countryUnitedKingdom": "Великобритания",
+    "unknownCountry": "Неизвестная страна",
+    "loadError": "Не удалось загрузить товары. Проверьте соединение с сервером.",
+    "emptyAll": "Товары не найдены",
+    "status": {
+      "draft": "Черновик",
+      "published": "Опубликован",
+      "archived": "В архиве"
+    },
     "titleLabel": "Название (RU)",
     "titleUzLabel": "Название (UZ)",
     "titleEnLabel": "Название (EN)",

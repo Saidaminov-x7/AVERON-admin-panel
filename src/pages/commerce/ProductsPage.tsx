@@ -17,10 +17,12 @@ import {
 } from "../../lib/commerceApi";
 import { uploadMediaApi } from "../../lib/mediaApi";
 
+const ALL_COUNTRIES = "ALL" as const;
+
 export default function ProductsPage() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [country, setCountry] = useState<ProductCountry | "">("");
+  const [country, setCountry] = useState<ProductCountry | typeof ALL_COUNTRIES>(ALL_COUNTRIES);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(15);
   const [editingProduct, setEditingProduct] = useState<ProductListItem | null>(null);
@@ -32,9 +34,13 @@ export default function ProductsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["commerce-products", country, page, limit],
-    queryFn: () => getProducts({ country: country || undefined, page, limit }),
+    queryFn: () => getProducts({
+      country: country === ALL_COUNTRIES ? undefined : country,
+      page,
+      limit,
+    }),
   });
 
   const mutation = useMutation({
@@ -145,7 +151,7 @@ export default function ProductsPage() {
 
   const products = data?.items ?? [];
   const countryOptions = [
-    { value: "", label: `🌍 ${t("products.allCountries")}` },
+    { value: ALL_COUNTRIES, label: `🌍 ${t("products.allCountries")}` },
     ...PRODUCT_COUNTRIES.map(({ code, flag, translationKey }) => ({
       value: code,
       label: `${flag} ${t(translationKey)}`,
@@ -157,7 +163,7 @@ export default function ProductsPage() {
   }));
   const getCountryLabel = (selectedCountry: ProductCountry) => {
     const option = PRODUCT_COUNTRIES.find(({ code }) => code === selectedCountry);
-    return option ? `${option.flag} ${t(option.translationKey)}` : selectedCountry;
+    return option ? `${option.flag} ${t(option.translationKey)}` : `🌍 ${t("products.unknownCountry")}`;
   };
   const field = "input";
 
@@ -176,13 +182,14 @@ export default function ProductsPage() {
         </button>
       </div>
 
-      <div className="mt-4 max-w-sm">
+      <div className="mt-4 w-full max-w-sm">
         <Select
           label={t("products.countryFilterLabel")}
+          placeholder={t("products.countryPlaceholder")}
           value={country}
           options={countryOptions}
           onChange={(value) => {
-            setCountry(isProductCountry(value) ? value : "");
+            setCountry(value === ALL_COUNTRIES ? ALL_COUNTRIES : isProductCountry(value) ? value : ALL_COUNTRIES);
             setPage(1);
           }}
         />
@@ -356,6 +363,13 @@ export default function ProductsPage() {
 
       {isLoading ? (
         <div className="card">{t("products.loading")}</div>
+      ) : isError && !data ? (
+        <div className="card flex flex-wrap items-center justify-between gap-3 text-muted">
+          <p>{t("products.loadError")}</p>
+          <button type="button" onClick={() => void refetch()} className="btn-ghost">
+            {t("common.refresh")}
+          </button>
+        </div>
       ) : products.length ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {products.map((p) => (
@@ -387,7 +401,9 @@ export default function ProductsPage() {
                   <strong>
                     {Number(p.salePriceUzs).toLocaleString()} UZS
                   </strong>
-                  <span className="badge-success">PUBLISHED</span>
+                  <span className={p.status === "PUBLISHED" ? "badge-success" : p.status === "DRAFT" ? "badge-warning" : "badge-neutral"}>
+                    {t(`products.status.${p.status.toLowerCase()}`)}
+                  </span>
                 </div>
                 <button
                   type="button"
@@ -405,7 +421,7 @@ export default function ProductsPage() {
           ))}
         </div>
       ) : (
-        <div className="card text-muted">{t("products.empty")}</div>
+        <div className="card text-muted">{t("products.emptyAll")}</div>
       )}
       {data?.pagination && (
         <Pagination

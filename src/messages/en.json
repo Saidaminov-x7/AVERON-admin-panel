@@ -82,7 +82,12 @@
     "noNotifications": "No new notifications",
     "apiOnline": "API Online",
     "apiOffline": "API Offline",
-    "goToSite": "Go to Website"
+    "goToSite": "Go to Website",
+    "openMenu": "Open navigation menu",
+    "switchToLightTheme": "Switch to light theme",
+    "switchToDarkTheme": "Switch to dark theme",
+    "lightTheme": "Light theme",
+    "darkTheme": "Dark theme"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -483,6 +488,14 @@
     "countryTurkey": "Turkey",
     "countryItaly": "Italy",
     "countryUnitedKingdom": "United Kingdom",
+    "unknownCountry": "Unknown country",
+    "loadError": "Could not load products. Check your connection to the server.",
+    "emptyAll": "No products found",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
     "titleLabel": "Title (RU)",
     "titleUzLabel": "Title (UZ)",
     "titleEnLabel": "Title (EN)",

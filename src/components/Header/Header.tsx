@@ -126,19 +126,19 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
   return (
     <header
       className="
-        flex items-center justify-between px-6 h-16
+        flex items-center justify-between px-3 sm:px-6 h-16
         bg-surface border-b border-app
         flex-shrink-0 transition-colors duration-200 relative z-30
       "
     >
       {/* Заголовок страницы + Гамбургер на мобилке */}
-      <div className="flex min-w-0 flex-1 items-center gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
         {onToggleMobileMenu && (
           <button
             type="button"
             onClick={onToggleMobileMenu}
-            aria-label="Открыть боковое меню"
-            className="order-last ml-auto inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 shadow-xs transition-all duration-200 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900 dark:border-white/10 dark:bg-stone-900 dark:text-stone-300 dark:hover:border-white/20 dark:hover:bg-stone-800 dark:hover:text-white lg:hidden"
+            aria-label={t('header.openMenu')}
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 shadow-xs transition-all duration-200 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900 dark:border-white/10 dark:bg-stone-900 dark:text-stone-300 dark:hover:border-white/20 dark:hover:bg-stone-800 dark:hover:text-white lg:hidden"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="4" x2="20" y1="12" y2="12" />
@@ -151,7 +151,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
       </div>
 
       {/* Правая часть */}
-      <div className="flex items-center gap-2 ml-auto">
+      <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
         {/* Поиск / Command Palette */}
         <button
           type="button"
@@ -221,7 +221,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
         <ThemeToggle />
 
         {/* Дропдаун Уведомлений */}
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative shrink-0" ref={dropdownRef}>
           <button
             id="notifications-btn"
             onClick={() => setIsNotifOpen(!isNotifOpen)}
@@ -234,7 +234,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
                   : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10'
               }
             `}
-            aria-label="Уведомления"
+            aria-label={t('header.notifications')}
           >
             <BellIcon />
             {unreadCount > 0 && (
@@ -245,7 +245,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
           </button>
 
           {isNotifOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-surface border border-app shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
+            <div className="absolute right-0 mt-2 w-[min(20rem,calc(100vw-1.5rem))] sm:w-96 rounded-xl bg-surface border border-app shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
               {/* Шапка уведомлений */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-app bg-gray-50/50 dark:bg-white/5">
                 <div className="flex items-center gap-2">

@@ -2,6 +2,7 @@
 // Переключатель светлой/тёмной темы
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../hooks/useTheme';
 
 const SunIcon = () => (
@@ -26,12 +27,13 @@ const MoonIcon = () => (
 
 const ThemeToggle: React.FC = () => {
   const { toggleTheme, isDark } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <button
       onClick={toggleTheme}
-      aria-label={isDark ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'}
-      title={isDark ? 'Светлая тема' : 'Тёмная тема'}
+      aria-label={isDark ? t('header.switchToLightTheme') : t('header.switchToDarkTheme')}
+      title={isDark ? t('header.lightTheme') : t('header.darkTheme')}
       className={`
         relative w-10 h-10 rounded-lg flex items-center justify-center
         transition-all duration-200 cursor-pointer
