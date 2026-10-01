@@ -260,8 +260,8 @@ export interface CommerceOrderItem {
   id: string;
   title: string;
   quantity: number;
-  unitPrice: string;
-  totalPrice: string;
+  unitPrice: string | number;
+  totalPrice: string | number;
   variantSnapshot?: { color: string | null; size: string | null; sku: string } | null;
 }
 
@@ -269,10 +269,10 @@ export interface CommerceOrder {
   orderNumber: string;
   status: CommerceOrderStatus;
   currency: 'UZS';
-  subtotal: string;
-  discount: string;
-  deliveryCost: string;
-  totalRevenue: string;
+  subtotal: string | number;
+  discount: string | number;
+  deliveryCost: string | number;
+  totalRevenue: string | number;
   contact: unknown;
   deliveryAddress: unknown;
   items: CommerceOrderItem[];
