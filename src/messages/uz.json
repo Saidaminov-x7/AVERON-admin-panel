@@ -565,6 +565,29 @@
       "disabled": "AI yordamida mahsulot to‘ldirish hozir o‘chirilgan. Takliflar yaratilmagan.",
       "sourceTitleRequired": "Taklif olish uchun tanlangan tilda nom kiriting."
     },
+    "imageEmbeddings": {
+      "title": "Rasm indeksi",
+      "hint": "Indekslash holatini ko‘ring yoki qo‘lda qayta indekslang. Embedding ma’lumotlari ko‘rsatilmaydi.",
+      "loading": "Rasm indekslash holati yuklanmoqda…",
+      "statusError": "Rasm indekslash holatini yuklab bo‘lmadi.",
+      "statusLabel": "Holat",
+      "status": {
+        "INDEXED": "Indekslangan",
+        "PENDING": "Navbatda",
+        "UNAVAILABLE": "Mavjud emas",
+        "FAILED": "Xatolik"
+      },
+      "provider": "Provayder",
+      "model": "Model",
+      "version": "Embedding versiyasi",
+      "lastIndexed": "Oxirgi indekslangan vaqt",
+      "reindex": "Rasmlarni qayta indekslash",
+      "reindexing": "Indekslanmoqda…",
+      "reindexSuccess": "Rasmlarni qayta indekslash so‘rovi yuborildi.",
+      "reindexError": "Rasmlarni qayta indekslashni boshlashda xatolik. Qayta urinib ko‘ring.",
+      "featureDisabled": "Rasm embeddinglari hozir o‘chirilgan.",
+      "providerNotConfigured": "Rasm embedding provayderi sozlanmagan."
+    },
     "contentLanguage": "Mahsulot kontenti tili",
     "contentLocale": {
       "ru": "Русский",

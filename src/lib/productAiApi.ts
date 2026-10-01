@@ -4,6 +4,7 @@ import type { ProductCountry, ProductLocale } from './commerceApi';
 
 export interface AdminCapabilities {
   aiProductFill: boolean;
+  imageEmbeddings?: boolean;
 }
 
 export interface ProductAiVariant {
@@ -86,16 +87,27 @@ export function hasAiProductFillCapability(
   return capabilities?.aiProductFill === true;
 }
 
+export function hasImageEmbeddingsCapability(
+  capabilities: AdminCapabilities | undefined,
+): boolean {
+  return capabilities?.imageEmbeddings === true;
+}
+
 export function parseAdminCapabilities(value: unknown): AdminCapabilities {
   if (
     !value ||
     typeof value !== 'object' ||
     !('aiProductFill' in value) ||
-    typeof value.aiProductFill !== 'boolean'
+    typeof value.aiProductFill !== 'boolean' ||
+    ('imageEmbeddings' in value && typeof value.imageEmbeddings !== 'boolean')
   ) {
     throw new Error('Invalid admin capabilities response');
   }
-  return { aiProductFill: value.aiProductFill };
+  const source = value as Record<string, unknown>;
+  return {
+    aiProductFill: source.aiProductFill as boolean,
+    imageEmbeddings: typeof source.imageEmbeddings === 'boolean' ? source.imageEmbeddings : false,
+  };
 }
 
 export function toProductAiCountry(country: string): ProductCountry {

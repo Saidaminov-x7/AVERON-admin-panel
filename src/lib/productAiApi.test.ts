@@ -5,6 +5,7 @@ import {
   getAdminCapabilitiesApi,
   getProductAiSuggestionsApi,
   hasAiProductFillCapability,
+  hasImageEmbeddingsCapability,
   parseAdminCapabilities,
   parseProductAiSuggestions,
   toProductAiCountry,
@@ -38,18 +39,26 @@ describe('admin product AI capability and suggestions API', () => {
 
   it('accepts only the documented boolean capability value', () => {
     expect(parseAdminCapabilities({ aiProductFill: true, anotherCapability: false }))
-      .toEqual({ aiProductFill: true });
+      .toEqual({ aiProductFill: true, imageEmbeddings: false });
+    expect(parseAdminCapabilities({ aiProductFill: true, imageEmbeddings: true }))
+      .toEqual({ aiProductFill: true, imageEmbeddings: true });
     expect(hasAiProductFillCapability({ aiProductFill: true })).toBe(true);
     expect(hasAiProductFillCapability({ aiProductFill: false })).toBe(false);
     expect(hasAiProductFillCapability(undefined)).toBe(false);
+    expect(hasImageEmbeddingsCapability({ aiProductFill: true })).toBe(false);
+    expect(hasImageEmbeddingsCapability({ aiProductFill: true, imageEmbeddings: true })).toBe(true);
+    expect(() => parseAdminCapabilities({ aiProductFill: true, imageEmbeddings: 'true' })).toThrow();
     expect(() => parseAdminCapabilities({ aiProductFill: 'true' })).toThrow();
   });
 
   it('loads capabilities with an abort signal from the expected endpoint', async () => {
     const signal = new AbortController().signal;
-    vi.mocked(api.get).mockResolvedValue({ data: { aiProductFill: true } });
+    vi.mocked(api.get).mockResolvedValue({ data: { aiProductFill: true, imageEmbeddings: true } });
 
-    await expect(getAdminCapabilitiesApi(signal)).resolves.toEqual({ aiProductFill: true });
+    await expect(getAdminCapabilitiesApi(signal)).resolves.toEqual({
+      aiProductFill: true,
+      imageEmbeddings: true,
+    });
     expect(api.get).toHaveBeenCalledWith('/api/v1/capabilities', { signal });
   });
 

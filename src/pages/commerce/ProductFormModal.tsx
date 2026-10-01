@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import { ImageOff, MoveDown, MoveUp, Sparkles, Star, Trash2, Upload } from "lucide-react";
+import { ImageOff, MoveDown, MoveUp, RefreshCw, Sparkles, Star, Trash2, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button, Input, Modal, Select, Textarea } from "../../components/ui";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
@@ -12,9 +12,14 @@ import {
   applyProductAiSuggestions,
   getProductAiSuggestionsApi,
   hasAiProductFillCapability,
+  hasImageEmbeddingsCapability,
   toProductAiCountry,
   type ProductAiSuggestionsResponse,
 } from "../../lib/productAiApi";
+import {
+  getProductImageEmbeddingApi,
+  reindexProductImageEmbeddingApi,
+} from "../../lib/productImageEmbeddingApi";
 import {
   getProductCountryDisplay,
   isProductCountry,
@@ -147,9 +152,20 @@ export function ProductFormModal({
   const [aiSuggestions, setAiSuggestions] = useState<ProductAiSuggestionsResponse | null>(null);
   const [aiError, setAiError] = useState("");
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const [isReindexingImage, setIsReindexingImage] = useState(false);
+  const [imageEmbeddingError, setImageEmbeddingError] = useState("");
+  const [imageEmbeddingSuccess, setImageEmbeddingSuccess] = useState("");
   const aiRequestRef = useRef<AbortController | null>(null);
 
   const capabilitiesQuery = useAdminCapabilities(isOpen);
+  const imageEmbeddingQuery = useQuery({
+    queryKey: ["admin", "products", product?.id, "image-embedding"],
+    queryFn: ({ signal }) => getProductImageEmbeddingApi(product!.id, signal),
+    enabled: isOpen && Boolean(product?.id) &&
+      !capabilitiesQuery.isError &&
+      hasImageEmbeddingsCapability(capabilitiesQuery.data),
+    retry: false,
+  });
 
   const releaseObjectUrls = useCallback(() => {
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
@@ -336,6 +352,41 @@ export function ProductFormModal({
     setIsGeneratingAi(false);
     setAiSuggestions(null);
     setAiError("");
+  };
+
+  const reindexImageEmbedding = async () => {
+    if (
+      !product?.id ||
+      capabilitiesQuery.isError ||
+      !hasImageEmbeddingsCapability(capabilitiesQuery.data) ||
+      isReindexingImage
+    ) return;
+
+    setIsReindexingImage(true);
+    setImageEmbeddingError("");
+    setImageEmbeddingSuccess("");
+    try {
+      const result = await reindexProductImageEmbeddingApi(product.id);
+      if ("code" in result) {
+        setImageEmbeddingError(t(
+          result.code === "FEATURE_DISABLED"
+            ? "products.imageEmbeddings.featureDisabled"
+            : "products.imageEmbeddings.providerNotConfigured",
+        ));
+        if (result.code === "FEATURE_DISABLED") {
+          void queryClient.invalidateQueries({ queryKey: ["admin", "capabilities"] });
+        }
+        return;
+      }
+      setImageEmbeddingSuccess(t("products.imageEmbeddings.reindexSuccess"));
+      await queryClient.invalidateQueries({
+        queryKey: ["admin", "products", product.id, "image-embedding"],
+      });
+    } catch {
+      setImageEmbeddingError(t("products.imageEmbeddings.reindexError"));
+    } finally {
+      setIsReindexingImage(false);
+    }
   };
 
   const applyAiSuggestions = () => {
@@ -705,6 +756,64 @@ export function ProductFormModal({
             onChange={handleFileSelect}
           />
         </section>
+
+        {product && hasImageEmbeddingsCapability(capabilitiesQuery.data) && !capabilitiesQuery.isError && (
+          <section className="space-y-3 rounded-xl border border-app p-4">
+            <div>
+              <h4 className="text-sm font-bold text-app">{t("products.imageEmbeddings.title")}</h4>
+              <p className="mt-1 text-xs text-muted">{t("products.imageEmbeddings.hint")}</p>
+            </div>
+            {imageEmbeddingQuery.isLoading ? (
+              <p role="status" className="text-sm text-muted">{t("products.imageEmbeddings.loading")}</p>
+            ) : imageEmbeddingQuery.isError ? (
+              <p role="alert" className="text-sm text-red-500">{t("products.imageEmbeddings.statusError")}</p>
+            ) : imageEmbeddingQuery.data ? (
+              <div className="space-y-1 text-sm">
+                <p className="text-app">
+                  {t("products.imageEmbeddings.statusLabel")}:{" "}
+                  <span className="font-semibold">
+                    {t(`products.imageEmbeddings.status.${imageEmbeddingQuery.data.status}`)}
+                  </span>
+                </p>
+                {imageEmbeddingQuery.data.provider && (
+                  <p className="text-xs text-muted">
+                    {t("products.imageEmbeddings.provider")}: {imageEmbeddingQuery.data.provider}
+                  </p>
+                )}
+                {imageEmbeddingQuery.data.model && (
+                  <p className="text-xs text-muted">
+                    {t("products.imageEmbeddings.model")}: {imageEmbeddingQuery.data.model}
+                  </p>
+                )}
+                {imageEmbeddingQuery.data.embeddingVersion && (
+                  <p className="text-xs text-muted">
+                    {t("products.imageEmbeddings.version")}: {imageEmbeddingQuery.data.embeddingVersion}
+                  </p>
+                )}
+                {imageEmbeddingQuery.data.lastIndexedAt && !Number.isNaN(Date.parse(imageEmbeddingQuery.data.lastIndexedAt)) && (
+                  <p className="text-xs text-muted">
+                    {t("products.imageEmbeddings.lastIndexed")}:{" "}
+                    {new Date(imageEmbeddingQuery.data.lastIndexedAt).toLocaleString(i18n.resolvedLanguage)}
+                  </p>
+                )}
+              </div>
+            ) : null}
+            {imageEmbeddingError && <p role="alert" className="text-sm text-red-500">{imageEmbeddingError}</p>}
+            {imageEmbeddingSuccess && <p role="status" className="text-sm text-emerald-600">{imageEmbeddingSuccess}</p>}
+            <Button
+              type="button"
+              variant="outline"
+              leftIcon={<RefreshCw size={16} />}
+              onClick={() => void reindexImageEmbedding()}
+              loading={isReindexingImage}
+              disabled={isReindexingImage}
+            >
+              {isReindexingImage
+                ? t("products.imageEmbeddings.reindexing")
+                : t("products.imageEmbeddings.reindex")}
+            </Button>
+          </section>
+        )}
 
         {(product?.source === "MANUAL" || !product) && (
           <section className="space-y-4">

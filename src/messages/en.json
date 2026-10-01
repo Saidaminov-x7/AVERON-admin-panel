@@ -565,6 +565,29 @@
       "disabled": "AI product fill is currently disabled. Suggestions were not generated.",
       "sourceTitleRequired": "Enter a title in the selected language before requesting suggestions."
     },
+    "imageEmbeddings": {
+      "title": "Image search index",
+      "hint": "View indexing status or request a manual reindex. No embedding data is shown.",
+      "loading": "Loading image index status…",
+      "statusError": "Could not load image index status.",
+      "statusLabel": "Status",
+      "status": {
+        "INDEXED": "Indexed",
+        "PENDING": "Pending",
+        "UNAVAILABLE": "Unavailable",
+        "FAILED": "Failed"
+      },
+      "provider": "Provider",
+      "model": "Model",
+      "version": "Embedding version",
+      "lastIndexed": "Last indexed",
+      "reindex": "Reindex images",
+      "reindexing": "Reindexing…",
+      "reindexSuccess": "Image reindex was requested.",
+      "reindexError": "Could not request image reindex. Please try again.",
+      "featureDisabled": "Image embeddings are currently disabled.",
+      "providerNotConfigured": "No image embedding provider is configured."
+    },
     "contentLanguage": "Product content language",
     "contentLocale": {
       "ru": "Русский",
