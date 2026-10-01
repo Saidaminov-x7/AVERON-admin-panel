@@ -77,7 +77,7 @@ const StaffPage: React.FC = () => {
   // Мутация: сменить роль
   const updateRoleMutation = useMutation({
     mutationFn: ({ id, role }: { id: string; role: AdminRoleType }) =>
-      updateStaffRoleApi(id, role),
+      updateStaffRoleApi(id, { adminRole: role }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'staff'] });
       setFeedbackMsg(t('common.saved', 'Роль сотрудника обновлена'));

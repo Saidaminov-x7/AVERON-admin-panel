@@ -19,7 +19,7 @@ import {
   History,
 } from 'lucide-react';
 import Layout from '../components/Layout';
-import { useAuthStore, type AdminRoleType } from '../store/authStore';
+import { useAuthStore, type AdminRoleType, type AdminUser } from '../store/authStore';
 import {
   getStaffListApi,
   addStaffApi,
@@ -52,7 +52,7 @@ export const StaffPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'staff' | 'audit'>('staff');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingStaff, setEditingStaff] = useState<any | null>(null);
+  const [editingStaff, setEditingStaff] = useState<AdminUser | null>(null);
   const [revokeConfirmId, setRevokeConfirmId] = useState<string | null>(null);
 
   // Form state
@@ -60,6 +60,8 @@ export const StaffPage: React.FC = () => {
   const [formName, setFormName] = useState('');
   const [formPhone, setFormPhone] = useState('');
   const [formPassword, setFormPassword] = useState('');
+  const [formTelegramId, setFormTelegramId] = useState('');
+  const [editingTelegramId, setEditingTelegramId] = useState('');
   const [formRole, setFormRole] = useState<AdminRoleType>('MODERATOR');
 
   const { data: staffList = [], isLoading: isStaffLoading, refetch: refetchStaff } = useQuery({
@@ -87,8 +89,8 @@ export const StaffPage: React.FC = () => {
   });
 
   const updateRoleMutation = useMutation({
-    mutationFn: ({ id, role }: { id: string; role: AdminRoleType }) =>
-      updateStaffRoleApi(id, role),
+    mutationFn: ({ id, role, telegramId }: { id: string; role?: AdminRoleType; telegramId?: string }) =>
+      updateStaffRoleApi(id, { adminRole: role, telegramId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-staff'] });
       setEditingStaff(null);
@@ -116,6 +118,7 @@ export const StaffPage: React.FC = () => {
     setFormName('');
     setFormPhone('');
     setFormPassword('');
+    setFormTelegramId('');
     setFormRole('MODERATOR');
   };
 
@@ -131,6 +134,7 @@ export const StaffPage: React.FC = () => {
       name: formName.trim() || undefined,
       phone: formPhone.trim() || undefined,
       password: formPassword.trim() || undefined,
+      telegramId: formTelegramId.trim() || undefined,
     });
   };
 
@@ -250,6 +254,11 @@ export const StaffPage: React.FC = () => {
                             <Badge variant={getRoleBadgeVariant(member.adminRole || 'SUPPORT')} size="sm">
                               {member.adminRole || 'SUPPORT'}
                             </Badge>
+                            {member.telegramId && (
+                              <span className="inline-flex items-center rounded-md bg-primary-500/10 px-2 py-0.5 font-mono text-[11px] text-primary-700 dark:text-primary-300">
+                                Telegram ID: {member.telegramId}
+                              </span>
+                            )}
                           </div>
                           <div className="flex items-center gap-3 text-xs text-muted mt-1 flex-wrap">
                             <span className="flex items-center gap-1">
@@ -277,6 +286,7 @@ export const StaffPage: React.FC = () => {
                             onClick={() => {
                               setEditingStaff(member);
                               setFormRole(member.adminRole as AdminRoleType);
+                              setEditingTelegramId(member.telegramId || '');
                             }}
                             icon={<Edit2 size={14} />}
                           >
@@ -387,6 +397,8 @@ export const StaffPage: React.FC = () => {
 
             <Input
               label="Номер телефона"
+              type="tel"
+              inputMode="tel"
               value={formPhone}
               onChange={(e) => setFormPhone(e.target.value)}
               placeholder="+998 90 123-45-67"
@@ -398,8 +410,17 @@ export const StaffPage: React.FC = () => {
               type="password"
               value={formPassword}
               onChange={(e) => setFormPassword(e.target.value)}
-              placeholder="Минимум 8 символов..."
+              placeholder="Не менее 8 символов: A–Z, a–z и цифра"
               leftIcon={<Lock size={16} />}
+            />
+
+            <Input
+              label="Telegram ID"
+              inputMode="numeric"
+              value={formTelegramId}
+              onChange={(e) => setFormTelegramId(e.target.value.replace(/\D/g, '').slice(0, 20))}
+              placeholder="Например, 123456789"
+              helperText="Укажите числовой ID, не Telegram username."
             />
 
             <Select
@@ -430,6 +451,7 @@ export const StaffPage: React.FC = () => {
                     updateRoleMutation.mutate({
                       id: editingStaff.id,
                       role: formRole,
+                      telegramId: editingTelegramId.trim(),
                     });
                   }}
                   loading={updateRoleMutation.isPending}
@@ -445,6 +467,14 @@ export const StaffPage: React.FC = () => {
                 options={ROLE_OPTIONS}
                 value={formRole}
                 onChange={(val) => setFormRole(val as AdminRoleType)}
+              />
+              <Input
+                label="Telegram ID"
+                inputMode="numeric"
+                value={editingTelegramId}
+                onChange={(e) => setEditingTelegramId(e.target.value.replace(/\D/g, '').slice(0, 20))}
+                placeholder="Например, 123456789"
+                helperText="Укажите числовой ID, не Telegram username."
               />
             </div>
           </Modal>

@@ -16,7 +16,7 @@ interface AdminThemeData {
 }
 
 const DEFAULT_ADMIN_THEME: AdminThemeData = {
-  primaryColor: '#7c3aed',
+  primaryColor: '#0f766e',
   secondaryColor: '#5b21b6',
   backgroundColor: '#0f0f0f',
   textColor: '#f1f5f9',

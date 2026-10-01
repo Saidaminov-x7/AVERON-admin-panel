@@ -114,7 +114,9 @@ export const Select: React.FC<SelectProps> = ({
 
       const triggerRect = trigger.getBoundingClientRect();
       const desiredHeight = estimatedMenuHeight;
-      const availableBelow = Math.max(0, window.innerHeight - triggerRect.bottom - VIEWPORT_GUTTER);
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      const availableBelow = Math.max(0, viewportHeight - triggerRect.bottom - VIEWPORT_GUTTER);
       const availableAbove = Math.max(0, triggerRect.top - VIEWPORT_GUTTER);
       const placeAbove = desiredHeight > availableBelow && availableAbove > availableBelow;
       const availableHeight = placeAbove ? availableAbove : availableBelow;
@@ -122,12 +124,19 @@ export const Select: React.FC<SelectProps> = ({
       const width = Math.min(triggerRect.width, window.innerWidth - VIEWPORT_GUTTER * 2);
       const left = Math.min(
         Math.max(VIEWPORT_GUTTER, triggerRect.left),
-        Math.max(VIEWPORT_GUTTER, window.innerWidth - width - VIEWPORT_GUTTER),
+        Math.max(VIEWPORT_GUTTER, viewportWidth - width - VIEWPORT_GUTTER),
+      );
+      const desiredTop = placeAbove
+        ? triggerRect.top - height - MENU_OFFSET
+        : triggerRect.bottom + MENU_OFFSET;
+      const top = Math.min(
+        Math.max(VIEWPORT_GUTTER, desiredTop),
+        Math.max(VIEWPORT_GUTTER, viewportHeight - height - VIEWPORT_GUTTER),
       );
 
       setMenuPosition({
         left,
-        top: placeAbove ? triggerRect.top - height - MENU_OFFSET : triggerRect.bottom + MENU_OFFSET,
+        top,
         width,
         height,
       });

@@ -4,6 +4,7 @@ import { ImageOff, MoveDown, MoveUp, Star, Trash2, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button, Input, Modal, Select, Textarea } from "../../components/ui";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
+import { LanguageFlag } from "../../components/ui/LanguageFlag";
 import {
   getProductCountryDisplay,
   isProductCountry,
@@ -73,7 +74,6 @@ interface ProductFormModalProps {
 }
 
 const locales: ProductLocale[] = ["ru", "uz", "en"];
-const localeLabels: Record<ProductLocale, string> = { ru: "RU", uz: "UZ", en: "EN" };
 const localeErrorKeys: Record<ProductLocale, "titleRu" | "titleUz" | "titleEn"> = {
   ru: "titleRu",
   uz: "titleUz",
@@ -174,6 +174,12 @@ export function ProductFormModal({
         [activeLocale]: { ...current.translations[activeLocale], [field]: value },
       },
     }));
+    if (field === "title") {
+      const errorKey = localeErrorKeys[activeLocale];
+      setErrors((current) => value.trim().length >= 2
+        ? { ...current, [errorKey]: undefined }
+        : current);
+    }
   };
 
   const updateValue = <K extends keyof ProductFormValues>(key: K, value: ProductFormValues[K]) => {
@@ -358,7 +364,7 @@ export function ProductFormModal({
               activeLocale === locale ? "bg-surface text-primary-600 shadow-sm dark:text-primary-400" : "text-muted hover:text-app"
             }`}
           >
-            {localeLabels[locale]}
+            <LanguageFlag locale={locale} className="h-4 w-6" />
             {error ? <span aria-hidden="true" className="text-red-500">!</span> : complete ? <span aria-hidden="true" className="text-emerald-600">✓</span> : null}
           </button>
         );

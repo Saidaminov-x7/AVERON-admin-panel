@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import ThemeToggle from '../ThemeToggle/ThemeToggle';
 import Dropdown from '../Dropdown/Dropdown';
 import { CountBadge } from '../ui/CountBadge';
+import { LanguageFlag } from '../ui/LanguageFlag';
 import {
   getNotificationsApi,
   markNotificationReadApi,
@@ -188,13 +189,9 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           align="right"
           trigger={
             <div className="flex items-center justify-between gap-1.5 h-10 px-3 rounded-xl text-xs font-semibold bg-surface border border-app text-app hover:border-primary-500 transition-colors cursor-pointer select-none">
-              <span>
-                {i18n.language?.startsWith('uz')
-                  ? '🇺🇿 UZ'
-                  : i18n.language?.startsWith('en')
-                  ? '🇬🇧 EN'
-                  : '🇷🇺 RU'}
-              </span>
+              <LanguageFlag
+                locale={i18n.language?.startsWith('uz') ? 'uz' : i18n.language?.startsWith('en') ? 'en' : 'ru'}
+              />
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-muted">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -202,11 +199,11 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           }
           contentClassName="w-32 p-1 border border-app rounded-xl bg-surface shadow-xl"
         >
-          {[
-            { code: 'ru', label: '🇷🇺 Русский' },
-            { code: 'uz', label: '🇺🇿 Oʻzbek' },
-            { code: 'en', label: '🇬🇧 English' },
-          ].map((lang) => {
+          {([
+            { code: 'ru', label: 'Русский' },
+            { code: 'uz', label: 'Oʻzbek' },
+            { code: 'en', label: 'English' },
+          ] as const).map((lang) => {
             const active = (i18n.language?.slice(0, 2) || 'ru') === lang.code;
             return (
               <button
@@ -220,7 +217,10 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                   active ? 'bg-primary-500 text-white font-semibold' : 'text-app hover:bg-gray-100 dark:hover:bg-white/5'
                 }`}
               >
-                <span>{lang.label}</span>
+                <span className="flex items-center gap-2">
+                  <LanguageFlag locale={lang.code} />
+                  {lang.label}
+                </span>
               </button>
             );
           })}

@@ -15,6 +15,7 @@ export const addStaffApi = async (dto: {
   name?: string;
   phone?: string;
   password?: string;
+  telegramId?: string;
 }): Promise<AdminUser> => {
   const { data } = await api.post('/admin/staff', dto);
   return data;
@@ -22,9 +23,9 @@ export const addStaffApi = async (dto: {
 
 export const updateStaffRoleApi = async (
   id: string,
-  adminRole: AdminRoleType,
+  updates: { adminRole?: AdminRoleType; telegramId?: string },
 ): Promise<AdminUser> => {
-  const { data } = await api.patch(`/admin/staff/${id}`, { adminRole });
+  const { data } = await api.patch(`/admin/staff/${id}`, updates);
   return data;
 };
 

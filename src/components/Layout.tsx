@@ -13,8 +13,22 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   const { t } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const focusRestoreFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
+    const desktopViewport = window.matchMedia('(min-width: 1024px)');
+    const closeDrawerOnDesktop = () => {
+      if (desktopViewport.matches) setIsMobileMenuOpen(false);
+    };
+    desktopViewport.addEventListener('change', closeDrawerOnDesktop);
+    return () => desktopViewport.removeEventListener('change', closeDrawerOnDesktop);
+  }, []);
+
+  useEffect(() => {
+    if (focusRestoreFrameRef.current !== null) {
+      cancelAnimationFrame(focusRestoreFrameRef.current);
+      focusRestoreFrameRef.current = null;
+    }
     if (!isMobileMenuOpen) return;
     const previousOverflow = document.body.style.overflow;
     const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -53,7 +67,12 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
       cancelAnimationFrame(frame);
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = previousOverflow;
-      if (previouslyFocused?.isConnected) previouslyFocused.focus();
+      if (previouslyFocused) {
+        focusRestoreFrameRef.current = requestAnimationFrame(() => {
+          focusRestoreFrameRef.current = null;
+          if (previouslyFocused.isConnected) previouslyFocused.focus();
+        });
+      }
     };
   }, [isMobileMenuOpen]);
 
@@ -75,15 +94,19 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
       <div
         ref={drawerRef}
         id="admin-mobile-navigation"
+        role={isMobileMenuOpen ? 'dialog' : undefined}
+        aria-modal={isMobileMenuOpen ? true : undefined}
+        aria-label={isMobileMenuOpen ? t('header.mobileNavigation') : undefined}
+        tabIndex={-1}
         className={`invisible fixed inset-y-0 left-0 z-50 -translate-x-full transform transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:translate-x-0 ${
           isMobileMenuOpen ? 'visible translate-x-0' : ''
         }`}
       >
-        <Sidebar onCloseMobile={() => setIsMobileMenuOpen(false)} mobileMenuOpen={isMobileMenuOpen} />
+        <Sidebar onCloseMobile={() => setIsMobileMenuOpen(false)} />
       </div>
 
       {/* Основная область */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden" inert={isMobileMenuOpen}>
         {/* Верхняя панель */}
         <Header
           title={title}

@@ -17,3 +17,4 @@ export * from './Modal';
 export * from './Skeleton';
 export * from './CountBadge';
 export * from './FullScreenLoader';
+export * from './LanguageFlag';

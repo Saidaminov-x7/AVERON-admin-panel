@@ -35,6 +35,7 @@ const ProfilePage: React.FC = () => {
   // Состояния формы профиля
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [telegramId, setTelegramId] = useState('');
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -44,6 +45,7 @@ const ProfilePage: React.FC = () => {
     if (profile) {
       setName(profile.name || '');
       setAvatar(profile.avatar || null);
+      setTelegramId(profile.telegramId || '');
     }
   }, [profile]);
 
@@ -109,7 +111,7 @@ const ProfilePage: React.FC = () => {
     e.preventDefault();
     setProfileSuccess('');
     setProfileError('');
-    updateProfileMutation.mutate({ name, avatar });
+    updateProfileMutation.mutate({ name, avatar, telegramId: telegramId.trim() || '' });
   };
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -122,8 +124,8 @@ const ProfilePage: React.FC = () => {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setPasswordError('Новый пароль должен содержать минимум 6 символов');
+    if (newPassword.length < 8 || !/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/\d/.test(newPassword)) {
+      setPasswordError('Пароль должен содержать минимум 8 символов, заглавную и строчную буквы и цифру');
       return;
     }
 
@@ -274,6 +276,21 @@ const ProfilePage: React.FC = () => {
               />
             </div>
 
+            <div>
+              <label htmlFor="profile-telegram-id" className="block text-sm font-medium text-app mb-1.5">Telegram ID</label>
+              <input
+                id="profile-telegram-id"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{5,20}"
+                value={telegramId}
+                onChange={(e) => setTelegramId(e.target.value.replace(/\D/g, '').slice(0, 20))}
+                placeholder="Например, 123456789"
+                className="input"
+              />
+              <p className="mt-1 text-xs text-muted">Числовой ID, не имя пользователя Telegram.</p>
+            </div>
+
             <button
               type="submit"
               disabled={updateProfileMutation.isPending || isUploading}
@@ -319,9 +336,11 @@ const ProfilePage: React.FC = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
+                autoComplete="new-password"
                 className="input"
               />
+              <p className="mt-1 text-xs text-muted">Не менее 8 символов, включая заглавную, строчную букву и цифру.</p>
             </div>
 
             <div>
@@ -331,7 +350,7 @@ const ProfilePage: React.FC = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
                 className="input"
               />
             </div>

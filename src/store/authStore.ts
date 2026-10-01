@@ -14,6 +14,7 @@ export interface AdminUser {
   role: string;
   adminRole?: AdminRoleType | null;
   phone?: string;
+  telegramId?: string | null;
   avatar?: string | null;
   lastLoginAt?: string | null;
   createdAt?: string;

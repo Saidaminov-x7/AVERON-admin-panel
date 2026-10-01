@@ -48,7 +48,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title=""
+      title={title}
       size="sm"
       footer={
         <div className="flex items-center justify-end gap-2.5 w-full">
@@ -73,7 +73,6 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           {iconConfig.icon}
         </div>
         <div className="space-y-1">
-          <h4 className="text-sm font-bold text-app">{title}</h4>
           <div className="text-xs text-muted leading-relaxed">{message}</div>
         </div>
       </div>

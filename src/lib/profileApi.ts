@@ -12,8 +12,9 @@ export const getProfileApi = async (): Promise<AdminUser> => {
 export const updateProfileApi = async (dto: {
   name?: string;
   avatar?: string | null;
+  telegramId?: string;
 }): Promise<AdminUser> => {
-  const { data } = await api.patch('/admin/me/profile', dto);
+  const { data } = await api.patch('/admin/profile', dto);
   return data;
 };
 
@@ -21,7 +22,7 @@ export const changePasswordApi = async (dto: {
   currentPassword: string;
   newPassword: string;
 }): Promise<{ message: string }> => {
-  const { data } = await api.post('/admin/me/change-password', dto);
+  const { data } = await api.patch('/admin/profile/password', dto);
   return data;
 };
 
