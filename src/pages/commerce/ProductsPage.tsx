@@ -18,7 +18,8 @@ import {
   type ProductPayload,
   type ProductUpdatePayload,
 } from "../../lib/commerceApi";
-import { uploadMediaApi } from "../../lib/mediaApi";
+import { deleteUnattachedMediaApi, uploadProductPhotoApi } from "../../lib/mediaApi";
+import { getSiteSettingsApi } from "../../lib/siteSettingsApi";
 import { ProductFormModal, type ProductFormSubmission } from "./ProductFormModal";
 
 const ALL_COUNTRIES = "ALL" as const;
@@ -45,59 +46,81 @@ export default function ProductsPage() {
     queryFn: getProductCategories,
     enabled: isFormOpen,
   });
+  const settingsQuery = useQuery({
+    queryKey: ["admin", "site-settings"],
+    queryFn: getSiteSettingsApi,
+    enabled: isFormOpen,
+  });
 
   const mutation = useMutation({
     mutationFn: async ({ productId, values }: { productId: string | null; values: ProductFormSubmission }) => {
-      let imageUrl = typeof values.imageUrlOrFile === "string" ? values.imageUrlOrFile : undefined;
-      if (values.imageUrlOrFile instanceof File) {
-        const uploaded = await uploadMediaApi(values.imageUrlOrFile);
-        imageUrl = uploaded.url;
-      }
+      const uploadedIds: string[] = [];
+      try {
+        const images: Array<{ id: string } | { mediaId: string }> = [];
+        for (const image of values.images) {
+          if ("id" in image) {
+            images.push({ id: image.id });
+          } else {
+            const uploaded = await uploadProductPhotoApi(image.file);
+            if (uploaded.isNewUpload) uploadedIds.push(uploaded.id);
+            images.push({ mediaId: uploaded.id });
+          }
+        }
 
-      const sharedFields = {
-        title: values.title,
-        titleUz: values.titleUz,
-        titleEn: values.titleEn,
-        description: values.description,
-        descriptionUz: values.descriptionUz,
-        descriptionEn: values.descriptionEn,
-        sourceUrl: values.sourceUrl,
-        ...(imageUrl ? { imageUrl } : {}),
-        salePriceUzs: values.salePriceUzs,
-      };
-
-      if (productId) {
-        const payload: ProductUpdatePayload = {
-          ...sharedFields,
-          ...(isProductCountry(values.country) ? { country: values.country } : {}),
-          categoryId: values.categoryId ?? null,
-          ...(editingProduct?.source === "MANUAL"
-            ? { color: values.color, size: values.size }
-            : {}),
+        const sharedFields = {
+          title: values.title,
+          titleUz: values.titleUz,
+          titleEn: values.titleEn,
+          description: values.description,
+          descriptionUz: values.descriptionUz,
+          descriptionEn: values.descriptionEn,
+          ...(values.sourceUrl ? { sourceUrl: values.sourceUrl } : {}),
+          images,
+          salePriceUzs: values.salePriceUzs,
         };
-        return updateManualProduct(productId, payload);
-      }
 
-      if (!isProductCountry(values.country)) {
-        throw new Error("A supported product country is required");
+        if (productId) {
+          const payload: ProductUpdatePayload = {
+            ...sharedFields,
+            ...(isProductCountry(values.country) ? { country: values.country } : {}),
+            categoryId: values.categoryId ?? null,
+            ...(editingProduct?.source === "MANUAL"
+              ? { color: values.color, size: values.size }
+              : {}),
+          };
+          return await updateManualProduct(productId, payload);
+        }
+
+        if (!isProductCountry(values.country)) {
+          throw new Error("A supported product country is required");
+        }
+        const payload: ProductPayload = {
+          ...sharedFields,
+          country: values.country,
+          images: images.map((image) => {
+            if (!("mediaId" in image)) throw new Error("New products require uploaded photo references");
+            return { mediaId: image.mediaId };
+          }),
+          categoryId: values.categoryId || undefined,
+          color: values.color,
+          size: values.size,
+          publish: values.publish,
+        };
+        return await createManualProduct(payload);
+      } catch (error) {
+        await Promise.allSettled(uploadedIds.map((id) => deleteUnattachedMediaApi(id)));
+        throw error;
       }
-      const payload: ProductPayload = {
-        ...sharedFields,
-        country: values.country,
-        categoryId: values.categoryId || undefined,
-        color: values.color,
-        size: values.size,
-        publish: values.publish,
-      };
-      return createManualProduct(payload);
     },
     onSuccess: (_result, variables) => {
       toast.success(t(variables.productId ? "products.productUpdated" : "products.done"));
       closeForm();
       void qc.invalidateQueries({ queryKey: ["commerce-products"] });
     },
-    onError: (_error, variables) => {
-      toast.error(t(variables.productId ? "products.updateError" : "products.createError"));
+    onError: (error: unknown) => {
+      const responseError = error as { response?: { data?: { message?: unknown } } };
+      const message = responseError.response?.data?.message;
+      toast.error(typeof message === "string" ? message : t("products.serverError"));
     },
   });
 
@@ -241,6 +264,9 @@ export default function ProductsPage() {
           product={editingProduct}
           categories={categoriesQuery.data ?? []}
           categoriesError={categoriesQuery.isError}
+          maxProductPhotos={settingsQuery.data?.maxProductPhotos ?? 15}
+          maxProductPhotoSizeMb={settingsQuery.data?.maxProductPhotoSizeMb ?? 10}
+          settingsLoading={settingsQuery.isLoading}
           isSaving={mutation.isPending}
           onClose={closeForm}
           onSubmit={handleFormSubmit}

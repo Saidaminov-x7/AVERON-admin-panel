@@ -126,19 +126,25 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
   return (
     <header
       className="
-        flex items-center justify-between px-3 sm:px-6 h-16
+        h-16 w-full
         bg-surface border-b border-app
         flex-shrink-0 transition-colors duration-200 relative z-30
       "
     >
+      <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between px-3 sm:px-6">
       {/* Заголовок страницы + Гамбургер на мобилке */}
-      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+      <div className="flex min-w-0 flex-1 items-center">
+        {title && <h1 className="min-w-0 truncate text-base font-bold text-app sm:text-xl">{title}</h1>}
+      </div>
+
+      {/* Правая часть */}
+      <div className="ml-auto flex shrink-0 items-center gap-2">
         {onToggleMobileMenu && (
           <button
             type="button"
             onClick={onToggleMobileMenu}
             aria-label={t('header.openMenu')}
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-white text-stone-600 shadow-xs transition-all duration-200 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900 dark:border-white/10 dark:bg-stone-900 dark:text-stone-300 dark:hover:border-white/20 dark:hover:bg-stone-800 dark:hover:text-white lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-app bg-surface text-app transition-colors hover:bg-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 lg:hidden"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="4" x2="20" y1="12" y2="12" />
@@ -147,11 +153,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
             </svg>
           </button>
         )}
-        {title && <h1 className="min-w-0 truncate text-base font-bold text-app sm:text-xl">{title}</h1>}
-      </div>
-
-      {/* Правая часть */}
-      <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div className="hidden items-center gap-1.5 lg:flex sm:gap-2">
         {/* Поиск / Command Palette */}
         <button
           type="button"
@@ -328,6 +330,8 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu }) => {
           {t('header.goToSite', 'Перейти на сайт')}
           <ExternalLinkIcon />
         </a>
+        </div>
+      </div>
       </div>
     </header>
   );

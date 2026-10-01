@@ -30,6 +30,10 @@ export interface ProductCategory {
   id: string;
   slug: string;
   name: Record<string, string> | string;
+  active?: boolean;
+  parentId?: string | null;
+  sortOrder?: number;
+  _count?: { products: number; imports: number };
 }
 
 export interface DashboardData {
@@ -69,11 +73,11 @@ export interface ProductListItem {
   slug: string;
   country: string;
   source: string;
-  sourceUrl: string;
+  sourceUrl?: string | null;
   categoryId?: string | null;
   translations?: Partial<Record<ProductLocale, { title?: string } | string>>;
   description?: Partial<Record<ProductLocale, string>> | null;
-  images?: Array<{ url: string }>;
+  images?: Array<{ id: string; mediaId?: string | null; url: string; sortOrder: number }>;
   variants?: Array<{ id: string; color?: string | null; size?: string | null }>;
   salePriceUzs: string | number;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
@@ -92,13 +96,13 @@ export interface ProductListResponse {
 export interface ProductPayload {
   title: string;
   country: ProductCountry;
-  titleUz?: string;
-  titleEn?: string;
+  titleUz: string;
+  titleEn: string;
   description?: string;
   descriptionUz?: string;
   descriptionEn?: string;
-  sourceUrl: string;
-  imageUrl?: string;
+  sourceUrl?: string;
+  images: Array<{ mediaId: string }>;
   salePriceUzs: number;
   categoryId?: string;
   color?: string;
@@ -113,8 +117,8 @@ export interface ProductUpdatePayload {
   description?: string;
   descriptionUz?: string;
   descriptionEn?: string;
-  sourceUrl: string;
-  imageUrl?: string;
+  sourceUrl?: string | null;
+  images?: Array<{ id: string } | { mediaId: string }>;
   salePriceUzs: number;
   country?: ProductCountry;
   categoryId?: string | null;
@@ -128,7 +132,25 @@ export const getCommerceDashboard = () =>
   api.get<DashboardData>('/api/v1/admin/dashboard').then((r) => r.data);
 
 export const getProductCategories = () =>
-  api.get<ProductCategory[]>('/api/v1/categories').then((r) => r.data);
+  api.get<ProductCategory[]>('/api/v1/admin/categories').then((r) => r.data);
+
+export const createProductCategory = (payload: {
+  slug: string;
+  name: Record<ProductLocale, string>;
+  parentId?: string | null;
+  sortOrder?: number;
+}) => api.post<ProductCategory>('/api/v1/admin/categories', payload).then((r) => r.data);
+
+export const updateProductCategory = (id: string, payload: {
+  slug?: string;
+  name?: Partial<Record<ProductLocale, string>>;
+  parentId?: string | null;
+  sortOrder?: number;
+  active?: boolean;
+}) => api.put<ProductCategory>(`/api/v1/admin/categories/${id}`, payload).then((r) => r.data);
+
+export const archiveProductCategory = (id: string) =>
+  api.delete<ProductCategory>(`/api/v1/admin/categories/${id}`).then((r) => r.data);
 
 // ─── Импорты (AI-парсер) ──────────────────────────────────────────────────────
 

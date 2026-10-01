@@ -13,6 +13,8 @@ export interface SiteSettings {
   googleAuthEnabled: boolean;
   autoModerationEnabled: boolean;
   maxImagesPerListing: number;
+  maxProductPhotos: number;
+  maxProductPhotoSizeMb: number;
   listingsPerPage: number;
   logoUrl: string | null;
   navLinks?: Array<{ label: string; href: string; position: 'header' | 'footer' }>;

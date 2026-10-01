@@ -43,6 +43,8 @@ const GeneralSettingsPage: React.FC = () => {
   const [maintenancePasswordEnabled, setMaintenancePasswordEnabled] = useState(false);
   const [maintenanceBypassPassword, setMaintenanceBypassPassword] = useState('');
   const [mobilePinchZoomEnabled, setMobilePinchZoomEnabled] = useState(true);
+  const [maxProductPhotos, setMaxProductPhotos] = useState(15);
+  const [maxProductPhotoSizeMb, setMaxProductPhotoSizeMb] = useState(10);
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -64,6 +66,8 @@ const GeneralSettingsPage: React.FC = () => {
       setMaintenanceBypassPassword((settings as any).maintenanceBypassPassword || '');
       setMaintenancePasswordEnabled((settings as any).maintenancePasswordEnabled ?? false);
       setMobilePinchZoomEnabled((settings as any).mobilePinchZoomEnabled ?? true);
+      setMaxProductPhotos(settings.maxProductPhotos ?? 15);
+      setMaxProductPhotoSizeMb(settings.maxProductPhotoSizeMb ?? 10);
       setLogoPreview(settings.logoUrl || null);
       if (settings.navLinks && Array.isArray(settings.navLinks) && settings.navLinks.length > 0) {
         setNavLinks(settings.navLinks.filter((link) => !['/add-listing', '/chat'].includes(link.href)));
@@ -126,6 +130,8 @@ const GeneralSettingsPage: React.FC = () => {
       maintenancePasswordEnabled,
       maintenanceBypassPassword: maintenanceBypassPassword.trim() || null,
       mobilePinchZoomEnabled,
+      maxProductPhotos,
+      maxProductPhotoSizeMb,
       navLinks,
     });
 
@@ -155,8 +161,37 @@ const GeneralSettingsPage: React.FC = () => {
 
   return (
     <Layout title="Основные настройки">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="w-full space-y-6">
         <form onSubmit={handleSubmit} className="space-y-6">
+          <Card
+            title={t('settings.productMediaTitle')}
+            description={t('settings.productMediaDescription')}
+          >
+            <div className="grid gap-4 pt-2 sm:grid-cols-2">
+              <Input
+                label={t('settings.maxProductPhotos')}
+                type="number"
+                min={1}
+                max={15}
+                step={1}
+                value={maxProductPhotos}
+                onChange={(event) => setMaxProductPhotos(Number(event.target.value))}
+                helperText={t('settings.maxProductPhotosHint')}
+                required
+              />
+              <Input
+                label={t('settings.maxProductPhotoSizeMb')}
+                type="number"
+                min={1}
+                max={25}
+                step={1}
+                value={maxProductPhotoSizeMb}
+                onChange={(event) => setMaxProductPhotoSizeMb(Number(event.target.value))}
+                helperText={t('settings.maxProductPhotoSizeMbHint')}
+                required
+              />
+            </div>
+          </Card>
           {/* Масштабирование двумя пальцами (Pinch-to-zoom) */}
           <Card
             title="Масштабирование на смартфонах (Pinch-to-zoom)"

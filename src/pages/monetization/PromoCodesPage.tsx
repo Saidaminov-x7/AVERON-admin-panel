@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
+import { Button, Modal } from '../../components/ui';
 import { getPromoCodesApi, createPromoCodeApi, deletePromoCodeApi } from '../../lib/extendedAdminApi';
 import { Ticket, Plus, Trash2, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -124,11 +125,25 @@ const PromoCodesPage: React.FC = () => {
         </div>
 
         {/* Модалка создания */}
-        {isOpenModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-            <div className="bg-surface border border-app rounded-2xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-150">
-              <h3 className="text-lg font-bold text-app mb-4">{t('monetization.addPromoCode', 'Создать промокод')}</h3>
-              <form onSubmit={handleCreate} className="space-y-4">
+        <Modal
+          isOpen={isOpenModal}
+          onClose={() => setIsOpenModal(false)}
+          title={t('monetization.addPromoCode', 'Создать промокод')}
+          size="md"
+          fullscreenOnMobile
+          closeLabel={t('common.close', 'Закрыть')}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setIsOpenModal(false)} disabled={createMutation.isPending}>
+                {t('common.cancel', 'Отмена')}
+              </Button>
+              <Button type="submit" form="promo-code-create-form" loading={createMutation.isPending}>
+                {createMutation.isPending ? t('common.saving', 'Сохранение...') : t('common.create', 'Создать')}
+              </Button>
+            </>
+          }
+        >
+              <form id="promo-code-create-form" onSubmit={handleCreate} className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-muted mb-1">{t('monetization.code', 'Код (например, SUMMER25)')}</label>
                   <input
@@ -168,26 +183,8 @@ const PromoCodesPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setIsOpenModal(false)}
-                    className="px-4 py-2 rounded-xl border border-app text-sm font-medium text-muted hover:text-app"
-                  >
-                    {t('common.cancel', 'Отмена')}
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={createMutation.isPending}
-                    className="btn btn-primary text-sm"
-                  >
-                    {createMutation.isPending ? t('common.saving', 'Сохранение...') : t('common.create', 'Создать')}
-                  </button>
-                </div>
               </form>
-            </div>
-          </div>
-        )}
+        </Modal>
       </div>
     </Layout>
   );

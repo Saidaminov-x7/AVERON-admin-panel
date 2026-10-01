@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
+import { Button, Modal } from '../../components/ui';
 import {
   getStaffListApi,
   addStaffApi,
@@ -278,29 +279,32 @@ const StaffPage: React.FC = () => {
         </div>
 
         {/* Модальное окно добавления администратора */}
-        {isAddModalOpen && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
-            <div className="bg-surface rounded-2xl border border-app shadow-2xl max-w-md w-full p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-app">{t('common.add', 'Добавить сотрудника')}</h3>
-                <button
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="text-muted hover:text-app p-1 rounded-lg"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </button>
-              </div>
-
+        <Modal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          title={t('common.add', 'Добавить сотрудника')}
+          size="md"
+          fullscreenOnMobile
+          closeLabel={t('common.close', 'Закрыть')}
+          footer={
+            <>
+              <Button variant="ghost" onClick={() => setIsAddModalOpen(false)} disabled={addMutation.isPending}>
+                {t('common.cancel', 'Отмена')}
+              </Button>
+              <Button type="submit" form="staff-add-form" loading={addMutation.isPending}>
+                {t('common.save', 'Назначить права')}
+              </Button>
+            </>
+          }
+        >
+          <div className="space-y-4">
               {modalError && (
                 <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs border border-red-200 dark:border-red-800">
                   {modalError}
                 </div>
               )}
 
-              <form onSubmit={handleAddSubmit} className="space-y-4">
+              <form id="staff-add-form" onSubmit={handleAddSubmit} className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-app mb-1">
                     Email пользователя *
@@ -360,26 +364,9 @@ const StaffPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsAddModalOpen(false)}
-                    className="px-4 py-2 text-sm font-medium text-muted hover:text-app transition-colors"
-                  >
-                    {t('common.cancel', 'Отмена')}
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={addMutation.isPending}
-                    className="btn-primary"
-                  >
-                    {addMutation.isPending ? t('common.saving', 'Сохранение...') : t('common.save', 'Назначить права')}
-                  </button>
-                </div>
               </form>
-            </div>
           </div>
-        )}
+        </Modal>
       </div>
     </Layout>
   );

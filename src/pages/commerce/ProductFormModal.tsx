@@ -1,8 +1,8 @@
-import { useId, useRef, useState } from "react";
-import type { FormEvent, KeyboardEvent } from "react";
-import { ImageOff, Upload } from "lucide-react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
+import { ImageOff, MoveDown, MoveUp, Star, Trash2, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button, Modal } from "../../components/ui";
+import { Button, Input, Modal, Select, Textarea } from "../../components/ui";
 import {
   getProductCountryDisplay,
   isProductCountry,
@@ -11,33 +11,44 @@ import {
   type ProductCountry,
   type ProductListItem,
   type ProductLocale,
-  type ProductPayload,
 } from "../../lib/commerceApi";
 
-type LocalizedContent = {
-  title: string;
-  description: string;
+type LocalizedContent = { title: string; description: string };
+type PhotoDraft = {
+  key: string;
+  id?: string;
+  mediaId?: string | null;
+  url: string;
+  file?: File;
 };
-
 type ProductFormValues = {
   translations: Record<ProductLocale, LocalizedContent>;
   country: string;
   categoryId: string;
   sourceUrl: string;
-  imageUrl: string;
   salePriceUzs: string;
   color: string;
   size: string;
   publish: boolean;
 };
+type FormErrors = Partial<Record<"titleRu" | "titleUz" | "titleEn" | "country" | "sourceUrl" | "salePriceUzs" | "photos", string>>;
 
-export type ProductFormSubmission = Omit<ProductPayload, "country" | "imageUrl" | "categoryId"> & {
+export type ProductFormSubmission = {
+  title: string;
+  titleUz: string;
+  titleEn: string;
+  description: string;
+  descriptionUz: string;
+  descriptionEn: string;
+  sourceUrl?: string;
+  salePriceUzs: number;
   country?: ProductCountry;
   categoryId?: string | null;
-  imageUrlOrFile?: string | File;
+  color: string;
+  size: string;
+  publish: boolean;
+  images: Array<{ id: string } | { file: File }>;
 };
-
-type FormErrors = Partial<Record<"title" | "country" | "sourceUrl" | "salePriceUzs", string>>;
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -45,15 +56,19 @@ interface ProductFormModalProps {
   categories: ProductCategory[];
   categoriesError: boolean;
   isSaving: boolean;
+  settingsLoading: boolean;
+  maxProductPhotos: number;
+  maxProductPhotoSizeMb: number;
   onClose: () => void;
   onSubmit: (values: ProductFormSubmission) => void;
 }
 
 const locales: ProductLocale[] = ["ru", "uz", "en"];
-const localeLabels: Record<ProductLocale, string> = {
-  ru: "RU",
-  uz: "UZ",
-  en: "EN",
+const localeLabels: Record<ProductLocale, string> = { ru: "RU", uz: "UZ", en: "EN" };
+const localeErrorKeys: Record<ProductLocale, "titleRu" | "titleUz" | "titleEn"> = {
+  ru: "titleRu",
+  uz: "titleUz",
+  en: "titleEn",
 };
 
 const readTitle = (product: ProductListItem, locale: ProductLocale): string => {
@@ -73,15 +88,21 @@ const getInitialValues = (product: ProductListItem | null): ProductFormValues =>
     uz: { title: product ? readTitle(product, "uz") : "", description: product ? readDescription(product, "uz") : "" },
     en: { title: product ? readTitle(product, "en") : "", description: product ? readDescription(product, "en") : "" },
   },
-  country: product?.country ?? "CN",
+  country: product?.country ?? "",
   categoryId: product?.categoryId ?? "",
   sourceUrl: product?.sourceUrl ?? "",
-  imageUrl: product?.images?.[0]?.url ?? "",
   salePriceUzs: product ? String(product.salePriceUzs) : "",
   color: product?.source === "MANUAL" ? product.variants?.[0]?.color ?? "" : "",
   size: product?.source === "MANUAL" ? product.variants?.[0]?.size ?? "" : "",
   publish: product ? product.status === "PUBLISHED" : true,
 });
+
+const formatFileSize = (size: number): string =>
+  size >= 1024 * 1024
+    ? `${(size / (1024 * 1024)).toFixed(1)} MB`
+    : `${Math.max(1, Math.round(size / 1024))} KB`;
+
+const fileIdentity = (file: File) => `${file.name.toLowerCase()}-${file.size}-${file.lastModified}`;
 
 export function ProductFormModal({
   isOpen,
@@ -89,18 +110,34 @@ export function ProductFormModal({
   categories,
   categoriesError,
   isSaving,
+  settingsLoading,
+  maxProductPhotos,
+  maxProductPhotoSizeMb,
   onClose,
   onSubmit,
 }: ProductFormModalProps) {
   const { t, i18n } = useTranslation();
   const formId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlsRef = useRef(new Set<string>());
   const [activeLocale, setActiveLocale] = useState<ProductLocale>("ru");
   const [values, setValues] = useState<ProductFormValues>(() => getInitialValues(product));
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [localPreview, setLocalPreview] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
+  const [photos, setPhotos] = useState<PhotoDraft[]>(() => (product?.images ?? []).map((image) => ({
+    key: `existing-${image.id}`,
+    id: image.id,
+    mediaId: image.mediaId,
+    url: image.url,
+  })));
   const [errors, setErrors] = useState<FormErrors>({});
+  const [photoInputErrors, setPhotoInputErrors] = useState<string[]>([]);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const releaseObjectUrls = useCallback(() => {
+    objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    objectUrlsRef.current.clear();
+  }, []);
+
+  useEffect(() => () => releaseObjectUrls(), [releaseObjectUrls]);
 
   const updateLocalizedValue = (field: keyof LocalizedContent, value: string) => {
     setValues((current) => ({
@@ -110,16 +147,11 @@ export function ProductFormModal({
         [activeLocale]: { ...current.translations[activeLocale], [field]: value },
       },
     }));
-    if (field === "title" && activeLocale === "ru") {
-      setErrors((current) => ({ ...current, title: undefined }));
-    }
   };
 
   const updateValue = <K extends keyof ProductFormValues>(key: K, value: ProductFormValues[K]) => {
     setValues((current) => ({ ...current, [key]: value }));
-    if (key === "country" || key === "sourceUrl" || key === "salePriceUzs") {
-      setErrors((current) => ({ ...current, [key]: undefined }));
-    }
+    setErrors((current) => ({ ...current, [key]: undefined }));
   };
 
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -130,84 +162,162 @@ export function ProductFormModal({
     else if (event.key === "Home") nextIndex = 0;
     else if (event.key === "End") nextIndex = locales.length - 1;
     else return;
-
     event.preventDefault();
     setActiveLocale(locales[nextIndex]);
     event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[nextIndex]?.focus();
   };
 
-  const handleFileSelect = (file: File) => {
-    setImageFile(file);
-    setLocalPreview(null);
-    setImageError(false);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (typeof event.target?.result === "string") setLocalPreview(event.target.result);
-    };
-    reader.readAsDataURL(file);
+  const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files ?? []);
+    const issues: string[] = [];
+    const maxSize = Math.min(25, Math.max(1, maxProductPhotoSizeMb)) * 1024 * 1024;
+    const maxCount = Math.min(15, Math.max(1, maxProductPhotos));
+    const knownFiles = new Set(photos.flatMap((photo) => photo.file ? [fileIdentity(photo.file)] : []));
+    const additions: PhotoDraft[] = [];
+
+    for (const file of selectedFiles) {
+      if (!["image/jpeg", "image/png", "image/webp", "image/gif"].includes(file.type)) {
+        issues.push(t("products.photoInvalidType", { name: file.name }));
+        continue;
+      }
+      if (file.size > maxSize) {
+        issues.push(t("products.photoTooLarge", { name: file.name, size: maxProductPhotoSizeMb }));
+        continue;
+      }
+      const identity = fileIdentity(file);
+      if (knownFiles.has(identity)) {
+        issues.push(t("products.duplicatePhoto"));
+        continue;
+      }
+      if (photos.length + additions.length >= maxCount) {
+        issues.push(t("products.photoLimitReached", { max: maxCount }));
+        break;
+      }
+      knownFiles.add(identity);
+      const url = URL.createObjectURL(file);
+      objectUrlsRef.current.add(url);
+      additions.push({ key: `local-${identity}-${crypto.randomUUID()}`, file, url });
+    }
+
+    if (additions.length) {
+      setPhotos((current) => [...current, ...additions]);
+      setErrors((current) => ({ ...current, photos: undefined }));
+    }
+    setPhotoInputErrors(issues);
+    event.currentTarget.value = "";
+  };
+
+  const removePhoto = (photo: PhotoDraft) => {
+    if (photo.file) {
+      URL.revokeObjectURL(photo.url);
+      objectUrlsRef.current.delete(photo.url);
+    }
+    setPhotos((current) => current.filter((item) => item.key !== photo.key));
+    setErrors((current) => ({ ...current, photos: undefined }));
+  };
+
+  const movePhoto = (index: number, offset: -1 | 1) => {
+    setPhotos((current) => {
+      const nextIndex = index + offset;
+      if (nextIndex < 0 || nextIndex >= current.length) return current;
+      const reordered = [...current];
+      [reordered[index], reordered[nextIndex]] = [reordered[nextIndex], reordered[index]];
+      return reordered;
+    });
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const title = values.translations.ru.title.trim();
-    const sourceUrl = values.sourceUrl.trim();
-    const salePriceUzs = Number(values.salePriceUzs);
+    setSubmitAttempted(true);
     const nextErrors: FormErrors = {};
-
-    if (title.length < 2) nextErrors.title = t("products.validationTitle");
-    const countryIsUnchangedUnknown = Boolean(product)
-      && values.country === product?.country
-      && !isProductCountry(values.country);
-    if (!isProductCountry(values.country) && !countryIsUnchangedUnknown) {
+    for (const locale of locales) {
+      if (values.translations[locale].title.trim().length < 2) {
+        nextErrors[localeErrorKeys[locale]] = t("products.validationTitleLocale");
+      }
+    }
+    const unknownCountryIsUnchanged = Boolean(product) && values.country === product?.country && !isProductCountry(values.country);
+    if (!isProductCountry(values.country) && !unknownCountryIsUnchanged) {
       nextErrors.country = t("products.countryRequired");
     }
-    try {
-      const url = new URL(sourceUrl);
-      if (!url.protocol || !url.host) nextErrors.sourceUrl = t("products.validationSourceUrl");
-    } catch {
-      nextErrors.sourceUrl = t("products.validationSourceUrl");
-    }
+    const salePriceUzs = Number(values.salePriceUzs);
     if (!Number.isFinite(salePriceUzs) || salePriceUzs <= 0) {
       nextErrors.salePriceUzs = t("products.validationSalePrice");
+    }
+    const sourceUrl = values.sourceUrl.trim();
+    if (sourceUrl) {
+      try {
+        if (!new URL(sourceUrl).host) nextErrors.sourceUrl = t("products.validationSourceUrl");
+      } catch {
+        nextErrors.sourceUrl = t("products.validationSourceUrl");
+      }
+    }
+    if (!photos.length) nextErrors.photos = t("products.validationPhotos");
+    if (photos.length > Math.min(15, maxProductPhotos)) {
+      nextErrors.photos = t("products.photoLimitReached", { max: Math.min(15, maxProductPhotos) });
+    }
+    if (photos.some((photo) => photo.file && photo.file.size > maxProductPhotoSizeMb * 1024 * 1024)) {
+      nextErrors.photos = t("products.photoSizeLimit", { size: maxProductPhotoSizeMb });
     }
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
-      if (nextErrors.title) setActiveLocale("ru");
+      const firstMissingLocale = locales.find((locale) => nextErrors[localeErrorKeys[locale]]);
+      if (firstMissingLocale) setActiveLocale(firstMissingLocale);
       return;
     }
 
-    const imageUrl = values.imageUrl.trim();
-    const originalImageUrl = product?.images?.[0]?.url ?? "";
     onSubmit({
-      title,
-      country: isProductCountry(values.country) ? values.country : undefined,
+      title: values.translations.ru.title.trim(),
       titleUz: values.translations.uz.title.trim(),
       titleEn: values.translations.en.title.trim(),
       description: values.translations.ru.description.trim(),
       descriptionUz: values.translations.uz.description.trim(),
       descriptionEn: values.translations.en.description.trim(),
-      sourceUrl,
-      imageUrlOrFile: imageFile ?? (imageUrl && imageUrl !== originalImageUrl ? imageUrl : undefined),
+      ...(sourceUrl ? { sourceUrl } : {}),
       salePriceUzs,
+      country: isProductCountry(values.country) ? values.country : undefined,
       categoryId: values.categoryId || null,
       color: values.color.trim(),
       size: values.size.trim(),
       publish: values.publish,
+      images: photos.map((photo) => photo.file ? { file: photo.file } : { id: photo.id! }),
     });
   };
 
   const localeName = (locale: ProductLocale) => t(`products.contentLocale.${locale}`);
+  const localizedCategoryName = (category: ProductCategory) => {
+    if (typeof category.name === "string") return category.name;
+    const uiLocale = i18n.language.slice(0, 2);
+    return category.name[uiLocale] || category.name.ru || category.name.en || category.slug;
+  };
+  const countryDisplay = getProductCountryDisplay(values.country);
+  const countryOptions = [
+    ...(!isProductCountry(values.country) && product
+      ? [{ value: values.country, label: `${countryDisplay.flag} ${t("products.unknownCountry")}` }]
+      : []),
+    ...PRODUCT_COUNTRIES.map(({ code, flag, translationKey }) => ({ value: code, label: `${flag} ${t(translationKey)}` })),
+  ];
+  const categoryOptions = [
+    { value: "", label: t("products.noCategory") },
+    ...categories.filter((category) => category.active !== false || category.id === values.categoryId).map((category) => ({
+      value: category.id,
+      label: `${localizedCategoryName(category)}${category.active === false ? ` (${t("categories.inactive")})` : ""}`,
+    })),
+  ];
+  const errorLabels: Record<keyof FormErrors, string> = {
+    titleRu: `${t("products.titleLabel")} (RU)`,
+    titleUz: `${t("products.titleLabel")} (UZ)`,
+    titleEn: `${t("products.titleLabel")} (EN)`,
+    country: t("products.countryLabel"),
+    sourceUrl: t("products.sourceLabel"),
+    salePriceUzs: t("products.salePriceLabel"),
+    photos: t("products.photoSection"),
+  };
   const headerContent = (
-    <div
-      role="tablist"
-      aria-label={t("products.contentLanguage")}
-      className="inline-flex w-full rounded-xl border border-app bg-gray-50 p-1 dark:bg-white/5 sm:w-auto"
-    >
+    <div role="tablist" aria-label={t("products.contentLanguage")} className="inline-flex w-full rounded-xl border border-app bg-gray-50 p-1 dark:bg-white/5 sm:w-auto">
       {locales.map((locale) => {
-        const complete = locale === "ru"
-          ? values.translations[locale].title.trim().length >= 2
-          : values.translations[locale].title.trim().length > 0;
+        const error = errors[localeErrorKeys[locale]];
+        const complete = values.translations[locale].title.trim().length >= 2;
         return (
           <button
             key={locale}
@@ -218,116 +328,82 @@ export function ProductFormModal({
             aria-selected={activeLocale === locale}
             aria-label={t("products.contentTabLabel", {
               language: localeName(locale),
-              status: complete ? t("products.translationComplete") : t("products.translationIncomplete"),
+              status: error ? t("products.translationError") : complete ? t("products.translationComplete") : t("products.translationIncomplete"),
             })}
             tabIndex={activeLocale === locale ? 0 : -1}
             onClick={() => setActiveLocale(locale)}
             onKeyDown={handleTabKeyDown}
             className={`inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:flex-none ${
-              activeLocale === locale
-                ? "bg-surface text-primary-600 shadow-sm dark:text-primary-400"
-                : "text-muted hover:text-app"
+              activeLocale === locale ? "bg-surface text-primary-600 shadow-sm dark:text-primary-400" : "text-muted hover:text-app"
             }`}
           >
             {localeLabels[locale]}
-            {complete && <span aria-hidden="true" className="text-emerald-600 dark:text-emerald-400">✓</span>}
+            {error ? <span aria-hidden="true" className="text-red-500">!</span> : complete ? <span aria-hidden="true" className="text-emerald-600">✓</span> : null}
           </button>
         );
       })}
     </div>
   );
 
-  const localizedCategoryName = (category: ProductCategory) => {
-    if (typeof category.name === "string") return category.name;
-    const uiLocale = i18n.language.slice(0, 2);
-    return category.name[uiLocale] || category.name.ru || category.name.en || category.slug;
-  };
-  const countryDisplay = getProductCountryDisplay(values.country);
-  const imagePreview = localPreview || values.imageUrl;
-  const fieldClass = "input";
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={t(product ? "products.editProduct" : "products.createProduct")}
-      subtitle={product?.translations?.ru && typeof product.translations.ru !== "string"
-        ? product.translations.ru.title || product.slug
-        : product?.slug}
+      subtitle={product?.slug}
       size="2xl"
       fullscreenOnMobile
       closeLabel={t("common.close")}
       headerContent={headerContent}
       footer={
         <>
-          <Button variant="ghost" onClick={onClose} disabled={isSaving}>
-            {t("common.cancel")}
-          </Button>
-          <Button
-            type="submit"
-            form={formId}
-            loading={isSaving}
-          >
-            {isSaving
-              ? t(product ? "products.saving" : "products.creating")
-              : t(product ? "products.saveChanges" : "products.saveBtn")}
+          <Button variant="ghost" onClick={onClose} disabled={isSaving}>{t("common.cancel")}</Button>
+          <Button type="submit" form={formId} loading={isSaving} disabled={settingsLoading}>
+            {isSaving ? t(product ? "products.saving" : "products.creating") : t(product ? "products.saveChanges" : "products.saveBtn")}
           </Button>
         </>
       }
     >
       <form id={formId} noValidate onSubmit={handleSubmit} className="space-y-6">
+        {submitAttempted && Object.keys(errors).length > 0 && (
+          <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
+            <p className="font-semibold">{t("products.formHasErrors")}</p>
+            <ul className="mt-2 list-inside list-disc space-y-1">
+              {Object.entries(errors).map(([field, message]) => message && (
+                <li key={field}><strong>{errorLabels[field as keyof FormErrors]}:</strong> {message}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <section className="space-y-4">
           <h4 className="text-sm font-bold text-app">{t("products.mainInformation")}</h4>
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold text-app">{t("products.sourceLabel")}</span>
-              <input
-                required
-                type="url"
-                value={values.sourceUrl}
-                onChange={(event) => updateValue("sourceUrl", event.target.value)}
-                className={fieldClass}
-                placeholder="https://..."
-                aria-invalid={Boolean(errors.sourceUrl)}
-                aria-describedby={errors.sourceUrl ? `${formId}-source-error` : undefined}
-              />
-              {errors.sourceUrl && <span id={`${formId}-source-error`} className="mt-1 block text-xs text-red-500">{errors.sourceUrl}</span>}
-            </label>
-            <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold text-app">{t("products.countryLabel")}</span>
-              <select
-                required={!product}
-                value={values.country}
-                onChange={(event) => updateValue("country", event.target.value)}
-                className={fieldClass}
-                aria-invalid={Boolean(errors.country)}
-                aria-describedby={errors.country ? `${formId}-country-error` : undefined}
-              >
-                {!isProductCountry(values.country) && product && (
-                  <option value={values.country}>
-                    {countryDisplay.flag} {t(countryDisplay.translationKey, countryDisplay.code ? { code: countryDisplay.code } : undefined)}
-                  </option>
-                )}
-                {PRODUCT_COUNTRIES.map(({ code, flag, translationKey }) => (
-                  <option key={code} value={code}>{flag} {t(translationKey)}</option>
-                ))}
-              </select>
-              {errors.country && <span id={`${formId}-country-error`} className="mt-1 block text-xs text-red-500">{errors.country}</span>}
-            </label>
-            <label className="block md:col-span-2">
-              <span className="mb-1.5 block text-xs font-semibold text-app">{t("products.categoryLabel")}</span>
-              <select
+            <Input
+              label={t("products.sourceLabel")}
+              type="url"
+              value={values.sourceUrl}
+              onChange={(event) => updateValue("sourceUrl", event.target.value)}
+              className={errors.sourceUrl ? "border-red-500" : ""}
+              placeholder={t("products.sourceOptional")}
+              error={errors.sourceUrl}
+            />
+            <Select
+              label={t("products.countryLabel")}
+              placeholder={t("products.countryPlaceholder")}
+              value={values.country}
+              options={countryOptions}
+              onChange={(value) => updateValue("country", value)}
+              error={errors.country}
+            />
+            <div className="md:col-span-2">
+              <Select
+                label={t("products.categoryLabel")}
                 value={values.categoryId}
-                onChange={(event) => updateValue("categoryId", event.target.value)}
-                className={fieldClass}
-              >
-                <option value="">{t("products.noCategory")}</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>{localizedCategoryName(category)}</option>
-                ))}
-              </select>
-              {categoriesError && <span className="mt-1 block text-xs text-red-500">{t("products.categoriesLoadError")}</span>}
-            </label>
+                options={categoryOptions}
+                onChange={(value) => updateValue("categoryId", value)}
+                error={categoriesError ? t("products.categoriesLoadError") : undefined}
+              />
+            </div>
           </div>
         </section>
 
@@ -336,34 +412,23 @@ export function ProductFormModal({
             <h4 className="text-sm font-bold text-app">{t("products.localizedContent")}</h4>
             <p className="mt-1 text-xs text-muted">{t("products.localizedContentHint")}</p>
           </div>
-          <div
-            id={`${formId}-panel`}
-            role="tabpanel"
-            aria-labelledby={`${formId}-tab-${activeLocale}`}
-            className="grid gap-4 md:grid-cols-2"
-          >
-            <label className="block md:col-span-2">
-              <span className="mb-1.5 block text-xs font-semibold text-app">{t("products.titleLabel")}</span>
-              <input
-                required={activeLocale === "ru"}
-                maxLength={500}
-                value={values.translations[activeLocale].title}
-                onChange={(event) => updateLocalizedValue("title", event.target.value)}
-                className={fieldClass}
-                aria-invalid={activeLocale === "ru" && Boolean(errors.title)}
-                aria-describedby={activeLocale === "ru" && errors.title ? `${formId}-title-error` : undefined}
-              />
-              {activeLocale === "ru" && errors.title && <span id={`${formId}-title-error`} className="mt-1 block text-xs text-red-500">{errors.title}</span>}
-            </label>
-            <label className="block md:col-span-2">
-              <span className="mb-1.5 block text-xs font-semibold text-app">{t("products.descLabel")}</span>
-              <textarea
-                maxLength={5000}
-                value={values.translations[activeLocale].description}
-                onChange={(event) => updateLocalizedValue("description", event.target.value)}
-                className={`${fieldClass} min-h-28`}
-              />
-            </label>
+          <div id={`${formId}-panel`} role="tabpanel" aria-labelledby={`${formId}-tab-${activeLocale}`} className="grid gap-4 md:grid-cols-2">
+            <Input
+              label={t("products.titleLabel")}
+              maxLength={500}
+              value={values.translations[activeLocale].title}
+              onChange={(event) => updateLocalizedValue("title", event.target.value)}
+              error={errors[localeErrorKeys[activeLocale]]}
+              containerClassName="md:col-span-2"
+            />
+            <Textarea
+              label={t("products.descLabel")}
+              maxLength={5000}
+              value={values.translations[activeLocale].description}
+              onChange={(event) => updateLocalizedValue("description", event.target.value)}
+              className="min-h-32 resize-y"
+              containerClassName="md:col-span-2"
+            />
           </div>
         </section>
 
@@ -372,93 +437,71 @@ export function ProductFormModal({
             <h4 className="text-sm font-bold text-app">{t("products.priceSection")}</h4>
             <p className="mt-1 text-xs text-muted">{t("products.priceSectionHint")}</p>
           </div>
-          <label className="block max-w-md">
-            <span className="mb-1.5 block text-xs font-semibold text-app">{t("products.salePriceLabel")}</span>
-            <div className="relative">
-              <input
-                required
-                type="number"
-                min="0.01"
-                step="0.01"
-                inputMode="decimal"
-                value={values.salePriceUzs}
-                onChange={(event) => updateValue("salePriceUzs", event.target.value)}
-                className={`${fieldClass} pr-16`}
-                aria-invalid={Boolean(errors.salePriceUzs)}
-                aria-describedby={errors.salePriceUzs ? `${formId}-price-error` : undefined}
-              />
-              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-semibold text-muted">UZS</span>
-            </div>
-            {errors.salePriceUzs && <span id={`${formId}-price-error`} className="mt-1 block text-xs text-red-500">{errors.salePriceUzs}</span>}
-          </label>
+          <Input
+            label={t("products.salePriceLabel")}
+            type="number"
+            min="0.01"
+            step="0.01"
+            inputMode="decimal"
+            value={values.salePriceUzs}
+            onChange={(event) => updateValue("salePriceUzs", event.target.value)}
+            error={errors.salePriceUzs}
+            className="max-w-md"
+          />
         </section>
 
         <section className="space-y-4">
-          <h4 className="text-sm font-bold text-app">{t("products.photoSection")}</h4>
-          <div className="grid gap-4 rounded-xl border border-app p-3 sm:grid-cols-[160px_minmax(0,1fr)] sm:p-4">
-            <div className="flex h-36 items-center justify-center overflow-hidden rounded-xl bg-stone-100 dark:bg-stone-800">
-              {imagePreview && !imageError ? (
-                <img
-                  src={imagePreview}
-                  alt={values.translations[activeLocale].title || t("products.page")}
-                  className="h-full w-full object-cover"
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className="flex flex-col items-center gap-2 text-muted">
-                  <ImageOff size={24} />
-                  <span className="text-xs">{t("products.noImage")}</span>
-                </div>
-              )}
-            </div>
-            <div className="min-w-0 space-y-3">
-              <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold text-app">{t("products.imageLabel")}</span>
-                <input
-                  type="url"
-                  value={values.imageUrl}
-                  onChange={(event) => {
-                    updateValue("imageUrl", event.target.value);
-                    setImageFile(null);
-                    setLocalPreview(null);
-                    setImageError(false);
-                  }}
-                  className={fieldClass}
-                  placeholder="https://..."
-                />
-              </label>
-              <Button type="button" variant="outline" leftIcon={<Upload size={16} />} onClick={() => fileInputRef.current?.click()}>
-                {t("products.uploadBtn")}
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/avif"
-                className="sr-only"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) handleFileSelect(file);
-                  event.currentTarget.value = "";
-                }}
-              />
-              {imageFile && <p className="break-all text-xs font-medium text-violet-500">{imageFile.name}</p>}
-              <p className="text-xs text-muted">{t("products.uploadHint")}</p>
-            </div>
+          <div>
+            <h4 className="text-sm font-bold text-app">{t("products.photoSection")}</h4>
+            <p className="mt-1 text-xs text-muted">
+              {t("products.photoCount", { count: photos.length, max: Math.min(15, maxProductPhotos) })} · {t("products.photoSizeLimit", { size: maxProductPhotoSizeMb })}
+            </p>
           </div>
+          {errors.photos && <p role="alert" className="text-sm text-red-500">{errors.photos}</p>}
+          {photoInputErrors.map((issue, index) => <p key={`${issue}-${index}`} role="alert" className="text-sm text-red-500">{issue}</p>)}
+          {photos.length > 0 && (
+            <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {photos.map((photo, index) => (
+                <li key={photo.key} className={`relative min-w-0 overflow-hidden rounded-xl border ${index === 0 ? "border-primary-500 ring-1 ring-primary-500/30" : "border-app"}`}>
+                  <div className="relative flex h-36 items-center justify-center bg-stone-100 dark:bg-stone-800">
+                    {photo.url ? <img src={photo.url} alt="" className="h-full w-full object-cover" /> : <ImageOff size={24} className="text-muted" />}
+                    {index === 0 && <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary-600 px-2.5 py-1 text-xs font-bold text-white"><Star size={12} fill="currentColor" />{t("products.mainPhoto")}</span>}
+                    <span className="absolute right-2 top-2 rounded-full bg-black/70 px-2 py-1 text-xs font-semibold text-white">{index + 1}</span>
+                  </div>
+                  <div className="space-y-2 p-3">
+                    <p className="truncate text-xs text-app">{photo.file?.name ?? t("products.existingPhoto")}</p>
+                    <p className="text-xs text-muted">{photo.file ? formatFileSize(photo.file.size) : t("products.alreadyUploaded")}</p>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex gap-1">
+                        <button type="button" disabled={index === 0} onClick={() => movePhoto(index, -1)} aria-label={t("products.movePhotoUp")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveUp size={16} /></button>
+                        <button type="button" disabled={index === photos.length - 1} onClick={() => movePhoto(index, 1)} aria-label={t("products.movePhotoDown")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveDown size={16} /></button>
+                      </div>
+                      <button type="button" onClick={() => removePhoto(photo)} aria-label={t("products.removePhoto")} className="rounded-lg p-2 text-red-500 hover:bg-red-500/10"><Trash2 size={16} /></button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+          <Button type="button" variant="outline" leftIcon={<Upload size={16} />} onClick={() => fileInputRef.current?.click()} disabled={settingsLoading || photos.length >= Math.min(15, maxProductPhotos)}>
+            {t("products.addPhotos")}
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            className="sr-only"
+            onChange={handleFileSelect}
+          />
         </section>
 
         {(product?.source === "MANUAL" || !product) && (
           <section className="space-y-4">
             <h4 className="text-sm font-bold text-app">{t("products.additionalInformation")}</h4>
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold text-app">{t("products.colorLabel")}</span>
-                <input maxLength={80} value={values.color} onChange={(event) => updateValue("color", event.target.value)} className={fieldClass} />
-              </label>
-              <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold text-app">{t("products.sizeLabel")}</span>
-                <input maxLength={80} value={values.size} onChange={(event) => updateValue("size", event.target.value)} className={fieldClass} />
-              </label>
+              <Input label={t("products.colorLabel")} maxLength={80} value={values.color} onChange={(event) => updateValue("color", event.target.value)} />
+              <Input label={t("products.sizeLabel")} maxLength={80} value={values.size} onChange={(event) => updateValue("size", event.target.value)} />
               {!product && (
                 <label className="flex items-center gap-2 md:col-span-2">
                   <input type="checkbox" checked={values.publish} onChange={(event) => updateValue("publish", event.target.checked)} />

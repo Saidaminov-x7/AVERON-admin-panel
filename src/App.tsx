@@ -6,6 +6,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import CommerceDashboardPage from './pages/commerce/CommerceDashboardPage';
 import ProductsPage from './pages/commerce/ProductsPage';
+import CategoriesPage from './pages/commerce/CategoriesPage';
+import NotificationsPage from './pages/NotificationsPage';
 import ImportsPage from './pages/commerce/ImportsPage';
 import OrdersPage from './pages/commerce/OrdersPage';
 import FinancePage from './pages/commerce/FinancePage';
@@ -30,6 +32,7 @@ export default function App() {
     <Route path="/login" element={<LoginPage/>}/>
     <Route path="/" element={<Guard><CommerceDashboardPage/></Guard>}/>
     <Route path="/products" element={<Guard><ProductsPage/></Guard>}/>
+    <Route path="/categories" element={<Guard><CategoriesPage/></Guard>}/>
     <Route path="/imports" element={<Guard><ImportsPage/></Guard>}/>
     <Route path="/orders" element={<Guard><OrdersPage/></Guard>}/>
     <Route path="/finance" element={<Guard><FinancePage/></Guard>}/>
@@ -37,6 +40,7 @@ export default function App() {
     <Route path="/users" element={<Guard><UsersPage/></Guard>}/>
     <Route path="/users/:id" element={<Guard><UserProfilePage/></Guard>}/>
     <Route path="/audit-log" element={<Guard><AuditLogPage/></Guard>}/>
+    <Route path="/notifications" element={<Guard><NotificationsPage/></Guard>}/>
     <Route path="/analytics" element={<Guard><AnalyticsPage/></Guard>}/>
     <Route path="/error-logs" element={<Guard><ErrorLogsPage/></Guard>}/>
 
@@ -48,4 +52,3 @@ export default function App() {
     <Route path="*" element={<NotFoundPage/>}/>
   </Routes></BrowserRouter>;
 }
-

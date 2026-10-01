@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import {
   AlertCircle,
   BarChart2,
+  Bell,
   ClipboardCheck,
   Gauge,
   HeartHandshake,
@@ -13,10 +14,12 @@ import {
   Settings,
   ShieldCheck,
   ShoppingBag,
+  Tags,
   Users,
   X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import { useAuth } from "../../hooks/useAuth";
 import { logoutApi } from "../../lib/authApi";
 import { useAuthStore } from "../../store/authStore";
@@ -33,6 +36,7 @@ const sections: { sectionKey: string; items: Item[] }[] = [
     items: [
       { to: "/imports", labelKey: "sidebar.review", icon: ClipboardCheck },
       { to: "/products", labelKey: "sidebar.catalog", icon: ShoppingBag },
+      { to: "/categories", labelKey: "sidebar.categories", icon: Tags },
       { to: "/media", labelKey: "sidebar.media", icon: Images },
     ],
   },
@@ -49,6 +53,7 @@ const sections: { sectionKey: string; items: Item[] }[] = [
       { to: "/users", labelKey: "sidebar.users", icon: Users },
       { to: "/analytics", labelKey: "sidebar.analytics", icon: BarChart2 },
       { to: "/audit-log", labelKey: "sidebar.audit", icon: ShieldCheck },
+      { to: "/notifications", labelKey: "sidebar.notifications", icon: Bell },
       { to: "/error-logs", labelKey: "sidebar.errorLogs", icon: AlertCircle },
       { to: "/settings/general", labelKey: "sidebar.settings", icon: Settings },
       { to: "/system/health", labelKey: "sidebar.health", icon: HeartHandshake },
@@ -63,7 +68,8 @@ export default function Sidebar({
 }) {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const siteUrl = import.meta.env.VITE_SITE_URL || "https://averon.uz";
 
   const logout = async () => {
     try {
@@ -84,7 +90,12 @@ export default function Sidebar({
           </div>
         </button>
         {onCloseMobile && (
-          <button onClick={onCloseMobile} className="lg:hidden">
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            aria-label={t("common.close", "Закрыть")}
+            className="lg:hidden"
+          >
             <X />
           </button>
         )}
@@ -114,6 +125,38 @@ export default function Sidebar({
           </div>
         ))}
       </nav>
+      <div className="space-y-3 border-t border-app p-4 lg:hidden">
+        <p className="text-[10px] font-bold tracking-[.16em] text-muted">{t("header.language")}</p>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { code: "ru", label: "🇷🇺 RU" },
+            { code: "uz", label: "🇺🇿 UZ" },
+            { code: "en", label: "🇬🇧 EN" },
+          ].map(({ code, label }) => (
+            <button
+              key={code}
+              type="button"
+              onClick={() => {
+                void i18n.changeLanguage(code);
+                localStorage.setItem("i18nextLng", code);
+              }}
+              aria-pressed={i18n.language.slice(0, 2) === code}
+              className={`min-h-10 rounded-lg border px-2 text-xs font-semibold ${i18n.language.slice(0, 2) === code ? "border-primary-500 bg-primary-500 text-white" : "border-app text-app"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <NavLink to="/notifications" onClick={onCloseMobile} className="text-sm font-semibold text-app">
+            {t("header.notifications")}
+          </NavLink>
+          <ThemeToggle />
+          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="text-sm font-semibold text-primary-600">
+            {t("header.goToSite")}
+          </a>
+        </div>
+      </div>
       <div className="border-t border-app p-4">
         <div className="mb-3 rounded-xl bg-violet-500/10 p-3">
           <p className="text-sm font-bold">{user?.name || t("sidebar.admin")}</p>

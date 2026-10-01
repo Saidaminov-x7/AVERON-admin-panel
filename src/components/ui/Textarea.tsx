@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -30,17 +30,17 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const internalRef = useRef<HTMLTextAreaElement | null>(null);
     const textareaId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
-    const handleResize = () => {
+    const handleResize = useCallback(() => {
       const el = internalRef.current;
       if (el && autoResize) {
         el.style.height = 'auto';
         el.style.height = `${Math.max(el.scrollHeight + 2, 70)}px`;
       }
-    };
+    }, [autoResize]);
 
     useEffect(() => {
       handleResize();
-    }, [props.value]);
+    }, [handleResize, props.value]);
 
     return (
       <div className={twMerge('w-full space-y-1.5', containerClassName)}>
@@ -67,7 +67,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           }}
           className={twMerge(
             clsx(
-              'w-full px-3.5 py-2.5 text-sm rounded-xl transition-all duration-150 outline-none resize-y',
+              'w-full px-3.5 py-3 text-sm leading-relaxed rounded-xl transition-all duration-150 outline-none resize-y',
               'bg-surface border border-app text-app placeholder:text-muted',
               'focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20',
               'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-white/5',
@@ -75,6 +75,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             ),
             className,
           )}
+          aria-invalid={Boolean(error)}
           {...props}
         />
         {error ? (

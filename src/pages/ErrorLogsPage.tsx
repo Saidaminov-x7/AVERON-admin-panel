@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
+import { Modal } from '../components/ui/Modal';
 import { getErrorReportsApi, resolveErrorReportApi, type ClientErrorReportItem } from '../lib/errorReportsApi';
 import Badge from '../components/Badge/Badge';
 import { Select } from '../components/ui/Select';
@@ -222,40 +223,55 @@ const ErrorLogsPage: React.FC = () => {
 
         {/* Модальное окно деталей ошибки */}
         {selectedError && (
-          <div
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
-            onClick={() => setSelectedError(null)}
-          >
-            <div
-              className="bg-surface border border-app rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-5 border-b border-app flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant={
-                      selectedError.severity === 'error'
-                        ? 'danger'
-                        : selectedError.severity === 'warning'
-                        ? 'warning'
-                        : 'info'
-                    }
-                    className="text-xs font-mono"
+          <Modal
+            isOpen={Boolean(selectedError)}
+            onClose={() => setSelectedError(null)}
+            title={t('auditLog.details', 'Детали ошибки')}
+            subtitle={selectedError.url}
+            size="lg"
+            fullscreenOnMobile
+            closeLabel={t('common.close', 'Закрыть')}
+            headerContent={
+              <Badge
+                variant={
+                  selectedError.severity === 'error'
+                    ? 'danger'
+                    : selectedError.severity === 'warning'
+                    ? 'warning'
+                    : 'info'
+                }
+                className="text-xs font-mono"
+              >
+                {selectedError.severity.toUpperCase()}
+              </Badge>
+            }
+            footer={
+              <>
+                {!selectedError.resolved ? (
+                  <button
+                    type="button"
+                    onClick={() => resolveMutation.mutate(selectedError.id)}
+                    disabled={resolveMutation.isPending}
+                    className="btn-primary text-xs py-2 px-4 cursor-pointer"
                   >
-                    {selectedError.severity.toUpperCase()}
-                  </Badge>
-                  <h3 className="font-bold text-app text-base">{t('auditLog.details', 'Детали ошибки')}</h3>
-                </div>
+                    {t('system.markAsResolved', 'Пометить как решённую')}
+                  </button>
+                ) : (
+                  <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                    <CheckCircle size={14} /> {t('system.errorResolved', 'Ошибка помечена как решённая')}
+                  </span>
+                )}
                 <button
                   type="button"
                   onClick={() => setSelectedError(null)}
-                  className="text-muted hover:text-app text-sm p-1 rounded-lg"
+                  className="btn-ghost text-xs py-2 px-4 cursor-pointer"
                 >
-                  ✕
+                  {t('common.cancel', 'Закрыть')}
                 </button>
-              </div>
-
-              <div className="p-5 overflow-y-auto space-y-4 text-sm flex-1">
+              </>
+            }
+          >
+              <div className="space-y-4 text-sm">
                 <div>
                   <div className="text-xs text-muted mb-1 font-medium">{t('system.errorMessage', 'Сообщение')}:</div>
                   <div className="font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/20 p-3 rounded-xl border border-rose-200 dark:border-rose-900/30 break-words">
@@ -300,34 +316,7 @@ const ErrorLogsPage: React.FC = () => {
                   </div>
                 )}
               </div>
-
-              <div className="p-4 border-t border-app flex items-center justify-between">
-                <div>
-                  {!selectedError.resolved ? (
-                    <button
-                      type="button"
-                      onClick={() => resolveMutation.mutate(selectedError.id)}
-                      disabled={resolveMutation.isPending}
-                      className="btn-primary text-xs py-2 px-4 cursor-pointer"
-                    >
-                      {t('system.markAsResolved', 'Пометить как решённую')}
-                    </button>
-                  ) : (
-                    <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
-                      <CheckCircle size={14} /> {t('system.errorResolved', 'Ошибка помечена как решённая')}
-                    </span>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedError(null)}
-                  className="btn-ghost text-xs py-2 px-4 cursor-pointer"
-                >
-                  {t('common.cancel', 'Закрыть')}
-                </button>
-              </div>
-            </div>
-          </div>
+          </Modal>
         )}
       </div>
     </Layout>
