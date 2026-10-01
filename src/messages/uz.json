@@ -67,6 +67,7 @@
     "staff": "Xodimlar va rollar",
     "profile": "Mening profilim",
     "audit": "Harakatlar auditi",
+    "visualSearchAudit": "Vizual qidiruv faolligi",
     "monetization": "Monetizatsiya",
     "system": "Infratuzilma"
   },
@@ -503,6 +504,24 @@
     "health": "Tizim holati",
     "admin": "Administrator",
     "logout": "Chiqish"
+  },
+  "visualSearchAudit": {
+    "title": "Vizual qidiruv faolligi",
+    "subtitle": "Amaliyotlar tarixi va indekslashning xavfsiz ma'lumotlari.",
+    "operation": "Amaliyot",
+    "timestamp": "Vaqt",
+    "results": "Natijalar",
+    "duration": "Davomiyligi",
+    "provider": "Provayder / model",
+    "productId": "Mahsulot ID",
+    "indexing": "Indekslash / xato",
+    "emptyTitle": "Hozircha vizual qidiruv faolligi yo'q",
+    "emptyText": "Muvaffaqiyatli yoki xato bilan tugagan amaliyotlar shu yerda ko'rinadi.",
+    "error": "Vizual qidiruv faolligini yuklab bo'lmadi.",
+    "retry": "Qayta urinish",
+    "previous": "Oldingi",
+    "next": "Keyingi",
+    "showing": "{{total}} tadan {{from}}-{{to}} ko'rsatilmoqda"
   },
   "commerce": {
     "commandCenter": "AVERON Command Center",

@@ -21,6 +21,7 @@ import SystemHealthPage from './pages/system/SystemHealthPage';
 import MediaLibraryPage from './pages/MediaLibraryPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import ErrorLogsPage from './pages/ErrorLogsPage';
+import VisualSearchAuditPage from './pages/VisualSearchAuditPage';
 
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -40,6 +41,7 @@ export default function App() {
     <Route path="/users" element={<Guard><UsersPage/></Guard>}/>
     <Route path="/users/:id" element={<Guard><UserProfilePage/></Guard>}/>
     <Route path="/audit-log" element={<Guard><AuditLogPage/></Guard>}/>
+    <Route path="/visual-search/audit" element={<Guard><VisualSearchAuditPage/></Guard>}/>
     <Route path="/notifications" element={<Guard><NotificationsPage/></Guard>}/>
     <Route path="/analytics" element={<Guard><AnalyticsPage/></Guard>}/>
     <Route path="/error-logs" element={<Guard><ErrorLogsPage/></Guard>}/>

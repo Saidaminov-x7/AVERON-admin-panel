@@ -1,1 +1,1 @@
-export const ROUTES = { LOGIN:'/login', DASHBOARD:'/', PRODUCTS:'/products', IMPORTS:'/imports', ORDERS:'/orders', FINANCE:'/finance', USERS:'/users', AUDIT:'/audit-log', SETTINGS:'/settings/general', STAFF:'/settings/staff', HEALTH:'/system/health' } as const;
+export const ROUTES = { LOGIN:'/login', DASHBOARD:'/', PRODUCTS:'/products', IMPORTS:'/imports', ORDERS:'/orders', FINANCE:'/finance', USERS:'/users', AUDIT:'/audit-log', VISUAL_SEARCH_AUDIT:'/visual-search/audit', SETTINGS:'/settings/general', STAFF:'/settings/staff', HEALTH:'/system/health' } as const;
