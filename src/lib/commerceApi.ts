@@ -5,6 +5,19 @@ import { api } from './axios';
 
 // ─── Типы ─────────────────────────────────────────────────────────────────────
 
+export const PRODUCT_COUNTRIES = [
+  { code: 'CN', flag: '🇨🇳', translationKey: 'products.countryChina' },
+  { code: 'US', flag: '🇺🇸', translationKey: 'products.countryUnitedStates' },
+  { code: 'TR', flag: '🇹🇷', translationKey: 'products.countryTurkey' },
+  { code: 'IT', flag: '🇮🇹', translationKey: 'products.countryItaly' },
+  { code: 'GB', flag: '🇬🇧', translationKey: 'products.countryUnitedKingdom' },
+] as const;
+
+export type ProductCountry = typeof PRODUCT_COUNTRIES[number]['code'];
+
+export const isProductCountry = (value: unknown): value is ProductCountry =>
+  PRODUCT_COUNTRIES.some(({ code }) => code === value);
+
 export interface DashboardData {
   products: {
     published: number;
@@ -37,8 +50,31 @@ export interface ImportedProduct {
   createdAt: string;
 }
 
+export interface ProductListItem {
+  id: string;
+  slug: string;
+  country: ProductCountry;
+  translations?: {
+    ru?: { title?: string };
+  };
+  images?: Array<{ url: string }>;
+  salePriceUzs: string | number;
+  status: string;
+}
+
+export interface ProductListResponse {
+  items: ProductListItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
 export interface ProductPayload {
   title: string;
+  country: ProductCountry;
   titleUz?: string;
   titleEn?: string;
   description?: string;
@@ -62,9 +98,14 @@ export const getCommerceDashboard = () =>
 export const getImports = (status = 'PENDING_REVIEW') =>
   api.get<ImportedProduct[]>('/api/v1/admin/imports', { params: { status } }).then((r) => r.data);
 
-export const approveImport = (id: string, salePriceUzs: number, exchangeRate: number) =>
+export const approveImport = (
+  id: string,
+  salePriceUzs: number,
+  exchangeRate: number,
+  country: ProductCountry,
+) =>
   api
-    .post(`/api/v1/admin/imports/${id}/approve`, { salePriceUzs, exchangeRate, publish: true })
+    .post(`/api/v1/admin/imports/${id}/approve`, { salePriceUzs, exchangeRate, country, publish: true })
     .then((r) => r.data);
 
 export const rejectImport = (id: string, reason: string) =>
@@ -72,11 +113,26 @@ export const rejectImport = (id: string, reason: string) =>
 
 // ─── Товары ────────────────────────────────────────────────────────────────────
 
-export const getProducts = (params?: { page?: number; limit?: number; q?: string }) =>
-  api.get('/api/v1/products', { params: { limit: params?.limit ?? 15, page: params?.page ?? 1, q: params?.q } }).then((r) => r.data);
+export const getProducts = (params?: {
+  page?: number;
+  limit?: number;
+  q?: string;
+  country?: ProductCountry;
+}) =>
+  api.get<ProductListResponse>('/api/v1/admin/products', {
+    params: {
+      limit: params?.limit ?? 15,
+      page: params?.page ?? 1,
+      q: params?.q,
+      ...(params?.country ? { country: params.country } : {}),
+    },
+  }).then((r) => r.data);
 
 export const createManualProduct = (payload: ProductPayload) =>
   api.post('/api/v1/admin/products', payload).then((r) => r.data);
+
+export const updateProductCountry = (id: string, country: ProductCountry) =>
+  api.put<ProductListItem>(`/api/v1/admin/products/${id}`, { country }).then((r) => r.data);
 
 // ─── Заказы ────────────────────────────────────────────────────────────────────
 

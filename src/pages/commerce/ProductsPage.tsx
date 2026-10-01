@@ -1,16 +1,30 @@
 import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ImageOff, LoaderCircle, Plus, Upload, X } from "lucide-react";
+import { Check, ImageOff, LoaderCircle, Pencil, Plus, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import Layout from "../../components/Layout";
-import { createManualProduct, getProducts } from "../../lib/commerceApi";
+import { Button, Modal, Pagination, Select } from "../../components/ui";
+import {
+  createManualProduct,
+  getProducts,
+  isProductCountry,
+  PRODUCT_COUNTRIES,
+  updateProductCountry,
+  type ProductListItem,
+  type ProductCountry,
+} from "../../lib/commerceApi";
 import { uploadMediaApi } from "../../lib/mediaApi";
 
 export default function ProductsPage() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [country, setCountry] = useState<ProductCountry | "">("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(15);
+  const [editingProduct, setEditingProduct] = useState<ProductListItem | null>(null);
+  const [editingCountry, setEditingCountry] = useState<ProductCountry | "">("");
   const [imageUrl, setImageUrl] = useState("");
   const [localPreview, setLocalPreview] = useState<string | null>(null);
   const [localFile, setLocalFile] = useState<File | null>(null);
@@ -18,14 +32,15 @@ export default function ProductsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
 
-  const { data, isLoading } = useQuery<{ items: any[]; pagination: any }>({
-    queryKey: ["commerce-products"],
-    queryFn: () => getProducts(),
+  const { data, isLoading } = useQuery({
+    queryKey: ["commerce-products", country, page, limit],
+    queryFn: () => getProducts({ country: country || undefined, page, limit }),
   });
 
   const mutation = useMutation({
     mutationFn: async (formData: {
       title: string;
+      country: ProductCountry;
       titleUz: string;
       titleEn: string;
       description: string;
@@ -50,6 +65,7 @@ export default function ProductsPage() {
 
       return createManualProduct({
         title: formData.title,
+        country: formData.country,
         titleUz: formData.titleUz,
         titleEn: formData.titleEn,
         description: formData.description,
@@ -71,6 +87,18 @@ export default function ProductsPage() {
     onError: () => toast.error(t("products.createError")),
   });
 
+  const countryMutation = useMutation({
+    mutationFn: ({ id, country: selectedCountry }: { id: string; country: ProductCountry }) =>
+      updateProductCountry(id, selectedCountry),
+    onSuccess: () => {
+      toast.success(t("products.countryUpdated"));
+      setEditingProduct(null);
+      setEditingCountry("");
+      qc.invalidateQueries({ queryKey: ["commerce-products"] });
+    },
+    onError: () => toast.error(t("products.countryUpdateError")),
+  });
+
   const closeForm = () => {
     setOpen(false);
     setImageUrl("");
@@ -82,8 +110,14 @@ export default function ProductsPage() {
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
+    const selectedCountry = f.get("country");
+    if (!isProductCountry(selectedCountry)) {
+      toast.error(t("products.countryRequired"));
+      return;
+    }
     mutation.mutate({
       title: String(f.get("title")),
+      country: selectedCountry,
       titleUz: String(f.get("titleUz") || ""),
       titleEn: String(f.get("titleEn") || ""),
       description: String(f.get("description") || ""),
@@ -110,6 +144,21 @@ export default function ProductsPage() {
   const previewSrc = localPreview || imageUrl;
 
   const products = data?.items ?? [];
+  const countryOptions = [
+    { value: "", label: `🌍 ${t("products.allCountries")}` },
+    ...PRODUCT_COUNTRIES.map(({ code, flag, translationKey }) => ({
+      value: code,
+      label: `${flag} ${t(translationKey)}`,
+    })),
+  ];
+  const editableCountryOptions = PRODUCT_COUNTRIES.map(({ code, flag, translationKey }) => ({
+    value: code,
+    label: `${flag} ${t(translationKey)}`,
+  }));
+  const getCountryLabel = (selectedCountry: ProductCountry) => {
+    const option = PRODUCT_COUNTRIES.find(({ code }) => code === selectedCountry);
+    return option ? `${option.flag} ${t(option.translationKey)}` : selectedCountry;
+  };
   const field = "input";
 
   return (
@@ -125,6 +174,18 @@ export default function ProductsPage() {
           <Plus size={18} />
           {t("products.add")}
         </button>
+      </div>
+
+      <div className="mt-4 max-w-sm">
+        <Select
+          label={t("products.countryFilterLabel")}
+          value={country}
+          options={countryOptions}
+          onChange={(value) => {
+            setCountry(isProductCountry(value) ? value : "");
+            setPage(1);
+          }}
+        />
       </div>
 
       {open && (
@@ -151,6 +212,16 @@ export default function ProductsPage() {
             <label>
               {t("products.sourceLabel")}
               <input required type="url" name="sourceUrl" className={field} />
+            </label>
+            <label>
+              {t("products.countryLabel")}
+              <select required name="country" defaultValue="CN" className={field}>
+                {PRODUCT_COUNTRIES.map(({ code, flag, translationKey }) => (
+                  <option key={code} value={code}>
+                    {flag} {t(translationKey)}
+                  </option>
+                ))}
+              </select>
             </label>
 
             {/* Фото-блок: preview + URL ввод + выбор файла */}
@@ -287,7 +358,7 @@ export default function ProductsPage() {
         <div className="card">{t("products.loading")}</div>
       ) : products.length ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {products.map((p: any) => (
+          {products.map((p) => (
             <article className="card overflow-hidden p-0" key={p.id}>
               <div className="flex h-48 items-center justify-center bg-stone-100 dark:bg-stone-800">
                 {p.images?.[0]?.url && (
@@ -311,12 +382,24 @@ export default function ProductsPage() {
                 <h2 className="font-bold">
                   {p.translations?.ru?.title || p.slug}
                 </h2>
+                <p className="mt-1 text-sm text-muted">{getCountryLabel(p.country)}</p>
                 <div className="mt-3 flex justify-between">
                   <strong>
                     {Number(p.salePriceUzs).toLocaleString()} UZS
                   </strong>
                   <span className="badge-success">PUBLISHED</span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingProduct(p);
+                    setEditingCountry(p.country);
+                  }}
+                  className="btn-ghost mt-3 inline-flex items-center gap-2 text-sm"
+                >
+                  <Pencil size={14} />
+                  {t("products.editCountry")}
+                </button>
               </div>
             </article>
           ))}
@@ -324,6 +407,62 @@ export default function ProductsPage() {
       ) : (
         <div className="card text-muted">{t("products.empty")}</div>
       )}
+      {data?.pagination && (
+        <Pagination
+          currentPage={page}
+          totalPages={data.pagination.pages}
+          totalItems={data.pagination.total}
+          pageSize={limit}
+          pageSizeOptions={[15, 30, 48]}
+          onPageChange={setPage}
+          onPageSizeChange={(nextLimit) => {
+            setLimit(nextLimit);
+            setPage(1);
+          }}
+        />
+      )}
+      <Modal
+        isOpen={!!editingProduct}
+        onClose={() => {
+          setEditingProduct(null);
+          setEditingCountry("");
+        }}
+        title={t("products.editCountry")}
+        subtitle={editingProduct?.translations?.ru?.title || editingProduct?.slug}
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setEditingProduct(null);
+                setEditingCountry("");
+              }}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              loading={countryMutation.isPending}
+              leftIcon={<Check size={15} />}
+              disabled={!isProductCountry(editingCountry)}
+              onClick={() => {
+                if (editingProduct && isProductCountry(editingCountry)) {
+                  countryMutation.mutate({ id: editingProduct.id, country: editingCountry });
+                }
+              }}
+            >
+              {t("products.saveCountry")}
+            </Button>
+          </div>
+        }
+      >
+        <Select
+          label={t("products.countryLabel")}
+          placeholder={t("products.countryPlaceholder")}
+          value={editingCountry}
+          options={editableCountryOptions}
+          onChange={(value) => setEditingCountry(isProductCountry(value) ? value : "")}
+        />
+      </Modal>
     </Layout>
   );
 }

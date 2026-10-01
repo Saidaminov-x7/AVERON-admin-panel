@@ -4,8 +4,16 @@ import { Check, ExternalLink, X, Package, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
-import { approveImport, getImports, rejectImport, type ImportedProduct } from '../../lib/commerceApi';
-import { EmptyState, Modal, Input, Button, Textarea } from '../../components/ui';
+import {
+  approveImport,
+  getImports,
+  isProductCountry,
+  PRODUCT_COUNTRIES,
+  rejectImport,
+  type ImportedProduct,
+  type ProductCountry,
+} from '../../lib/commerceApi';
+import { EmptyState, Modal, Input, Button, Select, Textarea } from '../../components/ui';
 
 export default function ImportsPage() {
   const { t, i18n } = useTranslation();
@@ -13,6 +21,7 @@ export default function ImportsPage() {
   const [approveItem, setApproveItem] = useState<ImportedProduct | null>(null);
   const [rejectItem, setRejectItem] = useState<ImportedProduct | null>(null);
   const [priceInput, setPriceInput] = useState('');
+  const [country, setCountry] = useState<ProductCountry | ''>('');
   const [rejectReason, setRejectReason] = useState('');
 
   const { data = [], isLoading } = useQuery({
@@ -23,12 +32,13 @@ export default function ImportsPage() {
   const refresh = () => client.invalidateQueries({ queryKey: ['imports'] });
 
   const approveMutation = useMutation({
-    mutationFn: ({ id, price }: { id: string; price: number }) =>
-      approveImport(id, price, 1800),
+    mutationFn: ({ id, price, country: productCountry }: { id: string; price: number; country: ProductCountry }) =>
+      approveImport(id, price, 1800, productCountry),
     onSuccess: () => {
       toast.success(t('imports.toastPublished', 'Товар опубликован'));
       setApproveItem(null);
       setPriceInput('');
+      setCountry('');
       refresh();
     },
     onError: () => toast.error(t('imports.toastPublishError', 'Ошибка публикации')),
@@ -49,9 +59,14 @@ export default function ImportsPage() {
   const openApprove = (item: ImportedProduct) => {
     setApproveItem(item);
     setPriceInput(item.suggestedPriceUzs ? String(Math.round(Number(item.suggestedPriceUzs))) : '');
+    setCountry('');
   };
 
   const currencyLocale = i18n.language?.startsWith('en') ? 'en-US' : 'ru-RU';
+  const countryOptions = PRODUCT_COUNTRIES.map(({ code, flag, translationKey }) => ({
+    value: code,
+    label: `${flag} ${t(translationKey)}`,
+  }));
 
   return (
     <Layout title={t('imports.title', 'Импорт · Очередь проверки')}>
@@ -151,21 +166,21 @@ export default function ImportsPage() {
       {/* Модал: Одобрить */}
       <Modal
         isOpen={!!approveItem}
-        onClose={() => { setApproveItem(null); setPriceInput(''); }}
+        onClose={() => { setApproveItem(null); setPriceInput(''); setCountry(''); }}
         title={t('imports.approveModalTitle', 'Одобрить товар')}
         subtitle={approveItem?.originalTitle}
         footer={
           <div className="flex gap-2 justify-end">
-            <Button variant="ghost" onClick={() => { setApproveItem(null); setPriceInput(''); }}>
+            <Button variant="ghost" onClick={() => { setApproveItem(null); setPriceInput(''); setCountry(''); }}>
               {t('common.cancel', 'Отмена')}
             </Button>
             <Button
               loading={approveMutation.isPending}
               leftIcon={<Check size={15} />}
-              disabled={!priceInput || Number(priceInput) <= 0}
+              disabled={!priceInput || Number(priceInput) <= 0 || !country}
               onClick={() => {
-                if (approveItem && Number(priceInput) > 0) {
-                  approveMutation.mutate({ id: approveItem.id, price: Number(priceInput) });
+                if (approveItem && Number(priceInput) > 0 && isProductCountry(country)) {
+                  approveMutation.mutate({ id: approveItem.id, price: Number(priceInput), country });
                 }
               }}
             >
@@ -191,6 +206,13 @@ export default function ImportsPage() {
             value={priceInput}
             onChange={(e) => setPriceInput(e.target.value)}
             placeholder={t('imports.salePricePlaceholder', 'Например: 450000')}
+          />
+          <Select
+            label={t('products.countryLabel')}
+            placeholder={t('products.countryPlaceholder')}
+            value={country}
+            options={countryOptions}
+            onChange={(value) => setCountry(isProductCountry(value) ? value : '')}
           />
         </div>
       </Modal>
