@@ -60,12 +60,42 @@ export interface ImportedProduct {
   originalTitle: string;
   source: string;
   sourceUrl: string;
-  sourcePriceCny: string;
+  sourcePriceCny: string | null;
   suggestedPriceUzs?: string;
   expectedProfitUzs?: string;
-  status: string;
-  imageUrl?: string;
+  status: 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+  sourceMetadata?: Record<string, unknown> | null;
+  normalizedPayload?: {
+    schemaVersion?: number;
+    provider?: string;
+    country?: string;
+    sourceDescription?: string | null;
+    sourceImages?: Array<string | { url?: string }>;
+    sourceCategory?: string | null;
+    sourcePriceCurrency?: string | null;
+    sourceAttributes?: Record<string, string | string[]>;
+    variants?: Array<{ sourceVariantId?: string; color?: string; size?: string; sourcePriceCny?: number }>;
+    sizes?: string[];
+    fetchedAt?: string;
+    rawMetadata?: Record<string, unknown>;
+    images?: Array<string | { url?: string }>;
+  } | null;
   createdAt: string;
+  updatedAt: string;
+  reviewedAt?: string | null;
+  reviewedById?: string | null;
+  rejectionReason?: string | null;
+  product?: { id: string; status: ProductListItem['status'] } | null;
+}
+
+export interface ImportedProductListResponse {
+  items: ImportedProduct[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
 }
 
 export interface ProductListItem {
@@ -154,18 +184,30 @@ export const archiveProductCategory = (id: string) =>
 
 // ─── Импорты (AI-парсер) ──────────────────────────────────────────────────────
 
-export const getImports = (status = 'PENDING_REVIEW') =>
-  api.get<ImportedProduct[]>('/api/v1/admin/imports', { params: { status } }).then((r) => r.data);
+export const getImports = (params: {
+  status?: ImportedProduct['status'];
+  provider?: string;
+  country?: ProductCountry;
+  q?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  limit?: number;
+} = {}) =>
+  api.get<ImportedProductListResponse>('/api/v1/admin/imports', { params }).then((r) => r.data);
 
 export const approveImport = (
   id: string,
-  salePriceUzs: number,
-  exchangeRate: number,
-  country: ProductCountry,
+  payload: {
+    translations: Partial<Record<ProductLocale, { title?: string; description?: string }>>;
+    salePriceUzs: number;
+    exchangeRate?: number;
+    country: ProductCountry;
+    mediaIds?: string[];
+    publish: boolean;
+  },
 ) =>
-  api
-    .post(`/api/v1/admin/imports/${id}/approve`, { salePriceUzs, exchangeRate, country, publish: true })
-    .then((r) => r.data);
+  api.post(`/api/v1/admin/imports/${id}/approve`, payload).then((r) => r.data);
 
 export const rejectImport = (id: string, reason: string) =>
   api.post(`/api/v1/admin/imports/${id}/reject`, { reason }).then((r) => r.data);
