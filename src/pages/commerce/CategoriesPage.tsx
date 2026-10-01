@@ -125,7 +125,7 @@ export default function CategoriesPage() {
     <Layout title={t("categories.page")}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-bold tracking-widest text-violet-500">{t("sidebar.section.products")}</p>
+          <p className="text-xs font-bold tracking-widest text-primary-500">{t("sidebar.section.products")}</p>
           <h1 className="text-2xl font-black">{t("categories.title")}</h1>
         </div>
         <Button leftIcon={<Plus size={17} />} onClick={openCreate}>{t("categories.add")}</Button>

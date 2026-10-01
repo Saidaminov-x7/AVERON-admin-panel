@@ -32,6 +32,12 @@
     "requestFailed": "Could not complete the request. Try again later.",
     "disabled": "Two-factor protection disabled."
   },
+  "profile": {
+    "telegramId": "Telegram ID",
+    "telegramIdPlaceholder": "For example, 123456789",
+    "telegramIdHint": "Use your numeric Telegram user ID, not your username.",
+    "telegramIdFormat": "Enter 5 to 20 digits. Usernames are not accepted."
+  },
   "nav": {
     "dashboard": "Dashboard",
     "listings": "Listings",
@@ -547,6 +553,18 @@
     "mainInformation": "Main information",
     "localizedContent": "Localized content",
     "localizedContentHint": "Enter a title and description separately for each language.",
+    "aiFill": {
+      "action": "Suggest text",
+      "generating": "Generating…",
+      "cancel": "Cancel request",
+      "ignore": "Ignore",
+      "apply": "Use empty fields",
+      "preview": "AI suggestions",
+      "previewHint": "Review these suggestions. Applying fills only fields that are still empty; nothing is saved until you save the product.",
+      "error": "Could not generate suggestions. Please try again.",
+      "disabled": "AI product fill is currently disabled. Suggestions were not generated.",
+      "sourceTitleRequired": "Enter a title in the selected language before requesting suggestions."
+    },
     "contentLanguage": "Product content language",
     "contentLocale": {
       "ru": "Русский",

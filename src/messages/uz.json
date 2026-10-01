@@ -32,6 +32,12 @@
     "requestFailed": "So'rovni bajarib bo'lmadi. Keyinroq urinib ko'ring.",
     "disabled": "Ikki bosqichli himoya o'chirildi."
   },
+  "profile": {
+    "telegramId": "Telegram ID",
+    "telegramIdPlaceholder": "Masalan, 123456789",
+    "telegramIdHint": "Foydalanuvchi nomini emas, raqamli Telegram foydalanuvchi ID sini kiriting.",
+    "telegramIdFormat": "5 dan 20 gacha raqam kiriting. Foydalanuvchi nomi qabul qilinmaydi."
+  },
   "nav": {
     "dashboard": "Boshqaruv paneli",
     "listings": "E'lonlar",
@@ -547,6 +553,18 @@
     "mainInformation": "Asosiy ma'lumotlar",
     "localizedContent": "Tarjima qilingan kontent",
     "localizedContentHint": "Har bir til uchun nom va tavsifni alohida kiriting.",
+    "aiFill": {
+      "action": "Matn taklif qilish",
+      "generating": "Tayyorlanmoqda…",
+      "cancel": "So‘rovni bekor qilish",
+      "ignore": "E’tiborsiz qoldirish",
+      "apply": "Bo‘sh maydonlarni to‘ldirish",
+      "preview": "AI takliflari",
+      "previewHint": "Takliflarni tekshiring. Faqat bo‘sh maydonlar to‘ldiriladi; mahsulot saqlash tugmasini bosmaguningizcha saqlanmaydi.",
+      "error": "Takliflarni yaratib bo‘lmadi. Qayta urinib ko‘ring.",
+      "disabled": "AI yordamida mahsulot to‘ldirish hozir o‘chirilgan. Takliflar yaratilmagan.",
+      "sourceTitleRequired": "Taklif olish uchun tanlangan tilda nom kiriting."
+    },
     "contentLanguage": "Mahsulot kontenti tili",
     "contentLocale": {
       "ru": "Русский",

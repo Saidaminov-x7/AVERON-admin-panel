@@ -28,8 +28,8 @@ const updateAdminThemeApi = async (dto: Partial<AdminThemeData>): Promise<AdminT
 
 const PRESET_THEMES: { name: string; tokens: Partial<AdminThemeData> }[] = [
   {
-    name: 'Синий (по умолчанию)',
-    tokens: { primaryColor: '#2563eb', secondaryColor: '#1d4ed8', backgroundColor: '#0f0f0f', textColor: '#f1f5f9' },
+    name: 'Бирюзовый (по умолчанию)',
+    tokens: { primaryColor: '#0f766e', secondaryColor: '#115e59', backgroundColor: '#0f0f10', textColor: '#fafaf9' },
   },
   {
     name: 'Индиго',
@@ -76,12 +76,12 @@ const AdminPanelThemePage: React.FC = () => {
   });
 
   const [form, setForm] = useState<AdminThemeData>({
-    primaryColor: '#2563eb',
-    secondaryColor: '#1d4ed8',
-    backgroundColor: '#0f0f0f',
-    textColor: '#f1f5f9',
-    borderRadius: '0.5rem',
-    fontFamily: 'Inter, sans-serif',
+    primaryColor: '#0f766e',
+    secondaryColor: '#115e59',
+    backgroundColor: '#0f0f10',
+    textColor: '#fafaf9',
+    borderRadius: '0.75rem',
+    fontFamily: 'Calibri, system-ui, sans-serif',
   });
 
   const [successMsg, setSuccessMsg] = useState('');
@@ -204,15 +204,17 @@ const AdminPanelThemePage: React.FC = () => {
                 ].map((item) => (
                   <div key={item.key} className="flex items-center gap-3 p-3 rounded-lg border border-app">
                     <input
+                      aria-label={`${item.label}: выбор цвета`}
                       type="color"
                       value={form[item.key]}
                       onChange={(e) => handleColorChange(item.key, e.target.value)}
                       className="w-10 h-10 rounded-lg border border-app cursor-pointer p-0.5 bg-transparent"
                     />
                     <div className="flex-1 min-w-0">
-                      <label className="text-sm font-medium text-app">{item.label}</label>
+                      <label htmlFor={`admin-theme-${item.key}`} className="text-sm font-medium text-app">{item.label}</label>
                       <p className="text-xs text-muted">{item.desc}</p>
                       <input
+                        id={`admin-theme-${item.key}`}
                         type="text"
                         value={form[item.key]}
                         onChange={(e) => handleColorChange(item.key, e.target.value)}

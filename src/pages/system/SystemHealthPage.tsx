@@ -142,7 +142,7 @@ const SystemHealthPage: React.FC = () => {
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
               <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
-                <Cpu size={16} className="text-purple-500" /> {t('system.nodeMemory', 'Память Node.js')}
+                <Cpu size={16} className="text-primary-500" /> {t('system.nodeMemory', 'Память Node.js')}
               </span>
               <span className="text-xs font-mono text-muted">{data?.nodeVersion}</span>
             </div>

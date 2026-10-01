@@ -1,10 +1,20 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
-import { ImageOff, MoveDown, MoveUp, Star, Trash2, Upload } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
+import { ImageOff, MoveDown, MoveUp, Sparkles, Star, Trash2, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button, Input, Modal, Select, Textarea } from "../../components/ui";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { LanguageFlag } from "../../components/ui/LanguageFlag";
+import { useAdminCapabilities } from "../../hooks/useAdminCapabilities";
+import {
+  applyProductAiSuggestions,
+  getProductAiSuggestionsApi,
+  hasAiProductFillCapability,
+  toProductAiCountry,
+  type ProductAiSuggestionsResponse,
+} from "../../lib/productAiApi";
 import {
   getProductCountryDisplay,
   isProductCountry,
@@ -119,6 +129,7 @@ export function ProductFormModal({
   onSubmit,
 }: ProductFormModalProps) {
   const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
   const formId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlsRef = useRef(new Set<string>());
@@ -133,6 +144,12 @@ export function ProductFormModal({
   const [errors, setErrors] = useState<FormErrors>({});
   const [photoInputErrors, setPhotoInputErrors] = useState<string[]>([]);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<ProductAiSuggestionsResponse | null>(null);
+  const [aiError, setAiError] = useState("");
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const aiRequestRef = useRef<AbortController | null>(null);
+
+  const capabilitiesQuery = useAdminCapabilities(isOpen);
 
   const releaseObjectUrls = useCallback(() => {
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
@@ -140,6 +157,11 @@ export function ProductFormModal({
   }, []);
 
   useEffect(() => {
+    aiRequestRef.current?.abort();
+    aiRequestRef.current = null;
+    setIsGeneratingAi(false);
+    setAiSuggestions(null);
+    setAiError("");
     if (!isOpen) {
       releaseObjectUrls();
       setValues(getInitialValues(null));
@@ -253,6 +275,97 @@ export function ProductFormModal({
     setPhotos((current) => reorderItem(current, index, offset));
   };
 
+  const generateAiSuggestions = async () => {
+    if (
+      !isOpen ||
+      capabilitiesQuery.isError ||
+      !hasAiProductFillCapability(capabilitiesQuery.data) ||
+      isGeneratingAi
+    ) return;
+
+    aiRequestRef.current?.abort();
+    const controller = new AbortController();
+    aiRequestRef.current = controller;
+    setIsGeneratingAi(true);
+    setAiSuggestions(null);
+    setAiError("");
+    try {
+      const selectedCategory = categories.find((category) => category.id === values.categoryId);
+      const categoryName = selectedCategory ? localizedCategoryName(selectedCategory).trim() : "";
+      const sourceTitle = values.translations[activeLocale].title.trim();
+      const sourceDescription = values.translations[activeLocale].description.trim();
+      if (!sourceTitle) {
+        setAiError(t("products.aiFill.sourceTitleRequired"));
+        return;
+      }
+      const variant = {
+        ...(values.size.trim() ? { size: values.size.trim() } : {}),
+        ...(values.color.trim() ? { color: values.color.trim() } : {}),
+      };
+      const result = await getProductAiSuggestionsApi(capabilitiesQuery.data, {
+        sourceTitle,
+        ...(sourceDescription ? { sourceDescription } : {}),
+        country: toProductAiCountry(values.country),
+        ...(categoryName ? { categoryName } : {}),
+        ...(Object.keys(variant).length ? { variants: [variant] } : {}),
+      }, controller.signal);
+      if (!controller.signal.aborted) setAiSuggestions(result);
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        const responseData = isAxiosError(error)
+          ? error.response?.data as { code?: unknown } | undefined
+          : undefined;
+        if (isAxiosError(error) && error.response?.status === 403 && responseData?.code === "FEATURE_DISABLED") {
+          void queryClient.invalidateQueries({ queryKey: ["admin", "capabilities"] });
+          setAiError(t("products.aiFill.disabled"));
+        } else {
+          setAiError(t("products.aiFill.error"));
+        }
+      }
+    } finally {
+      if (aiRequestRef.current === controller) {
+        aiRequestRef.current = null;
+        setIsGeneratingAi(false);
+      }
+    }
+  };
+
+  const cancelAiSuggestions = () => {
+    aiRequestRef.current?.abort();
+    aiRequestRef.current = null;
+    setIsGeneratingAi(false);
+    setAiSuggestions(null);
+    setAiError("");
+  };
+
+  const applyAiSuggestions = () => {
+    if (!aiSuggestions) return;
+    const result = applyProductAiSuggestions(
+      values.translations,
+      { color: values.color, size: values.size },
+      aiSuggestions.suggestions,
+    );
+    if (!result.appliedCount) return;
+    setValues((current) => ({
+      ...current,
+      translations: result.translations,
+      color: result.variant.color ?? current.color,
+      size: result.variant.size ?? current.size,
+    }));
+    setErrors((current) => {
+      const next = { ...current };
+      for (const locale of locales) {
+        if (result.translations[locale].title.trim().length >= 2) {
+          next[localeErrorKeys[locale]] = undefined;
+        }
+      }
+      return next;
+    });
+    if (result.firstAppliedLocale) setActiveLocale(result.firstAppliedLocale);
+    setAiSuggestions(null);
+    setAiError("");
+  };
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitAttempted(true);
@@ -315,6 +428,11 @@ export function ProductFormModal({
     return category.name[uiLocale] || category.name.ru || category.name.en || category.slug;
   };
   const countryDisplay = getProductCountryDisplay(values.country);
+  const canApplyAiSuggestions = Boolean(aiSuggestions && applyProductAiSuggestions(
+    values.translations,
+    { color: values.color, size: values.size },
+    aiSuggestions.suggestions,
+  ).appliedCount);
   const countryOptions = [
     ...(!isProductCountry(values.country) && product
       ? [{ value: values.country, label: `${countryDisplay.flag} ${t("products.unknownCountry")}` }]
@@ -431,10 +549,79 @@ export function ProductFormModal({
         </section>
 
         <section className="space-y-4">
-          <div>
-            <h4 className="text-sm font-bold text-app">{t("products.localizedContent")}</h4>
-            <p className="mt-1 text-xs text-muted">{t("products.localizedContentHint")}</p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h4 className="text-sm font-bold text-app">{t("products.localizedContent")}</h4>
+              <p className="mt-1 text-xs text-muted">{t("products.localizedContentHint")}</p>
+            </div>
+            {hasAiProductFillCapability(capabilitiesQuery.data) && !capabilitiesQuery.isError && (
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  leftIcon={<Sparkles size={16} />}
+                  onClick={() => void generateAiSuggestions()}
+                  disabled={isGeneratingAi}
+                >
+                  {isGeneratingAi ? t("products.aiFill.generating") : t("products.aiFill.action")}
+                </Button>
+                {isGeneratingAi && (
+                  <Button type="button" variant="ghost" onClick={cancelAiSuggestions}>
+                    {t("products.aiFill.cancel")}
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
+          {aiError && <p role="alert" className="text-sm text-red-500">{aiError}</p>}
+          {aiSuggestions && (
+            <div role="region" aria-label={t("products.aiFill.preview")} className="space-y-3 rounded-xl border border-primary-500/30 bg-primary-500/5 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h5 className="text-sm font-semibold text-app">{t("products.aiFill.preview")}</h5>
+                  <p className="mt-1 text-xs text-muted">{t("products.aiFill.previewHint")}</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="ghost" onClick={() => setAiSuggestions(null)}>
+                    {t("products.aiFill.ignore")}
+                  </Button>
+                  <Button type="button" onClick={applyAiSuggestions} disabled={!canApplyAiSuggestions}>
+                    {t("products.aiFill.apply")}
+                  </Button>
+                </div>
+              </div>
+              <div className="grid gap-3 md:grid-cols-3">
+                {locales.map((locale) => {
+                  const suggestion = aiSuggestions.suggestions[locale];
+                  const title = suggestion.title.trim();
+                  const description = suggestion.description.trim();
+                  const characteristics = Object.entries(suggestion.characteristics)
+                    .filter(([, value]) => value.trim());
+                  if (!title && !description && !characteristics.length) return null;
+                  return (
+                    <div key={locale} className="min-w-0 space-y-2 rounded-lg border border-app bg-surface p-3">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-app">
+                        <LanguageFlag locale={locale} className="h-4 w-6" />
+                        {localeName(locale)}
+                      </div>
+                      {title && <p className="break-words text-sm font-medium text-app">{title}</p>}
+                      {description && <p className="whitespace-pre-wrap break-words text-xs text-muted">{description}</p>}
+                      {characteristics.length > 0 && (
+                        <dl className="space-y-1 border-t border-app pt-2">
+                          {characteristics.map(([name, value]) => (
+                            <div key={name} className="flex flex-wrap justify-between gap-x-2 text-xs">
+                              <dt className="text-muted">{name}</dt>
+                              <dd className="break-words text-right text-app">{value}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div id={`${formId}-panel`} role="tabpanel" aria-labelledby={`${formId}-tab-${activeLocale}`} className="grid gap-4 md:grid-cols-2">
             <Input
               label={t("products.titleLabel")}

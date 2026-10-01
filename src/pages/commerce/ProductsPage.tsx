@@ -172,7 +172,7 @@ export default function ProductsPage() {
     <Layout title={t("products.page")}>
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-bold tracking-widest text-violet-500">{t("products.sectionLabel")}</p>
+          <p className="text-xs font-bold tracking-widest text-primary-500">{t("products.sectionLabel")}</p>
           <h1 className="truncate text-2xl font-black">{t("products.catalog")}</h1>
         </div>
         <button

@@ -56,6 +56,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
   const queryClient = useQueryClient();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const notificationTriggerRef = useRef<HTMLButtonElement>(null);
 
   // Получаем реальный рабочий URL сайта из переменных окружения
   const siteUrl = import.meta.env.VITE_SITE_URL || 'https://averon.uz';
@@ -109,10 +110,20 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
         setIsNotifOpen(false);
       }
     };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsNotifOpen(false);
+        notificationTriggerRef.current?.focus();
+      }
+    };
     if (isNotifOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isNotifOpen]);
 
   const handleNotificationClick = (item: AdminNotificationItem) => {
@@ -192,6 +203,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
               <LanguageFlag
                 locale={i18n.language?.startsWith('uz') ? 'uz' : i18n.language?.startsWith('en') ? 'en' : 'ru'}
               />
+              <span className="sr-only">{t('header.language')}</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-muted">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -232,7 +244,9 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
         {/* Дропдаун Уведомлений */}
         <div className="relative shrink-0" ref={dropdownRef}>
           <button
+            ref={notificationTriggerRef}
             id="notifications-btn"
+            type="button"
             onClick={() => setIsNotifOpen(!isNotifOpen)}
             className={`
               relative w-10 h-10 rounded-lg flex items-center justify-center
@@ -244,6 +258,8 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
               }
             `}
             aria-label={t('header.notifications')}
+            aria-expanded={isNotifOpen}
+            aria-controls="header-notifications-panel"
           >
             <BellIcon />
             {unreadCount > 0 && (
@@ -254,7 +270,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           </button>
 
           {isNotifOpen && (
-            <div className="absolute right-0 mt-2 w-[min(20rem,calc(100vw-1.5rem))] sm:w-96 rounded-xl bg-surface border border-app shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
+            <div id="header-notifications-panel" role="region" aria-label={t('header.notifications')} className="absolute right-0 mt-2 w-[min(20rem,calc(100vw-1.5rem))] sm:w-96 rounded-xl bg-surface border border-app shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
               {/* Шапка уведомлений */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-app bg-gray-50/50 dark:bg-white/5">
                 <div className="flex items-center gap-2">
@@ -285,34 +301,35 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                   </div>
                 ) : (
                   notifications.map((n) => (
-                    <div
+                    <button
                       key={n.id}
+                      type="button"
                       onClick={() => handleNotificationClick(n)}
                       className={`
-                        p-3.5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer flex gap-3
+                        w-full p-3.5 text-left hover:bg-gray-50 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 transition-colors cursor-pointer flex gap-3
                         ${!n.isRead ? 'bg-primary-50/30 dark:bg-primary-950/10' : ''}
                       `}
                     >
-                      <div className="mt-0.5">
+                      <span className="mt-0.5">
                         <span
                           className={`w-2 h-2 rounded-full block ${
                             !n.isRead ? 'bg-primary-500' : 'bg-transparent'
                           }`}
                         />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1 mb-1">
-                          <h4 className="text-xs font-semibold text-app truncate">{n.title}</h4>
-                          <span className="text-[10px] text-muted whitespace-nowrap">
+                      </span>
+                      <span className="flex-1 min-w-0">
+                        <span className="flex items-center justify-between gap-1 mb-1">
+                          <span className="text-xs font-semibold text-app truncate">{n.title}</span>
+                          <time className="text-[10px] text-muted whitespace-nowrap">
                             {new Date(n.createdAt).toLocaleTimeString(i18n.language?.startsWith('en') ? 'en-US' : i18n.language?.startsWith('uz') ? 'uz-UZ' : 'ru-RU', {
                               hour: '2-digit',
                               minute: '2-digit',
                             })}
-                          </span>
-                        </div>
-                        <p className="text-xs text-muted leading-relaxed line-clamp-2">{n.message}</p>
-                      </div>
-                    </div>
+                          </time>
+                        </span>
+                        <span className="block text-xs text-muted leading-relaxed line-clamp-2">{n.message}</span>
+                      </span>
+                    </button>
                   ))
                 )}
               </div>

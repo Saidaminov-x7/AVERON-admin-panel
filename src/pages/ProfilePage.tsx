@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useAuthStore } from '../store/authStore';
@@ -23,6 +24,7 @@ const roleTitles: Record<string, string> = {
 };
 
 const ProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { updateUser, logout } = useAuthStore();
@@ -277,18 +279,20 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="profile-telegram-id" className="block text-sm font-medium text-app mb-1.5">Telegram ID</label>
+              <label htmlFor="profile-telegram-id" className="block text-sm font-medium text-app mb-1.5">{t('profile.telegramId')}</label>
               <input
                 id="profile-telegram-id"
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]{5,20}"
+                maxLength={20}
                 value={telegramId}
                 onChange={(e) => setTelegramId(e.target.value.replace(/\D/g, '').slice(0, 20))}
-                placeholder="Например, 123456789"
+                placeholder={t('profile.telegramIdPlaceholder')}
+                title={t('profile.telegramIdFormat')}
                 className="input"
               />
-              <p className="mt-1 text-xs text-muted">Числовой ID, не имя пользователя Telegram.</p>
+              <p className="mt-1 text-xs text-muted">{t('profile.telegramIdHint')}</p>
             </div>
 
             <button

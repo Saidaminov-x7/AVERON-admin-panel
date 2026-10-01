@@ -30,7 +30,7 @@ export default function CommerceDashboardPage() {
     { label: t('commerce.netProfit', 'Чистая прибыль'),             value: money(data?.finance.netProfit),   Icon: TrendingUp,       color: 'text-amber-500' },
     { label: t('commerce.orders', 'Заказы'),                       value: data?.orders.total ?? 0,          Icon: PackageCheck,     color: 'text-blue-500' },
     { label: t('commerce.pendingReview', 'Ожидают проверки'),     value: data?.products.pendingReview ?? 0, Icon: ClipboardCheck,  color: 'text-orange-500' },
-    { label: t('commerce.published', 'Опубликовано'),             value: data?.products.published ?? 0,    Icon: ShoppingBag,      color: 'text-violet-500' },
+    { label: t('commerce.published', 'Опубликовано'),             value: data?.products.published ?? 0,    Icon: ShoppingBag,      color: 'text-primary-500' },
     { label: t('commerce.users', 'Пользователи'),                 value: data?.users.total ?? 0,           Icon: Users,            color: 'text-cyan-500' },
   ] as const;
 
@@ -85,4 +85,3 @@ export default function CommerceDashboardPage() {
     </Layout>
   );
 }
-

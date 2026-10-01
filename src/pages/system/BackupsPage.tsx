@@ -94,7 +94,7 @@ const BackupsPage: React.FC = () => {
           </div>
 
           <div className="card p-5 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950/40 text-purple-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 flex items-center justify-center">
               <Users size={20} />
             </div>
             <div>
