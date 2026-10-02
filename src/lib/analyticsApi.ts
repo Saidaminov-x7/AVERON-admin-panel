@@ -6,14 +6,10 @@ import { api } from './axios';
 export interface DailyStatItem {
   date: string;
   visitors: number;
-  listings?: number;
-  products?: number;
+  products: number;
   registrations: number;
-}
-
-export interface CityStatItem {
-  city: string;
-  count: number;
+  paidOrders: number;
+  revenueUzs: number;
 }
 
 export interface RangeAnalyticsResponse {
@@ -21,12 +17,12 @@ export interface RangeAnalyticsResponse {
   to: string;
   summary: {
     totalVisitors: number;
-    totalListings?: number;
-    totalProducts?: number;
+    totalProducts: number;
+    totalPaidOrders: number;
+    revenueUzs: number;
     totalUsers: number;
   };
   chartData: DailyStatItem[];
-  byCity: CityStatItem[];
 }
 
 export interface VisitorsDailyItem {
@@ -73,12 +69,11 @@ export const exportReportUrl = (params: {
 };
 
 export interface FunnelAnalyticsResponse {
-  views: number;
+  visits: number;
   favorites: number;
-  viewingRequests: number;
   favoriteRate: number;
-  viewingRate: number;
-  conversionRate: number;
+  paidOrders: number;
+  orderRate: number;
 }
 
 export const getFunnelAnalyticsApi = async (params: {

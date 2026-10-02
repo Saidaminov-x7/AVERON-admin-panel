@@ -4,18 +4,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import Layout from '../components/Layout';
 import { getRangeAnalyticsApi, getFunnelAnalyticsApi, exportReportUrl } from '../lib/analyticsApi';
 
@@ -54,7 +43,11 @@ const AnalyticsPage: React.FC = () => {
   });
 
   const chartData = analytics?.chartData || [];
-  const summary = analytics?.summary || { totalVisitors: 0, totalProducts: 0, totalListings: 0, totalUsers: 0 };
+  const summary = analytics?.summary;
+  const formatMetric = (value: number | undefined) => {
+    if (isLoading) return '...';
+    return value === undefined ? t('analyticsPage.noData') : value.toLocaleString();
+  };
 
   const dateLocale = i18n.language === 'uz' ? 'uz-UZ' : i18n.language === 'en' ? 'en-US' : 'ru-RU';
 
@@ -116,15 +109,39 @@ const AnalyticsPage: React.FC = () => {
         </div>
 
         {/* Метрики за период */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <div className="card p-5">
             <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
               {t('analyticsPage.uniqueVisitors')}
             </div>
             <div className="text-2xl font-extrabold text-app">
-              {isLoading ? '...' : summary.totalVisitors.toLocaleString()}
+              {formatMetric(summary?.totalVisitors)}
             </div>
             <p className="text-[11px] text-muted mt-1">{t('analyticsPage.dedupeNote')}</p>
+          </div>
+
+          <div className="card p-5">
+            <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
+              {t('analyticsPage.paidOrders')}
+            </div>
+            <div className="text-2xl font-extrabold text-app">
+              {formatMetric(summary?.totalPaidOrders)}
+            </div>
+            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.paidOrdersNote')}</p>
+          </div>
+
+          <div className="card p-5">
+            <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
+              {t('analyticsPage.netRevenue')}
+            </div>
+            <div className="text-2xl font-extrabold text-app">
+              {isLoading
+                ? '...'
+                : summary === undefined
+                  ? t('analyticsPage.noData')
+                  : `${summary.revenueUzs.toLocaleString(dateLocale)} UZS`}
+            </div>
+            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.netRevenueNote')}</p>
           </div>
 
           <div className="card p-5">
@@ -132,19 +149,9 @@ const AnalyticsPage: React.FC = () => {
               {t('analyticsPage.newProducts')}
             </div>
             <div className="text-2xl font-extrabold text-app">
-              {isLoading ? '...' : (summary.totalProducts ?? summary.totalListings ?? 0).toLocaleString()}
+              {formatMetric(summary?.totalProducts)}
             </div>
             <p className="text-[11px] text-muted mt-1">{t('analyticsPage.addedNote')}</p>
-          </div>
-
-          <div className="card p-5">
-            <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
-              {t('analyticsPage.newUsers')}
-            </div>
-            <div className="text-2xl font-extrabold text-app">
-              {isLoading ? '...' : summary.totalUsers.toLocaleString()}
-            </div>
-            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.registeredNote')}</p>
           </div>
         </div>
 
@@ -212,9 +219,17 @@ const AnalyticsPage: React.FC = () => {
                 />
                 <Line
                   type="monotone"
-                  dataKey="listings"
-                  name={t('analyticsPage.lineListings')}
+                  dataKey="products"
+                  name={t('analyticsPage.lineProducts')}
                   stroke="#f59e0b"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="paidOrders"
+                  name={t('analyticsPage.linePaidOrders')}
+                  stroke="#0f766e"
                   strokeWidth={2}
                   dot={false}
                 />
@@ -226,11 +241,11 @@ const AnalyticsPage: React.FC = () => {
         {/* Воронка конверсии */}
         {funnel && (
           <div className="card">
-            <h3 className="text-base font-semibold text-app mb-4">{t('analyticsPage.funnelTitle')}</h3>
+            <h3 className="text-base font-semibold text-app mb-4">{t('analyticsPage.engagementTitle')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="p-4 rounded-xl bg-primary-500/10 border border-primary-500/20">
                 <div className="text-xs font-semibold text-primary-600 dark:text-primary-400">{t('analyticsPage.funnelViews')}</div>
-                <div className="text-2xl font-bold text-app mt-1">{funnel.views}</div>
+                <div className="text-2xl font-bold text-app mt-1">{funnel.visits}</div>
                 <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelVisits')}</div>
               </div>
               <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
@@ -239,29 +254,11 @@ const AnalyticsPage: React.FC = () => {
                 <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: (funnel.favoriteRate * 100).toFixed(1) })}</div>
               </div>
               <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{t('analyticsPage.funnelRequests')}</div>
-                <div className="text-2xl font-bold text-app mt-1">{funnel.viewingRequests}</div>
-                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelFromFav', { rate: (funnel.viewingRate * 100).toFixed(1) })}</div>
+                <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{t('analyticsPage.funnelOrders')}</div>
+                <div className="text-2xl font-bold text-app mt-1">{funnel.paidOrders}</div>
+                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: (funnel.orderRate * 100).toFixed(1) })}</div>
               </div>
             </div>
-
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart
-                layout="vertical"
-                data={[
-                  { stage: t('analyticsPage.funnelViews'), count: funnel.views },
-                  { stage: t('analyticsPage.funnelFavorites'), count: funnel.favorites },
-                  { stage: t('analyticsPage.funnelRequests'), count: funnel.viewingRequests },
-                ]}
-                margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 11, fill: 'var(--color-text-muted)' }} />
-                <YAxis dataKey="stage" type="category" tick={{ fontSize: 11, fill: 'var(--color-text-muted)' }} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#14b8a6" radius={[0, 6, 6, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
           </div>
         )}
       </div>

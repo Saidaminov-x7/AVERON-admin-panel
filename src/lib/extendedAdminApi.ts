@@ -79,38 +79,6 @@ export const getSearchAnalyticsApi = async (): Promise<SearchAnalyticsData> => {
   return data;
 };
 
-// [Фича 18] Promo Codes
-export interface PromoCodeItem {
-  id: string;
-  code: string;
-  discountPercent: number;
-  maxUses: number;
-  usedCount: number;
-  isActive: boolean;
-  expiresAt: string | null;
-  createdAt: string;
-}
-
-export const getPromoCodesApi = async (): Promise<PromoCodeItem[]> => {
-  const { data } = await api.get<PromoCodeItem[]>('/admin/promo-codes');
-  return data;
-};
-
-export const createPromoCodeApi = async (dto: {
-  code: string;
-  discountPercent: number;
-  maxUses: number;
-  expiresAt?: string;
-}): Promise<PromoCodeItem> => {
-  const { data } = await api.post<PromoCodeItem>('/admin/promo-codes', dto);
-  return data;
-};
-
-export const deletePromoCodeApi = async (id: string): Promise<{ success: boolean }> => {
-  const { data } = await api.delete<{ success: boolean }>(`/admin/promo-codes/${id}`);
-  return data;
-};
-
 // [Фича 20] Revenue & Finances
 export interface RevenueStatsData {
   actualRevenue: number;

@@ -1,33 +1,36 @@
-# React + TypeScript + Vite
+# AVERON Admin
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+The Admin panel is a React/Vite single-page application for authorized
+administrators. It manages catalog products, imports and review decisions,
+orders, reviews, commerce promo codes, users, settings, audit records, and
+integration diagnostics.
 
-Currently, two official plugins are available:
+## Local development
 
+Use Node.js 20 or newer and the repository's pnpm lockfile:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```powershell
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Configure the Backend API URL using the repository's local environment
+configuration. Do not place server-side provider credentials in Vite
+`VITE_*` variables; those values are exposed to the browser.
+
+## Checks
+
+```powershell
+pnpm test
+pnpm build
+pnpm lint
+```
+
+`pnpm build` runs the TypeScript project build before producing the Vite
+bundle. `pnpm lint` runs Oxlint.
+
+Admin-only actions are enforced by the Backend as well as hidden or guarded in
+the client. Parser and AI-assisted product data stays in review until an
+administrator explicitly approves and publishes it. Integration diagnostics
+report configured and verified status separately; the presence of an
+integration screen does not mean a provider is live.
