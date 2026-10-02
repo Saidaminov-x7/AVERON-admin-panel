@@ -12,6 +12,7 @@ const CategoriesPage = lazy(() => import('./pages/commerce/CategoriesPage'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
 const ImportsPage = lazy(() => import('./pages/commerce/ImportsPage'));
 const OrdersPage = lazy(() => import('./pages/commerce/OrdersPage'));
+const ReviewsPage = lazy(() => import('./pages/commerce/ReviewsPage'));
 const FinancePage = lazy(() => import('./pages/commerce/FinancePage'));
 const UsersPage = lazy(() => import('./pages/UsersPage'));
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
@@ -37,6 +38,7 @@ export default function App() {
     <Route path="/categories" element={<Guard><CategoriesPage/></Guard>}/>
     <Route path="/imports" element={<Guard><ImportsPage/></Guard>}/>
     <Route path="/orders" element={<Guard><OrdersPage/></Guard>}/>
+    <Route path="/reviews" element={<Guard><ReviewsPage/></Guard>}/>
     <Route path="/finance" element={<Guard><FinancePage/></Guard>}/>
     <Route path="/media" element={<Guard><MediaLibraryPage/></Guard>}/>
     <Route path="/users" element={<Guard><UsersPage/></Guard>}/>

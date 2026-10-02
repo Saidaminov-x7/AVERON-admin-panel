@@ -9,6 +9,7 @@ import {
   HeartHandshake,
   Images,
   LogOut,
+  MessageSquareText,
   PackageCheck,
   ReceiptText,
   Search,
@@ -40,6 +41,7 @@ const sections: { sectionKey: string; items: Item[] }[] = [
       { to: "/products", labelKey: "sidebar.catalog", icon: ShoppingBag },
       { to: "/categories", labelKey: "sidebar.categories", icon: Tags },
       { to: "/media", labelKey: "sidebar.media", icon: Images },
+      { to: "/reviews", labelKey: "sidebar.reviews", icon: MessageSquareText },
     ],
   },
   {

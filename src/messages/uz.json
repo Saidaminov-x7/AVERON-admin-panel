@@ -495,6 +495,7 @@
     "categories": "Kategoriyalar",
     "media": "Media kutubxona",
     "orders": "Buyurtmalar",
+    "reviews": "Mahsulot sharhlari",
     "finance": "Moliya va foyda",
     "users": "Foydalanuvchilar",
     "analytics": "Tahlil",
@@ -838,6 +839,42 @@
     "statusDelivered": "Yetkazilgan",
     "statusCancelled": "Bekor qilingan",
     "statusRefunded": "Qaytarilgan"
+  },
+  "commerceReviews": {
+    "title": "Sharhlar moderatsiyasi",
+    "subtitle": "Mahsulot sharhlarini tekshiring va qoidalarga moslarini e'lon qiling.",
+    "filters": "Sharh filtrlari",
+    "filterStatus": "Holati",
+    "filterRating": "Baho",
+    "filterVerified": "Xarid",
+    "all": "Barchasi",
+    "verified": "Xarid tasdiqlangan",
+    "unverified": "Tasdiqlanmagan",
+    "search": "Mahsulot, mijoz yoki buyurtma",
+    "loading": "Sharhlar yuklanmoqda…",
+    "loadError": "Sharhlarni yuklab bo'lmadi.",
+    "empty": "Tanlangan filtrlarga mos sharhlar yo'q.",
+    "order": "Buyurtma",
+    "unknownCustomer": "Xaridor",
+    "rating": "Baho: 5 dan {{rating}}",
+    "imageAlt": "Xaridorning {{index}}-surati",
+    "openImage": "Rasmni ochish",
+    "moderated": "Ko'rib chiqilgan",
+    "publish": "E'lon qilish",
+    "reject": "Rad etish",
+    "saved": "Moderatsiya qarori saqlandi",
+    "actionError": "Sharh holatini yangilab bo'lmadi. Sahifani yangilang va holatni tekshiring.",
+    "pagination": "Sharhlar sahifalari",
+    "status": {
+      "PENDING": "Tekshiruvda",
+      "PUBLISHED": "E'lon qilingan",
+      "REJECTED": "Rad etilgan"
+    },
+    "fit": {
+      "small": "Kichik keladi",
+      "true": "O'lchamga mos",
+      "large": "Katta keladi"
+    }
   },
   "finance": {
     "title": "Moliya",

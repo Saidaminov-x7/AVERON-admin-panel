@@ -494,6 +494,7 @@
     "categories": "Categories",
     "media": "Media library",
     "orders": "Orders",
+    "reviews": "Product reviews",
     "finance": "Finance and profit",
     "users": "Users",
     "analytics": "Analytics",
@@ -838,6 +839,42 @@
     "statusDelivered": "Delivered",
     "statusCancelled": "Cancelled",
     "statusRefunded": "Refunded"
+  },
+  "commerceReviews": {
+    "title": "Review moderation",
+    "subtitle": "Review product feedback and publish content that meets the moderation policy.",
+    "filters": "Review filters",
+    "filterStatus": "Status",
+    "filterRating": "Rating",
+    "filterVerified": "Purchase",
+    "all": "All",
+    "verified": "Verified purchase",
+    "unverified": "Not verified",
+    "search": "Product, customer, or order",
+    "loading": "Loading reviews…",
+    "loadError": "Could not load reviews.",
+    "empty": "No reviews match these filters.",
+    "order": "Order",
+    "unknownCustomer": "Customer",
+    "rating": "Rating: {{rating}} out of 5",
+    "imageAlt": "Customer photo {{index}}",
+    "openImage": "Open image",
+    "moderated": "Moderated",
+    "publish": "Publish",
+    "reject": "Reject",
+    "saved": "Moderation decision saved",
+    "actionError": "Could not update the review. Refresh and check its current status.",
+    "pagination": "Review pages",
+    "status": {
+      "PENDING": "Pending review",
+      "PUBLISHED": "Published",
+      "REJECTED": "Rejected"
+    },
+    "fit": {
+      "small": "Runs small",
+      "true": "True to size",
+      "large": "Runs large"
+    }
   },
   "finance": {
     "title": "Finance",
