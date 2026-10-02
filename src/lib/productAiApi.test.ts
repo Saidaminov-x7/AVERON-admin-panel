@@ -3,10 +3,12 @@ import { api } from './axios';
 import {
   applyProductAiSuggestions,
   getAdminCapabilitiesApi,
+  getAdminAiStatusApi,
   getProductAiSuggestionsApi,
   hasAiProductFillCapability,
   hasImageEmbeddingsCapability,
   parseAdminCapabilities,
+  parseAdminAiStatus,
   parseProductAiSuggestions,
   toProductAiCountry,
 } from './productAiApi';
@@ -60,6 +62,23 @@ describe('admin product AI capability and suggestions API', () => {
       imageEmbeddings: true,
     });
     expect(api.get).toHaveBeenCalledWith('/api/v1/capabilities', { signal });
+  });
+
+  it('parses safe AI deployment status without requiring or exposing provider credentials', async () => {
+    const status = {
+      flags: { aiSearch: false, styleAssistant: false, completeTheLook: false },
+      provider: 'openai-compatible',
+      model: 'gpt-4o-mini',
+      providerConfigured: false,
+      timeoutMs: 10000,
+    };
+    const signal = new AbortController().signal;
+    vi.mocked(api.get).mockResolvedValue({ data: status });
+
+    await expect(getAdminAiStatusApi(signal)).resolves.toEqual(status);
+    expect(api.get).toHaveBeenCalledWith('/api/v1/admin/ai-status', { signal });
+    expect(parseAdminAiStatus({ ...status, apiKey: 'must-not-be-returned' })).toEqual(status);
+    expect(() => parseAdminAiStatus({ ...status, flags: { ...status.flags, aiSearch: 'true' } })).toThrow();
   });
 
   it('posts the strict product-fill request and returns localized suggestions', async () => {

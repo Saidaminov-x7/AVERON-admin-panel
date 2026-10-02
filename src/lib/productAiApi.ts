@@ -2,6 +2,10 @@ import { api } from './axios';
 import { isProductCountry } from './commerceApi';
 import type { ProductCountry, ProductLocale } from './commerceApi';
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
 export interface AdminCapabilities {
   aiProductFill: boolean;
   imageEmbeddings?: boolean;
@@ -166,6 +170,51 @@ export function parseProductAiSuggestions(value: unknown): ProductAiSuggestionsR
 export async function getAdminCapabilitiesApi(signal?: AbortSignal): Promise<AdminCapabilities> {
   const { data } = await api.get<unknown>('/api/v1/capabilities', { signal });
   return parseAdminCapabilities(data);
+}
+
+export type AdminAiStatus = {
+  flags: {
+    aiSearch: boolean;
+    styleAssistant: boolean;
+    completeTheLook: boolean;
+  };
+  provider: string;
+  model: string;
+  providerConfigured: boolean;
+  timeoutMs: number;
+};
+
+export function parseAdminAiStatus(value: unknown): AdminAiStatus {
+  if (!isRecord(value) || !isRecord(value.flags)) throw new Error('Invalid AI status response');
+  const flags = value.flags;
+  if (
+    typeof flags.aiSearch !== 'boolean' ||
+    typeof flags.styleAssistant !== 'boolean' ||
+    typeof flags.completeTheLook !== 'boolean' ||
+    typeof value.provider !== 'string' ||
+    typeof value.model !== 'string' ||
+    typeof value.providerConfigured !== 'boolean' ||
+    typeof value.timeoutMs !== 'number' ||
+    !Number.isFinite(value.timeoutMs)
+  ) {
+    throw new Error('Invalid AI status response');
+  }
+  return {
+    flags: {
+      aiSearch: flags.aiSearch,
+      styleAssistant: flags.styleAssistant,
+      completeTheLook: flags.completeTheLook,
+    },
+    provider: value.provider,
+    model: value.model,
+    providerConfigured: value.providerConfigured,
+    timeoutMs: value.timeoutMs,
+  };
+}
+
+export async function getAdminAiStatusApi(signal?: AbortSignal): Promise<AdminAiStatus> {
+  const { data } = await api.get<unknown>('/api/v1/admin/ai-status', { signal });
+  return parseAdminAiStatus(data);
 }
 
 export async function getProductAiSuggestionsApi(

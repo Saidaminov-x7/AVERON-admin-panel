@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Layout from '../../components/Layout';
 import { getSiteSettingsApi, updateSiteSettingsApi } from '../../lib/siteSettingsApi';
+import { getAdminAiStatusApi } from '../../lib/productAiApi';
 import { Shield, Zap, CreditCard, BarChart2, CheckCircle2 } from 'lucide-react';
 
 const AppSettingsPage: React.FC = () => {
@@ -11,6 +12,12 @@ const AppSettingsPage: React.FC = () => {
   const { data: settings } = useQuery({
     queryKey: ['admin', 'site-settings'],
     queryFn: getSiteSettingsApi,
+  });
+  const { data: aiStatus, isError: aiStatusError } = useQuery({
+    queryKey: ['admin', 'ai-status'],
+    queryFn: ({ signal }) => getAdminAiStatusApi(signal),
+    retry: false,
+    staleTime: 60_000,
   });
 
   const [googleAuthEnabled, setGoogleAuthEnabled] = useState(true);
@@ -153,6 +160,27 @@ const AppSettingsPage: React.FC = () => {
   return (
     <Layout title="Настройки приложения и Feature Flags">
       <div className="max-w-4xl mx-auto space-y-6">
+        <section className="card p-6" aria-labelledby="ai-status-title">
+          <h3 id="ai-status-title" className="text-base font-semibold text-app flex items-center gap-2">
+            <Zap size={20} className="text-primary-500" />
+            AI-каталог: безопасное состояние
+          </h3>
+          {aiStatusError ? (
+            <p className="mt-3 text-sm text-rose-600" role="alert">Не удалось получить состояние AI-конфигурации.</p>
+          ) : aiStatus ? (
+            <div className="mt-3 space-y-2 text-sm">
+              <p>Провайдер настроен: <b>{aiStatus.providerConfigured ? 'Да' : 'Нет'}</b></p>
+              <p>Провайдер / модель: <b>{aiStatus.provider} / {aiStatus.model}</b></p>
+              <p>Лимит ожидания: <b>{aiStatus.timeoutMs} мс</b></p>
+              <ul className="grid gap-1 text-muted sm:grid-cols-3">
+                <li>AI Search: {aiStatus.flags.aiSearch ? 'включён' : 'выключен'}</li>
+                <li>Style Assistant: {aiStatus.flags.styleAssistant ? 'включён' : 'выключен'}</li>
+                <li>Complete the Look: {aiStatus.flags.completeTheLook ? 'включён' : 'выключен'}</li>
+              </ul>
+              <p className="text-xs text-muted">Ключи API не отображаются. Функции включаются только серверной конфигурацией.</p>
+            </div>
+          ) : <p className="mt-3 text-sm text-muted" role="status">Загрузка состояния…</p>}
+        </section>
         {successMsg && (
           <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-sm border border-emerald-200 dark:border-emerald-800 flex items-center gap-2">
             <CheckCircle2 size={18} />
