@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   AlertCircle,
+  Activity,
   BarChart2,
   Bell,
   ClipboardCheck,
@@ -49,6 +50,7 @@ const sections: { sectionKey: string; items: Item[] }[] = [
     items: [
       { to: "/orders", labelKey: "sidebar.orders", icon: PackageCheck },
       { to: "/finance", labelKey: "sidebar.finance", icon: ReceiptText },
+      { to: "/commerce/promo-codes", labelKey: "sidebar.commercePromos", icon: Tags },
     ],
   },
   {
@@ -62,6 +64,7 @@ const sections: { sectionKey: string; items: Item[] }[] = [
       { to: "/error-logs", labelKey: "sidebar.errorLogs", icon: AlertCircle },
       { to: "/settings/general", labelKey: "sidebar.settings", icon: Settings },
       { to: "/system/health", labelKey: "sidebar.health", icon: HeartHandshake },
+      { to: "/system/integrations", labelKey: "sidebar.integrations", icon: Activity },
     ],
   },
 ];

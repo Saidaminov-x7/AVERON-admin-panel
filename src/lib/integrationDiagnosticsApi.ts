@@ -1,0 +1,16 @@
+import { api } from './axios';
+
+export interface IntegrationDiagnostic {
+  name: string;
+  featureEnabled: boolean;
+  configured: boolean;
+  implementationStatus: string;
+  verificationStatus: string;
+  degraded: boolean;
+  lastSuccessfulOperation: string | null;
+}
+
+export async function getIntegrationDiagnostics() {
+  const { data } = await api.get<IntegrationDiagnostic[]>('/api/v1/admin/integration-diagnostics');
+  return data;
+}

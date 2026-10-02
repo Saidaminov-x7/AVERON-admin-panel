@@ -14,6 +14,7 @@ const ImportsPage = lazy(() => import('./pages/commerce/ImportsPage'));
 const OrdersPage = lazy(() => import('./pages/commerce/OrdersPage'));
 const ReviewsPage = lazy(() => import('./pages/commerce/ReviewsPage'));
 const FinancePage = lazy(() => import('./pages/commerce/FinancePage'));
+const CommercePromosPage = lazy(() => import('./pages/commerce/CommercePromosPage'));
 const UsersPage = lazy(() => import('./pages/UsersPage'));
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
 const StaffPage = lazy(() => import('./pages/settings/StaffPage'));
@@ -21,6 +22,7 @@ const GeneralSettingsPage = lazy(() => import('./pages/settings/GeneralSettingsP
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const AuditLogPage = lazy(() => import('./pages/AuditLogPage'));
 const SystemHealthPage = lazy(() => import('./pages/system/SystemHealthPage'));
+const IntegrationDiagnosticsPage = lazy(() => import('./pages/system/IntegrationDiagnosticsPage'));
 const MediaLibraryPage = lazy(() => import('./pages/MediaLibraryPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
 const ErrorLogsPage = lazy(() => import('./pages/ErrorLogsPage'));
@@ -40,6 +42,7 @@ export default function App() {
     <Route path="/orders" element={<Guard><OrdersPage/></Guard>}/>
     <Route path="/reviews" element={<Guard><ReviewsPage/></Guard>}/>
     <Route path="/finance" element={<Guard><FinancePage/></Guard>}/>
+    <Route path="/commerce/promo-codes" element={<Guard><CommercePromosPage/></Guard>}/>
     <Route path="/media" element={<Guard><MediaLibraryPage/></Guard>}/>
     <Route path="/users" element={<Guard><UsersPage/></Guard>}/>
     <Route path="/users/:id" element={<Guard><UserProfilePage/></Guard>}/>
@@ -54,6 +57,7 @@ export default function App() {
     <Route path="/settings/general" element={<Guard><GeneralSettingsPage/></Guard>}/>
     <Route path="/settings/staff" element={<Guard role="SUPER_ADMIN"><StaffPage/></Guard>}/>
     <Route path="/system/health" element={<Guard><SystemHealthPage/></Guard>}/>
+    <Route path="/system/integrations" element={<Guard><IntegrationDiagnosticsPage/></Guard>}/>
     <Route path="*" element={<NotFoundPage/>}/>
   </Routes></Suspense></BrowserRouter>;
 }

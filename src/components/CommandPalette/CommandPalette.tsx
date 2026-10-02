@@ -59,8 +59,10 @@ const STATIC_ROUTES: StaticRoute[] = [
   { label: 'Тепловая карта цен', labelKey: 'nav.heatmap', path: '/analytics/heatmap', keywords: ['тепловая карта', 'карта', 'heatmap', 'цены'], icon: <MapPin size={16} /> },
   { label: 'Поисковые запросы', labelKey: 'nav.searchQueries', path: '/analytics/search-queries', keywords: ['запросы', 'поиск', 'search queries', 'спрос'], icon: <Search size={16} /> },
   { label: 'Промокоды и скидки', labelKey: 'nav.promoCodes', path: '/monetization/promo-codes', keywords: ['промокоды', 'скидки', 'promo', 'купоны'], icon: <Tag size={16} /> },
+  { label: 'Промокоды магазина', labelKey: 'nav.commercePromos', path: '/commerce/promo-codes', keywords: ['commerce promo', 'магазин промокоды', 'discount'], icon: <Tag size={16} /> },
   { label: 'Выручка и финансы', labelKey: 'nav.revenue', path: '/monetization/revenue', keywords: ['выручка', 'финансы', 'revenue', 'деньги', 'доход'], icon: <DollarSign size={16} /> },
   { label: 'Здоровье системы', labelKey: 'nav.health', path: '/system/health', keywords: ['здоровье', 'health', 'redis', 'postgres', 'uptime'], icon: <Activity size={16} /> },
+  { label: 'Диагностика интеграций', labelKey: 'nav.integrations', path: '/system/integrations', keywords: ['integrations', 'n8n', 'telegram', 'ipost', 'currency', 'sms'], icon: <Webhook size={16} /> },
   { label: 'Вебхуки', labelKey: 'nav.webhooks', path: '/system/webhooks', keywords: ['вебхуки', 'webhooks', 'интеграции'], icon: <Webhook size={16} /> },
   { label: 'Резервные копии', labelKey: 'nav.backups', path: '/system/backups', keywords: ['бэкапы', 'backups', 'дамп', 'снапшот', 'копии'], icon: <Database size={16} /> },
   { label: 'Журнал ошибок', labelKey: 'nav.errors', path: '/errors', keywords: ['ошибки', 'errors', 'логи', 'logs'], icon: <AlertCircle size={16} /> },
@@ -73,8 +75,8 @@ const STATIC_ROUTES: StaticRoute[] = [
 ];
 
 const ACTIVE_PATHS = new Set([
-  '/', '/products', '/imports', '/orders', '/finance', '/media', '/users',
-  '/audit-log', '/profile', '/settings/general', '/settings/staff', '/system/health',
+  '/', '/products', '/imports', '/orders', '/finance', '/commerce/promo-codes', '/media', '/users',
+  '/audit-log', '/profile', '/settings/general', '/settings/staff', '/system/health', '/system/integrations',
 ]);
 
 export const CommandPalette: React.FC = () => {
