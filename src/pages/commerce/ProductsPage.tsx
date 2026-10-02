@@ -22,11 +22,12 @@ import {
 import { deleteUnattachedMediaApi, uploadProductPhotoApi } from "../../lib/mediaApi";
 import { getSiteSettingsApi } from "../../lib/siteSettingsApi";
 import { ProductFormModal, type ProductFormSubmission } from "./ProductFormModal";
+import { TelegramPublicationPanel } from "./TelegramPublicationPanel";
 
 const ALL_COUNTRIES = "ALL" as const;
 
 export default function ProductsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [country, setCountry] = useState<ProductCountry | typeof ALL_COUNTRIES>(ALL_COUNTRIES);
   const [page, setPage] = useState(1);
@@ -256,6 +257,13 @@ export default function ProductsPage() {
                     <Pencil size={14} />
                     {t("products.editProduct")}
                   </button>
+                  {product.status === "PUBLISHED" ? (
+                    <TelegramPublicationPanel productId={product.id} locale={i18n.language} />
+                  ) : (
+                    <p className="mt-4 rounded-xl border border-stone-200 p-3 text-xs text-muted dark:border-white/10">
+                      {t("products.telegram.notEligible")}
+                    </p>
+                  )}
                 </div>
               </article>
             );
