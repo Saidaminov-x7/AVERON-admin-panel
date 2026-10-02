@@ -1,13 +1,14 @@
 // src/components/ProtectedRoute.tsx
 // HOC для защиты маршрутов: проверяет авторизацию, роль ADMIN и гранулярный AdminRole
 
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import type { AdminRoleType } from '../store/authStore';
-import NotFoundPage from '../pages/NotFoundPage';
 
 import FullScreenLoader from './ui/FullScreenLoader';
+
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -48,7 +49,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredAdmin
   // Если требуется конкретная роль (например, SUPER_ADMIN для /settings/staff),
   // а у пользователя другая роль — показываем реальную страницу 404
   if (requiredAdminRole && user?.adminRole !== requiredAdminRole) {
-    return <NotFoundPage />;
+    return <Suspense fallback={<FullScreenLoader label="Загрузка страницы..." />}><NotFoundPage /></Suspense>;
   }
 
   return <>{children}</>;
