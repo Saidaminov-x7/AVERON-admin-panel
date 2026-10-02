@@ -4,11 +4,13 @@ import {
   applyProductAiSuggestions,
   getAdminCapabilitiesApi,
   getAdminAiStatusApi,
+  getAdminRecommendationStatusApi,
   getProductAiSuggestionsApi,
   hasAiProductFillCapability,
   hasImageEmbeddingsCapability,
   parseAdminCapabilities,
   parseAdminAiStatus,
+  parseAdminRecommendationStatus,
   parseProductAiSuggestions,
   toProductAiCountry,
 } from './productAiApi';
@@ -51,6 +53,39 @@ describe('admin product AI capability and suggestions API', () => {
     expect(hasImageEmbeddingsCapability({ aiProductFill: true, imageEmbeddings: true })).toBe(true);
     expect(() => parseAdminCapabilities({ aiProductFill: true, imageEmbeddings: 'true' })).toThrow();
     expect(() => parseAdminCapabilities({ aiProductFill: 'true' })).toThrow();
+  });
+
+  describe('admin recommendation diagnostics API', () => {
+    it('accepts only the aggregate feature and privacy status contract', () => {
+      expect(parseAdminRecommendationStatus({
+        flags: { recommendations: false, personalized: false, recentlyViewed: false },
+        embeddingAvailable: false,
+        sharedCacheEnabled: false,
+        personalizedResultsShared: false,
+      })).toEqual({
+        flags: { recommendations: false, personalized: false, recentlyViewed: false },
+        embeddingAvailable: false,
+        sharedCacheEnabled: false,
+        personalizedResultsShared: false,
+      });
+      expect(() => parseAdminRecommendationStatus({ flags: {}, users: ['private-user'] })).toThrow();
+    });
+
+    it('requests the protected aggregated recommendation diagnostics endpoint', async () => {
+      const signal = new AbortController().signal;
+      vi.mocked(api.get).mockResolvedValue({
+        data: {
+          flags: { recommendations: false, personalized: false, recentlyViewed: false },
+          embeddingAvailable: false,
+          sharedCacheEnabled: false,
+          personalizedResultsShared: false,
+        },
+      });
+
+      await getAdminRecommendationStatusApi(signal);
+
+      expect(api.get).toHaveBeenCalledWith('/api/v1/admin/recommendation-status', { signal });
+    });
   });
 
   it('loads capabilities with an abort signal from the expected endpoint', async () => {

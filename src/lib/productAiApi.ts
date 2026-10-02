@@ -217,6 +217,45 @@ export async function getAdminAiStatusApi(signal?: AbortSignal): Promise<AdminAi
   return parseAdminAiStatus(data);
 }
 
+export type AdminRecommendationStatus = {
+  flags: { recommendations: boolean; personalized: boolean; recentlyViewed: boolean };
+  embeddingAvailable: boolean;
+  sharedCacheEnabled: boolean;
+  personalizedResultsShared: boolean;
+};
+
+export function parseAdminRecommendationStatus(value: unknown): AdminRecommendationStatus {
+  if (!isRecord(value) || !isRecord(value.flags)) {
+    throw new Error('Invalid recommendation status response');
+  }
+  const { flags } = value;
+  if (
+    typeof flags.recommendations !== 'boolean' ||
+    typeof flags.personalized !== 'boolean' ||
+    typeof flags.recentlyViewed !== 'boolean' ||
+    typeof value.embeddingAvailable !== 'boolean' ||
+    typeof value.sharedCacheEnabled !== 'boolean' ||
+    typeof value.personalizedResultsShared !== 'boolean'
+  ) {
+    throw new Error('Invalid recommendation status response');
+  }
+  return {
+    flags: {
+      recommendations: flags.recommendations,
+      personalized: flags.personalized,
+      recentlyViewed: flags.recentlyViewed,
+    },
+    embeddingAvailable: value.embeddingAvailable,
+    sharedCacheEnabled: value.sharedCacheEnabled,
+    personalizedResultsShared: value.personalizedResultsShared,
+  };
+}
+
+export async function getAdminRecommendationStatusApi(signal?: AbortSignal): Promise<AdminRecommendationStatus> {
+  const { data } = await api.get<unknown>('/api/v1/admin/recommendation-status', { signal });
+  return parseAdminRecommendationStatus(data);
+}
+
 export async function getProductAiSuggestionsApi(
   capabilities: AdminCapabilities | undefined,
   request: ProductAiSuggestionsRequest,

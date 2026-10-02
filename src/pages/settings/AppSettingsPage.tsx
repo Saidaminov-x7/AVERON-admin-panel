@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Layout from '../../components/Layout';
 import { getSiteSettingsApi, updateSiteSettingsApi } from '../../lib/siteSettingsApi';
-import { getAdminAiStatusApi } from '../../lib/productAiApi';
+import { getAdminAiStatusApi, getAdminRecommendationStatusApi } from '../../lib/productAiApi';
 import { Shield, Zap, CreditCard, BarChart2, CheckCircle2 } from 'lucide-react';
 
 const AppSettingsPage: React.FC = () => {
@@ -16,6 +16,12 @@ const AppSettingsPage: React.FC = () => {
   const { data: aiStatus, isError: aiStatusError } = useQuery({
     queryKey: ['admin', 'ai-status'],
     queryFn: ({ signal }) => getAdminAiStatusApi(signal),
+    retry: false,
+    staleTime: 60_000,
+  });
+  const { data: recommendationStatus, isError: recommendationStatusError } = useQuery({
+    queryKey: ['admin', 'recommendation-status'],
+    queryFn: ({ signal }) => getAdminRecommendationStatusApi(signal),
     retry: false,
     staleTime: 60_000,
   });
@@ -178,6 +184,26 @@ const AppSettingsPage: React.FC = () => {
                 <li>Complete the Look: {aiStatus.flags.completeTheLook ? 'включён' : 'выключен'}</li>
               </ul>
               <p className="text-xs text-muted">Ключи API не отображаются. Функции включаются только серверной конфигурацией.</p>
+            </div>
+          ) : <p className="mt-3 text-sm text-muted" role="status">Загрузка состояния…</p>}
+        </section>
+        <section className="card p-6" aria-labelledby="recommendation-status-title">
+          <h3 id="recommendation-status-title" className="text-base font-semibold text-app flex items-center gap-2">
+            <Zap size={20} className="text-primary-500" />
+            Рекомендации: диагностика
+          </h3>
+          {recommendationStatusError ? (
+            <p className="mt-3 text-sm text-rose-600" role="alert">Не удалось получить состояние рекомендаций.</p>
+          ) : recommendationStatus ? (
+            <div className="mt-3 space-y-2 text-sm">
+              <ul className="grid gap-1 text-muted sm:grid-cols-3">
+                <li>Рекомендации: {recommendationStatus.flags.recommendations ? 'включены' : 'выключены'}</li>
+                <li>Персонализация: {recommendationStatus.flags.personalized ? 'включена' : 'выключена'}</li>
+                <li>Недавно просмотренные: {recommendationStatus.flags.recentlyViewed ? 'включены' : 'выключены'}</li>
+              </ul>
+              <p>Визуальные эмбеддинги доступны: <b>{recommendationStatus.embeddingAvailable ? 'Да' : 'Нет'}</b></p>
+              <p>Персональные результаты передаются через общий кэш: <b>{recommendationStatus.personalizedResultsShared ? 'Да' : 'Нет'}</b></p>
+              <p className="text-xs text-muted">Проверяются только агрегированные настройки; история просмотров и данные пользователей не отображаются.</p>
             </div>
           ) : <p className="mt-3 text-sm text-muted" role="status">Загрузка состояния…</p>}
         </section>
