@@ -9,10 +9,17 @@ const copy = {
   en: { title: 'Integration diagnostics', loading: 'Loading…', error: 'Diagnostics could not be loaded.', enabled: 'Feature enabled', configured: 'Configured', implementation: 'Implementation', verification: 'Verification', lastSuccess: 'Last successful operation', degraded: 'Degraded', yes: 'Yes', no: 'No', none: 'No data', warning: 'Secrets, API keys, and private URLs are not shown.' },
 } as const;
 
+const rateCopy = {
+  ru: { provider: 'Провайдер курса', rate: 'Текущий курс CNY → UZS', fetched: 'Курс получен', providerTime: 'Время провайдера', stale: 'Устаревший курс' },
+  uz: { provider: 'Valyuta kursi provayderi', rate: 'Joriy CNY → UZS kursi', fetched: 'Kurs olingan vaqt', providerTime: 'Provayder vaqti', stale: 'Eskirgan kurs' },
+  en: { provider: 'Rate provider', rate: 'Current CNY → UZS rate', fetched: 'Rate fetched', providerTime: 'Provider timestamp', stale: 'Stale rate' },
+} as const;
+
 export default function IntegrationDiagnosticsPage() {
   const { i18n } = useTranslation();
   const locale = i18n.language.startsWith('en') ? 'en' : i18n.language.startsWith('uz') ? 'uz' : 'ru';
   const text = copy[locale];
+  const rateLabels = rateCopy[locale];
   const query = useQuery({ queryKey: ['admin', 'integration-diagnostics'], queryFn: getIntegrationDiagnostics, refetchInterval: 60_000 });
   return (
     <Layout title={text.title}>
@@ -28,6 +35,13 @@ export default function IntegrationDiagnosticsPage() {
                 <dt>{text.implementation}</dt><dd className="font-mono text-xs">{item.implementationStatus}</dd>
                 <dt>{text.verification}</dt><dd className="font-mono text-xs">{item.verificationStatus}</dd>
                 <dt>{text.lastSuccess}</dt><dd>{item.lastSuccessfulOperation ? new Date(item.lastSuccessfulOperation).toLocaleString(locale) : text.none}</dd>
+                {item.name === 'Currency' && <>
+                  <dt>{rateLabels.provider}</dt><dd>{item.rateProvider ?? text.none}</dd>
+                  <dt>{rateLabels.rate}</dt><dd>{item.currentRate === null || item.currentRate === undefined ? text.none : `${item.currentRate.toLocaleString(locale)} UZS`}</dd>
+                  <dt>{rateLabels.fetched}</dt><dd>{item.rateFetchedAt ? new Date(item.rateFetchedAt).toLocaleString(locale) : text.none}</dd>
+                  <dt>{rateLabels.providerTime}</dt><dd>{item.providerTimestamp ? new Date(item.providerTimestamp).toLocaleString(locale) : text.none}</dd>
+                  <dt>{rateLabels.stale}</dt><dd>{item.stale === null || item.stale === undefined ? text.none : item.stale ? text.yes : text.no}</dd>
+                </>}
               </dl>
             </li>)}
           </ul>
