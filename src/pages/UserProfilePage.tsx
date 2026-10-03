@@ -1,5 +1,5 @@
 // src/pages/UserProfilePage.tsx
-// Страница профиля пользователя в админке: контакты, история действий, объявления
+// Страница профиля пользователя в админке: контакты, безопасность и история AVERON AI
 
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -8,9 +8,9 @@ import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
 import { getAdminUserByIdApi, blockUserApi, unblockUserApi, getUserActivityApi, getUserSessionsApi, revokeUserSessionApi } from '../lib/usersApi';
 import { getUserAuditLogsApi } from '../lib/auditLogApi';
-import { getUserAllChatsApi, getUserAllListingsApi } from '../lib/extendedAdminApi';
+import { getUserAiSessionsApi } from '../lib/extendedAdminApi';
 import Badge from '../components/Badge/Badge';
-import { ArrowLeft, Shield, Lock, Unlock, Mail, Phone, Calendar, Home, Clock, Activity, MessageSquare, MonitorSmartphone, X } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, Unlock, Mail, Phone, Calendar, Clock, Activity, MessageSquare, MonitorSmartphone, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru, enUS } from 'date-fns/locale';
 
@@ -19,21 +19,16 @@ const UserProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'info' | 'listings' | 'chats' | 'activity' | 'history' | 'sessions'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'ai' | 'activity' | 'history' | 'sessions'>('info');
 
   const { data: user, isLoading: isUserLoading } = useQuery({
     queryKey: ['admin', 'user', id],
     queryFn: () => getAdminUserByIdApi(id!),
   });
 
-  const { data: userChatsData } = useQuery({
-    queryKey: ['admin', 'user', id, 'all-chats'],
-    queryFn: () => getUserAllChatsApi(id!),
-  });
-
-  const { data: userAllListingsData } = useQuery({
-    queryKey: ['admin', 'user', id, 'all-listings'],
-    queryFn: () => getUserAllListingsApi(id!),
+  const { data: userAiSessionsData } = useQuery({
+    queryKey: ['admin', 'user', id, 'ai-sessions'],
+    queryFn: () => getUserAiSessionsApi(id!),
   });
 
   const { data: userActivity, isLoading: isActivityLoading } = useQuery({
@@ -90,7 +85,6 @@ const UserProfilePage: React.FC = () => {
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'ADMIN': return { label: 'Администратор', variant: 'teal' as const };
-      case 'LANDLORD': return { label: 'Арендодатель', variant: 'success' as const };
       default: return { label: 'Пользователь', variant: 'info' as const };
     }
   };
@@ -191,20 +185,12 @@ const UserProfilePage: React.FC = () => {
               {t('users.profile', 'Информация')}
             </button>
             <button
-              onClick={() => setActiveTab('listings')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
-                activeTab === 'listings' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
-              }`}
-            >
-              {t('nav.listings', 'Все объявления')} ({userAllListingsData?.listings?.length || user.listings?.length || 0})
-            </button>
-            <button
-              onClick={() => setActiveTab('chats')}
+              onClick={() => setActiveTab('ai')}
               className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'chats' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
+                activeTab === 'ai' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
               }`}
             >
-              <MessageSquare size={14} /> Все чаты ({(userChatsData?.messages?.length || 0) + (userChatsData?.aiSessions?.length || 0)})
+              <MessageSquare size={14} /> История AVERON AI ({userAiSessionsData?.aiSessions?.length || 0})
             </button>
             <button
               onClick={() => setActiveTab('activity')}
@@ -255,78 +241,30 @@ const UserProfilePage: React.FC = () => {
           </div>
         )}
 
-        {/* Все чаты пользователя */}
-        {activeTab === 'chats' && (
+        {/* AVERON AI history */}
+        {activeTab === 'ai' && (
           <div className="card min-w-0 overflow-hidden p-0">
-            {userChatsData?.aiSessions?.length ? <div className="border-b border-app p-4"><h3 className="mb-3 font-semibold text-app">История AVERON AI</h3><div className="space-y-3">{userChatsData.aiSessions.map((session: any) => <div key={session.id} className="rounded-xl border border-app bg-surface p-3"><div className="mb-2 flex flex-wrap items-center justify-between gap-2"><strong className="text-sm text-app">{session.title || 'Диалог с AI'}</strong><span className="text-xs text-muted">{format(new Date(session.updatedAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</span></div><div className="space-y-2">{session.messages.map((message: any) => <div key={message.id} className={`max-w-full break-words rounded-lg px-3 py-2 text-xs ${message.role === 'user' ? 'ml-auto bg-primary-500 text-white' : 'bg-gray-100 text-app dark:bg-white/5'}`}><span className="mb-1 block font-semibold">{message.role === 'user' ? 'Пользователь' : 'AVERON AI'}</span>{message.content}</div>)}</div></div>)}</div></div> : null}
-            {(!userChatsData?.messages || userChatsData.messages.length === 0) && (!userChatsData?.aiSessions || userChatsData.aiSessions.length === 0) ? (
-              <div className="p-8 text-center text-muted">У пользователя нет истории переписок</div>
-            ) : (
+            {userAiSessionsData?.aiSessions?.length ? (
               <div className="divide-y divide-app">
-                {userChatsData.messages.map((m: any) => (
-                  <div key={m.id} className="p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                    <div className="flex items-center justify-between text-xs text-muted mb-1">
-                      <span className="font-bold text-app">
-                        {m.sender?.name || 'Пользователь'} ➔ {m.recipient?.name || 'Собеседник'}
-                      </span>
-                      <span>{format(new Date(m.createdAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</span>
+                {userAiSessionsData.aiSessions.map((session: any) => (
+                  <div key={session.id} className="p-4">
+                    <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                      <strong className="text-sm text-app">{session.title || 'Диалог с AI'}</strong>
+                      <span className="text-xs text-muted">{format(new Date(session.updatedAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</span>
                     </div>
-                    {m.listing && (
-                      <p className="text-xs text-primary-500 font-semibold mb-1">
-                        Объект: {m.listing.title} ({m.listing.price} сум, {m.listing.city})
-                      </p>
-                    )}
-                    <p className="text-xs text-app bg-surface p-2.5 rounded-xl border border-app">
-                      {m.message}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Все объявления пользователя (включая удаленные и архивные) */}
-        {activeTab === 'listings' && (
-          <div className="card p-0 overflow-hidden">
-            {(!userAllListingsData?.listings || userAllListingsData.listings.length === 0) && user.listings?.length === 0 ? (
-              <div className="p-6 text-center text-muted">{t('common.noData', 'У пользователя нет объявлений')}</div>
-            ) : (
-              <div className="divide-y divide-app">
-                {(userAllListingsData?.listings || user.listings)?.map((listing: any) => (
-                  <div key={listing.id} className="p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                    <div className="flex gap-4">
-                      <div className="w-20 h-16 bg-gray-100 dark:bg-white/10 rounded-xl flex-shrink-0 overflow-hidden">
-                        {listing.images?.[0]?.url ? (
-                          <img
-                            src={listing.images[0].url}
-                            alt={listing.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted">
-                            <Home size={24} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-app truncate">{listing.title}</h3>
-                          <Badge variant={listing.moderationStatus === 'APPROVED' ? 'success' : listing.moderationStatus === 'REJECTED' ? 'danger' : 'warning'} className="text-xs">
-                            {listing.moderationStatus === 'APPROVED' ? t('common.approved', 'Одобрено') : listing.moderationStatus === 'REJECTED' ? t('common.rejected', 'Отклонено') : t('common.pending', 'На модерации')}
-                          </Badge>
+                    <div className="space-y-2">
+                      {session.messages.map((message: any) => (
+                        <div key={message.id} className={`max-w-full break-words rounded-lg px-3 py-2 text-xs ${message.role === 'user' ? 'ml-auto bg-primary-500 text-white' : 'bg-gray-100 text-app dark:bg-white/5'}`}>
+                          <span className="mb-1 block font-semibold">{message.role === 'user' ? 'Пользователь' : 'AVERON AI'}</span>
+                          {message.content}
                         </div>
-                        <div className="text-sm text-muted mb-1">
-                          {listing.city}{listing.district ? `, ${listing.district}` : ''}
-                        </div>
-                        <div className="text-sm text-muted">
-                          {listing.rooms} комн., {listing.area} м², {listing.price.toLocaleString()} сум/мес
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 ))}
               </div>
+            ) : (
+              <div className="p-8 text-center text-muted">У пользователя нет истории AVERON AI</div>
             )}
           </div>
         )}

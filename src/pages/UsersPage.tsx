@@ -60,7 +60,6 @@ export const UsersPage: React.FC = () => {
     { value: 'createdAt-desc', label: t('users.newestFirst', 'Сначала новые') },
     { value: 'createdAt-asc', label: t('users.oldestFirst', 'Сначала старые') },
     { value: 'name-asc', label: t('users.sortByName', 'По имени (А-Я)') },
-    { value: 'listingsCount-desc', label: t('users.sortByListings', 'По количеству объявлений') },
   ];
 
   const roleFilter = (searchParams.get('role') as UserRole) || '';
@@ -117,7 +116,7 @@ export const UsersPage: React.FC = () => {
   }, [selectedIds]);
 
   const [sortByField, sortDirection] = sortOption.split('-') as [
-    'createdAt' | 'name' | 'email' | 'listingsCount',
+    'createdAt' | 'name' | 'email',
     'asc' | 'desc',
   ];
 
@@ -431,7 +430,6 @@ export const UsersPage: React.FC = () => {
                     <th className="p-3.5">{t('users.phone', 'Контакты')}</th>
                     <th className="p-3.5">{t('users.role', 'Роль')}</th>
                     <th className="p-3.5">{t('common.status', 'Статус')}</th>
-                    <th className="p-3.5">{t('nav.listings', 'Объявлений')}</th>
                     <th className="p-3.5">{t('users.registeredAt', 'Дата регистрации')}</th>
                     <th className="p-3.5 text-right">{t('common.actions', 'Действия')}</th>
                   </tr>
@@ -514,10 +512,6 @@ export const UsersPage: React.FC = () => {
                                 {t('common.active', 'Активен')}
                               </Badge>
                             )}
-                          </td>
-
-                          <td className="p-3.5 font-semibold text-app">
-                            {user._count?.listings ?? 0}
                           </td>
 
                           <td className="p-3.5 text-muted font-mono text-[11px]">
@@ -638,7 +632,7 @@ export const UsersPage: React.FC = () => {
               label={t('users.blockReasonLabel', 'Причина блокировки *')}
               value={blockReason}
               onChange={(e) => setBlockReason(e.target.value)}
-              placeholder={t('users.blockReasonPlaceholder', 'Спам, фейковые объявления, подозрительная активность...')}
+              placeholder={t('users.blockReasonPlaceholder', 'Спам, мошенничество, подозрительная активность...')}
               rows={3}
             />
           </Modal>

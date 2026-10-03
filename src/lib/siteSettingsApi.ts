@@ -15,7 +15,6 @@ export interface SiteSettings {
   maxImagesPerListing: number;
   maxProductPhotos: number;
   maxProductPhotoSizeMb: number;
-  listingsPerPage: number;
   logoUrl: string | null;
   navLinks?: Array<{ label: string; href: string; position: 'header' | 'footer' }>;
 
@@ -35,7 +34,6 @@ export interface SiteSettings {
   watermarkDetectorEnabled?: boolean;
   webPushEnabled?: boolean;
   oneIdAuthEnabled?: boolean;
-  yandexRealtyXmlEnabled?: boolean;
   openTelemetryEnabled?: boolean;
   yandexMetrikaId?: string;
   yandexMetrikaEnabled?: boolean;

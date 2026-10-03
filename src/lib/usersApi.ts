@@ -27,23 +27,11 @@ export interface AdminUser {
   blockedReason: string | null;
   createdAt: string;
   avatar: string | null;
-  _count: { listings: number };
 }
 
 export interface AdminUserProfile extends AdminUser {
   lastLoginAt: string | null;
   updatedAt: string;
-  listings: Array<{
-    id: string;
-    title: string;
-    city: string;
-    district: string;
-    price: number;
-    area: number;
-    rooms: number;
-    moderationStatus: string;
-    images: Array<{ url: string }>;
-  }>;
 }
 
 export interface UsersFilter {
@@ -133,4 +121,3 @@ export const deleteUserApi = async (id: string): Promise<{ success: boolean; mes
 export interface UserAuthSession { id: string; userAgent?: string; ipAddress?: string; createdAt: string; lastSeenAt: string; expiresAt: string }
 export const getUserSessionsApi = async (id: string): Promise<UserAuthSession[]> => (await api.get(`/admin/users/${id}/sessions`)).data;
 export const revokeUserSessionApi = async (id: string, sessionId: string): Promise<void> => { await api.delete(`/admin/users/${id}/sessions/${sessionId}`); };
-
