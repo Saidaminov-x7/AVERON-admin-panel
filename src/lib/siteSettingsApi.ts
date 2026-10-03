@@ -12,7 +12,6 @@ export interface SiteSettings {
   contactPhone: string;
   googleAuthEnabled: boolean;
   autoModerationEnabled: boolean;
-  maxImagesPerListing: number;
   maxProductPhotos: number;
   maxProductPhotoSizeMb: number;
   logoUrl: string | null;

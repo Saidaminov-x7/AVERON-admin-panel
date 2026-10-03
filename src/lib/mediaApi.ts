@@ -7,7 +7,6 @@ export interface MediaItem {
   id: string;
   url: string;
   ownerId: string;
-  listingId?: string | null;
   mimeType: string;
   size: number;
   width?: number | null;
@@ -38,11 +37,10 @@ export const getMediaListApi = async (params: {
   return data;
 };
 
-export const uploadMediaApi = async (file: File, listingId?: string): Promise<MediaItem> => {
+export const uploadMediaApi = async (file: File): Promise<MediaItem> => {
   const formData = new FormData();
   formData.append('file', file);
-  const url = listingId ? `/media/upload?listingId=${encodeURIComponent(listingId)}` : '/media/upload';
-  const { data } = await api.post(url, formData, {
+  const { data } = await api.post('/media/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return data;
@@ -62,10 +60,5 @@ export const deleteMediaApi = async (id: string): Promise<void> => {
 };
 
 export const deleteUnattachedMediaApi = async (id: string): Promise<void> => {
-  await api.delete(`/media/${id}?onlyIfUnattached=true`);
-};
-
-export const attachMediaToListingApi = async (mediaId: string, listingId: string): Promise<MediaItem> => {
-  const { data } = await api.patch(`/media/${mediaId}/attach`, { listingId });
-  return data;
+  await api.delete(`/media/${id}`);
 };

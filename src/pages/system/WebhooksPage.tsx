@@ -213,7 +213,6 @@ const WebhooksPage: React.FC = () => {
                     className="w-full px-3 py-2 rounded-xl border border-app bg-app text-app text-sm outline-none focus:border-primary-500 cursor-pointer"
                   >
                     <option value="ALL">Все события платформы (ALL)</option>
-                    <option value="LISTING_REPORTED">Новая жалоба на объявление</option>
                     <option value="FRAUD_DETECTED">Обнаружен подозрительный скам</option>
                     <option value="USER_REGISTERED">Регистрация нового пользователя</option>
                   </select>
