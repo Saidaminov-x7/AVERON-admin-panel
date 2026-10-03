@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Layout from '../../components/Layout';
+import { Select } from '../../components/ui/Select';
 import { api } from '../../lib/axios';
 
 interface ThemeSettingsData {
@@ -206,31 +207,21 @@ const AppearanceSettingsPage: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-app mb-1.5">Шрифт</label>
-                  <select
+                  <Select
                     value={form.fontFamily}
-                    onChange={(e) => setForm((prev) => ({ ...prev, fontFamily: e.target.value }))}
-                    className="select w-full"
-                  >
-                    {FONT_OPTIONS.map((f) => (
-                      <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
-                        {f.label}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(fontFamily) => setForm((prev) => ({ ...prev, fontFamily }))}
+                    options={FONT_OPTIONS.map((option) => ({ value: option.value, label: option.label }))}
+                    containerClassName="w-full"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-app mb-1.5">Скругление углов</label>
-                  <select
+                  <Select
                     value={form.borderRadius}
-                    onChange={(e) => setForm((prev) => ({ ...prev, borderRadius: e.target.value }))}
-                    className="select w-full"
-                  >
-                    {BORDER_RADIUS_OPTIONS.map((r) => (
-                      <option key={r.value} value={r.value}>
-                        {r.label}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(borderRadius) => setForm((prev) => ({ ...prev, borderRadius }))}
+                    options={BORDER_RADIUS_OPTIONS.map((option) => ({ value: option.value, label: option.label }))}
+                    containerClassName="w-full"
+                  />
                 </div>
               </div>
             </div>

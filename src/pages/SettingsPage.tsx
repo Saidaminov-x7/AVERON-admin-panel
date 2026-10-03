@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Layout from '../components/Layout';
+import { Select } from '../components/ui/Select';
 import { getSiteSettingsApi, updateSiteSettingsApi, uploadSiteLogoApi, deleteSiteLogoApi, getMediaUrl } from '../lib/siteSettingsApi';
 
 const SettingsPage: React.FC = () => {
@@ -262,18 +263,21 @@ const SettingsPage: React.FC = () => {
                   placeholder="/"
                   className="input flex-1"
                 />
-                <select
+                <Select
                   value={link.position}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  onChange={(value) => {
+                    if (value !== 'header' && value !== 'footer') return;
                     const newLinks = [...navLinks];
-                    newLinks[index] = { ...newLinks[index], position: e.target.value as 'header' | 'footer' };
+                    newLinks[index] = { ...newLinks[index], position: value };
                     setNavLinks(newLinks);
                   }}
-                  className="select text-sm w-28"
-                >
-                  <option value="header">Шапка</option>
-                  <option value="footer">Подвал</option>
-                </select>
+                  options={[
+                    { value: 'header', label: 'Шапка' },
+                    { value: 'footer', label: 'Подвал' },
+                  ]}
+                  className="text-sm"
+                  containerClassName="w-28"
+                />
                 <button
                   onClick={() => {
                     const newLinks = [...navLinks];

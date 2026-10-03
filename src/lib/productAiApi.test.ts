@@ -23,6 +23,7 @@ vi.mock('./axios', () => ({
 }));
 
 const request = {
+  mediaIds: ['00000000-0000-4000-8000-000000000001'],
   sourceTitle: 'Cotton shirt',
   sourceDescription: 'A lightweight shirt',
   country: 'GB' as const,
@@ -43,9 +44,21 @@ describe('admin product AI capability and suggestions API', () => {
 
   it('accepts only the documented boolean capability value', () => {
     expect(parseAdminCapabilities({ aiProductFill: true, anotherCapability: false }))
-      .toEqual({ aiProductFill: true, imageEmbeddings: false });
+      .toEqual({
+        aiProductFill: true,
+        imageEmbeddings: false,
+        telegramProductPublish: false,
+        telegramProductPublishFeatureEnabled: false,
+        telegramProductPublishConfigured: false,
+      });
     expect(parseAdminCapabilities({ aiProductFill: true, imageEmbeddings: true }))
-      .toEqual({ aiProductFill: true, imageEmbeddings: true });
+      .toEqual({
+        aiProductFill: true,
+        imageEmbeddings: true,
+        telegramProductPublish: false,
+        telegramProductPublishFeatureEnabled: false,
+        telegramProductPublishConfigured: false,
+      });
     expect(hasAiProductFillCapability({ aiProductFill: true })).toBe(true);
     expect(hasAiProductFillCapability({ aiProductFill: false })).toBe(false);
     expect(hasAiProductFillCapability(undefined)).toBe(false);
@@ -95,6 +108,9 @@ describe('admin product AI capability and suggestions API', () => {
     await expect(getAdminCapabilitiesApi(signal)).resolves.toEqual({
       aiProductFill: true,
       imageEmbeddings: true,
+      telegramProductPublish: false,
+      telegramProductPublishFeatureEnabled: false,
+      telegramProductPublishConfigured: false,
     });
     expect(api.get).toHaveBeenCalledWith('/api/v1/capabilities', { signal });
   });

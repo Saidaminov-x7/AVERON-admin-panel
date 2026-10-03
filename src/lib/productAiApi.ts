@@ -9,6 +9,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 export interface AdminCapabilities {
   aiProductFill: boolean;
   imageEmbeddings?: boolean;
+  telegramProductPublish?: boolean;
+  telegramProductPublishFeatureEnabled?: boolean;
+  telegramProductPublishConfigured?: boolean;
 }
 
 export interface ProductAiVariant {
@@ -17,7 +20,8 @@ export interface ProductAiVariant {
 }
 
 export interface ProductAiSuggestionsRequest {
-  sourceTitle: string;
+  mediaIds: string[];
+  sourceTitle?: string;
   sourceDescription?: string;
   country: ProductCountry;
   categoryName?: string;
@@ -104,6 +108,9 @@ export function parseAdminCapabilities(value: unknown): AdminCapabilities {
     !('aiProductFill' in value) ||
     typeof value.aiProductFill !== 'boolean' ||
     ('imageEmbeddings' in value && typeof value.imageEmbeddings !== 'boolean')
+    || ('telegramProductPublish' in value && typeof value.telegramProductPublish !== 'boolean')
+    || ('telegramProductPublishFeatureEnabled' in value && typeof value.telegramProductPublishFeatureEnabled !== 'boolean')
+    || ('telegramProductPublishConfigured' in value && typeof value.telegramProductPublishConfigured !== 'boolean')
   ) {
     throw new Error('Invalid admin capabilities response');
   }
@@ -111,6 +118,13 @@ export function parseAdminCapabilities(value: unknown): AdminCapabilities {
   return {
     aiProductFill: source.aiProductFill as boolean,
     imageEmbeddings: typeof source.imageEmbeddings === 'boolean' ? source.imageEmbeddings : false,
+    telegramProductPublish: typeof source.telegramProductPublish === 'boolean' ? source.telegramProductPublish : false,
+    telegramProductPublishFeatureEnabled: typeof source.telegramProductPublishFeatureEnabled === 'boolean'
+      ? source.telegramProductPublishFeatureEnabled
+      : false,
+    telegramProductPublishConfigured: typeof source.telegramProductPublishConfigured === 'boolean'
+      ? source.telegramProductPublishConfigured
+      : false,
   };
 }
 

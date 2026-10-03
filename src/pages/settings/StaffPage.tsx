@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
-import { Button, Modal } from '../../components/ui';
+import { Button, Modal, Select } from '../../components/ui';
 import {
   getStaffListApi,
   addStaffApi,
@@ -212,22 +212,24 @@ const StaffPage: React.FC = () => {
                               {roleMeta.label}
                             </span>
                           ) : (
-                            <select
+                            <Select
                               value={role}
-                              onChange={(e) =>
+                              onChange={(value) => {
+                                if (!['ADMIN', 'MODERATOR', 'SUPPORT', 'SUPER_ADMIN'].includes(value)) return;
                                 updateRoleMutation.mutate({
                                   id: staff.id,
-                                  role: e.target.value as AdminRoleType,
-                                })
-                              }
+                                  role: value as AdminRoleType,
+                                });
+                              }}
                               disabled={updateRoleMutation.isPending}
-                              className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-app bg-surface text-app cursor-pointer outline-none"
-                            >
-                              <option value="ADMIN">Администратор</option>
-                              <option value="MODERATOR">Модератор</option>
-                              <option value="SUPPORT">Поддержка</option>
-                              <option value="SUPER_ADMIN">Супер-Админ</option>
-                            </select>
+                              options={[
+                                { value: 'ADMIN', label: 'Администратор' },
+                                { value: 'MODERATOR', label: 'Модератор' },
+                                { value: 'SUPPORT', label: 'Поддержка' },
+                                { value: 'SUPER_ADMIN', label: 'Супер-Админ' },
+                              ]}
+                              className="text-xs font-semibold"
+                            />
                           )}
                         </td>
 
@@ -326,16 +328,21 @@ const StaffPage: React.FC = () => {
                   <label className="block text-xs font-semibold text-app mb-1">
                     Назначаемая роль *
                   </label>
-                  <select
+                  <Select
                     value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value as AdminRoleType)}
-                    className="input cursor-pointer"
-                  >
-                    <option value="ADMIN">Администратор (Модерация, пользователи, CMS)</option>
-                    <option value="MODERATOR">Модератор (Проверка объявлений)</option>
-                    <option value="SUPPORT">Поддержка (Read-only просмотр)</option>
-                    <option value="SUPER_ADMIN">Супер Администратор (Полный доступ)</option>
-                  </select>
+                    onChange={(value) => {
+                      if (['ADMIN', 'MODERATOR', 'SUPPORT', 'SUPER_ADMIN'].includes(value)) {
+                        setSelectedRole(value as AdminRoleType);
+                      }
+                    }}
+                    options={[
+                      { value: 'ADMIN', label: 'Администратор (Модерация, пользователи, CMS)' },
+                      { value: 'MODERATOR', label: 'Модератор (Проверка объявлений)' },
+                      { value: 'SUPPORT', label: 'Поддержка (Read-only просмотр)' },
+                      { value: 'SUPER_ADMIN', label: 'Супер Администратор (Полный доступ)' },
+                    ]}
+                    className="input"
+                  />
                 </div>
 
                 <div>

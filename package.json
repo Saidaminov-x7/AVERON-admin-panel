@@ -6,7 +6,8 @@
   "packageManager": "pnpm@9.15.9",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/check-no-native-select.mjs && tsc -b && vite build",
+    "check:no-native-select": "node scripts/check-no-native-select.mjs",
     "lint": "oxlint",
     "test": "vitest run",
     "preview": "vite preview"

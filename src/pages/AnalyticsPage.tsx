@@ -6,11 +6,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import Layout from '../components/Layout';
-import { getRangeAnalyticsApi, getFunnelAnalyticsApi, exportReportUrl } from '../lib/analyticsApi';
+import { downloadAnalyticsReportApi, getRangeAnalyticsApi, getFunnelAnalyticsApi } from '../lib/analyticsApi';
 
 const AnalyticsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [periodDays, setPeriodDays] = useState(30);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState(false);
 
   const PERIODS = [
     { label: t('analyticsPage.period7'), value: 7 },
@@ -32,12 +34,12 @@ const AnalyticsPage: React.FC = () => {
     ? { from: dateFrom, to: dateTo }
     : { days: periodDays };
 
-  const { data: analytics, isLoading } = useQuery({
+  const { data: analytics, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin', 'analytics', 'range', queryParams],
     queryFn: () => getRangeAnalyticsApi(queryParams),
   });
 
-  const { data: funnel } = useQuery({
+  const { data: funnel, isError: isFunnelError, refetch: refetchFunnel } = useQuery({
     queryKey: ['admin', 'analytics', 'funnel', queryParams],
     queryFn: () => getFunnelAnalyticsApi(queryParams),
   });
@@ -46,10 +48,40 @@ const AnalyticsPage: React.FC = () => {
   const summary = analytics?.summary;
   const formatMetric = (value: number | undefined) => {
     if (isLoading) return '...';
-    return value === undefined ? t('analyticsPage.noData') : value.toLocaleString();
+    return typeof value !== 'number' || !Number.isFinite(value)
+      ? t('analyticsPage.noData')
+      : value.toLocaleString(dateLocale);
   };
 
   const dateLocale = i18n.language === 'uz' ? 'uz-UZ' : i18n.language === 'en' ? 'en-US' : 'ru-RU';
+  const formatRate = (value: number | undefined) =>
+    typeof value !== 'number' || !Number.isFinite(value)
+      ? t('analyticsPage.noData')
+      : `${(value * 100).toFixed(1)}%`;
+
+  const exportReport = async () => {
+    setIsExporting(true);
+    setExportError(false);
+    try {
+      const blob = await downloadAnalyticsReportApi({
+        from: isCustom ? dateFrom : undefined,
+        to: isCustom ? dateTo : undefined,
+        type: 'traffic',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `traffic-report-${isCustom ? `${dateFrom}-${dateTo}` : `${periodDays}-days`}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      setExportError(true);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <Layout title={t('analytics.title')}>
@@ -89,14 +121,10 @@ const AnalyticsPage: React.FC = () => {
             )}
           </div>
 
-          <a
-            href={exportReportUrl({
-              from: isCustom ? dateFrom : undefined,
-              to: isCustom ? dateTo : undefined,
-              type: 'traffic',
-            })}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => void exportReport()}
+            disabled={isExporting}
             className="px-4 py-2 text-xs font-semibold rounded-lg border border-app text-app hover:bg-gray-100 dark:hover:bg-white/5 flex items-center gap-2 transition-colors cursor-pointer"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -104,9 +132,16 @@ const AnalyticsPage: React.FC = () => {
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            {t('analyticsPage.exportCsv')}
-          </a>
+            {isExporting ? t('analyticsPage.exporting') : t('analyticsPage.exportCsv')}
+          </button>
         </div>
+        {exportError && <p role="alert" className="text-sm text-red-600">{t('analyticsPage.exportError')}</p>}
+        {isError && (
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">
+            <span>{t('analyticsPage.loadError')}</span>
+            <button type="button" className="underline" onClick={() => void refetch()}>{t('analyticsPage.retry')}</button>
+          </div>
+        )}
 
         {/* Метрики за период */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -135,11 +170,9 @@ const AnalyticsPage: React.FC = () => {
               {t('analyticsPage.netRevenue')}
             </div>
             <div className="text-2xl font-extrabold text-app">
-              {isLoading
-                ? '...'
-                : summary === undefined
-                  ? t('analyticsPage.noData')
-                  : `${summary.revenueUzs.toLocaleString(dateLocale)} UZS`}
+              {isLoading ? '...' : formatMetric(summary?.revenueUzs) === t('analyticsPage.noData')
+                ? t('analyticsPage.noData')
+                : `${formatMetric(summary?.revenueUzs)} UZS`}
             </div>
             <p className="text-[11px] text-muted mt-1">{t('analyticsPage.netRevenueNote')}</p>
           </div>
@@ -239,24 +272,29 @@ const AnalyticsPage: React.FC = () => {
         </div>
 
         {/* Воронка конверсии */}
-        {funnel && (
+        {isFunnelError ? (
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">
+            <span>{t('analyticsPage.funnelError')}</span>
+            <button type="button" className="underline" onClick={() => void refetchFunnel()}>{t('analyticsPage.retry')}</button>
+          </div>
+        ) : funnel && (
           <div className="card">
             <h3 className="text-base font-semibold text-app mb-4">{t('analyticsPage.engagementTitle')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="p-4 rounded-xl bg-primary-500/10 border border-primary-500/20">
                 <div className="text-xs font-semibold text-primary-600 dark:text-primary-400">{t('analyticsPage.funnelViews')}</div>
-                <div className="text-2xl font-bold text-app mt-1">{funnel.visits}</div>
+                <div className="text-2xl font-bold text-app mt-1">{formatMetric(funnel.visits)}</div>
                 <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelVisits')}</div>
               </div>
               <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
                 <div className="text-xs font-semibold text-purple-600 dark:text-purple-400">{t('analyticsPage.funnelFavorites')}</div>
-                <div className="text-2xl font-bold text-app mt-1">{funnel.favorites}</div>
-                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: (funnel.favoriteRate * 100).toFixed(1) })}</div>
+                <div className="text-2xl font-bold text-app mt-1">{formatMetric(funnel.favorites)}</div>
+                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: formatRate(funnel.favoriteRate) })}</div>
               </div>
               <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                 <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{t('analyticsPage.funnelOrders')}</div>
-                <div className="text-2xl font-bold text-app mt-1">{funnel.paidOrders}</div>
-                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: (funnel.orderRate * 100).toFixed(1) })}</div>
+                <div className="text-2xl font-bold text-app mt-1">{formatMetric(funnel.paidOrders)}</div>
+                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: formatRate(funnel.orderRate) })}</div>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Search, ShoppingCart, RefreshCw, Eye, Check, Ban } from 'lucide-react';
 import { toast } from 'sonner';
@@ -7,6 +7,7 @@ import Layout from '../../components/Layout';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Modal } from '../../components/ui/Modal';
+import { Select } from '../../components/ui/Select';
 import { getOrder, getOrders, updateOrderShipping, updateOrderStatus } from '../../lib/commerceApi';
 import type { CommerceDeliveryStatus, CommerceOrderTransition } from '../../lib/commerceApi';
 import { filterCommerceOrders } from './orderFilters';
@@ -90,6 +91,7 @@ export default function OrdersPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedOrderNumber, setSelectedOrderNumber] = useState<string | null>(null);
+  const [deliveryStatus, setDeliveryStatus] = useState<CommerceDeliveryStatus>('PENDING');
   const [cancelPending, setCancelPending] = useState(false);
   const [statusNote, setStatusNote] = useState('');
 
@@ -140,6 +142,9 @@ export default function OrdersPage() {
   );
 
   const order = selectedOrderQuery.data;
+  useEffect(() => {
+    setDeliveryStatus(order?.delivery?.status ?? 'PENDING');
+  }, [order?.orderNumber, order?.delivery?.status]);
   const nextStatus = order ? getNextOrderTransition(order.status) : null;
   const nextDeliveryStatuses = order ? getNextDeliveryTransitions(order.delivery?.status ?? 'PENDING') : [];
   const fulfillment = fulfillmentCopy[locale];
@@ -167,13 +172,13 @@ export default function OrdersPage() {
             <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
             <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={copy.search} className="input w-full pl-9" />
           </label>
-          <label>
-            <span className="sr-only">{copy.filter}</span>
-            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="input min-w-44">
-              <option value="">{copy.all}</option>
-              {Object.entries(statusLabels).map(([value, labels]) => <option key={value} value={value}>{labels[locale]}</option>)}
-            </select>
-          </label>
+          <Select
+            value={statusFilter}
+            options={[{ value: '', label: copy.all }, ...Object.entries(statusLabels).map(([value, labels]) => ({ value, label: labels[locale] }))]}
+            onChange={setStatusFilter}
+            placeholder={copy.filter}
+            containerClassName="min-w-44"
+          />
         </div>
 
         {ordersQuery.isLoading ? (
@@ -277,11 +282,18 @@ export default function OrdersPage() {
                 >
                   <label className="block">
                     <span className="mb-1 block text-sm font-medium">{fulfillment.shipmentStatus}</span>
-                    <select name="status" defaultValue={order.delivery?.status ?? 'PENDING'} className="input w-full" required>
-                      {([order.delivery?.status ?? 'PENDING', ...nextDeliveryStatuses].filter((value, index, all) => all.indexOf(value) === index)).map((value) => (
-                        <option key={value} value={value}>{statusLabels[value][locale]}</option>
-                      ))}
-                    </select>
+                    <Select
+                      name="status"
+                      value={deliveryStatus}
+                      options={([order.delivery?.status ?? 'PENDING', ...nextDeliveryStatuses].filter((value, index, all) => all.indexOf(value) === index)).map((value) => ({
+                        value,
+                        label: statusLabels[value][locale],
+                      }))}
+                      onChange={(value) => {
+                        if (isDeliveryStatus(value)) setDeliveryStatus(value);
+                      }}
+                      containerClassName="w-full"
+                    />
                   </label>
                   <label className="block">
                     <span className="mb-1 block text-sm font-medium">{fulfillment.provider}</span>

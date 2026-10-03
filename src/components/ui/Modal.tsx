@@ -8,6 +8,7 @@ export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  presentation?: 'dialog' | 'page';
   subtitle?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   fullscreenOnMobile?: boolean;
@@ -29,6 +30,7 @@ export function Modal({
   isOpen,
   onClose,
   title,
+  presentation = 'dialog',
   subtitle,
   size = 'md',
   fullscreenOnMobile = false,
@@ -47,7 +49,7 @@ export function Modal({
   }, [onClose]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || presentation === 'page') return;
     const previousOverflow = document.body.style.overflow;
     const previouslyFocused = document.activeElement instanceof HTMLElement
       ? document.activeElement
@@ -59,7 +61,7 @@ export function Modal({
       document.body.style.overflow = previousOverflow;
       previouslyFocused?.focus();
     };
-  }, [isOpen]);
+  }, [isOpen, presentation]);
 
   const handleDialogKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape') {
@@ -89,10 +91,18 @@ export function Modal({
     }
   };
 
-  return createPortal(
+  const panelClass = presentation === 'page'
+    ? 'rounded-theme border border-app'
+    : `relative z-10 shadow-2xl border border-app ${
+      fullscreenOnMobile
+        ? `h-[100dvh] max-h-[100dvh] rounded-none border-x-0 border-y-0 sm:h-auto sm:max-h-[90vh] sm:rounded-theme sm:border ${sizeClasses[size]}`
+        : `max-h-[90vh] rounded-theme ${sizeClasses[size]}`
+    }`;
+  const content = (
     <AnimatePresence>
       {isOpen && (
-        <div className={`fixed inset-0 z-50 flex items-center justify-center ${fullscreenOnMobile ? 'p-0 sm:p-4' : 'p-4'}`}>
+        <div className={presentation === 'page' ? 'w-full' : `fixed inset-0 z-50 flex items-center justify-center ${fullscreenOnMobile ? 'p-0 sm:p-4' : 'p-4'}`}>
+          {presentation === 'dialog' && (
           <motion.div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
@@ -102,20 +112,17 @@ export function Modal({
             onClick={onClose}
             aria-hidden="true"
           />
+          )}
           <motion.div
             ref={dialogRef}
             id={dialogId}
-            role="dialog"
-            aria-modal="true"
+            role={presentation === 'page' ? undefined : 'dialog'}
+            aria-modal={presentation === 'page' ? undefined : 'true'}
             aria-labelledby={`${dialogId}-title`}
             aria-describedby={subtitle ? `${dialogId}-description` : undefined}
             tabIndex={-1}
-            onKeyDown={handleDialogKeyDown}
-            className={`relative z-10 flex w-full min-h-0 flex-col overflow-hidden font-theme bg-surface shadow-2xl border border-app outline-none ${
-              fullscreenOnMobile
-                ? `h-[100dvh] max-h-[100dvh] rounded-none border-x-0 border-y-0 sm:h-auto sm:max-h-[90vh] sm:rounded-theme sm:border ${sizeClasses[size]}`
-                : `max-h-[90vh] rounded-theme ${sizeClasses[size]}`
-            }`}
+            onKeyDown={presentation === 'page' ? undefined : handleDialogKeyDown}
+            className={`flex w-full min-h-0 flex-col overflow-hidden font-theme bg-surface outline-none ${panelClass}`}
             initial={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}
             animate={{ opacity: 1, transform: 'scale(1)' }}
             exit={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}
@@ -155,7 +162,7 @@ export function Modal({
           </motion.div>
         </div>
       )}
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   );
+  return presentation === 'page' ? content : createPortal(content, document.body);
 }

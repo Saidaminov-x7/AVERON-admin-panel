@@ -4,6 +4,7 @@ import { BadgeCheck, Check, ExternalLink, RefreshCw, Search, X } from 'lucide-re
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
+import { Select } from '../../components/ui/Select';
 import { api } from '../../lib/axios';
 
 type ReviewStatus = 'PENDING' | 'PUBLISHED' | 'REJECTED';
@@ -83,25 +84,31 @@ export default function ReviewsPage() {
           <p className="mt-1 text-sm text-muted">{t('commerceReviews.subtitle')}</p>
         </header>
         <section className="grid gap-3 rounded-2xl border border-app bg-card p-4 sm:grid-cols-2 xl:grid-cols-4" aria-label={t('commerceReviews.filters')}>
-          <label className="text-sm font-semibold">{t('commerceReviews.filterStatus')}
-            <select value={status} onChange={(event) => { setStatus(event.target.value); setPage(1); }} className="mt-1 min-h-10 w-full rounded-lg border border-app bg-app px-3">
-              <option value="">{t('commerceReviews.all')}</option>
-              {statusKeys.map((key) => <option key={key} value={key}>{statusLabel(key)}</option>)}
-            </select>
-          </label>
-          <label className="text-sm font-semibold">{t('commerceReviews.filterRating')}
-            <select value={rating} onChange={(event) => { setRating(event.target.value); setPage(1); }} className="mt-1 min-h-10 w-full rounded-lg border border-app bg-app px-3">
-              <option value="">{t('commerceReviews.all')}</option>
-              {[5, 4, 3, 2, 1].map((item) => <option key={item} value={item}>{item} / 5</option>)}
-            </select>
-          </label>
-          <label className="text-sm font-semibold">{t('commerceReviews.filterVerified')}
-            <select value={verified} onChange={(event) => { setVerified(event.target.value); setPage(1); }} className="mt-1 min-h-10 w-full rounded-lg border border-app bg-app px-3">
-              <option value="">{t('commerceReviews.all')}</option>
-              <option value="true">{t('commerceReviews.verified')}</option>
-              <option value="false">{t('commerceReviews.unverified')}</option>
-            </select>
-          </label>
+          <Select
+            label={t('commerceReviews.filterStatus')}
+            value={status}
+            options={[{ value: '', label: t('commerceReviews.all') }, ...statusKeys.map((key) => ({ value: key, label: statusLabel(key) }))]}
+            onChange={(value) => { setStatus(value); setPage(1); }}
+            containerClassName="text-sm font-semibold"
+          />
+          <Select
+            label={t('commerceReviews.filterRating')}
+            value={rating}
+            options={[{ value: '', label: t('commerceReviews.all') }, ...[5, 4, 3, 2, 1].map((item) => ({ value: String(item), label: `${item} / 5` }))]}
+            onChange={(value) => { setRating(value); setPage(1); }}
+            containerClassName="text-sm font-semibold"
+          />
+          <Select
+            label={t('commerceReviews.filterVerified')}
+            value={verified}
+            options={[
+              { value: '', label: t('commerceReviews.all') },
+              { value: 'true', label: t('commerceReviews.verified') },
+              { value: 'false', label: t('commerceReviews.unverified') },
+            ]}
+            onChange={(value) => { setVerified(value); setPage(1); }}
+            containerClassName="text-sm font-semibold"
+          />
           <form onSubmit={(event) => { event.preventDefault(); setDebouncedSearch(search.trim()); setPage(1); }} className="text-sm font-semibold">
             <label htmlFor="review-search">{t('commerceReviews.search')}</label>
             <span className="mt-1 flex min-h-10 overflow-hidden rounded-lg border border-app">

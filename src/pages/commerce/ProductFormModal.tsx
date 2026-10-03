@@ -16,6 +16,7 @@ import {
   toProductAiCountry,
   type ProductAiSuggestionsResponse,
 } from "../../lib/productAiApi";
+import { uploadProductPhotoApi } from "../../lib/mediaApi";
 import {
   getProductImageEmbeddingApi,
   reindexProductImageEmbeddingApi,
@@ -54,6 +55,7 @@ type ProductFormValues = {
   color: string;
   size: string;
   publish: boolean;
+  publishTelegram: boolean;
 };
 type FormErrors = Partial<Record<ProductValidationField, string>>;
 
@@ -71,16 +73,21 @@ export type ProductFormSubmission = {
   color: string;
   size: string;
   publish: boolean;
-  images: Array<{ id: string } | { file: File }>;
+  publishTelegram: boolean;
+  images: Array<{ id: string } | { mediaId: string } | { file: File }>;
 };
 
 interface ProductFormModalProps {
   isOpen: boolean;
+  presentation?: "dialog" | "page";
   product: ProductListItem | null;
   categories: ProductCategory[];
   categoriesError: boolean;
   isSaving: boolean;
   submissionError: string | null;
+  telegramPublishError: string | null;
+  isRetryingTelegram: boolean;
+  onRetryTelegram: () => void;
   settingsLoading: boolean;
   maxProductPhotos: number;
   maxProductPhotoSizeMb: number;
@@ -118,15 +125,20 @@ const getInitialValues = (product: ProductListItem | null): ProductFormValues =>
   color: product?.source === "MANUAL" ? product.variants?.[0]?.color ?? "" : "",
   size: product?.source === "MANUAL" ? product.variants?.[0]?.size ?? "" : "",
   publish: product ? product.status === "PUBLISHED" : true,
+  publishTelegram: false,
 });
 
 export function ProductFormModal({
   isOpen,
+  presentation = "dialog",
   product,
   categories,
   categoriesError,
   isSaving,
   submissionError,
+  telegramPublishError,
+  isRetryingTelegram,
+  onRetryTelegram,
   settingsLoading,
   maxProductPhotos,
   maxProductPhotoSizeMb,
@@ -221,7 +233,11 @@ export function ProductFormModal({
   };
 
   const updateValue = <K extends keyof ProductFormValues>(key: K, value: ProductFormValues[K]) => {
-    setValues((current) => ({ ...current, [key]: value }));
+    setValues((current) => ({
+      ...current,
+      [key]: value,
+      ...(key === "publish" && value === false ? { publishTelegram: false } : {}),
+    }));
     setErrors((current) => ({ ...current, [key]: undefined }));
   };
 
@@ -306,20 +322,38 @@ export function ProductFormModal({
     setAiSuggestions(null);
     setAiError("");
     try {
+      if (!photos.length) {
+        setAiError(t("products.aiFill.imageRequired"));
+        return;
+      }
+      if (photos.length > 5) {
+        setAiError(t("products.aiFill.imageLimit"));
+        return;
+      }
+      const mediaIds: string[] = [];
+      for (const photo of photos) {
+        if (photo.mediaId) {
+          mediaIds.push(photo.mediaId);
+          continue;
+        }
+        if (!photo.file) throw new Error("PRODUCT_IMAGE_NOT_AVAILABLE");
+        const uploaded = await uploadProductPhotoApi(photo.file);
+        mediaIds.push(uploaded.id);
+        setPhotos((current) => current.map((item) =>
+          item.key === photo.key ? { ...item, mediaId: uploaded.id } : item,
+        ));
+      }
       const selectedCategory = categories.find((category) => category.id === values.categoryId);
       const categoryName = selectedCategory ? localizedCategoryName(selectedCategory).trim() : "";
       const sourceTitle = values.translations[activeLocale].title.trim();
       const sourceDescription = values.translations[activeLocale].description.trim();
-      if (!sourceTitle) {
-        setAiError(t("products.aiFill.sourceTitleRequired"));
-        return;
-      }
       const variant = {
         ...(values.size.trim() ? { size: values.size.trim() } : {}),
         ...(values.color.trim() ? { color: values.color.trim() } : {}),
       };
       const result = await getProductAiSuggestionsApi(capabilitiesQuery.data, {
-        sourceTitle,
+        mediaIds,
+        ...(sourceTitle ? { sourceTitle } : {}),
         ...(sourceDescription ? { sourceDescription } : {}),
         country: toProductAiCountry(values.country),
         ...(categoryName ? { categoryName } : {}),
@@ -468,7 +502,12 @@ export function ProductFormModal({
       color: values.color.trim(),
       size: values.size.trim(),
       publish: values.publish,
-      images: photos.map((photo) => photo.file ? { file: photo.file } : { id: photo.id! }),
+      publishTelegram: values.publishTelegram,
+      images: photos.map((photo) => photo.mediaId
+        ? { mediaId: photo.mediaId }
+        : photo.file
+          ? { file: photo.file }
+          : { id: photo.id! }),
     });
   };
 
@@ -544,6 +583,7 @@ export function ProductFormModal({
   return (
     <Modal
       isOpen={isOpen}
+      presentation={presentation}
       onClose={onClose}
       title={t(product ? "products.editProduct" : "products.createProduct")}
       subtitle={product?.slug}
@@ -821,15 +861,83 @@ export function ProductFormModal({
             <div className="grid gap-4 md:grid-cols-2">
               <Input label={t("products.colorLabel")} maxLength={80} value={values.color} onChange={(event) => updateValue("color", event.target.value)} />
               <Input label={t("products.sizeLabel")} maxLength={80} value={values.size} onChange={(event) => updateValue("size", event.target.value)} />
-              {!product && (
-                <label className="flex items-center gap-2 md:col-span-2">
-                  <input type="checkbox" checked={values.publish} onChange={(event) => updateValue("publish", event.target.checked)} />
-                  <span className="text-sm text-app">{t("products.publishLabel")}</span>
-                </label>
-              )}
             </div>
           </section>
         )}
+        {product && (
+          <section className="space-y-3 rounded-xl border border-app bg-surface-muted p-4">
+            <h4 className="text-sm font-bold text-app">{t("products.sourceInformation")}</h4>
+            <dl className="grid gap-3 text-sm sm:grid-cols-2">
+              <div>
+                <dt className="text-xs text-muted">{t("products.sourceProvider")}</dt>
+                <dd className="break-words font-medium text-app">{product.source}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted">{t("products.sourceProductId")}</dt>
+                <dd className="break-all font-mono text-app">{product.sourceProductId || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted">{t("products.sourceTitle")}</dt>
+                <dd className="break-words text-app">{product.importedFrom?.originalTitle || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted">{t("products.sourceStatus")}</dt>
+                <dd className="break-words text-app">{product.importedFrom?.status || product.status}</dd>
+              </div>
+              <div className="sm:col-span-2">
+                <dt className="text-xs text-muted">{t("products.sourceUrl")}</dt>
+                <dd className="break-all text-app">
+                  {product.sourceUrl && /^https?:\/\//i.test(product.sourceUrl)
+                    ? <a href={product.sourceUrl} target="_blank" rel="noreferrer" className="text-primary-600 underline">{product.sourceUrl}</a>
+                    : product.sourceUrl || "—"}
+                </dd>
+              </div>
+            </dl>
+          </section>
+        )}
+        <section className="space-y-3 rounded-xl border border-app p-4">
+          <h4 className="text-sm font-bold text-app">{t("products.publicationSection")}</h4>
+          <label className="flex items-center gap-2">
+            <input type="checkbox" checked={values.publish} onChange={(event) => updateValue("publish", event.target.checked)} />
+            <span className="text-sm text-app">{t("products.publishLabel")}</span>
+          </label>
+          <div>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={values.publishTelegram}
+                disabled={!values.publish || !capabilitiesQuery.data?.telegramProductPublish}
+                onChange={(event) => updateValue("publishTelegram", event.target.checked)}
+              />
+              <span className="text-sm text-app">{t("products.telegram.publishLabel")}</span>
+            </label>
+            {!capabilitiesQuery.isLoading && !capabilitiesQuery.isError && (
+              <p className="ml-6 mt-1 text-xs text-muted">
+                {!capabilitiesQuery.data?.telegramProductPublishFeatureEnabled
+                  ? t("products.telegram.featureDisabled")
+                  : !capabilitiesQuery.data.telegramProductPublishConfigured
+                    ? t("products.telegram.notConfigured")
+                    : !values.publish
+                      ? t("products.telegram.storefrontRequired")
+                      : ""}
+              </p>
+            )}
+            {capabilitiesQuery.isLoading && (
+              <p className="ml-6 mt-1 text-xs text-muted">{t("products.telegram.loading")}</p>
+            )}
+            {capabilitiesQuery.isError && (
+              <p role="alert" className="ml-6 mt-1 text-xs text-red-600">{t("products.telegram.statusError")}</p>
+            )}
+          </div>
+          {telegramPublishError && (
+            <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300">
+              <span>{t("products.telegram.savedButFailed")}</span>
+              <Button type="button" variant="outline" onClick={onRetryTelegram} loading={isRetryingTelegram}>
+                {t("products.telegram.retry")}
+              </Button>
+            </div>
+          )}
+        </section>
       </form>
     </Modal>
   );

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImageOff, Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Layout from "../../components/Layout";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { Pagination, Select } from "../../components/ui";
@@ -12,42 +13,68 @@ import {
   getProductCountryDisplay,
   getProducts,
   isProductCountry,
+  publishProductToTelegram,
   PRODUCT_COUNTRIES,
   updateManualProduct,
   type ProductCountry,
   type ProductListItem,
   type ProductPayload,
+  type ProductSource,
   type ProductUpdatePayload,
 } from "../../lib/commerceApi";
 import { deleteUnattachedMediaApi, uploadProductPhotoApi } from "../../lib/mediaApi";
 import { getSiteSettingsApi } from "../../lib/siteSettingsApi";
 import { ProductFormModal, type ProductFormSubmission } from "./ProductFormModal";
-import { TelegramPublicationPanel } from "./TelegramPublicationPanel";
 
 const ALL_COUNTRIES = "ALL" as const;
 
 export default function ProductsPage() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { identifier } = useParams<{ identifier: string }>();
+  const isEditorRoute = location.pathname === "/products/new" || Boolean(identifier);
+  const isNewProductRoute = location.pathname === "/products/new";
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [country, setCountry] = useState<ProductCountry | typeof ALL_COUNTRIES>(ALL_COUNTRIES);
+  const [searchDraft, setSearchDraft] = useState("");
+  const [search, setSearch] = useState("");
+  const [categorySlug, setCategorySlug] = useState(() => searchParams.get("category") ?? "");
+  const [status, setStatus] = useState<ProductListItem["status"] | "ALL">("ALL");
+  const [source, setSource] = useState<ProductSource | "ALL">("ALL");
+  const [sort, setSort] = useState<"newest" | "price_asc" | "price_desc">("newest");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(15);
   const [editingProduct, setEditingProduct] = useState<ProductListItem | null>(null);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [telegramPublishError, setTelegramPublishError] = useState<string | null>(null);
+  const [telegramRetryProductId, setTelegramRetryProductId] = useState<string | null>(null);
+  const [isRetryingTelegram, setIsRetryingTelegram] = useState(false);
   const qc = useQueryClient();
 
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["commerce-products", country, page, limit],
+    queryKey: ["commerce-products", country, categorySlug, status, source, sort, search, page, limit],
     queryFn: () => getProducts({
       country: country === ALL_COUNTRIES ? undefined : country,
+      category: categorySlug || undefined,
+      status: status === "ALL" ? undefined : status,
+      source: source === "ALL" ? undefined : source,
+      sort,
+      q: search || undefined,
       page,
       limit,
     }),
   });
+  const editorProductQuery = useQuery({
+    queryKey: ["commerce-product-editor", identifier],
+    queryFn: () => getProducts({ q: identifier, limit: 5 }),
+    enabled: Boolean(identifier),
+    retry: false,
+  });
   const categoriesQuery = useQuery({
     queryKey: ["commerce-product-categories"],
     queryFn: getProductCategories,
-    enabled: isFormOpen,
   });
   const settingsQuery = useQuery({
     queryKey: ["admin", "site-settings"],
@@ -63,6 +90,8 @@ export default function ProductsPage() {
         for (const image of values.images) {
           if ("id" in image) {
             images.push({ id: image.id });
+          } else if ("mediaId" in image) {
+            images.push({ mediaId: image.mediaId });
           } else {
             const uploaded = await uploadProductPhotoApi(image.file);
             if (uploaded.isNewUpload) uploadedIds.push(uploaded.id);
@@ -85,6 +114,7 @@ export default function ProductsPage() {
         if (productId) {
           const payload: ProductUpdatePayload = {
             ...sharedFields,
+            publish: values.publish,
             ...(isProductCountry(values.country) ? { country: values.country } : {}),
             categoryId: values.categoryId ?? null,
             ...(editingProduct?.source === "MANUAL"
@@ -115,11 +145,21 @@ export default function ProductsPage() {
         throw error;
       }
     },
-    onSuccess: (_result, variables) => {
+    onSuccess: async (result, variables) => {
       setSubmissionError(null);
       toast.success(t(variables.productId ? "products.productUpdated" : "products.done"));
-      closeForm();
       void qc.invalidateQueries({ queryKey: ["commerce-products"] });
+      if (variables.values.publishTelegram) {
+        if (!result?.id) {
+          setTelegramPublishError(t("products.telegram.savedButFailed"));
+          return;
+        }
+        setEditingProduct(result);
+        setTelegramRetryProductId(result.id);
+        await retryTelegramPublication(result.id);
+      } else {
+        closeForm();
+      }
     },
     onError: (error: unknown) => {
       const responseError = error as {
@@ -142,9 +182,44 @@ export default function ProductsPage() {
 
   const closeForm = () => {
     setSubmissionError(null);
+    setTelegramPublishError(null);
+    setTelegramRetryProductId(null);
     setIsFormOpen(false);
     setEditingProduct(null);
+    if (isEditorRoute) navigate("/products");
   };
+
+  const retryTelegramPublication = async (productId: string) => {
+    setIsRetryingTelegram(true);
+    try {
+      await publishProductToTelegram(productId);
+      setTelegramPublishError(null);
+      setTelegramRetryProductId(null);
+      toast.success(t("products.telegram.published"));
+      closeForm();
+    } catch {
+      setTelegramPublishError(t("products.telegram.failedAfterSave"));
+      toast.error(t("products.telegram.publishError"));
+    } finally {
+      setIsRetryingTelegram(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isNewProductRoute) {
+      setEditingProduct(null);
+      setIsFormOpen(true);
+      return;
+    }
+    if (!identifier || editorProductQuery.isLoading) return;
+    const match = editorProductQuery.data?.items.find((product) =>
+      product.slug === identifier || product.id === identifier,
+    );
+    if (match) {
+      setEditingProduct(match);
+      setIsFormOpen(true);
+    }
+  }, [editorProductQuery.data, editorProductQuery.isLoading, identifier, isNewProductRoute]);
 
   const handleFormSubmit = (values: ProductFormSubmission) => {
     setSubmissionError(null);
@@ -160,6 +235,32 @@ export default function ProductsPage() {
       icon: <CountryFlag country={code} />,
     })),
   ];
+  const categoryOptions = [
+    { value: "", label: t("categories.all") },
+    ...(categoriesQuery.data ?? []).filter((category) => category.active !== false).map((category) => ({
+      value: category.slug,
+      label: typeof category.name === "string" ? category.name : category.name.ru || category.name.en || category.slug,
+    })),
+  ];
+  const statusOptions = [
+    { value: "ALL", label: t("products.allStatuses") },
+    { value: "PUBLISHED", label: t("products.status.published") },
+    { value: "DRAFT", label: t("products.status.draft") },
+    { value: "ARCHIVED", label: t("products.status.archived") },
+  ];
+  const sortOptions = [
+    { value: "newest", label: t("products.sortNewest") },
+    { value: "price_asc", label: t("products.sortPriceAsc") },
+    { value: "price_desc", label: t("products.sortPriceDesc") },
+  ];
+  const sourceOptions = [
+    { value: "ALL", label: t("products.allSources") },
+    ...(["SOURCE_1688", "TAOBAO", "ALIBABA", "ALIEXPRESS", "MANUAL"] as const).map((value) => ({
+      value,
+      label: t(`products.source.${value}`),
+    })),
+  ];
+  const pageSizeOptions = [15, 30, 48].map((size) => ({ value: String(size), label: String(size) }));
   const getCountryLabel = (productCountry: string) => {
     const knownCountry = PRODUCT_COUNTRIES.find(({ code }) => code === productCountry);
     if (knownCountry) {
@@ -171,6 +272,7 @@ export default function ProductsPage() {
 
   return (
     <Layout title={t("products.page")}>
+      {!isEditorRoute && <>
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-bold tracking-widest text-primary-500">{t("products.sectionLabel")}</p>
@@ -178,10 +280,7 @@ export default function ProductsPage() {
         </div>
         <button
           type="button"
-          onClick={() => {
-            setEditingProduct(null);
-            setIsFormOpen(true);
-          }}
+          onClick={() => navigate("/products/new")}
           className="btn-primary shrink-0"
         >
           <Plus size={18} />
@@ -189,10 +288,23 @@ export default function ProductsPage() {
         </button>
       </div>
 
-      <div className="mt-4 w-full max-w-sm">
+      <div className="mt-5 grid gap-3 rounded-2xl border border-app bg-surface p-4 sm:grid-cols-2 xl:grid-cols-5 2xl:grid-cols-8">
+        <form
+          className="flex min-w-0 items-end gap-2 xl:col-span-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setSearch(searchDraft.trim());
+            setPage(1);
+          }}
+        >
+          <label className="min-w-0 flex-1 text-xs font-semibold text-muted">
+            {t("products.searchProducts")}
+            <input className="input mt-1.5 w-full" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} />
+          </label>
+          <button type="submit" className="btn-primary h-10">{t("common.search")}</button>
+        </form>
         <Select
           label={t("products.countryFilterLabel")}
-          placeholder={t("products.countryPlaceholder")}
           value={country}
           options={countryOptions}
           onChange={(value) => {
@@ -200,8 +312,52 @@ export default function ProductsPage() {
             setPage(1);
           }}
         />
+        <Select
+          label={t("products.categoryFilter")}
+          value={categorySlug}
+          options={categoryOptions}
+          onChange={(value) => { setCategorySlug(value); setPage(1); }}
+        />
+        <Select
+          label={t("products.statusFilter")}
+          value={status}
+          options={statusOptions}
+          onChange={(value) => {
+            setStatus(value === "PUBLISHED" || value === "DRAFT" || value === "ARCHIVED" ? value : "ALL");
+            setPage(1);
+          }}
+        />
+        <Select
+          label={t("products.sortLabel")}
+          value={sort}
+          options={sortOptions}
+          onChange={(value) => {
+            setSort(value === "price_asc" || value === "price_desc" ? value : "newest");
+            setPage(1);
+          }}
+        />
+        <Select
+          label={t("products.sourceFilter")}
+          value={source}
+          options={sourceOptions}
+          onChange={(value) => {
+            setSource(value === "SOURCE_1688" || value === "TAOBAO" || value === "ALIBABA" || value === "ALIEXPRESS" || value === "MANUAL" ? value : "ALL");
+            setPage(1);
+          }}
+        />
+        <Select
+          label={t("products.pageSize")}
+          value={String(limit)}
+          options={pageSizeOptions}
+          onChange={(value) => {
+            const nextLimit = Number(value);
+            setLimit(nextLimit === 15 || nextLimit === 30 || nextLimit === 48 ? nextLimit : 15);
+            setPage(1);
+          }}
+        />
       </div>
 
+      <div className="mt-4">
       {isLoading ? (
         <div className="card">{t("products.loading")}</div>
       ) : isError && !data ? (
@@ -240,30 +396,29 @@ export default function ProductsPage() {
                 <div className="p-4">
                   <h2 className="font-bold">{title}</h2>
                   <p className="mt-1 text-sm text-muted">{getCountryLabel(product.country)}</p>
+                  <p className="mt-1 text-xs text-muted">{product.category
+                    ? (typeof product.category.name === "string" ? product.category.name : product.category.name.ru || product.category.name.en || product.category.slug)
+                    : t("products.uncategorized")}</p>
                   <div className="mt-3 flex items-center justify-between gap-2">
                     <strong>{Number(product.salePriceUzs).toLocaleString()} UZS</strong>
                     <span className={product.status === "PUBLISHED" ? "badge-success" : product.status === "DRAFT" ? "badge-warning" : "badge-neutral"}>
                       {t(`products.status.${product.status.toLowerCase()}`)}
                     </span>
                   </div>
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted">
+                    <span>{t("products.providerLabel")}: {t(`products.source.${product.source}`, { defaultValue: product.source })}</span>
+                    <span>{product.variants?.some((variant) => variant.available !== false && (variant.stock === undefined || variant.stock > 0))
+                      ? t("products.inStock")
+                      : t("products.outOfStock")}</span>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => {
-                      setEditingProduct(product);
-                      setIsFormOpen(true);
-                    }}
+                    onClick={() => navigate(`/products/edit/${encodeURIComponent(product.slug)}`)}
                     className="btn-ghost mt-3 inline-flex items-center gap-2 text-sm"
                   >
                     <Pencil size={14} />
                     {t("products.editProduct")}
                   </button>
-                  {product.status === "PUBLISHED" ? (
-                    <TelegramPublicationPanel productId={product.id} locale={i18n.language} />
-                  ) : (
-                    <p className="mt-4 rounded-xl border border-stone-200 p-3 text-xs text-muted dark:border-white/10">
-                      {t("products.telegram.notEligible")}
-                    </p>
-                  )}
                 </div>
               </article>
             );
@@ -287,10 +442,23 @@ export default function ProductsPage() {
           }}
         />
       )}
+      </div>
+      </>}
 
+      {isEditorRoute && identifier && editorProductQuery.isLoading ? (
+        <div className="card" role="status">
+          {t("products.loading")}
+        </div>
+      ) : null}
+      {isEditorRoute && identifier && editorProductQuery.isError ? (
+        <div className="card flex flex-wrap items-center justify-between gap-3" role="alert">
+          <div className="card">{t("products.loadError")} <button type="button" onClick={() => navigate("/products")} className="btn-ghost">{t("common.back")}</button></div>
+        </div>
+      ) : null}
       {isFormOpen && (
         <ProductFormModal
           isOpen={isFormOpen}
+          presentation={isEditorRoute ? "page" : "dialog"}
           product={editingProduct}
           categories={categoriesQuery.data ?? []}
           categoriesError={categoriesQuery.isError}
@@ -299,6 +467,11 @@ export default function ProductsPage() {
           settingsLoading={settingsQuery.isLoading}
           isSaving={mutation.isPending}
           submissionError={submissionError}
+          telegramPublishError={telegramPublishError}
+          isRetryingTelegram={isRetryingTelegram}
+          onRetryTelegram={() => {
+            if (telegramRetryProductId) void retryTelegramPublication(telegramRetryProductId);
+          }}
           onClose={closeForm}
           onSubmit={handleFormSubmit}
         />

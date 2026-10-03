@@ -51,3 +51,8 @@ export async function getCommercePromoUsages(id: string) {
   const { data } = await api.get<CommercePromoUsage[]>(`${root}/${encodeURIComponent(id)}/usages`);
   return data;
 }
+
+export async function deleteCommercePromo(id: string): Promise<{ deleted: boolean; archived: boolean }> {
+  const { data } = await api.delete<{ deleted: boolean; archived: boolean }>(`${root}/${encodeURIComponent(id)}`);
+  return data;
+}

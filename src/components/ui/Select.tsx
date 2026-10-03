@@ -23,6 +23,7 @@ export interface SelectProps {
   searchable?: boolean;
   disabled?: boolean;
   clearable?: boolean;
+  name?: string;
   className?: string;
   containerClassName?: string;
 }
@@ -46,6 +47,7 @@ export const Select: React.FC<SelectProps> = ({
   searchable = false,
   disabled = false,
   clearable = false,
+  name,
   className,
   containerClassName,
 }) => {
@@ -185,6 +187,7 @@ export const Select: React.FC<SelectProps> = ({
           {label}
         </label>
       )}
+      {name && <input type="hidden" name={name} value={value ?? ''} disabled={disabled} />}
 
       {/* Trigger button */}
       <button

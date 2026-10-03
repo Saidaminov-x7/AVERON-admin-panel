@@ -36,6 +36,8 @@ export default function App() {
   return <BrowserRouter><Suspense fallback={<div className="p-6" role="status" aria-label="Loading page" />}><Routes>
     <Route path="/login" element={<LoginPage/>}/>
     <Route path="/" element={<Guard><CommerceDashboardPage/></Guard>}/>
+    <Route path="/products/new" element={<Guard><ProductsPage/></Guard>}/>
+    <Route path="/products/edit/:identifier" element={<Guard><ProductsPage/></Guard>}/>
     <Route path="/products" element={<Guard><ProductsPage/></Guard>}/>
     <Route path="/categories" element={<Guard><CategoriesPage/></Guard>}/>
     <Route path="/imports" element={<Guard><ImportsPage/></Guard>}/>

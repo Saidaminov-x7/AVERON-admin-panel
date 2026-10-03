@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, RotateCcw, Archive } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import { Button, Input, Modal, Select } from "../../components/ui";
 import {
@@ -15,14 +16,12 @@ import {
 } from "../../lib/commerceApi";
 
 type CategoryValues = {
-  slug: string;
   names: Record<ProductLocale, string>;
   parentId: string;
   sortOrder: string;
 };
 
 const emptyValues: CategoryValues = {
-  slug: "",
   names: { ru: "", uz: "", en: "" },
   parentId: "",
   sortOrder: "0",
@@ -35,6 +34,7 @@ const localizedName = (category: ProductCategory, locale: string) => {
 
 export default function CategoriesPage() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<ProductCategory | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -51,7 +51,6 @@ export default function CategoriesPage() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       const payload = {
-        slug: values.slug.trim(),
         name: {
           ru: values.names.ru.trim(),
           uz: values.names.uz.trim(),
@@ -94,7 +93,6 @@ export default function CategoriesPage() {
     const name = typeof category.name === "string" ? { ru: category.name, uz: category.name, en: category.name } : category.name;
     setEditing(category);
     setValues({
-      slug: category.slug,
       names: {
         ru: name.ru ?? "",
         uz: name.uz ?? "",
@@ -158,6 +156,9 @@ export default function CategoriesPage() {
                   {t("categories.productsCount")}: {category._count?.products ?? 0}
                 </span>
                 <div className="flex gap-2">
+                  <button type="button" onClick={() => navigate(`/products?category=${encodeURIComponent(category.slug)}`)} className="btn-ghost text-xs">
+                    {t("categories.viewProducts")}
+                  </button>
                   <button type="button" onClick={() => openEdit(category)} className="btn-ghost" aria-label={t("categories.edit")}><Pencil size={16} /></button>
                   {category.active === false ? (
                     <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: true })} className="btn-ghost" aria-label={t("categories.restore")}><RotateCcw size={16} /></button>
@@ -195,7 +196,6 @@ export default function CategoriesPage() {
             saveMutation.mutate();
           }}
         >
-          <Input label={t("categories.slug")} value={values.slug} onChange={(event) => setValues((current) => ({ ...current, slug: event.target.value.toLowerCase() }))} pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required />
           <Input label={t("categories.nameRu")} value={values.names.ru} onChange={(event) => updateName("ru", event.target.value)} required />
           <Input label={t("categories.nameUz")} value={values.names.uz} onChange={(event) => updateName("uz", event.target.value)} required />
           <Input label={t("categories.nameEn")} value={values.names.en} onChange={(event) => updateName("en", event.target.value)} required />

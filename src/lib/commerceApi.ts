@@ -15,6 +15,7 @@ export const PRODUCT_COUNTRIES = [
 
 export type ProductCountry = typeof PRODUCT_COUNTRIES[number]['code'];
 export type ProductLocale = 'ru' | 'uz' | 'en';
+export type ProductSource = 'SOURCE_1688' | 'TAOBAO' | 'ALIBABA' | 'ALIEXPRESS' | 'MANUAL';
 
 export const isProductCountry = (value: unknown): value is ProductCountry =>
   PRODUCT_COUNTRIES.some(({ code }) => code === value);
@@ -58,7 +59,7 @@ export interface DashboardData {
 export interface ImportedProduct {
   id: string;
   originalTitle: string;
-  source: string;
+  source: ProductSource;
   sourceUrl: string;
   sourcePriceCny: string | null;
   suggestedPriceUzs?: string;
@@ -103,12 +104,19 @@ export interface ProductListItem {
   slug: string;
   country: string;
   source: string;
+  sourceProductId?: string;
   sourceUrl?: string | null;
+  importedFrom?: {
+    originalTitle: string;
+    status: string;
+    source: string;
+  } | null;
   categoryId?: string | null;
+  category?: ProductCategory | null;
   translations?: Partial<Record<ProductLocale, { title?: string } | string>>;
   description?: Partial<Record<ProductLocale, string>> | null;
   images?: Array<{ id: string; mediaId?: string | null; url: string; sortOrder: number }>;
-  variants?: Array<{ id: string; color?: string | null; size?: string | null }>;
+  variants?: Array<{ id: string; color?: string | null; size?: string | null; stock?: number; available?: boolean }>;
   salePriceUzs: string | number;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 }
@@ -152,6 +160,7 @@ export interface ProductUpdatePayload {
   salePriceUzs: number;
   country?: ProductCountry;
   categoryId?: string | null;
+  publish?: boolean;
   color?: string;
   size?: string;
 }
@@ -165,7 +174,7 @@ export const getProductCategories = () =>
   api.get<ProductCategory[]>('/api/v1/admin/categories').then((r) => r.data);
 
 export const createProductCategory = (payload: {
-  slug: string;
+  slug?: string;
   name: Record<ProductLocale, string>;
   parentId?: string | null;
   sortOrder?: number;
@@ -219,21 +228,35 @@ export const getProducts = (params?: {
   limit?: number;
   q?: string;
   country?: ProductCountry;
+  category?: string;
+  status?: ProductListItem['status'];
+  source?: ProductSource;
+  sort?: 'newest' | 'price_asc' | 'price_desc';
 }) =>
   api.get<ProductListResponse>('/api/v1/admin/products', {
     params: {
       limit: params?.limit ?? 15,
       page: params?.page ?? 1,
       q: params?.q,
+      category: params?.category || undefined,
+      status: params?.status,
+      source: params?.source,
+      sort: params?.sort,
       ...(isProductCountry(params?.country) ? { country: params.country } : {}),
     },
   }).then((r) => r.data);
 
 export const createManualProduct = (payload: ProductPayload) =>
-  api.post('/api/v1/admin/products', payload).then((r) => r.data);
+  api.post<ProductListItem>('/api/v1/admin/products', payload).then((r) => r.data);
 
 export const updateManualProduct = (id: string, payload: ProductUpdatePayload) =>
   api.put<ProductListItem>(`/api/v1/admin/products/${id}`, payload).then((r) => r.data);
+
+export const publishProductToTelegram = (id: string) =>
+  api.post<{ status: string; telegramMessageId: string; publishedAt: string }>(
+    `/api/v1/admin/products/${encodeURIComponent(id)}/telegram-publish`,
+    {},
+  ).then((response) => response.data);
 
 export const updateProductCountry = (id: string, country: ProductCountry) =>
   api.put<ProductListItem>(`/api/v1/admin/products/${id}`, { country }).then((r) => r.data);

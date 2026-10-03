@@ -169,6 +169,7 @@ export default function ImportsPage() {
         Object.entries(snapshot?.sourceAttributes ?? {}).map(([key, value]) => [key, Array.isArray(value) ? value.join(', ') : value]),
       );
       return getProductAiSuggestionsApi(capabilities.data, {
+        mediaIds: uploadedImages.map(({ id }) => id),
         sourceTitle: approveItem.originalTitle,
         ...(snapshot?.sourceDescription ? { sourceDescription: snapshot.sourceDescription.slice(0, 5000) } : {}),
         country,
@@ -442,7 +443,7 @@ export default function ImportsPage() {
           {capabilities.data?.aiProductFill && <div className="space-y-3 rounded-xl border border-app p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div><h3 className="font-semibold text-app">{t('imports.localizedContent', 'Локализованный контент')}</h3><p className="text-xs text-muted">{t('imports.reviewBeforeApply', 'Проверьте каждое поле. AI не меняет исходные факты и ничего не сохраняет автоматически.')}</p></div>
-              <Button variant="outline" size="sm" loading={aiMutation.isPending} leftIcon={<Sparkles size={15} />} disabled={!isProductCountry(country)} onClick={() => aiMutation.mutate()}>
+              <Button variant="outline" size="sm" loading={aiMutation.isPending} leftIcon={<Sparkles size={15} />} disabled={!isProductCountry(country) || uploadedImages.length === 0} onClick={() => aiMutation.mutate()}>
                 {t('imports.aiFill', 'Предложить AI-текст')}
               </Button>
             </div>

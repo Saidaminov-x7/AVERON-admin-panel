@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
-import { Button, Modal } from '../../components/ui';
+import { Button, Modal, Select } from '../../components/ui';
 import { getWebhooksApi, createWebhookApi, deleteWebhookApi } from '../../lib/extendedAdminApi';
 import { Webhook, Plus, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -207,15 +207,15 @@ const WebhooksPage: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-semibold text-muted mb-1">{t('system.events', 'События для отправки')}</label>
-                  <select
+                  <Select
                     value={event}
-                    onChange={(e) => setEvent(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-app bg-app text-app text-sm outline-none focus:border-primary-500 cursor-pointer"
-                  >
-                    <option value="ALL">Все события платформы (ALL)</option>
-                    <option value="FRAUD_DETECTED">Обнаружен подозрительный скам</option>
-                    <option value="USER_REGISTERED">Регистрация нового пользователя</option>
-                  </select>
+                    onChange={setEvent}
+                    options={[
+                      { value: 'ALL', label: 'Все события платформы (ALL)' },
+                      { value: 'FRAUD_DETECTED', label: 'Обнаружен подозрительный скам' },
+                      { value: 'USER_REGISTERED', label: 'Регистрация нового пользователя' },
+                    ]}
+                  />
                 </div>
 
               </form>

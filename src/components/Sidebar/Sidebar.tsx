@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   AlertCircle,
@@ -78,6 +79,24 @@ export default function Sidebar({
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const siteUrl = import.meta.env.VITE_SITE_URL || "https://averon.uz";
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    try {
+      nav.scrollTop = Number(sessionStorage.getItem("averon-admin-sidebar-scroll") || 0);
+    } catch {
+      // Keep the sidebar usable when storage is unavailable.
+    }
+    return () => {
+      try {
+        sessionStorage.setItem("averon-admin-sidebar-scroll", String(nav.scrollTop));
+      } catch {
+        // Scrolling still works when storage is unavailable.
+      }
+    };
+  }, []);
 
   const logout = async () => {
     try {
@@ -110,7 +129,7 @@ export default function Sidebar({
           </button>
         )}
       </div>
-      <nav className="flex-1 space-y-6 overflow-y-auto px-4 py-6">
+      <nav ref={navRef} className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-4 py-6">
         {sections.map((s) => (
           <div key={s.sectionKey}>
             <p className="mb-2 px-3 text-[10px] font-bold tracking-[.16em] text-muted">

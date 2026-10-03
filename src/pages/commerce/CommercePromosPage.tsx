@@ -1,38 +1,80 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, Plus, Save } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, Save, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import { Button } from '../../components/ui';
-import { createCommercePromo, getCommercePromoUsages, getCommercePromos, updateCommercePromo } from '../../lib/commercePromoApi';
+import { createCommercePromo, deleteCommercePromo, getCommercePromoUsages, getCommercePromos, updateCommercePromo } from '../../lib/commercePromoApi';
 
-const copy = {
-  ru: { title: 'Промокоды магазина', intro: 'Скидка не может превышать 15%. Использование учитывается только после успешного оформления заказа.', create: 'Создать промокод', code: 'Код', percent: 'Скидка (%)', cap: 'Лимит активаций', start: 'Начало действия', expiry: 'Окончание действия', unlimited: 'Без лимита', status: 'Статус', active: 'Активен', inactive: 'Неактивен', used: 'Использовано', remaining: 'Осталось', save: 'Сохранить', history: 'История', customer: 'Покупатель', order: 'Заказ', date: 'Дата', subtotal: 'Сумма', discount: 'Скидка', final: 'Итого', loading: 'Загрузка…', error: 'Операция не выполнена. Проверьте данные и права доступа.', empty: 'Промокодов пока нет', invalid: 'Укажите корректный код, скидку до 15% и лимит.' },
-  uz: { title: 'Do‘kon promokodlari', intro: 'Chegirma 15% dan oshmaydi. Foydalanish faqat buyurtma muvaffaqiyatli rasmiylashtirilganda hisoblanadi.', create: 'Promokod yaratish', code: 'Kod', percent: 'Chegirma (%)', cap: 'Faollashtirish limiti', start: 'Boshlanish vaqti', expiry: 'Tugash vaqti', unlimited: 'Cheklovsiz', status: 'Holati', active: 'Faol', inactive: 'Faol emas', used: 'Ishlatildi', remaining: 'Qoldi', save: 'Saqlash', history: 'Tarix', customer: 'Xaridor', order: 'Buyurtma', date: 'Sana', subtotal: 'Summa', discount: 'Chegirma', final: 'Jami', loading: 'Yuklanmoqda…', error: 'Amal bajarilmadi. Ma’lumot va ruxsatlarni tekshiring.', empty: 'Hozircha promokodlar yo‘q', invalid: 'To‘g‘ri kod, 15% gacha chegirma va limit kiriting.' },
-  en: { title: 'Store promo codes', intro: 'Discounts are capped at 15%. Usage is consumed only when an order succeeds.', create: 'Create promo code', code: 'Code', percent: 'Discount (%)', cap: 'Activation limit', start: 'Starts at', expiry: 'Expires at', unlimited: 'Unlimited', status: 'Status', active: 'Active', inactive: 'Inactive', used: 'Used', remaining: 'Remaining', save: 'Save', history: 'History', customer: 'Customer', order: 'Order', date: 'Date', subtotal: 'Subtotal', discount: 'Discount', final: 'Final total', loading: 'Loading…', error: 'Action failed. Check the values and your access.', empty: 'No promo codes yet', invalid: 'Enter a valid code, discount up to 15%, and limit.' },
-} as const;
-type PromoCopy = (typeof copy)[keyof typeof copy];
+type PromoCopy = {
+  title: string; intro: string; create: string; code: string; percent: string; cap: string;
+  start: string; expiry: string; unlimited: string; status: string; active: string; inactive: string;
+  used: string; remaining: string; save: string; history: string; customer: string; order: string;
+  date: string; subtotal: string; discount: string; final: string; loading: string; error: string;
+  empty: string; invalid: string; remove: string; confirmRemove: string; archived: string; deleted: string;
+};
 
 const asIso = (value: string) => value ? new Date(value).toISOString() : null;
 const money = (value: string, locale: string) => `${Number(value).toLocaleString(locale)} ${locale === 'en' ? 'UZS' : locale === 'uz' ? 'so‘m' : 'сум'}`;
 
 export default function CommercePromosPage() {
   const queryClient = useQueryClient();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const locale = i18n.language.startsWith('en') ? 'en' : i18n.language.startsWith('uz') ? 'uz' : 'ru';
-  const text = copy[locale];
+  const text: PromoCopy = {
+    title: t('commercePromosPage.title'),
+    intro: t('commercePromosPage.intro'),
+    create: t('commercePromosPage.create'),
+    code: t('commercePromosPage.code'),
+    percent: t('commercePromosPage.percent'),
+    cap: t('commercePromosPage.cap'),
+    start: t('commercePromosPage.start'),
+    expiry: t('commercePromosPage.expiry'),
+    unlimited: t('commercePromosPage.unlimited'),
+    status: t('commercePromosPage.status'),
+    active: t('commercePromosPage.active'),
+    inactive: t('commercePromosPage.inactive'),
+    used: t('commercePromosPage.used'),
+    remaining: t('commercePromosPage.remaining'),
+    save: t('commercePromosPage.save'),
+    history: t('commercePromosPage.history'),
+    customer: t('commercePromosPage.customer'),
+    order: t('commercePromosPage.order'),
+    date: t('commercePromosPage.date'),
+    subtotal: t('commercePromosPage.subtotal'),
+    discount: t('commercePromosPage.discount'),
+    final: t('commercePromosPage.final'),
+    loading: t('commercePromosPage.loading'),
+    error: t('commercePromosPage.error'),
+    empty: t('commercePromosPage.empty'),
+    invalid: t('commercePromosPage.invalid'),
+    remove: t('commercePromosPage.remove'),
+    confirmRemove: t('commercePromosPage.confirmRemove'),
+    archived: t('commercePromosPage.archived'),
+    deleted: t('commercePromosPage.deleted'),
+  };
   const [code, setCode] = useState('');
   const [percent, setPercent] = useState(1);
   const [cap, setCap] = useState('');
   const [startsAt, setStartsAt] = useState('');
   const [expiresAt, setExpiresAt] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
   const [error, setError] = useState('');
   const promos = useQuery({ queryKey: ['admin', 'commerce-promos'], queryFn: getCommercePromos });
   const changed = () => queryClient.invalidateQueries({ queryKey: ['admin', 'commerce-promos'] });
   const create = useMutation({
     mutationFn: createCommercePromo,
-    onSuccess: () => { void changed(); setCode(''); setPercent(1); setCap(''); setStartsAt(''); setExpiresAt(''); setError(''); },
+    onSuccess: () => { void changed(); setCode(''); setPercent(1); setCap(''); setStartsAt(''); setExpiresAt(''); setError(''); setCreateOpen(false); },
+    onError: () => setError(text.error),
+  });
+  const remove = useMutation({
+    mutationFn: deleteCommercePromo,
+    onSuccess: async (result) => {
+      await changed();
+      setError('');
+      window.alert(result.archived ? text.archived : text.deleted);
+    },
     onError: () => setError(text.error),
   });
   const update = useMutation({
@@ -57,16 +99,19 @@ export default function CommercePromosPage() {
   return (
     <Layout title={text.title}>
       <main className="mx-auto max-w-7xl space-y-6 pb-12">
-        <p className="text-sm text-muted">{text.intro}</p>
-        <form onSubmit={submit} className="card grid gap-4 p-5 sm:grid-cols-2 xl:grid-cols-5">
+        <header className="flex flex-wrap items-start justify-between gap-4">
+          <p className="max-w-3xl text-sm text-muted">{text.intro}</p>
+          <Button type="button" onClick={() => setCreateOpen((open) => !open)}><Plus size={16} />{text.create}</Button>
+        </header>
+        {createOpen && <form onSubmit={submit} className="card grid gap-4 p-5 sm:grid-cols-2 xl:grid-cols-3">
           <label className="text-sm font-semibold">{text.code}<input required minLength={3} maxLength={40} value={code} onChange={(event) => setCode(event.target.value.toUpperCase())} className="mt-1 w-full rounded-lg border border-app bg-app px-3 py-2 font-mono uppercase" /></label>
           <label className="text-sm font-semibold">{text.percent}<input required type="number" min={1} max={15} value={percent} onChange={(event) => setPercent(Number(event.target.value))} className="mt-1 w-full rounded-lg border border-app bg-app px-3 py-2" /></label>
           <label className="text-sm font-semibold">{text.cap}<input type="number" min={1} value={cap} onChange={(event) => setCap(event.target.value)} placeholder={text.unlimited} className="mt-1 w-full rounded-lg border border-app bg-app px-3 py-2" /></label>
           <label className="text-sm font-semibold">{text.start}<input type="datetime-local" value={startsAt} onChange={(event) => setStartsAt(event.target.value)} className="mt-1 w-full rounded-lg border border-app bg-app px-3 py-2" /></label>
           <label className="text-sm font-semibold">{text.expiry}<input type="datetime-local" value={expiresAt} onChange={(event) => setExpiresAt(event.target.value)} className="mt-1 w-full rounded-lg border border-app bg-app px-3 py-2" /></label>
-          <Button type="submit" loading={create.isPending} className="sm:col-span-2 xl:col-span-5"><Plus size={16} />{text.create}</Button>
-          {error && <p role="alert" className="text-sm text-rose-600 sm:col-span-2 xl:col-span-5">{error}</p>}
-        </form>
+          <Button type="submit" loading={create.isPending} className="self-end"><Plus size={16} />{text.create}</Button>
+          {error && <p role="alert" className="text-sm text-rose-600 sm:col-span-2 xl:col-span-3">{error}</p>}
+        </form>}
 
         <section className="card overflow-x-auto p-0" aria-label={text.title}>
           {promos.isPending ? <p role="status" className="p-6">{text.loading}</p> : promos.isError ? <p role="alert" className="p-6 text-rose-600">{text.error}</p> : !promos.data?.length ? <p className="p-6 text-muted">{text.empty}</p> : (
@@ -75,7 +120,9 @@ export default function CommercePromosPage() {
                 <th className="p-3">{text.code}</th><th className="p-3">{text.percent}</th><th className="p-3">{text.used}</th><th className="p-3">{text.remaining}</th><th className="p-3">{text.start} / {text.expiry}</th><th className="p-3">{text.status}</th><th className="p-3">{text.history}</th>
               </tr></thead>
               <tbody className="divide-y divide-app">
-                {promos.data.map((promo) => <PromoRow key={promo.id} promo={promo} text={text} locale={locale} expanded={expanded === promo.id} onExpand={() => setExpanded(expanded === promo.id ? null : promo.id)} onUpdate={(patch) => update.mutate({ id: promo.id, patch })} updating={update.isPending} />)}
+                {promos.data.map((promo) => <PromoRow key={promo.id} promo={promo} text={text} locale={locale} expanded={expanded === promo.id} onExpand={() => setExpanded(expanded === promo.id ? null : promo.id)} onUpdate={(patch) => update.mutate({ id: promo.id, patch })} onRemove={() => {
+                  if (window.confirm(text.confirmRemove)) remove.mutate(promo.id);
+                }} updating={update.isPending || remove.isPending} />)}
               </tbody>
             </table>
           )}
@@ -85,13 +132,14 @@ export default function CommercePromosPage() {
   );
 }
 
-function PromoRow({ promo, text, locale, expanded, onExpand, onUpdate, updating }: {
+function PromoRow({ promo, text, locale, expanded, onExpand, onUpdate, onRemove, updating }: {
   promo: NonNullable<ReturnType<typeof getCommercePromos> extends Promise<infer T> ? T : never>[number];
   text: PromoCopy;
   locale: string;
   expanded: boolean;
   onExpand: () => void;
   onUpdate: (patch: Parameters<typeof updateCommercePromo>[1]) => void;
+  onRemove: () => void;
   updating: boolean;
 }) {
   const [discount, setDiscount] = useState(promo.discountPercent);
@@ -105,7 +153,7 @@ function PromoRow({ promo, text, locale, expanded, onExpand, onUpdate, updating 
       <td className="p-3">{promo.remainingActivations ?? text.unlimited}</td>
       <td className="p-3 text-xs">{promo.startsAt ? new Date(promo.startsAt).toLocaleString(locale) : '—'}<br />{promo.expiresAt ? new Date(promo.expiresAt).toLocaleString(locale) : '—'}</td>
       <td className="p-3"><button type="button" disabled={updating} onClick={() => onUpdate({ isActive: !promo.isActive })} className={`rounded-full px-3 py-1 text-xs font-bold ${promo.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-700'}`}>{promo.isActive ? text.active : text.inactive}</button></td>
-      <td className="p-3"><div className="flex gap-2"><button type="button" disabled={updating || discount < 1 || discount > 15 || !Number.isInteger(discount)} onClick={() => onUpdate({ discountPercent: discount, maxActivations: limit ? Number(limit) : null })} className="rounded border border-app p-2" aria-label={`${text.save}: ${promo.code}`}><Save size={15} /></button><button type="button" onClick={onExpand} className="rounded border border-app p-2" aria-expanded={expanded} aria-label={`${text.history}: ${promo.code}`}>{expanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}</button></div><input aria-label={`${text.cap}: ${promo.code}`} type="number" min={promo.usedActivations || 1} value={limit} onChange={(event) => setLimit(event.target.value)} placeholder={text.unlimited} className="mt-2 w-28 rounded border border-app bg-app px-2 py-1 text-xs" /></td>
+      <td className="p-3"><div className="flex gap-2"><button type="button" disabled={updating || discount < 1 || discount > 15 || !Number.isInteger(discount)} onClick={() => onUpdate({ discountPercent: discount, maxActivations: limit ? Number(limit) : null })} className="rounded border border-app p-2" aria-label={`${text.save}: ${promo.code}`}><Save size={15} /></button><button type="button" onClick={onExpand} className="rounded border border-app p-2" aria-expanded={expanded} aria-label={`${text.history}: ${promo.code}`}>{expanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}</button><button type="button" disabled={updating} onClick={onRemove} className="rounded border border-app p-2 text-red-600" aria-label={`${text.remove}: ${promo.code}`}><Trash2 size={15} /></button></div><input aria-label={`${text.cap}: ${promo.code}`} type="number" min={promo.usedActivations || 1} value={limit} onChange={(event) => setLimit(event.target.value)} placeholder={text.unlimited} className="mt-2 w-28 rounded border border-app bg-app px-2 py-1 text-xs" /></td>
     </tr>
     {expanded && <tr><td colSpan={7} className="bg-gray-50 p-4 dark:bg-white/5">
       {usages.isPending ? <p role="status">{text.loading}</p> : usages.isError ? <p role="alert" className="text-rose-600">{text.error}</p> : !usages.data?.length ? <p className="text-muted">{text.empty}</p> : (
