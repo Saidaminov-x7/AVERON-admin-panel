@@ -239,6 +239,11 @@ export default function ProductsPage() {
   };
 
   useEffect(() => {
+    if (!isEditorRoute) {
+      setIsFormOpen(false);
+      setEditingProduct(null);
+      return;
+    }
     if (isNewProductRoute) {
       setEditingProduct(null);
       setIsFormOpen(true);
@@ -252,7 +257,7 @@ export default function ProductsPage() {
       setEditingProduct(match);
       setIsFormOpen(true);
     }
-  }, [editorProductQuery.data, editorProductQuery.isLoading, identifier, isNewProductRoute]);
+  }, [editorProductQuery.data, editorProductQuery.isLoading, identifier, isEditorRoute, isNewProductRoute]);
 
   const handleFormSubmit = (values: ProductFormSubmission) => {
     setSubmissionError(null);
