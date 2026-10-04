@@ -109,6 +109,7 @@ export default function ProductsPage() {
           ...(values.sourceUrl ? { sourceUrl: values.sourceUrl } : {}),
           images,
           salePriceUzs: values.salePriceUzs,
+          sizeChartType: values.sizeChartType || null,
         };
 
         if (productId) {

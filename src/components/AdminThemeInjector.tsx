@@ -16,12 +16,12 @@ interface AdminThemeData {
 }
 
 const DEFAULT_ADMIN_THEME: AdminThemeData = {
-  primaryColor: '#0f766e',
-  secondaryColor: '#115e59',
+  primaryColor: '#34383c',
+  secondaryColor: '#25282b',
   backgroundColor: '#0f0f0f',
   textColor: '#f1f5f9',
-  borderRadius: '0.75rem',
-  fontFamily: 'Calibri, system-ui, sans-serif',
+  borderRadius: '0.5rem',
+  fontFamily: 'Inter, "Segoe UI", system-ui, sans-serif',
 };
 
 const getAdminThemeApi = async (): Promise<AdminThemeData> => {

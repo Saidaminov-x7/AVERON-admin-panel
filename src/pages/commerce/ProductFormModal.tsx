@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { ImageOff, MoveDown, MoveUp, RefreshCw, Sparkles, Star, Trash2, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button, Input, Modal, Select, Textarea } from "../../components/ui";
+import { Button, Input, Modal, Select } from "../../components/ui";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { LanguageFlag } from "../../components/ui/LanguageFlag";
 import { useAdminCapabilities } from "../../hooks/useAdminCapabilities";
@@ -38,6 +38,7 @@ import {
   validateProductDraft,
   type ProductValidationField,
 } from "./productFormValidation";
+import { ProductRichTextField } from "./ProductRichTextField";
 
 type LocalizedContent = { title: string; description: string };
 type PhotoDraft = {
@@ -54,6 +55,7 @@ type ProductFormValues = {
   salePriceUzs: string;
   color: string;
   size: string;
+  sizeChartType: "" | "CLOTHING" | "SHOES" | "KIDS_CLOTHING";
   publish: boolean;
   publishTelegram: boolean;
 };
@@ -72,6 +74,7 @@ export type ProductFormSubmission = {
   categoryId?: string | null;
   color: string;
   size: string;
+  sizeChartType: ProductFormValues["sizeChartType"];
   publish: boolean;
   publishTelegram: boolean;
   images: Array<{ id: string } | { mediaId: string } | { file: File }>;
@@ -124,6 +127,7 @@ const getInitialValues = (product: ProductListItem | null): ProductFormValues =>
   salePriceUzs: product ? String(product.salePriceUzs) : "",
   color: product?.source === "MANUAL" ? product.variants?.[0]?.color ?? "" : "",
   size: product?.source === "MANUAL" ? product.variants?.[0]?.size ?? "" : "",
+  sizeChartType: product?.sizeChartType ?? "",
   publish: product ? product.status === "PUBLISHED" : true,
   publishTelegram: false,
 });
@@ -501,6 +505,7 @@ export function ProductFormModal({
       categoryId: values.categoryId || null,
       color: values.color.trim(),
       size: values.size.trim(),
+      sizeChartType: values.sizeChartType,
       publish: values.publish,
       publishTelegram: values.publishTelegram,
       images: photos.map((photo) => photo.mediaId
@@ -714,21 +719,39 @@ export function ProductFormModal({
             </div>
           )}
           <div id={`${formId}-panel`} role="tabpanel" aria-labelledby={`${formId}-tab-${activeLocale}`} className="grid gap-4 md:grid-cols-2">
-            <Input
+            <ProductRichTextField
               label={t("products.titleLabel")}
               maxLength={500}
               value={values.translations[activeLocale].title}
-              onChange={(event) => updateLocalizedValue("title", event.target.value)}
+              onChange={(value) => updateLocalizedValue("title", value)}
               error={errors[localeErrorKeys[activeLocale]]}
               containerClassName="md:col-span-2"
+              copy={{
+                bold: t("products.richText.bold"),
+                italic: t("products.richText.italic"),
+                strikethrough: t("products.richText.strikethrough"),
+                bulletList: t("products.richText.bulletList"),
+                insertText: t("products.richText.insertText"),
+                preview: t("products.richText.preview"),
+                hint: t("products.richText.hint"),
+              }}
             />
-            <Textarea
+            <ProductRichTextField
               label={t("products.descLabel")}
               maxLength={5000}
               value={values.translations[activeLocale].description}
-              onChange={(event) => updateLocalizedValue("description", event.target.value)}
-              className="min-h-32 resize-y"
+              onChange={(value) => updateLocalizedValue("description", value)}
+              multiline
               containerClassName="md:col-span-2"
+              copy={{
+                bold: t("products.richText.bold"),
+                italic: t("products.richText.italic"),
+                strikethrough: t("products.richText.strikethrough"),
+                bulletList: t("products.richText.bulletList"),
+                insertText: t("products.richText.insertText"),
+                preview: t("products.richText.preview"),
+                hint: t("products.richText.hint"),
+              }}
             />
           </div>
         </section>
@@ -861,6 +884,24 @@ export function ProductFormModal({
             <div className="grid gap-4 md:grid-cols-2">
               <Input label={t("products.colorLabel")} maxLength={80} value={values.color} onChange={(event) => updateValue("color", event.target.value)} />
               <Input label={t("products.sizeLabel")} maxLength={80} value={values.size} onChange={(event) => updateValue("size", event.target.value)} />
+              <div className="md:col-span-2">
+                <Select
+                  label={t("products.sizeChartLabel")}
+                  value={values.sizeChartType}
+                  options={[
+                    { value: "", label: t("products.sizeChartNone") },
+                    { value: "CLOTHING", label: t("products.sizeChartClothing") },
+                    { value: "SHOES", label: t("products.sizeChartShoes") },
+                    { value: "KIDS_CLOTHING", label: t("products.sizeChartKids") },
+                  ]}
+                  onChange={(value) => {
+                    if (value === "" || value === "CLOTHING" || value === "SHOES" || value === "KIDS_CLOTHING") {
+                      updateValue("sizeChartType", value);
+                    }
+                  }}
+                  helperText={t("products.sizeChartHint")}
+                />
+              </div>
             </div>
           </section>
         )}

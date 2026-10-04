@@ -210,12 +210,11 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-app px-4">
+    <div className="averon-admin-shell min-h-screen flex items-center justify-center bg-app px-4">
       <div className="relative w-full max-w-sm">
         {/* Логотип */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <div className="flex size-10 items-center justify-center rounded bg-primary-500 text-lg font-black text-white" aria-hidden="true">A</div>
             <div className="flex items-center gap-1.5">
               <span className="font-bold text-app text-xl tracking-[0.18em]">AVERON</span>
               <span className="text-[10px] font-semibold bg-primary-500 text-white px-1.5 py-0.5 rounded uppercase tracking-wider">

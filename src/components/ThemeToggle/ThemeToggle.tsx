@@ -35,11 +35,9 @@ const ThemeToggle: React.FC = () => {
       aria-label={isDark ? t('header.switchToLightTheme') : t('header.switchToDarkTheme')}
       title={isDark ? t('header.lightTheme') : t('header.darkTheme')}
       className={`
-        relative w-10 h-10 rounded-lg flex items-center justify-center
-        transition-all duration-200 cursor-pointer
-        hover:bg-gray-100 dark:hover:bg-white/10
-        text-gray-500 dark:text-gray-400
-        border border-transparent hover:border-gray-200 dark:hover:border-white/10
+        relative flex h-11 w-11 items-center justify-center rounded-theme border border-app
+        bg-surface text-app transition-colors duration-150 cursor-pointer
+        hover:bg-[var(--color-surface-soft)]
       `}
     >
       {isDark ? <SunIcon /> : <MoonIcon />}

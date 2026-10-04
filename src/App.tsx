@@ -33,7 +33,7 @@ const Guard = ({ children, role }: { children: ReactNode; role?: 'SUPER_ADMIN' }
 
 export default function App() {
   useTheme(); useInitAuth();
-  return <BrowserRouter><Suspense fallback={<div className="p-6" role="status" aria-label="Loading page" />}><Routes>
+  return <BrowserRouter><Suspense fallback={<div className="averon-admin-shell flex min-h-dvh items-center justify-center bg-app text-muted" role="status" aria-label="Loading page"><span className="size-8 animate-spin rounded-full border-2 border-app border-t-primary-500" aria-hidden="true" /></div>}><Routes>
     <Route path="/login" element={<LoginPage/>}/>
     <Route path="/" element={<Guard><CommerceDashboardPage/></Guard>}/>
     <Route path="/products/new" element={<Guard><ProductsPage/></Guard>}/>

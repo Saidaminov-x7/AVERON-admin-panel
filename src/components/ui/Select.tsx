@@ -217,7 +217,7 @@ export const Select: React.FC<SelectProps> = ({
         className={twMerge(
           clsx(
             fieldControlClass,
-            'h-10 flex items-center justify-between gap-2 text-left cursor-pointer transition-[transform,border-color,box-shadow,background-color] [transition-timing-function:var(--ease-out-ui)] active:scale-[.99]',
+            'h-11 flex items-center justify-between gap-2 text-left cursor-pointer transition-[transform,border-color,box-shadow,background-color] [transition-timing-function:var(--ease-out-ui)] active:scale-[.99]',
             'focus-visible:ring-2 focus-visible:ring-primary-500/30',
             isOpen && 'border-primary-500 ring-2 ring-primary-500/20',
             error && fieldErrorClass,
@@ -257,7 +257,7 @@ export const Select: React.FC<SelectProps> = ({
           id={menuId}
           role="listbox"
           onKeyDown={handleOptionsKeyDown}
-          className="fixed z-[100] flex flex-col overflow-hidden rounded-xl border border-app bg-surface shadow-lg animate-fade-in"
+          className="averon-admin-menu fixed z-[100] flex flex-col overflow-hidden rounded-theme animate-fade-in"
           style={{
             left: menuPosition?.left ?? 0,
             top: menuPosition?.top ?? 0,
@@ -303,10 +303,10 @@ export const Select: React.FC<SelectProps> = ({
                     aria-selected={isSelected}
                     data-select-option
                     className={clsx(
-                      'min-h-11 w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500',
+                      'min-h-11 w-full flex items-center justify-between px-3 py-2 text-xs rounded-theme text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500',
                       isSelected
-                        ? 'bg-primary-500 text-white font-semibold'
-                        : 'text-app hover:bg-gray-100 dark:hover:bg-white/5',
+                        ? 'bg-[var(--color-surface-soft)] text-app font-semibold'
+                        : 'text-app hover:bg-[var(--color-surface-soft)]',
                     )}
                   >
                     <div className="flex items-center gap-2 truncate">

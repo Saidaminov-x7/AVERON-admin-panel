@@ -96,6 +96,7 @@ export default function ImportsPage() {
   const [priceInput, setPriceInput] = useState('');
   const [exchangeRateInput, setExchangeRateInput] = useState('');
   const [country, setCountry] = useState<ProductCountry | ''>('');
+  const [sizeChartType, setSizeChartType] = useState<'' | 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING'>('');
   const [publishNow, setPublishNow] = useState(false);
   const [localizedDraft, setLocalizedDraft] = useState<LocalizedDraft>({
     ru: { title: '', description: '', characteristics: {} },
@@ -136,6 +137,7 @@ export default function ImportsPage() {
       salePriceUzs: number;
       exchangeRate?: number;
       country: ProductCountry;
+      sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
       mediaIds: string[];
       publish: boolean;
     } }) => approveImport(item.id, form),
@@ -189,6 +191,7 @@ export default function ImportsPage() {
     setPriceInput(item.suggestedPriceUzs ? String(Math.round(Number(item.suggestedPriceUzs))) : '');
     setExchangeRateInput('');
     setCountry(isProductCountry(productCountry) ? productCountry : '');
+    setSizeChartType('');
     setPublishNow(false);
     setUploadedImages([]);
     setAiSuggestions(null);
@@ -419,6 +422,7 @@ export default function ImportsPage() {
                   salePriceUzs: Number(priceInput),
                   ...(Number(exchangeRateInput) > 0 ? { exchangeRate: Number(exchangeRateInput) } : {}),
                   country,
+                  sizeChartType: sizeChartType || null,
                   mediaIds: uploadedImages.map(({ id }) => id),
                   publish: publishNow,
                 },
@@ -438,6 +442,22 @@ export default function ImportsPage() {
             <Input label={t('imports.salePriceLabel', 'Цена продажи (UZS)')} type="number" min={1} value={priceInput} onChange={(event) => setPriceInput(event.target.value)} />
             <Input label={t('imports.exchangeRate', 'Курс CNY → UZS (необязательно)')} type="number" min={0} step="any" value={exchangeRateInput} onChange={(event) => setExchangeRateInput(event.target.value)} />
             <Select label={t('products.countryLabel')} value={country} options={countryOptions} onChange={(value) => setCountry(isProductCountry(value) ? value : '')} />
+            <Select
+              label={t('products.sizeChartLabel')}
+              value={sizeChartType}
+              options={[
+                { value: '', label: t('products.sizeChartNone') },
+                { value: 'CLOTHING', label: t('products.sizeChartClothing') },
+                { value: 'SHOES', label: t('products.sizeChartShoes') },
+                { value: 'KIDS_CLOTHING', label: t('products.sizeChartKids') },
+              ]}
+              onChange={(value) => {
+                if (value === '' || value === 'CLOTHING' || value === 'SHOES' || value === 'KIDS_CLOTHING') {
+                  setSizeChartType(value);
+                }
+              }}
+              helperText={t('products.sizeChartHint')}
+            />
           </div>
 
           {capabilities.data?.aiProductFill && <div className="space-y-3 rounded-xl border border-app p-3">

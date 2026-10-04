@@ -102,6 +102,8 @@ export interface ImportedProductListResponse {
 export interface ProductListItem {
   id: string;
   slug: string;
+  publicId?: string | null;
+  sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
   country: string;
   source: string;
   sourceProductId?: string;
@@ -134,6 +136,7 @@ export interface ProductListResponse {
 export interface ProductPayload {
   title: string;
   country: ProductCountry;
+  sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
   titleUz: string;
   titleEn: string;
   description?: string;
@@ -159,6 +162,7 @@ export interface ProductUpdatePayload {
   images?: Array<{ id: string } | { mediaId: string }>;
   salePriceUzs: number;
   country?: ProductCountry;
+  sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
   categoryId?: string | null;
   publish?: boolean;
   color?: string;
@@ -212,6 +216,7 @@ export const approveImport = (
     salePriceUzs: number;
     exchangeRate?: number;
     country: ProductCountry;
+    sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
     mediaIds?: string[];
     publish: boolean;
   },

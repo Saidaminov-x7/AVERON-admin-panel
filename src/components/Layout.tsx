@@ -77,7 +77,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   }, [isMobileMenuOpen]);
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-app">
+    <div className="averon-admin-shell flex h-dvh overflow-hidden bg-app">
       <CommandPalette />
       {/* Глобальная командная строка / Поиск */}
       {/* Затемнение фона для мобильного меню (Backdrop) */}

@@ -14,17 +14,17 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 shadow-xs',
-  ghost: 'bg-transparent text-app hover:bg-gray-100 dark:hover:bg-white/5',
+  primary: 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] active:brightness-90 shadow-xs',
+  ghost: 'bg-transparent text-app hover:bg-[var(--color-surface-soft)]',
   danger: 'bg-red-600 text-white hover:bg-red-700 shadow-xs',
-  outline: 'bg-transparent border border-app text-app hover:bg-gray-50 dark:hover:bg-white/5',
+  outline: 'bg-surface border border-app text-app hover:bg-[var(--color-surface-soft)]',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
   sm: 'h-8 px-3 text-xs gap-1.5 min-w-fit',
-  md: 'h-10 px-4 text-sm gap-2 min-w-fit',
+  md: 'h-11 px-4 text-sm gap-2 min-w-fit',
   lg: 'h-12 px-6 text-base gap-2 min-w-fit',
-  icon: 'h-9 w-9 p-0 justify-center shrink-0',
+  icon: 'h-11 w-11 p-0 justify-center shrink-0',
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
