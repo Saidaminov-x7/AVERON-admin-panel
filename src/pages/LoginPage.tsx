@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { loginApi, verify2faApi, resend2faApi, verifyAdminTotpLoginApi } from '../lib/authApi';
+import ThemeToggle from '../components/ThemeToggle/ThemeToggle';
 
 const REMEMBER_EMAIL_KEY = 'admin_remembered_email';
 
@@ -210,19 +211,38 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="averon-admin-shell min-h-screen flex items-center justify-center bg-app px-4">
-      <div className="relative w-full max-w-sm">
-        {/* Логотип */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-app text-xl tracking-[0.18em]">AVERON</span>
-              <span className="text-[10px] font-semibold bg-primary-500 text-white px-1.5 py-0.5 rounded uppercase tracking-wider">
-                ADMIN
-              </span>
-            </div>
+    <div className="averon-admin-shell min-h-screen bg-app">
+      <header className="h-20 border-b border-app bg-surface">
+        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-black tracking-[0.2em] text-app">AVERON</span>
+            <span className="bg-primary-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white">ADMIN</span>
           </div>
-          <h1 className="text-2xl font-bold text-app">
+          <ThemeToggle />
+        </div>
+      </header>
+
+      <main className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-[1440px] items-stretch lg:grid-cols-[minmax(0,1fr)_520px]">
+        <section className="hidden border-r border-app bg-surface-soft px-12 py-16 lg:flex lg:flex-col lg:justify-between">
+          <div>
+            <p className="mb-5 text-xs font-bold uppercase tracking-[0.18em] text-muted">Управление AVERON</p>
+            <h1 className="max-w-2xl text-5xl font-black leading-[1.02] text-app xl:text-6xl">
+              Единый стиль.<br />Полный контроль.
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-7 text-muted">
+              Товары, заказы, пользователи и настройки магазина — в защищённой панели, оформленной в той же визуальной системе, что и основной сайт.
+            </p>
+          </div>
+          <div className="grid grid-cols-3 border-y border-app py-5 text-xs font-semibold uppercase tracking-wider text-muted">
+            <span>Каталог</span><span>Заказы</span><span>Аналитика</span>
+          </div>
+        </section>
+
+        <section className="flex items-center justify-center px-5 py-12 sm:px-10">
+      <div className="relative w-full max-w-sm">
+        <div className="mb-8">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-muted">Только для сотрудников</p>
+          <h1 className="text-3xl font-black text-app">
             {step !== 'credentials' ? 'Подтверждение входа' : 'Вход в панель'}
           </h1>
           <p className="text-muted text-sm mt-1">
@@ -466,11 +486,12 @@ const LoginPage: React.FC = () => {
           )}
         </div>
 
-        <p className="text-center text-xs text-muted mt-6">
+        <p className="mt-6 text-center text-xs text-muted">
           Защищённый вход в панель администратора
         </p>
       </div>
-
+        </section>
+      </main>
     </div>
   );
 };
