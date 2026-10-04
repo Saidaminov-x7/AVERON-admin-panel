@@ -82,6 +82,8 @@ type ProductFormValues = {
   country: string;
   categoryId: string;
   salePriceUzs: string;
+  compareAtPriceUzs: string;
+  colorsText: string;
   color: string;
   size: string;
   sizeChartType: "" | "CLOTHING" | "SHOES" | "KIDS_CLOTHING";
@@ -99,6 +101,8 @@ export type ProductFormSubmission = {
   descriptionEn: string;
   sourceUrl?: string;
   salePriceUzs: number;
+  compareAtPriceUzs: number | null;
+  colors: Array<{ name: string; hex: string }>;
   country?: ProductCountry;
   categoryId?: string | null;
   color: string;
@@ -154,6 +158,11 @@ const getInitialValues = (product: ProductListItem | null): ProductFormValues =>
   country: product?.country ?? "",
   categoryId: product?.categoryId ?? "",
   salePriceUzs: product ? String(product.salePriceUzs) : "",
+  compareAtPriceUzs: product?.compareAtPriceUzs ? String(product.compareAtPriceUzs) : "",
+  colorsText: product?.variants?.map((variant) => {
+    const [name, hex] = (variant.color ?? "").split("::");
+    return hex ? `${name} | ${hex}` : "";
+  }).filter(Boolean).join("\n") ?? "",
   color: product?.source === "MANUAL" ? product.variants?.[0]?.color ?? "" : "",
   size: product?.source === "MANUAL" ? product.variants?.[0]?.size ?? "" : "",
   sizeChartType: product?.sizeChartType ?? "",
@@ -575,6 +584,11 @@ export function ProductFormModal({
         descriptionUz: values.translations.uz.description.trim(),
         descriptionEn: values.translations.en.description.trim(),
         salePriceUzs: Number(values.salePriceUzs),
+        compareAtPriceUzs: values.compareAtPriceUzs ? Number(values.compareAtPriceUzs) : null,
+        colors: values.colorsText.split("\n").map((row) => {
+          const [name, hex] = row.split("|").map((part) => part.trim());
+          return { name, hex };
+        }).filter((item) => item.name && /^#[0-9a-fA-F]{6}$/.test(item.hex)),
         country: isProductCountry(values.country) ? values.country : undefined,
         categoryId: values.categoryId || null,
         color: values.color.trim(),
@@ -860,6 +874,43 @@ export function ProductFormModal({
             error={errors.salePriceUzs}
             className="max-w-md"
           />
+          <Input
+            label="Старая цена до скидки (необязательно)"
+            type="number"
+            min="0.01"
+            step="0.01"
+            inputMode="decimal"
+            value={values.compareAtPriceUzs}
+            onChange={(event) => updateValue("compareAtPriceUzs", event.target.value)}
+            className="max-w-md"
+          />
+          <p className="text-xs text-muted">Если цена выше текущей, на витрине автоматически появится скидка.</p>
+        </section>
+
+        <section className="space-y-4">
+          <div>
+            <h4 className="text-sm font-bold text-app">Цвета товара</h4>
+            <p className="mt-1 text-xs text-muted">Каждый цвет с новой строки: название | HEX. Например: Чёрный | #111111</p>
+          </div>
+          <label className="block max-w-2xl text-sm font-medium text-app">
+            Названия и HEX-цвета
+            <textarea
+              value={values.colorsText}
+              onChange={(event) => updateValue("colorsText", event.target.value)}
+              rows={5}
+              placeholder={'Чёрный | #111111\nБелый | #FFFFFF\nСиний | #234A8B'}
+              className="mt-2 w-full rounded-xl border border-app bg-app px-3 py-3 font-mono text-sm text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+            />
+          </label>
+          {values.colorsText && (
+            <div className="flex flex-wrap gap-2" aria-label="Предпросмотр цветов">
+              {values.colorsText.split("\n").map((row, index) => {
+                const [name, hex] = row.split("|").map((part) => part.trim());
+                if (!name || !/^#[0-9a-fA-F]{6}$/.test(hex)) return null;
+                return <span key={`${name}-${index}`} className="inline-flex items-center gap-2 rounded-full border border-app px-2.5 py-1 text-xs"><span className="size-4 rounded-full border border-black/10" style={{ backgroundColor: hex }} />{name}</span>;
+              })}
+            </div>
+          )}
         </section>
 
         <section className="space-y-4">

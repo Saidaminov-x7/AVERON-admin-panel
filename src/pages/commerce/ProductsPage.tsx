@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ImageOff, Pencil, Plus } from "lucide-react";
+import { ImageOff, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -9,6 +9,7 @@ import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { Pagination, Select } from "../../components/ui";
 import {
   createManualProduct,
+  deleteProduct,
   getProductCategories,
   getProductCountryDisplay,
   getProducts,
@@ -109,6 +110,8 @@ export default function ProductsPage() {
           ...(values.sourceUrl ? { sourceUrl: values.sourceUrl } : {}),
           images,
           salePriceUzs: values.salePriceUzs,
+          compareAtPriceUzs: values.compareAtPriceUzs,
+          colors: values.colors,
           sizeChartType: values.sizeChartType || null,
         };
 
@@ -179,6 +182,14 @@ export default function ProductsPage() {
       setSubmissionError(`${message}${requestId}`);
       toast.error(`${message}${requestId}`);
     },
+  });
+  const deleteMutation = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: () => {
+      toast.success("Товар удалён из витрины");
+      void qc.invalidateQueries({ queryKey: ["commerce-products"] });
+    },
+    onError: () => toast.error("Не удалось удалить товар"),
   });
 
   const closeForm = () => {
@@ -412,14 +423,27 @@ export default function ProductsPage() {
                       ? t("products.inStock")
                       : t("products.outOfStock")}</span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/products/edit/${encodeURIComponent(product.slug)}`)}
-                    className="btn-ghost mt-3 inline-flex items-center gap-2 text-sm"
-                  >
-                    <Pencil size={14} />
-                    {t("products.editProduct")}
-                  </button>
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/products/edit/${encodeURIComponent(product.slug)}`)}
+                      className="btn-ghost inline-flex items-center gap-2 text-sm"
+                    >
+                      <Pencil size={14} />
+                      {t("products.editProduct")}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={deleteMutation.isPending}
+                      onClick={() => {
+                        if (window.confirm(`Удалить «${title}» из витрины?`)) deleteMutation.mutate(product.id);
+                      }}
+                      className="inline-flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50"
+                      aria-label={`Удалить ${title}`}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </div>
               </article>
             );

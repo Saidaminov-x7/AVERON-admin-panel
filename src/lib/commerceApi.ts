@@ -120,6 +120,7 @@ export interface ProductListItem {
   images?: Array<{ id: string; mediaId?: string | null; url: string; sortOrder: number }>;
   variants?: Array<{ id: string; color?: string | null; size?: string | null; stock?: number; available?: boolean }>;
   salePriceUzs: string | number;
+  compareAtPriceUzs?: string | number | null;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 }
 
@@ -145,8 +146,10 @@ export interface ProductPayload {
   sourceUrl?: string;
   images: Array<{ mediaId: string }>;
   salePriceUzs: number;
+  compareAtPriceUzs?: number | null;
   categoryId?: string;
   color?: string;
+  colors?: Array<{ name: string; hex: string }>;
   size?: string;
   publish: boolean;
 }
@@ -161,11 +164,13 @@ export interface ProductUpdatePayload {
   sourceUrl?: string | null;
   images?: Array<{ id: string } | { mediaId: string }>;
   salePriceUzs: number;
+  compareAtPriceUzs?: number | null;
   country?: ProductCountry;
   sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
   categoryId?: string | null;
   publish?: boolean;
   color?: string;
+  colors?: Array<{ name: string; hex: string }>;
   size?: string;
 }
 
@@ -256,6 +261,9 @@ export const createManualProduct = (payload: ProductPayload) =>
 
 export const updateManualProduct = (id: string, payload: ProductUpdatePayload) =>
   api.put<ProductListItem>(`/api/v1/admin/products/${id}`, payload).then((r) => r.data);
+
+export const deleteProduct = (id: string) =>
+  api.delete<ProductListItem>(`/api/v1/admin/products/${id}`).then((r) => r.data);
 
 export const publishProductToTelegram = (id: string) =>
   api.post<{ status: string; telegramMessageId: string; publishedAt: string }>(
