@@ -159,7 +159,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
             aria-label={t(isMobileMenuOpen ? 'header.closeMenu' : 'header.openMenu')}
             aria-expanded={isMobileMenuOpen}
             aria-controls="admin-mobile-navigation"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-app bg-surface text-app transition-colors hover:bg-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded border border-app bg-surface text-app transition-colors hover:bg-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 lg:hidden"
           >
             {isMobileMenuOpen ? (
               <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="m18 6-12 12M6 6l12 12" /></svg>
@@ -179,7 +179,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           onClick={() => window.dispatchEvent(new CustomEvent('open-command-palette'))}
           id="header-search-btn"
           className="
-            hidden sm:flex items-center gap-2 pl-9 pr-3 h-10 text-sm rounded-xl w-52 md:w-64
+            hidden sm:flex items-center gap-2 pl-9 pr-3 h-10 text-sm rounded w-52 md:w-64
             bg-gray-50 dark:bg-white/5
             border border-app hover:border-primary-500/50 dark:hover:border-primary-500/50
             text-muted hover:text-app
@@ -199,7 +199,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
         <Dropdown
           align="right"
           trigger={
-            <div className="flex items-center justify-between gap-1.5 h-10 px-3 rounded-xl text-xs font-semibold bg-surface border border-app text-app hover:border-primary-500 transition-colors cursor-pointer select-none">
+            <div className="flex items-center justify-between gap-1.5 h-10 px-3 rounded text-xs font-semibold bg-surface border border-app text-app hover:border-primary-500 transition-colors cursor-pointer select-none">
               <LanguageFlag
                 locale={i18n.language?.startsWith('uz') ? 'uz' : i18n.language?.startsWith('en') ? 'en' : 'ru'}
               />
@@ -209,7 +209,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
               </svg>
             </div>
           }
-          contentClassName="w-32 p-1 border border-app rounded-xl bg-surface shadow-xl"
+          contentClassName="w-32 p-1 border border-app rounded bg-surface shadow-xl"
         >
           {([
             { code: 'ru', label: 'Русский' },
@@ -225,7 +225,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                   i18n.changeLanguage(lang.code);
                   localStorage.setItem('i18nextLng', lang.code);
                 }}
-                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-left transition-colors cursor-pointer ${
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-sm text-xs font-medium text-left transition-colors cursor-pointer ${
                   active ? 'bg-primary-500 text-white font-semibold' : 'text-app hover:bg-gray-100 dark:hover:bg-white/5'
                 }`}
               >
@@ -270,7 +270,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           </button>
 
           {isNotifOpen && (
-            <div id="header-notifications-panel" role="region" aria-label={t('header.notifications')} className="absolute right-0 mt-2 w-[min(20rem,calc(100vw-1.5rem))] sm:w-96 rounded-xl bg-surface border border-app shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
+            <div id="header-notifications-panel" role="region" aria-label={t('header.notifications')} className="absolute right-0 mt-2 w-[min(20rem,calc(100vw-1.5rem))] sm:w-96 rounded bg-surface border border-app shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
               {/* Шапка уведомлений */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-app bg-gray-50/50 dark:bg-white/5">
                 <div className="flex items-center gap-2">
