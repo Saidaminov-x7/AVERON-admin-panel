@@ -708,6 +708,10 @@ export function ProductFormModal({
       }
     >
       <form id={formId} noValidate onSubmit={handleSubmit} className="space-y-6">
+        <div className="rounded-xl border border-primary-500/20 bg-primary-500/5 p-4">
+          <p className="text-sm font-bold text-app">{product ? "Редактирование карточки товара" : "Новый товар — заполните по шагам"}</p>
+          <p className="mt-1 text-xs leading-5 text-muted">1. Страна и категория · 2. Название и описание · 3. Цена, скидка и цвета · 4. Фотографии · 5. Публикация</p>
+        </div>
         {submissionError && (
           <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
             {submissionError}
@@ -723,7 +727,7 @@ export function ProductFormModal({
             </ul>
           </div>
         )}
-        <section className="space-y-4">
+        <section className="space-y-4 rounded-xl border border-app bg-surface p-5">
           <h4 className="text-sm font-bold text-app">{t("products.mainInformation")}</h4>
           <div className="grid gap-4 md:grid-cols-2">
             <Select
@@ -746,7 +750,7 @@ export function ProductFormModal({
           </div>
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4 rounded-xl border border-app bg-surface p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h4 className="text-sm font-bold text-app">{t("products.localizedContent")}</h4>
@@ -858,7 +862,7 @@ export function ProductFormModal({
           </div>
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4 rounded-xl border border-app bg-surface p-5">
           <div>
             <h4 className="text-sm font-bold text-app">{t("products.priceSection")}</h4>
             <p className="mt-1 text-xs text-muted">{t("products.priceSectionHint")}</p>
@@ -887,7 +891,7 @@ export function ProductFormModal({
           <p className="text-xs text-muted">Если цена выше текущей, на витрине автоматически появится скидка.</p>
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4 rounded-xl border border-app bg-surface p-5">
           <div>
             <h4 className="text-sm font-bold text-app">Цвета товара</h4>
             <p className="mt-1 text-xs text-muted">Каждый цвет с новой строки: название | HEX. Например: Чёрный | #111111</p>
@@ -913,7 +917,7 @@ export function ProductFormModal({
           )}
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4 rounded-xl border border-app bg-surface p-5">
           <div>
             <h4 className="text-sm font-bold text-app">{t("products.photoSection")}</h4>
             <p className="mt-1 text-xs text-muted">

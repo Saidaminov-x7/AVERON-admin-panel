@@ -194,10 +194,19 @@ export default function Sidebar({
       style={{ width: compact ? 76 : isDesktop ? width : 256 }}
       className="sidebar-bg safe-top safe-bottom relative flex h-dvh shrink-0 flex-col border-r sidebar-border text-app transition-[width] duration-200"
     >
-      <div className={`flex h-16 items-center border-b border-app ${compact ? "justify-center px-2" : "justify-between px-5"}`}>
+      <div className={`relative flex h-16 items-center border-b border-app ${compact ? "justify-start px-4" : "justify-between px-5 pr-14"}`}>
         <button onClick={() => navigate("/")} className="text-left">
           <div className="flex items-center gap-2 text-base font-black tracking-[.2em]">{compact ? "A" : "AVERON"}<span className="h-1.5 w-1.5 bg-primary-500" /></div>
           {!compact && <div className="mt-1 text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</div>}
+        </button>
+        <button
+          type="button"
+          onClick={toggleCollapsed}
+          title={collapsed ? "Развернуть меню" : "Свернуть меню"}
+          aria-label={collapsed ? "Развернуть меню" : "Свернуть меню"}
+          className="absolute right-3 top-1/2 hidden size-9 -translate-y-1/2 items-center justify-center rounded-lg border border-app bg-surface text-muted shadow-sm transition-colors hover:bg-app hover:text-app lg:flex"
+        >
+          {compact ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
         </button>
         {onCloseMobile && (
           <button
@@ -285,9 +294,6 @@ export default function Sidebar({
           {!compact && t("sidebar.logout")}
         </button>
       </div>
-      <button type="button" onClick={toggleCollapsed} title={collapsed ? "Развернуть меню" : "Свернуть меню"} aria-label={collapsed ? "Развернуть меню" : "Свернуть меню"} className="absolute -right-4 bottom-20 z-10 hidden h-8 w-8 items-center justify-center border border-app bg-surface text-muted shadow-sm hover:text-app lg:flex">
-        {compact ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-      </button>
       {!compact && <div
         role="separator"
         aria-orientation="vertical"

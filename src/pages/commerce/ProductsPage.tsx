@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ImageOff, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, ImageOff, Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -9,7 +9,9 @@ import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { Pagination, Select } from "../../components/ui";
 import {
   createManualProduct,
-  deleteProduct,
+  archiveProduct,
+  deleteProductPermanently,
+  restoreProduct,
   getProductCategories,
   getProductCountryDisplay,
   getProducts,
@@ -183,13 +185,32 @@ export default function ProductsPage() {
       toast.error(`${message}${requestId}`);
     },
   });
-  const deleteMutation = useMutation({
-    mutationFn: deleteProduct,
+  const archiveMutation = useMutation({
+    mutationFn: archiveProduct,
     onSuccess: () => {
-      toast.success("Товар удалён из витрины");
+      toast.success("Товар перемещён в архив");
       void qc.invalidateQueries({ queryKey: ["commerce-products"] });
     },
-    onError: () => toast.error("Не удалось удалить товар"),
+    onError: () => toast.error("Не удалось архивировать товар"),
+  });
+  const restoreMutation = useMutation({
+    mutationFn: restoreProduct,
+    onSuccess: () => {
+      toast.success("Товар восстановлен как черновик");
+      void qc.invalidateQueries({ queryKey: ["commerce-products"] });
+    },
+    onError: () => toast.error("Не удалось восстановить товар"),
+  });
+  const permanentDeleteMutation = useMutation({
+    mutationFn: deleteProductPermanently,
+    onSuccess: () => {
+      toast.success("Товар удалён навсегда");
+      void qc.invalidateQueries({ queryKey: ["commerce-products"] });
+    },
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message;
+      toast.error(message || "Не удалось удалить товар навсегда");
+    },
   });
 
   const closeForm = () => {
@@ -387,13 +408,13 @@ export default function ProductsPage() {
               ? russianTranslation
               : russianTranslation?.title || product.slug;
             return (
-              <article className="card overflow-hidden p-0" key={product.id}>
-                <div className="flex h-48 items-center justify-center bg-stone-100 dark:bg-stone-800">
+              <article className="group overflow-hidden rounded-xl border border-app bg-surface transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary-500/40 hover:shadow-lg" key={product.id}>
+                <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden bg-stone-100 dark:bg-stone-800">
                   {product.images?.[0]?.url ? (
                     <img
                       src={product.images[0].url}
                       alt={title}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                       onError={(event) => {
                         event.currentTarget.style.display = "none";
                       }}
@@ -404,18 +425,28 @@ export default function ProductsPage() {
                       <span className="text-xs">AVERON</span>
                     </div>
                   )}
+                  <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm ${product.status === "PUBLISHED" ? "bg-emerald-600 text-white" : product.status === "DRAFT" ? "bg-amber-400 text-stone-950" : "bg-stone-900 text-white"}`}>
+                    {t(`products.status.${product.status.toLowerCase()}`)}
+                  </span>
                 </div>
                 <div className="p-4">
-                  <h2 className="font-bold">{title}</h2>
-                  <p className="mt-1 text-sm text-muted">{getCountryLabel(product.country)}</p>
+                  {product.variants?.some((variant) => variant.color?.includes("::")) ? (
+                    <div className="mb-3 flex items-center gap-1.5">
+                      {product.variants.filter((variant) => variant.color?.includes("::")).slice(0, 6).map((variant) => {
+                        const [name, hex] = variant.color!.split("::");
+                        return <span key={variant.id} title={name} className="size-3.5 rounded-full border border-black/10" style={{ backgroundColor: hex }} />;
+                      })}
+                      {product.variants.filter((variant) => variant.color?.includes("::")).length > 6 ? <span className="text-[11px] text-muted">+{product.variants.filter((variant) => variant.color?.includes("::")).length - 6}</span> : null}
+                    </div>
+                  ) : null}
+                  <p className="text-[10px] font-semibold uppercase tracking-[.12em] text-muted">{getCountryLabel(product.country)}</p>
+                  <h2 className="mt-1 line-clamp-2 min-h-10 text-sm font-semibold leading-5">{title}</h2>
                   <p className="mt-1 text-xs text-muted">{product.category
                     ? (typeof product.category.name === "string" ? product.category.name : product.category.name.ru || product.category.name.en || product.category.slug)
                     : t("products.uncategorized")}</p>
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <strong>{Number(product.salePriceUzs).toLocaleString()} UZS</strong>
-                    <span className={product.status === "PUBLISHED" ? "badge-success" : product.status === "DRAFT" ? "badge-warning" : "badge-neutral"}>
-                      {t(`products.status.${product.status.toLowerCase()}`)}
-                    </span>
+                  <div className="mt-3 flex flex-wrap items-baseline gap-2">
+                    <strong className="text-base tabular-nums">{Number(product.salePriceUzs).toLocaleString()} UZS</strong>
+                    {product.compareAtPriceUzs && Number(product.compareAtPriceUzs) > Number(product.salePriceUzs) ? <span className="text-xs tabular-nums text-muted line-through">{Number(product.compareAtPriceUzs).toLocaleString()} UZS</span> : null}
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted">
                     <span>{t("products.providerLabel")}: {t(`products.source.${product.source}`, { defaultValue: product.source })}</span>
@@ -423,7 +454,7 @@ export default function ProductsPage() {
                       ? t("products.inStock")
                       : t("products.outOfStock")}</span>
                   </div>
-                  <div className="mt-3 flex items-center gap-2">
+                  <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-app pt-3">
                     <button
                       type="button"
                       onClick={() => navigate(`/products/edit/${encodeURIComponent(product.slug)}`)}
@@ -432,17 +463,14 @@ export default function ProductsPage() {
                       <Pencil size={14} />
                       {t("products.editProduct")}
                     </button>
-                    <button
-                      type="button"
-                      disabled={deleteMutation.isPending}
-                      onClick={() => {
-                        if (window.confirm(`Удалить «${title}» из витрины?`)) deleteMutation.mutate(product.id);
-                      }}
-                      className="inline-flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50"
-                      aria-label={`Удалить ${title}`}
-                    >
-                      <Trash2 size={15} />
-                    </button>
+                    {product.status === "ARCHIVED" ? (
+                      <button type="button" disabled={restoreMutation.isPending} onClick={() => restoreMutation.mutate(product.id)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-app px-3 text-xs font-semibold hover:bg-app disabled:opacity-50"><RotateCcw size={14} />Восстановить</button>
+                    ) : (
+                      <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate(product.id)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-app px-3 text-xs font-semibold hover:bg-app disabled:opacity-50"><Archive size={14} />В архив</button>
+                    )}
+                    <button type="button" disabled={permanentDeleteMutation.isPending} onClick={() => {
+                      if (window.confirm(`Удалить «${title}» навсегда? Это действие нельзя отменить.`)) permanentDeleteMutation.mutate(product.id);
+                    }} className="inline-flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50" aria-label={`Удалить ${title} навсегда`}><Trash2 size={15} /></button>
                   </div>
                 </div>
               </article>

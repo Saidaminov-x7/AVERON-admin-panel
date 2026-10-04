@@ -262,7 +262,13 @@ export const createManualProduct = (payload: ProductPayload) =>
 export const updateManualProduct = (id: string, payload: ProductUpdatePayload) =>
   api.put<ProductListItem>(`/api/v1/admin/products/${id}`, payload).then((r) => r.data);
 
-export const deleteProduct = (id: string) =>
+export const archiveProduct = (id: string) =>
+  api.post<ProductListItem>(`/api/v1/admin/products/${id}/archive`).then((r) => r.data);
+
+export const restoreProduct = (id: string) =>
+  api.post<ProductListItem>(`/api/v1/admin/products/${id}/restore`).then((r) => r.data);
+
+export const deleteProductPermanently = (id: string) =>
   api.delete<ProductListItem>(`/api/v1/admin/products/${id}`).then((r) => r.data);
 
 export const publishProductToTelegram = (id: string) =>
