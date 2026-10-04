@@ -92,7 +92,7 @@ export function Modal({
   };
 
   const panelClass = presentation === 'page'
-    ? 'rounded-theme border border-app'
+    ? 'overflow-visible rounded-theme border border-app'
     : `relative z-10 shadow-2xl border border-app ${
       fullscreenOnMobile
         ? `h-[100dvh] max-h-[100dvh] rounded-none border-x-0 border-y-0 sm:h-auto sm:max-h-[90vh] sm:rounded-theme sm:border ${sizeClasses[size]}`
@@ -122,7 +122,7 @@ export function Modal({
             aria-describedby={subtitle ? `${dialogId}-description` : undefined}
             tabIndex={-1}
             onKeyDown={presentation === 'page' ? undefined : handleDialogKeyDown}
-            className={`flex w-full min-h-0 flex-col overflow-hidden font-theme bg-surface outline-none ${panelClass}`}
+            className={`flex w-full min-h-0 flex-col font-theme bg-surface outline-none ${presentation === 'page' ? 'overflow-visible' : 'overflow-hidden'} ${panelClass}`}
             initial={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}
             animate={{ opacity: 1, transform: 'scale(1)' }}
             exit={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}
@@ -153,7 +153,7 @@ export function Modal({
                 <X size={18} />
               </button>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">{children}</div>
+            <div className={`min-h-0 flex-1 p-4 sm:p-6 ${presentation === 'page' ? 'overflow-visible' : 'overflow-y-auto overscroll-contain'}`}>{children}</div>
             {footer && (
               <div className="flex shrink-0 items-center justify-end gap-3 border-t border-app bg-surface px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 sm:p-5">
                 {footer}
