@@ -38,6 +38,14 @@ import {
   validateProductDraft,
   type ProductValidationField,
 } from "./productFormValidation";
+import {
+  calculateProductPhotoCropRect,
+  cropProductPhoto,
+  DEFAULT_PRODUCT_PHOTO_CROP,
+  productPhotoCropSignature,
+  type ProductPhotoCrop,
+  type ProductPhotoOrientation,
+} from "./productImageCrop";
 import { ProductRichTextField } from "./ProductRichTextField";
 
 type LocalizedContent = { title: string; description: string };
@@ -45,9 +53,30 @@ type PhotoDraft = {
   key: string;
   id?: string;
   mediaId?: string | null;
+  mediaCropSignature?: string;
+  naturalWidth?: number;
+  naturalHeight?: number;
   url: string;
   file?: File;
+  crop: ProductPhotoCrop;
 };
+
+function getPhotoPreviewStyle(photo: PhotoDraft) {
+  if (!photo.file || !photo.naturalWidth || !photo.naturalHeight) {
+    return photo.file
+      ? { objectPosition: `${photo.crop.x}% ${photo.crop.y}%`, transform: `scale(${photo.crop.zoom})` }
+      : undefined;
+  }
+
+  const rect = calculateProductPhotoCropRect(photo.naturalWidth, photo.naturalHeight, photo.crop);
+  return {
+    width: `${photo.naturalWidth / rect.width * 100}%`,
+    height: `${photo.naturalHeight / rect.height * 100}%`,
+    left: `${-rect.x / rect.width * 100}%`,
+    top: `${-rect.y / rect.height * 100}%`,
+    objectFit: "fill" as const,
+  };
+}
 type ProductFormValues = {
   translations: Record<ProductLocale, LocalizedContent>;
   country: string;
@@ -154,6 +183,14 @@ export function ProductFormModal({
   const formId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlsRef = useRef(new Set<string>());
+  const cropDragRef = useRef<{
+    key: string;
+    pointerId: number;
+    clientX: number;
+    clientY: number;
+    focusX: number;
+    focusY: number;
+  } | null>(null);
   const [activeLocale, setActiveLocale] = useState<ProductLocale>("ru");
   const [values, setValues] = useState<ProductFormValues>(() => getInitialValues(product));
   const [photos, setPhotos] = useState<PhotoDraft[]>(() => (product?.images ?? []).map((image) => ({
@@ -161,10 +198,12 @@ export function ProductFormModal({
     id: image.id,
     mediaId: image.mediaId,
     url: image.url,
+    crop: { ...DEFAULT_PRODUCT_PHOTO_CROP },
   })));
   const [errors, setErrors] = useState<FormErrors>({});
   const [photoInputErrors, setPhotoInputErrors] = useState<string[]>([]);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [isPreparingImages, setIsPreparingImages] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<ProductAiSuggestionsResponse | null>(null);
   const [aiError, setAiError] = useState("");
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
@@ -201,6 +240,7 @@ export function ProductFormModal({
       setErrors({});
       setPhotoInputErrors([]);
       setSubmitAttempted(false);
+      setIsPreparingImages(false);
       setActiveLocale("ru");
       return;
     }
@@ -212,10 +252,12 @@ export function ProductFormModal({
       id: image.id,
       mediaId: image.mediaId,
       url: image.url,
+      crop: { ...DEFAULT_PRODUCT_PHOTO_CROP },
     })));
     setErrors({});
     setPhotoInputErrors([]);
     setSubmitAttempted(false);
+    setIsPreparingImages(false);
   }, [isOpen, product, releaseObjectUrls]);
 
   useEffect(() => () => releaseObjectUrls(), [releaseObjectUrls]);
@@ -287,7 +329,12 @@ export function ProductFormModal({
       knownFiles.add(identity);
       const url = URL.createObjectURL(file);
       objectUrlsRef.current.add(url);
-      additions.push({ key: `local-${identity}-${crypto.randomUUID()}`, file, url });
+      additions.push({
+        key: `local-${identity}-${crypto.randomUUID()}`,
+        file,
+        url,
+        crop: { ...DEFAULT_PRODUCT_PHOTO_CROP },
+      });
     }
 
     if (additions.length) {
@@ -309,6 +356,12 @@ export function ProductFormModal({
 
   const movePhoto = (index: number, offset: -1 | 1) => {
     setPhotos((current) => reorderItem(current, index, offset));
+  };
+
+  const updatePhotoCrop = (key: string, patch: Partial<ProductPhotoCrop>) => {
+    setPhotos((current) => current.map((photo) => photo.key === key
+      ? { ...photo, crop: { ...photo.crop, ...patch } }
+      : photo));
   };
 
   const generateAiSuggestions = async () => {
@@ -336,15 +389,20 @@ export function ProductFormModal({
       }
       const mediaIds: string[] = [];
       for (const photo of photos) {
-        if (photo.mediaId) {
+        if (photo.mediaId && (
+          !photo.file || photo.mediaCropSignature === productPhotoCropSignature(photo.crop)
+        )) {
           mediaIds.push(photo.mediaId);
           continue;
         }
         if (!photo.file) throw new Error("PRODUCT_IMAGE_NOT_AVAILABLE");
-        const uploaded = await uploadProductPhotoApi(photo.file);
+        const croppedFile = await cropProductPhoto(photo.file, photo.crop);
+        const uploaded = await uploadProductPhotoApi(croppedFile);
         mediaIds.push(uploaded.id);
         setPhotos((current) => current.map((item) =>
-          item.key === photo.key ? { ...item, mediaId: uploaded.id } : item,
+          item.key === photo.key
+            ? { ...item, mediaId: uploaded.id, mediaCropSignature: productPhotoCropSignature(photo.crop) }
+            : item,
         ));
       }
       const selectedCategory = categories.find((category) => category.id === values.categoryId);
@@ -455,8 +513,9 @@ export function ProductFormModal({
     setAiError("");
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isPreparingImages || isSaving) return;
     setSubmitAttempted(true);
     const nextErrors: FormErrors = {};
     const validationCodes = validateProductDraft({
@@ -493,27 +552,43 @@ export function ProductFormModal({
       return;
     }
 
-    onSubmit({
-      title: values.translations.ru.title.trim(),
-      titleUz: values.translations.uz.title.trim(),
-      titleEn: values.translations.en.title.trim(),
-      description: values.translations.ru.description.trim(),
-      descriptionUz: values.translations.uz.description.trim(),
-      descriptionEn: values.translations.en.description.trim(),
-      salePriceUzs: Number(values.salePriceUzs),
-      country: isProductCountry(values.country) ? values.country : undefined,
-      categoryId: values.categoryId || null,
-      color: values.color.trim(),
-      size: values.size.trim(),
-      sizeChartType: values.sizeChartType,
-      publish: values.publish,
-      publishTelegram: values.publishTelegram,
-      images: photos.map((photo) => photo.mediaId
-        ? { mediaId: photo.mediaId }
-        : photo.file
-          ? { file: photo.file }
-          : { id: photo.id! }),
-    });
+    setIsPreparingImages(true);
+    setPhotoInputErrors([]);
+    try {
+      const images: ProductFormSubmission["images"] = [];
+      for (const photo of photos) {
+        const signature = productPhotoCropSignature(photo.crop);
+        if (photo.mediaId && (!photo.file || photo.mediaCropSignature === signature)) {
+          images.push({ mediaId: photo.mediaId });
+        } else if (photo.file) {
+          images.push({ file: await cropProductPhoto(photo.file, photo.crop) });
+        } else if (photo.id) {
+          images.push({ id: photo.id });
+        }
+      }
+
+      onSubmit({
+        title: values.translations.ru.title.trim(),
+        titleUz: values.translations.uz.title.trim(),
+        titleEn: values.translations.en.title.trim(),
+        description: values.translations.ru.description.trim(),
+        descriptionUz: values.translations.uz.description.trim(),
+        descriptionEn: values.translations.en.description.trim(),
+        salePriceUzs: Number(values.salePriceUzs),
+        country: isProductCountry(values.country) ? values.country : undefined,
+        categoryId: values.categoryId || null,
+        color: values.color.trim(),
+        size: values.size.trim(),
+        sizeChartType: values.sizeChartType,
+        publish: values.publish,
+        publishTelegram: values.publishTelegram,
+        images,
+      });
+    } catch {
+      setPhotoInputErrors([t("products.photoCropError")]);
+    } finally {
+      setIsPreparingImages(false);
+    }
   };
 
   const localeName = (locale: ProductLocale) => t(`products.contentLocale.${locale}`);
@@ -553,6 +628,15 @@ export function ProductFormModal({
     salePriceUzs: t("products.salePriceLabel"),
     photos: t("products.photoSection"),
   };
+  const photoOrientations: Array<{
+    value: ProductPhotoOrientation;
+    label: string;
+    aspectClass: string;
+  }> = [
+    { value: "portrait", label: t("products.photoPortrait"), aspectClass: "aspect-[4/5]" },
+    { value: "landscape", label: t("products.photoLandscape"), aspectClass: "aspect-[4/3]" },
+    { value: "square", label: t("products.photoSquare"), aspectClass: "aspect-square" },
+  ];
   const headerContent = (
     <div role="tablist" aria-label={t("products.contentLanguage")} className="inline-flex w-full rounded-xl border border-app bg-gray-50 p-1 dark:bg-white/5 sm:w-auto">
       {locales.map((locale) => {
@@ -598,9 +682,13 @@ export function ProductFormModal({
       headerContent={headerContent}
       footer={
         <>
-          <Button variant="ghost" onClick={onClose} disabled={isSaving}>{t("common.cancel")}</Button>
-          <Button type="submit" form={formId} loading={isSaving} disabled={settingsLoading}>
-            {isSaving ? t(product ? "products.saving" : "products.creating") : t(product ? "products.saveChanges" : "products.saveBtn")}
+          <Button variant="ghost" onClick={onClose} disabled={isSaving || isPreparingImages}>{t("common.cancel")}</Button>
+          <Button type="submit" form={formId} loading={isSaving || isPreparingImages} disabled={settingsLoading || isPreparingImages}>
+            {isPreparingImages
+              ? t("products.preparingPhotos")
+              : isSaving
+                ? t(product ? "products.saving" : "products.creating")
+                : t(product ? "products.saveChanges" : "products.saveBtn")}
           </Button>
         </>
       }
@@ -780,6 +868,7 @@ export function ProductFormModal({
             <p className="mt-1 text-xs text-muted">
               {t("products.photoCount", { count: photos.length, max: Math.min(15, maxProductPhotos) })} · {t("products.photoSizeLimit", { size: maxProductPhotoSizeMb })}
             </p>
+            <p className="mt-1 text-xs text-muted">{t("products.photoEditingHint")}</p>
           </div>
           {errors.photos && <p role="alert" className="text-sm text-red-500">{errors.photos}</p>}
           {photoInputErrors.map((issue, index) => <p key={`${issue}-${index}`} role="alert" className="text-sm text-red-500">{issue}</p>)}
@@ -787,14 +876,125 @@ export function ProductFormModal({
             <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {photos.map((photo, index) => (
                 <li key={photo.key} className={`relative min-w-0 overflow-hidden rounded-xl border ${index === 0 ? "border-primary-500 ring-1 ring-primary-500/30" : "border-app"}`}>
-                  <div className="relative flex h-36 items-center justify-center bg-stone-100 dark:bg-stone-800">
-                    {photo.url ? <img src={photo.url} alt="" className="h-full w-full object-cover" /> : <ImageOff size={24} className="text-muted" />}
+                  <div
+                    className={`relative flex w-full items-center justify-center overflow-hidden bg-stone-100 dark:bg-stone-800 ${photo.file ? "touch-none cursor-grab active:cursor-grabbing" : ""} ${photoOrientations.find(({ value }) => value === photo.crop.orientation)?.aspectClass ?? "aspect-[4/5]"}`}
+                    onPointerDown={(event) => {
+                      if (!photo.file || event.button !== 0) return;
+                      event.currentTarget.setPointerCapture(event.pointerId);
+                      cropDragRef.current = {
+                        key: photo.key,
+                        pointerId: event.pointerId,
+                        clientX: event.clientX,
+                        clientY: event.clientY,
+                        focusX: photo.crop.x,
+                        focusY: photo.crop.y,
+                      };
+                    }}
+                    onPointerMove={(event) => {
+                      const drag = cropDragRef.current;
+                      if (!drag || drag.key !== photo.key || drag.pointerId !== event.pointerId) return;
+                      const bounds = event.currentTarget.getBoundingClientRect();
+                      if (!bounds.width || !bounds.height) return;
+                      updatePhotoCrop(photo.key, {
+                        x: Math.min(100, Math.max(0, drag.focusX - (event.clientX - drag.clientX) / bounds.width * 100)),
+                        y: Math.min(100, Math.max(0, drag.focusY - (event.clientY - drag.clientY) / bounds.height * 100)),
+                      });
+                    }}
+                    onPointerUp={(event) => {
+                      if (cropDragRef.current?.pointerId === event.pointerId) cropDragRef.current = null;
+                    }}
+                    onPointerCancel={() => {
+                      cropDragRef.current = null;
+                    }}
+                  >
+                    {photo.url ? (
+                      <img
+                        src={photo.url}
+                        alt=""
+                        draggable={false}
+                        onLoad={(event) => {
+                          const { naturalWidth, naturalHeight } = event.currentTarget;
+                          setPhotos((current) => current.map((item) => item.key === photo.key
+                            ? { ...item, naturalWidth, naturalHeight }
+                            : item));
+                        }}
+                        className={photo.file && photo.naturalWidth
+                          ? "absolute max-w-none select-none"
+                          : `h-full w-full ${photo.file ? "object-cover" : "object-contain"}`}
+                        style={getPhotoPreviewStyle(photo)}
+                      />
+                    ) : <ImageOff size={24} className="text-muted" />}
                     {index === 0 && <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary-600 px-2.5 py-1 text-xs font-bold text-white"><Star size={12} fill="currentColor" />{t("products.mainPhoto")}</span>}
                     <span className="absolute right-2 top-2 rounded-full bg-black/70 px-2 py-1 text-xs font-semibold text-white">{index + 1}</span>
                   </div>
                   <div className="space-y-2 p-3">
                     <p className="truncate text-xs text-app">{photo.file?.name ?? t("products.existingPhoto")}</p>
                     <p className="text-xs text-muted">{photo.file ? formatPhotoSize(photo.file.size) : t("products.alreadyUploaded")}</p>
+                    {photo.file && (
+                      <div className="space-y-3 border-t border-app pt-3">
+                        <p className="text-xs font-semibold text-app">{t("products.photoCrop")}</p>
+                        <div role="group" aria-label={t("products.photoOrientation")} className="grid grid-cols-3 gap-1">
+                          {photoOrientations.map(({ value, label }) => (
+                            <button
+                              key={value}
+                              type="button"
+                              aria-pressed={photo.crop.orientation === value}
+                              onClick={() => updatePhotoCrop(photo.key, { orientation: value })}
+                              className={`min-w-0 rounded-lg border px-2 py-1.5 text-[11px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                                photo.crop.orientation === value
+                                  ? "border-primary-600 bg-primary-600 text-white"
+                                  : "border-app text-muted hover:bg-app hover:text-app"
+                              }`}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                        <label className="block text-xs text-muted">
+                          <span className="mb-1 flex justify-between gap-2">
+                            <span>{t("products.photoZoom")}</span>
+                            <output>{Math.round(photo.crop.zoom * 100)}%</output>
+                          </span>
+                          <input
+                            type="range"
+                            min="100"
+                            max="300"
+                            step="10"
+                            value={Math.round(photo.crop.zoom * 100)}
+                            onChange={(event) => updatePhotoCrop(photo.key, { zoom: Number(event.target.value) / 100 })}
+                            className="w-full accent-primary-600"
+                          />
+                        </label>
+                        <label className="block text-xs text-muted">
+                          <span className="mb-1 flex justify-between gap-2">
+                            <span>{t("products.photoFocusX")}</span>
+                            <output>{photo.crop.x}%</output>
+                          </span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={photo.crop.x}
+                            onChange={(event) => updatePhotoCrop(photo.key, { x: Number(event.target.value) })}
+                            className="w-full accent-primary-600"
+                          />
+                        </label>
+                        <label className="block text-xs text-muted">
+                          <span className="mb-1 flex justify-between gap-2">
+                            <span>{t("products.photoFocusY")}</span>
+                            <output>{photo.crop.y}%</output>
+                          </span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={photo.crop.y}
+                            onChange={(event) => updatePhotoCrop(photo.key, { y: Number(event.target.value) })}
+                            className="w-full accent-primary-600"
+                          />
+                        </label>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex gap-1">
                         <button type="button" disabled={index === 0} onClick={() => movePhoto(index, -1)} aria-label={t("products.movePhotoUp")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveUp size={16} /></button>

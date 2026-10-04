@@ -1,4 +1,4 @@
-import type { ComponentType, PointerEvent as ReactPointerEvent } from "react";
+import type { ComponentType, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -72,6 +72,24 @@ const sections: { sectionKey: string; items: Item[] }[] = [
   },
 ];
 
+let rememberedNavigationScroll = 0;
+
+function readPreference(key: string) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function savePreference(key: string, value: string) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Keep the current session functional when browser storage is unavailable.
+  }
+}
+
 export default function Sidebar({
   onCloseMobile,
 }: {
@@ -82,10 +100,10 @@ export default function Sidebar({
   const { t, i18n } = useTranslation();
   const siteUrl = import.meta.env.VITE_SITE_URL || "https://averon.uz";
   const navRef = useRef<HTMLElement>(null);
-  const [collapsed, setCollapsed] = useState(() => localStorage.getItem("averon-admin-sidebar-collapsed") === "true");
+  const [collapsed, setCollapsed] = useState(() => readPreference("averon-admin-sidebar-collapsed") === "true");
   const [isDesktop, setIsDesktop] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
   const [width, setWidth] = useState(() => {
-    const stored = Number(localStorage.getItem("averon-admin-sidebar-width"));
+    const stored = Number(readPreference("averon-admin-sidebar-width"));
     return Number.isFinite(stored) ? Math.min(360, Math.max(220, stored)) : 256;
   });
   const compact = collapsed && isDesktop;
@@ -101,36 +119,65 @@ export default function Sidebar({
     const nav = navRef.current;
     if (!nav) return;
     try {
-      nav.scrollTop = Number(sessionStorage.getItem("averon-admin-sidebar-scroll") || 0);
+      const storedScroll = Number(sessionStorage.getItem("averon-admin-sidebar-scroll"));
+      nav.scrollTop = Number.isFinite(storedScroll) ? storedScroll : rememberedNavigationScroll;
     } catch {
-      // Keep the sidebar usable when storage is unavailable.
+      nav.scrollTop = rememberedNavigationScroll;
     }
-    const rememberScroll = () => sessionStorage.setItem("averon-admin-sidebar-scroll", String(nav.scrollTop));
+    const rememberScroll = () => {
+      rememberedNavigationScroll = nav.scrollTop;
+      try {
+        sessionStorage.setItem("averon-admin-sidebar-scroll", String(nav.scrollTop));
+      } catch {
+        // The in-memory position still survives route changes.
+      }
+    };
     nav.addEventListener("scroll", rememberScroll, { passive: true });
-    return () => nav.removeEventListener("scroll", rememberScroll);
+    return () => {
+      rememberScroll();
+      nav.removeEventListener("scroll", rememberScroll);
+    };
   }, []);
 
   const toggleCollapsed = () => {
     const next = !collapsed;
     setCollapsed(next);
-    localStorage.setItem("averon-admin-sidebar-collapsed", String(next));
+    savePreference("averon-admin-sidebar-collapsed", String(next));
   };
 
-  const startResize = (event: ReactPointerEvent<HTMLButtonElement>) => {
+  const startResize = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (compact) return;
     event.preventDefault();
     document.documentElement.classList.add("admin-sidebar-resizing");
-    const move = (pointerEvent: PointerEvent) => setWidth(Math.min(360, Math.max(220, pointerEvent.clientX)));
-    const finish = (pointerEvent: PointerEvent) => {
-      const nextWidth = Math.min(360, Math.max(220, pointerEvent.clientX));
+    let nextWidth = width;
+    const move = (pointerEvent: PointerEvent) => {
+      nextWidth = Math.min(360, Math.max(220, pointerEvent.clientX));
       setWidth(nextWidth);
-      localStorage.setItem("averon-admin-sidebar-width", String(nextWidth));
+    };
+    const finish = () => {
+      setWidth(nextWidth);
+      savePreference("averon-admin-sidebar-width", String(nextWidth));
       document.documentElement.classList.remove("admin-sidebar-resizing");
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", finish);
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", finish);
+    window.addEventListener("pointercancel", finish);
+  };
+
+  const resizeWithKeyboard = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const step = event.shiftKey ? 25 : 10;
+    const nextWidth = event.key === "Home"
+      ? 220
+      : event.key === "End"
+        ? 360
+        : Math.min(360, Math.max(220, width + (event.key === "ArrowRight" ? step : -step)));
+    setWidth(nextWidth);
+    savePreference("averon-admin-sidebar-width", String(nextWidth));
   };
 
   const logout = async () => {
@@ -241,7 +288,19 @@ export default function Sidebar({
       <button type="button" onClick={toggleCollapsed} title={collapsed ? "Развернуть меню" : "Свернуть меню"} aria-label={collapsed ? "Развернуть меню" : "Свернуть меню"} className="absolute -right-4 bottom-20 z-10 hidden h-8 w-8 items-center justify-center border border-app bg-surface text-muted shadow-sm hover:text-app lg:flex">
         {compact ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
       </button>
-      {!compact && <button type="button" onPointerDown={startResize} aria-label="Изменить ширину меню" title="Потяните, чтобы изменить ширину" className="absolute inset-y-0 -right-1 z-10 hidden w-2 cursor-col-resize bg-transparent hover:bg-primary-500/20 lg:block" />}
+      {!compact && <div
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Изменить ширину меню"
+        aria-valuemin={220}
+        aria-valuemax={360}
+        aria-valuenow={width}
+        title="Потяните, чтобы изменить ширину"
+        tabIndex={0}
+        onPointerDown={startResize}
+        onKeyDown={resizeWithKeyboard}
+        className="absolute inset-y-0 -right-1 z-10 hidden w-2 cursor-col-resize bg-transparent hover:bg-primary-500/20 focus-visible:outline-none focus-visible:bg-primary-500/30 lg:block"
+      />}
     </aside>
   );
 }

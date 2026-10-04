@@ -1,9 +1,10 @@
 import { lazy, Suspense } from 'react';
 import type { ReactNode } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { useInitAuth } from './hooks/useAuth';
 import { useTheme } from './hooks/useTheme';
 import ProtectedRoute from './components/ProtectedRoute';
+import Layout from './components/Layout';
 
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const CommerceDashboardPage = lazy(() => import('./pages/commerce/CommerceDashboardPage'));
@@ -31,35 +32,48 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 const Guard = ({ children, role }: { children: ReactNode; role?: 'SUPER_ADMIN' }) => <ProtectedRoute requiredAdminRole={role}>{children}</ProtectedRoute>;
 
+function PageLoading() {
+  return (
+    <div className="flex min-h-48 items-center justify-center text-muted" role="status" aria-label="Loading page">
+      <span className="size-8 animate-spin rounded-full border-2 border-app border-t-primary-500" aria-hidden="true" />
+    </div>
+  );
+}
+
 export default function App() {
   useTheme(); useInitAuth();
-  return <BrowserRouter><Suspense fallback={<div className="averon-admin-shell flex min-h-dvh items-center justify-center bg-app text-muted" role="status" aria-label="Loading page"><span className="size-8 animate-spin rounded-full border-2 border-app border-t-primary-500" aria-hidden="true" /></div>}><Routes>
-    <Route path="/login" element={<LoginPage/>}/>
-    <Route path="/" element={<Guard><CommerceDashboardPage/></Guard>}/>
-    <Route path="/products/new" element={<Guard><ProductsPage/></Guard>}/>
-    <Route path="/products/edit/:identifier" element={<Guard><ProductsPage/></Guard>}/>
-    <Route path="/products" element={<Guard><ProductsPage/></Guard>}/>
-    <Route path="/categories" element={<Guard><CategoriesPage/></Guard>}/>
-    <Route path="/imports" element={<Guard><ImportsPage/></Guard>}/>
-    <Route path="/orders" element={<Guard><OrdersPage/></Guard>}/>
-    <Route path="/reviews" element={<Guard><ReviewsPage/></Guard>}/>
-    <Route path="/finance" element={<Guard><FinancePage/></Guard>}/>
-    <Route path="/commerce/promo-codes" element={<Guard><CommercePromosPage/></Guard>}/>
-    <Route path="/media" element={<Guard><MediaLibraryPage/></Guard>}/>
-    <Route path="/users" element={<Guard><UsersPage/></Guard>}/>
-    <Route path="/users/:id" element={<Guard><UserProfilePage/></Guard>}/>
-    <Route path="/audit-log" element={<Guard><AuditLogPage/></Guard>}/>
-    <Route path="/visual-search/audit" element={<Guard><VisualSearchAuditPage/></Guard>}/>
-    <Route path="/notifications" element={<Guard><NotificationsPage/></Guard>}/>
-    <Route path="/analytics" element={<Guard><AnalyticsPage/></Guard>}/>
-    <Route path="/error-logs" element={<Guard><ErrorLogsPage/></Guard>}/>
-
-    <Route path="/profile" element={<Guard><ProfilePage/></Guard>}/>
-    <Route path="/settings" element={<Navigate to="/settings/general" replace/>}/>
-    <Route path="/settings/general" element={<Guard><GeneralSettingsPage/></Guard>}/>
-    <Route path="/settings/staff" element={<Guard role="SUPER_ADMIN"><StaffPage/></Guard>}/>
-    <Route path="/system/health" element={<Guard><SystemHealthPage/></Guard>}/>
-    <Route path="/system/integrations" element={<Guard><IntegrationDiagnosticsPage/></Guard>}/>
-    <Route path="*" element={<NotFoundPage/>}/>
-  </Routes></Suspense></BrowserRouter>;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Suspense fallback={<PageLoading />}><LoginPage /></Suspense>} />
+        <Route element={<Guard><Layout persistent><Suspense fallback={<PageLoading />}><Outlet /></Suspense></Layout></Guard>}>
+          <Route path="/" element={<CommerceDashboardPage />} />
+          <Route path="/products/new" element={<ProductsPage />} />
+          <Route path="/products/edit/:identifier" element={<ProductsPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/imports" element={<ImportsPage />} />
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/reviews" element={<ReviewsPage />} />
+          <Route path="/finance" element={<FinancePage />} />
+          <Route path="/commerce/promo-codes" element={<CommercePromosPage />} />
+          <Route path="/media" element={<MediaLibraryPage />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/users/:id" element={<UserProfilePage />} />
+          <Route path="/audit-log" element={<AuditLogPage />} />
+          <Route path="/visual-search/audit" element={<VisualSearchAuditPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/error-logs" element={<ErrorLogsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<Navigate to="/settings/general" replace />} />
+          <Route path="/settings/general" element={<GeneralSettingsPage />} />
+          <Route path="/settings/staff" element={<Guard role="SUPER_ADMIN"><StaffPage /></Guard>} />
+          <Route path="/system/health" element={<SystemHealthPage />} />
+          <Route path="/system/integrations" element={<IntegrationDiagnosticsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }

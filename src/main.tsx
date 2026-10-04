@@ -31,7 +31,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <App />
-        <Toaster closeButton position="top-right" toastOptions={{ duration: 4000 }} />
+        <Toaster closeButton richColors position="top-center" visibleToasts={4} toastOptions={{ duration: 4000 }} />
       </QueryClientProvider>
     </ErrorBoundary>
   </React.StrictMode>,

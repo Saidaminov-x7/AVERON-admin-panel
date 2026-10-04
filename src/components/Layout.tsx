@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Header/Header';
 import { CommandPalette } from './CommandPalette/CommandPalette';
@@ -7,24 +7,35 @@ import { useTranslation } from 'react-i18next';
 interface LayoutProps {
   children: React.ReactNode;
   title?: string;
+  persistent?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, title }) => {
+const PersistentLayoutContext = createContext<((title?: string) => void) | null>(null);
+
+const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) => {
   const { t } = useTranslation();
+  const updatePersistentTitle = useContext(PersistentLayoutContext);
+  const [pageTitle, setPageTitle] = useState(title);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const focusRestoreFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (updatePersistentTitle && !persistent) updatePersistentTitle(title);
+  }, [persistent, title, updatePersistentTitle]);
+
+  useEffect(() => {
+    if (updatePersistentTitle && !persistent) return;
     const desktopViewport = window.matchMedia('(min-width: 1024px)');
     const closeDrawerOnDesktop = () => {
       if (desktopViewport.matches) setIsMobileMenuOpen(false);
     };
     desktopViewport.addEventListener('change', closeDrawerOnDesktop);
     return () => desktopViewport.removeEventListener('change', closeDrawerOnDesktop);
-  }, []);
+  }, [persistent, updatePersistentTitle]);
 
   useEffect(() => {
+    if (updatePersistentTitle && !persistent) return;
     if (focusRestoreFrameRef.current !== null) {
       cancelAnimationFrame(focusRestoreFrameRef.current);
       focusRestoreFrameRef.current = null;
@@ -74,9 +85,11 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
         });
       }
     };
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, persistent, updatePersistentTitle]);
 
-  return (
+  if (updatePersistentTitle && !persistent) return <>{children}</>;
+
+  const shell = (
     <div className="averon-admin-shell flex h-dvh overflow-hidden bg-app">
       <CommandPalette />
       {/* Глобальная командная строка / Поиск */}
@@ -109,7 +122,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden" inert={isMobileMenuOpen}>
         {/* Верхняя панель */}
         <Header
-          title={title}
+          title={persistent ? pageTitle : title}
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           isMobileMenuOpen={isMobileMenuOpen}
         />
@@ -123,6 +136,9 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
       </div>
     </div>
   );
+  return persistent
+    ? <PersistentLayoutContext.Provider value={setPageTitle}>{shell}</PersistentLayoutContext.Provider>
+    : shell;
 };
 
 export default Layout;
