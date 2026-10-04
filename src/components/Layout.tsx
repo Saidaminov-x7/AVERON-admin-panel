@@ -116,7 +116,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
 
         {/* Контент страницы */}
         <main className="admin-scroll safe-bottom flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
-          <div className="mx-auto w-full max-w-[1440px] space-y-6">
+          <div className="mx-auto w-full max-w-[1600px] space-y-6">
             {children}
           </div>
         </main>

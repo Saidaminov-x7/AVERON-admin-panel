@@ -109,14 +109,12 @@ export default function Sidebar({
 
   return (
     <aside
-      className="sidebar-bg safe-top safe-bottom flex h-dvh w-72 flex-col border-r sidebar-border text-app shadow-[18px_0_50px_rgba(15,23,42,.08)] lg:shadow-none"
+      className="sidebar-bg safe-top safe-bottom flex h-dvh w-64 flex-col border-r sidebar-border text-app"
     >
-      <div className="flex h-20 items-center justify-between border-b border-app px-6">
+      <div className="flex h-16 items-center justify-between border-b border-app px-5">
         <button onClick={() => navigate("/")} className="text-left">
-          <div className="text-xl font-black tracking-[.2em]">AVERON</div>
-          <div className="text-[10px] font-bold tracking-[.24em] text-primary-600">
-            COMMAND CENTER
-          </div>
+          <div className="flex items-center gap-2 text-base font-black tracking-[.2em]">AVERON<span className="h-1.5 w-1.5 bg-primary-500" /></div>
+          <div className="mt-1 text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</div>
         </button>
         {onCloseMobile && (
           <button
@@ -143,7 +141,7 @@ export default function Sidebar({
                   end={to === "/"}
                   onClick={onCloseMobile}
                   className={({ isActive }) =>
-                    `flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-[transform,background-color,color,box-shadow] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] ${isActive ? "bg-primary-600 text-white shadow-md shadow-primary-900/10" : "text-app hover:bg-primary-500/10"}`
+                    `flex min-h-11 items-center gap-3 rounded px-3 py-2.5 text-sm font-semibold transition-[transform,background-color,color] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] ${isActive ? "bg-primary-600 text-white" : "text-app hover:bg-primary-500/10"}`
                   }
                 >
                   <Icon size={18} />
@@ -191,13 +189,13 @@ export default function Sidebar({
         </NavLink>
       </div>
       <div className="border-t border-app p-4">
-        <div className="mb-3 rounded-xl bg-primary-500/10 p-3">
+        <div className="mb-3 border border-app bg-primary-500/5 p-3">
           <p className="text-sm font-bold">{user?.name || t("sidebar.admin")}</p>
           <p className="text-xs text-muted">{user?.adminRole || "ADMIN"}</p>
         </div>
         <button
           onClick={logout}
-          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted hover:bg-red-500/10 hover:text-red-500"
+          className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-muted hover:bg-red-500/10 hover:text-red-500"
         >
           <LogOut size={17} />
           {t("sidebar.logout")}

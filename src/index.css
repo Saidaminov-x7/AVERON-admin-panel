@@ -6,18 +6,18 @@
 
 /* ─── CSS Custom Properties (Light Mode) ─────────────────────────────────── */
 :root {
-  --color-bg:          #fafafa;
+  --color-bg:          #fbf9f9;
   --color-surface:     #ffffff;
-  --color-border:      #e7e5e4;
-  --color-text:        #1c1917;
-  --color-text-muted:  #78716c;
+  --color-border:      #e3e2e2;
+  --color-text:        #1b1c1c;
+  --color-text-muted:  #747685;
   --color-sidebar-bg:  #ffffff;
-  --color-sidebar-border: #e7e5e4;
-  --color-primary:     #0f766e;
-  --color-primary-hover: #115e59;
-  --radius:            0.75rem;
-  --border-radius:     0.75rem;
-  --font-family:       Calibri, system-ui, sans-serif;
+  --color-sidebar-border: #e3e2e2;
+  --color-primary:     #1a44c2;
+  --color-primary-hover: #0f32a3;
+  --radius:            0.25rem;
+  --border-radius:     0.25rem;
+  --font-family:       Inter, "Segoe UI", system-ui, sans-serif;
   --ease-out-ui:       cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-ui:    cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer:       cubic-bezier(0.32, 0.72, 0, 1);
@@ -28,18 +28,18 @@
 
 /* ─── Dark Mode CSS Variables ─────────────────────────────────────────────── */
 .dark {
-  --color-bg:          #0f0f10;
-  --color-surface:     #18181b;
-  --color-border:      rgba(255, 255, 255, 0.08);
-  --color-text:        #fafaf9;
-  --color-text-muted:  #a8a29e;
-  --color-sidebar-bg:  #18181b;
-  --color-sidebar-border: rgba(255, 255, 255, 0.08);
-  --color-primary:     #2dd4bf;
-  --color-primary-hover: #5eead4;
-  --radius:            0.75rem;
-  --border-radius:     0.75rem;
-  --font-family:       Calibri, system-ui, sans-serif;
+  --color-bg:          #0e0f12;
+  --color-surface:     #14161b;
+  --color-border:      #272b35;
+  --color-text:        #f4f4f6;
+  --color-text-muted:  #9ca3af;
+  --color-sidebar-bg:  #14161b;
+  --color-sidebar-border: #272b35;
+  --color-primary:     #4d8eff;
+  --color-primary-hover: #3b82f6;
+  --radius:            0;
+  --border-radius:     0;
+  --font-family:       Inter, "Segoe UI", system-ui, sans-serif;
 }
 
 /* ─── Base Styles ─────────────────────────────────────────────────────────── */
@@ -82,7 +82,7 @@ body {
   .card {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 0.75rem;
+    border-radius: var(--radius);
     padding: 1.5rem;
     transition: background-color 0.2s ease, border-color 0.2s ease;
   }
@@ -90,21 +90,21 @@ body {
   .card-sm {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 0.75rem;
+    border-radius: var(--radius);
     padding: 1rem;
     transition: background-color 0.2s ease, border-color 0.2s ease;
   }
 
   /* Кнопка primary */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl font-semibold text-sm text-white
+    @apply inline-flex items-center justify-center gap-2 h-11 px-4 rounded font-semibold text-sm text-white
            bg-primary-500 hover:bg-primary-600 active:bg-primary-700
            transition-[transform,background-color,box-shadow] duration-150 cursor-pointer border-0 active:scale-[.98];
   }
 
   /* Кнопка ghost */
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl font-semibold text-sm
+    @apply inline-flex items-center justify-center gap-2 h-11 px-4 rounded font-semibold text-sm
            hover:bg-gray-100 dark:hover:bg-white/5
            transition-[transform,background-color,color] duration-150 cursor-pointer border-0 bg-transparent active:scale-[.98];
     color: var(--color-text);
@@ -137,7 +137,7 @@ body {
 
   /* Инпут */
   .input {
-    @apply w-full h-10 px-3.5 rounded-xl text-sm outline-none transition-[border-color,box-shadow,background-color] duration-150;
+    @apply w-full h-11 px-3.5 rounded text-sm outline-none transition-[border-color,box-shadow,background-color] duration-150;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     color: var(--color-text);
