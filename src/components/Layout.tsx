@@ -111,8 +111,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
         aria-modal={isMobileMenuOpen ? true : undefined}
         aria-label={isMobileMenuOpen ? t('header.mobileNavigation') : undefined}
         tabIndex={-1}
-        className={`invisible fixed inset-y-0 left-0 z-50 -translate-x-full transform transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:translate-x-0 ${
-          isMobileMenuOpen ? 'visible translate-x-0' : ''
+        className={`fixed inset-y-0 left-0 z-50 transform transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:translate-x-0 ${
+          isMobileMenuOpen ? 'visible translate-x-0' : 'invisible -translate-x-full'
         }`}
       >
         <Sidebar onCloseMobile={() => setIsMobileMenuOpen(false)} />
