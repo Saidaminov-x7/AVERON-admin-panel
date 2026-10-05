@@ -75,6 +75,9 @@ function loadPhoto(file: File): Promise<HTMLImageElement> {
 }
 
 export async function cropProductPhoto(file: File, crop: ProductPhotoCrop): Promise<File> {
+  if (file.type !== "image/gif" && productPhotoCropSignature(crop) === productPhotoCropSignature(DEFAULT_PRODUCT_PHOTO_CROP)) {
+    return file;
+  }
   const image = await loadPhoto(file);
   const rect = calculateProductPhotoCropRect(image.naturalWidth, image.naturalHeight, crop);
   const aspectRatio = ASPECT_RATIOS[crop.orientation];

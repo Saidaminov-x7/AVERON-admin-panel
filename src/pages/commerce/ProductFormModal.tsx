@@ -62,6 +62,9 @@ type PhotoDraft = {
 };
 
 function getPhotoPreviewStyle(photo: PhotoDraft) {
+  if (productPhotoCropSignature(photo.crop) === productPhotoCropSignature(DEFAULT_PRODUCT_PHOTO_CROP)) {
+    return undefined;
+  }
   if (!photo.file || !photo.naturalWidth || !photo.naturalHeight) {
     return photo.file
       ? { objectPosition: `${photo.crop.x}% ${photo.crop.y}%`, transform: `scale(${photo.crop.zoom})` }
@@ -973,9 +976,9 @@ export function ProductFormModal({
                             ? { ...item, naturalWidth, naturalHeight }
                             : item));
                         }}
-                        className={photo.file && photo.naturalWidth
+                        className={photo.file && photo.naturalWidth && productPhotoCropSignature(photo.crop) !== productPhotoCropSignature(DEFAULT_PRODUCT_PHOTO_CROP)
                           ? "absolute max-w-none select-none"
-                          : `h-full w-full ${photo.file ? "object-cover" : "object-contain"}`}
+                          : "h-full w-full object-contain"}
                         style={getPhotoPreviewStyle(photo)}
                       />
                     ) : <ImageOff size={24} className="text-muted" />}

@@ -122,7 +122,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                   <img
                     src={previews[idx]}
                     alt={file.name}
-                    className="h-20 w-full object-cover rounded-lg mb-2"
+                    className="h-20 w-full object-contain rounded-lg mb-2 bg-surface-muted"
                   />
                 ) : (
                   <div className="h-20 w-full flex items-center justify-center bg-gray-100 dark:bg-white/5 rounded-lg mb-2 text-muted">

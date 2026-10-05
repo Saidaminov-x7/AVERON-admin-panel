@@ -419,7 +419,7 @@ export default function ProductsPage() {
                     <img
                       src={product.images[0].url}
                       alt={title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                      className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                       onError={(event) => {
                         event.currentTarget.style.display = "none";
                       }}
