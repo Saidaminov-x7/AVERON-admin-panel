@@ -8,6 +8,7 @@ import {
   Bell,
   ClipboardCheck,
   Gauge,
+  ExternalLink,
   HeartHandshake,
   Images,
   LogOut,
@@ -22,6 +23,7 @@ import {
   ShoppingBag,
   Tags,
   Users,
+  UserRound,
   X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -191,10 +193,10 @@ export default function Sidebar({
 
   return (
     <aside
-      style={{ width: compact ? 76 : isDesktop ? width : 256 }}
-      className="sidebar-bg safe-top safe-bottom relative flex h-dvh shrink-0 flex-col border-r sidebar-border text-app transition-[width] duration-200"
+      style={{ width: isDesktop ? (compact ? 76 : width) : undefined }}
+      className="sidebar-bg safe-top safe-bottom relative flex h-dvh w-[min(92vw,380px)] max-w-full shrink-0 flex-col overflow-y-auto border-r sidebar-border text-app transition-[width] duration-200 lg:w-auto lg:overflow-hidden"
     >
-      <div className={`relative flex h-16 items-center border-b border-app ${compact ? "justify-start px-4" : "justify-between px-5 pr-14"}`}>
+      <div className={`sticky top-0 z-20 flex h-16 shrink-0 items-center border-b border-app bg-surface ${compact ? "justify-start px-4" : "justify-between px-5 pr-5 lg:pr-14"}`}>
         <button onClick={() => navigate("/")} className="text-left">
           <div className="flex items-center gap-2 text-base font-black tracking-[.2em]">{compact ? "A" : "AVERON"}<span className="h-1.5 w-1.5 bg-primary-500" /></div>
           {!compact && <div className="mt-1 text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</div>}
@@ -213,13 +215,13 @@ export default function Sidebar({
             type="button"
             onClick={onCloseMobile}
             aria-label={t("common.close", "Закрыть")}
-            className="lg:hidden"
+            className="flex size-10 items-center justify-center rounded-lg border border-app bg-surface text-app transition-colors hover:bg-app lg:hidden"
           >
             <X />
           </button>
         )}
       </div>
-      <nav ref={navRef} className={`min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain py-6 ${compact ? "px-2" : "px-4"}`}>
+      <nav ref={navRef} className={`flex-none space-y-7 overflow-visible overscroll-contain py-6 lg:min-h-0 lg:flex-1 lg:space-y-6 lg:overflow-y-auto ${compact ? "px-2" : "px-4"}`}>
         {sections.map((s) => (
           <div key={s.sectionKey}>
             <p className={`mb-2 px-3 text-[10px] font-bold tracking-[.16em] text-muted ${compact ? "sr-only" : ""}`}>
@@ -245,8 +247,8 @@ export default function Sidebar({
           </div>
         ))}
       </nav>
-      <div className="space-y-3 border-t border-app p-4 lg:hidden">
-        <p className="text-[10px] font-bold tracking-[.16em] text-muted">{t("header.language")}</p>
+      <div className="space-y-4 border-t border-app bg-app/40 p-4 lg:hidden">
+        <p className="text-[10px] font-bold uppercase tracking-[.16em] text-muted">{t("common.language", "Язык")}</p>
         <div className="grid grid-cols-3 gap-2">
           {([
             { code: "ru", label: "Русский" },
@@ -262,24 +264,31 @@ export default function Sidebar({
               }}
               aria-pressed={i18n.language.slice(0, 2) === code}
               aria-label={label}
-              className={`min-h-10 rounded-lg border px-2 text-xs font-semibold ${i18n.language.slice(0, 2) === code ? "border-primary-500 bg-primary-500 text-white" : "border-app text-app"}`}
+              className={`flex min-h-12 items-center justify-center gap-2 rounded-lg border px-2 text-xs font-bold transition-colors ${i18n.language.slice(0, 2) === code ? "border-primary-600 bg-primary-600 text-white" : "border-app bg-surface text-app"}`}
             >
               <LanguageFlag locale={code} />
+              <span>{code.toUpperCase()}</span>
             </button>
           ))}
         </div>
-        <div className="flex items-center justify-between gap-3">
-          <NavLink to="/notifications" onClick={onCloseMobile} className="text-sm font-semibold text-app">
-            {t("header.notifications")}
+        <div className="grid grid-cols-2 gap-2">
+          <NavLink to="/notifications" onClick={onCloseMobile} className="flex min-h-12 items-center gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app">
+            <Bell size={17} />
+            <span>{t("header.notifications")}</span>
           </NavLink>
-          <ThemeToggle />
-          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="text-sm font-semibold text-primary-600">
-            {t("header.goToSite")}
+          <div className="flex min-h-12 items-center gap-3 rounded-lg border border-app bg-surface px-2 text-sm font-semibold text-app">
+            <ThemeToggle />
+            <span>{t("header.darkTheme", "Тема")}</span>
+          </div>
+          <NavLink to="/profile" onClick={onCloseMobile} className="flex min-h-12 items-center gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app">
+            <UserRound size={17} />
+            <span>{t("header.account")}</span>
+          </NavLink>
+          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="flex min-h-12 items-center gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app">
+            <ExternalLink size={17} />
+            <span>{t("header.goToSite")}</span>
           </a>
         </div>
-        <NavLink to="/profile" onClick={onCloseMobile} className="block min-h-10 py-2 text-sm font-semibold text-app">
-          {t("header.account")}
-        </NavLink>
       </div>
       <div className={`border-t border-app ${compact ? "p-2" : "p-4"}`}>
         {!compact && <div className="mb-3 border border-app bg-primary-500/5 p-3">
