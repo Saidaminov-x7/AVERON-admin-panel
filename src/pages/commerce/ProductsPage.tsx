@@ -436,7 +436,7 @@ export default function ProductsPage() {
               : russianTranslation?.title || product.slug;
             return (
               <article className="group overflow-hidden rounded-xl border border-app bg-surface transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary-500/40 hover:shadow-lg" key={product.id}>
-                <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden bg-stone-100 dark:bg-stone-800">
+                <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-surface-muted">
                   {product.images?.[0]?.url ? (
                     <img
                       src={product.images[0].url}
