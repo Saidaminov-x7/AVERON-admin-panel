@@ -31,6 +31,15 @@ import { ProductFormModal, type ProductFormSubmission } from "./ProductFormModal
 
 const ALL_COUNTRIES = "ALL" as const;
 
+function formatPublishedAt(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  const days = Math.max(0, Math.floor((Date.now() - date.getTime()) / 86_400_000));
+  const time = date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+  return `${days} дн. назад · ${time}`;
+}
+
 export default function ProductsPage() {
   const { t } = useTranslation();
   const location = useLocation();
@@ -486,6 +495,9 @@ export default function ProductsPage() {
                     <span>Лайки: {product._count?.favoriteLinks ?? 0}</span>
                     <span>Отзывы: {product._count?.reviews ?? 0}</span>
                   </div>
+                  {product.status === "PUBLISHED" && formatPublishedAt(product.publishedAt) ? (
+                    <p className="mt-1 text-xs text-muted">Опубликован: {formatPublishedAt(product.publishedAt)}</p>
+                  ) : null}
                   <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-app pt-3">
                     <button
                       type="button"

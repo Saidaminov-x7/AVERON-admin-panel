@@ -123,6 +123,7 @@ export interface ProductListItem {
   salePriceUzs: string | number;
   compareAtPriceUzs?: string | number | null;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  publishedAt?: string | null;
   _count?: { favoriteLinks: number; recentlyViewedRecords: number; reviews: number };
 }
 
