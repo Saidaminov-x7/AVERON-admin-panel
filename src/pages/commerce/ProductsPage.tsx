@@ -35,7 +35,7 @@ export default function ProductsPage() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { identifier } = useParams<{ identifier: string }>();
   const isEditorRoute = location.pathname === "/products/new" || Boolean(identifier);
   const isNewProductRoute = location.pathname === "/products/new";
@@ -55,6 +55,19 @@ export default function ProductsPage() {
   const [telegramRetryProductId, setTelegramRetryProductId] = useState<string | null>(null);
   const [isRetryingTelegram, setIsRetryingTelegram] = useState(false);
   const qc = useQueryClient();
+
+  useEffect(() => {
+    setCategorySlug(searchParams.get("category") ?? "");
+  }, [searchParams]);
+
+  const updateCatalogQuery = (key: string, value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value && value !== "ALL") next.set(key, value);
+    else next.delete(key);
+    next.delete("page");
+    setSearchParams(next, { replace: true });
+    setPage(1);
+  };
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["commerce-products", country, categorySlug, status, source, sort, search, page, limit],
@@ -355,7 +368,7 @@ export default function ProductsPage() {
           label={t("products.categoryFilter")}
           value={categorySlug}
           options={categoryOptions}
-          onChange={(value) => { setCategorySlug(value); setPage(1); }}
+          onChange={(value) => updateCatalogQuery("category", value)}
         />
         <Select
           label={t("products.statusFilter")}
