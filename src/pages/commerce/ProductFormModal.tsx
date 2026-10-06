@@ -550,6 +550,12 @@ export function ProductFormModal({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isPreparingImages || isSaving) return;
+    // A submit event must never publish from an intermediate step. This guard
+    // keeps the stepper safe even if a browser or wrapper treats "Далее" as submit.
+    if (currentStep < steps.length - 1) {
+      setCurrentStep((step) => Math.min(steps.length - 1, step + 1));
+      return;
+    }
     setSubmitAttempted(true);
     const nextErrors: FormErrors = {};
     const validationCodes = validateProductDraft({
