@@ -111,8 +111,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
         aria-modal={isMobileMenuOpen ? true : undefined}
         aria-label={isMobileMenuOpen ? t('header.mobileNavigation') : undefined}
         tabIndex={-1}
-        className={`fixed inset-y-0 left-0 z-50 transform transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:translate-x-0 ${
-          isMobileMenuOpen ? 'visible translate-x-0' : 'invisible -translate-x-full'
+        className={`fixed inset-y-0 right-0 z-50 transform transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:right-auto lg:translate-x-0 ${
+          isMobileMenuOpen ? 'visible translate-x-0' : 'invisible translate-x-full'
         }`}
       >
         <Sidebar onCloseMobile={() => setIsMobileMenuOpen(false)} />
@@ -128,8 +128,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
         />
 
         {/* Контент страницы */}
-        <main className="admin-scroll safe-bottom flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
-          <div className="mx-auto w-full max-w-[1600px] space-y-6">
+        <main className="admin-scroll safe-bottom flex-1 overflow-x-hidden overflow-y-auto p-3 min-[390px]:p-4 sm:p-6 lg:p-8 animate-fade-in">
+          <div className="admin-page-frame mx-auto w-full max-w-[1440px] space-y-4 sm:space-y-6">
             {children}
           </div>
         </main>

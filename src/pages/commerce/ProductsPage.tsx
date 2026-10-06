@@ -516,7 +516,7 @@ export default function ProductsPage() {
       {isFormOpen && (
         <ProductFormModal
           isOpen={isFormOpen}
-          presentation={isEditorRoute ? "page" : "dialog"}
+          presentation="page"
           product={editingProduct}
           categories={categoriesQuery.data ?? []}
           categoriesError={categoriesQuery.isError}

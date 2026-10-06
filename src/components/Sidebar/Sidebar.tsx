@@ -194,7 +194,7 @@ export default function Sidebar({
   return (
     <aside
       style={{ width: isDesktop ? (compact ? 76 : width) : undefined }}
-      className="sidebar-bg safe-top safe-bottom relative flex h-dvh w-[min(92vw,380px)] max-w-full shrink-0 flex-col overflow-y-auto border-r sidebar-border text-app transition-[width] duration-200 lg:w-auto lg:overflow-hidden"
+      className="sidebar-bg safe-top safe-bottom relative flex h-dvh w-screen max-w-full shrink-0 flex-col overflow-hidden text-app transition-[width] duration-200 lg:w-auto lg:border-r lg:sidebar-border"
     >
       <div className={`sticky top-0 z-20 flex h-16 shrink-0 items-center border-b border-app bg-surface ${compact ? "justify-start px-4" : "justify-between px-5 pr-5 lg:pr-14"}`}>
         <button onClick={() => navigate("/")} className="text-left">
@@ -221,7 +221,7 @@ export default function Sidebar({
           </button>
         )}
       </div>
-      <nav ref={navRef} className={`flex-none space-y-7 overflow-visible overscroll-contain py-6 lg:min-h-0 lg:flex-1 lg:space-y-6 lg:overflow-y-auto ${compact ? "px-2" : "px-4"}`}>
+      <nav ref={navRef} className={`min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain py-5 lg:space-y-6 lg:py-6 ${compact ? "px-2" : "px-4"}`}>
         {sections.map((s) => (
           <div key={s.sectionKey}>
             <p className={`mb-2 px-3 text-[10px] font-bold tracking-[.16em] text-muted ${compact ? "sr-only" : ""}`}>
@@ -236,7 +236,7 @@ export default function Sidebar({
                   onClick={onCloseMobile}
                   title={compact ? t(labelKey) : undefined}
                   className={({ isActive }) =>
-                    `flex min-h-11 items-center gap-3 rounded px-3 py-2.5 text-sm font-semibold transition-[transform,background-color,color] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] ${isActive ? "bg-primary-600 text-white" : "text-app hover:bg-primary-500/10"}`
+                    `admin-drawer-link flex min-h-12 items-center gap-3 border-b border-app px-1 py-2 text-sm font-semibold transition-[transform,background-color,color] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] lg:min-h-11 lg:rounded lg:border-0 lg:px-3 ${isActive ? "is-active bg-primary-600 text-white" : "text-app hover:bg-primary-500/10"}`
                   }
                 >
                   <Icon size={18} />
@@ -247,8 +247,11 @@ export default function Sidebar({
           </div>
         ))}
       </nav>
-      <div className="space-y-4 border-t border-app bg-app/40 p-4 lg:hidden">
-        <p className="text-[10px] font-bold uppercase tracking-[.16em] text-muted">{t("common.language", "Язык")}</p>
+      <div className="space-y-4 border-t border-app bg-surface px-5 py-4 lg:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[10px] font-bold uppercase tracking-[.16em] text-muted">{t("common.language", "Язык")}</p>
+          <ThemeToggle />
+        </div>
         <div className="grid grid-cols-3 gap-2">
           {([
             { code: "ru", label: "Русский" },
@@ -264,7 +267,7 @@ export default function Sidebar({
               }}
               aria-pressed={i18n.language.slice(0, 2) === code}
               aria-label={label}
-              className={`flex min-h-12 items-center justify-center gap-2 rounded-lg border px-2 text-xs font-bold transition-colors ${i18n.language.slice(0, 2) === code ? "border-primary-600 bg-primary-600 text-white" : "border-app bg-surface text-app"}`}
+              className={`flex min-h-10 items-center justify-center gap-2 border-b px-2 text-xs font-bold transition-colors ${i18n.language.slice(0, 2) === code ? "border-current text-app" : "border-app text-muted"}`}
             >
               <LanguageFlag locale={code} />
               <span>{code.toUpperCase()}</span>
@@ -272,26 +275,22 @@ export default function Sidebar({
           ))}
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <NavLink to="/notifications" onClick={onCloseMobile} className="flex min-h-12 items-center gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app">
+          <NavLink to="/notifications" onClick={onCloseMobile} className="flex min-h-12 items-center gap-3 border-b border-app px-1 text-sm font-semibold text-app">
             <Bell size={17} />
             <span>{t("header.notifications")}</span>
           </NavLink>
-          <div className="flex min-h-12 items-center gap-3 rounded-lg border border-app bg-surface px-2 text-sm font-semibold text-app">
-            <ThemeToggle />
-            <span>{t("header.darkTheme", "Тема")}</span>
-          </div>
-          <NavLink to="/profile" onClick={onCloseMobile} className="flex min-h-12 items-center gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app">
+          <NavLink to="/profile" onClick={onCloseMobile} className="flex min-h-12 items-center gap-3 border-b border-app px-1 text-sm font-semibold text-app">
             <UserRound size={17} />
             <span>{t("header.account")}</span>
           </NavLink>
-          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="flex min-h-12 items-center gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app">
+          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="col-span-2 flex min-h-12 items-center gap-3 border-b border-app px-1 text-sm font-semibold text-app">
             <ExternalLink size={17} />
             <span>{t("header.goToSite")}</span>
           </a>
         </div>
       </div>
-      <div className={`border-t border-app ${compact ? "p-2" : "p-4"}`}>
-        {!compact && <div className="mb-3 border border-app bg-primary-500/5 p-3">
+      <div className={`shrink-0 border-t border-app ${compact ? "p-2" : "p-3 lg:p-4"}`}>
+        {!compact && <div className="mb-2 px-1 py-2">
           <p className="text-sm font-bold">{user?.name || t("sidebar.admin")}</p>
           <p className="text-xs text-muted">{user?.adminRole || "ADMIN"}</p>
         </div>}

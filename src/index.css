@@ -63,6 +63,7 @@
   --duration-press:    140ms;
   --duration-ui:       180ms;
   --duration-enter:    220ms;
+  --shadow-drawer:     -18px 0 48px rgb(0 0 0 / .18);
 }
 
 /* ─── Dark Mode CSS Variables ─────────────────────────────────────────────── */
@@ -87,6 +88,7 @@
   --radius-control:    var(--radius);
   --border-radius:     var(--radius);
   --font-family:       Inter, "Segoe UI", system-ui, sans-serif;
+  --shadow-drawer:     -18px 0 48px rgb(0 0 0 / .38);
 }
 
 .admin-sidebar-resizing, .admin-sidebar-resizing * {
@@ -338,6 +340,33 @@ button, [role="button"], summary { user-select: none; }
 @media (pointer: coarse) {
   input, textarea, select { font-size: 16px !important; }
   button, [role="button"], a { min-height: 44px; }
+}
+
+@media (max-width: 639px) {
+  .admin-page-frame,
+  .admin-page-frame > * { min-width: 0; width: 100%; max-width: 100%; }
+  .admin-page-frame .card { padding: 1rem; }
+  .admin-page-frame .card-sm { padding: .875rem; }
+  .admin-page-frame :where(.grid) { min-width: 0; }
+  .admin-page-frame :where(table) { min-width: 42rem; }
+  .admin-page-frame :where(.overflow-x-auto) {
+    margin-inline: -.25rem;
+    padding-inline: .25rem;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-page-frame :where(h1) { font-size: 1.35rem; }
+  .admin-page-frame :where(h2) { font-size: 1.125rem; }
+  .admin-page-frame :where(button, a, input, select, textarea) { max-width: 100%; }
+  .admin-drawer-link.is-active {
+    background: transparent !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-text);
+  }
+}
+
+@media (min-width: 640px) {
+  .admin-page-frame > * { width: 100%; max-width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

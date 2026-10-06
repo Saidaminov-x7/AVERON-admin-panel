@@ -144,10 +144,11 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
         flex-shrink-0 transition-colors duration-200 relative z-30
       "
     >
-      <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between px-3 sm:px-6">
+      <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between px-3 sm:px-6 lg:px-8">
       {/* Заголовок страницы + Гамбургер на мобилке */}
-      <div className="flex min-w-0 flex-1 items-center">
-        {title && <h1 className="min-w-0 truncate text-base font-bold text-app sm:text-xl">{title}</h1>}
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <span className="shrink-0 text-sm font-black tracking-[.18em] text-app lg:hidden">AVERON</span>
+        {title && <h1 className="min-w-0 truncate border-l border-app pl-3 text-sm font-semibold text-app sm:text-xl lg:border-0 lg:pl-0">{title}</h1>}
       </div>
 
       {/* Правая часть */}

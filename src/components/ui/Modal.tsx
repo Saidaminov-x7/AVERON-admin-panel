@@ -92,7 +92,7 @@ export function Modal({
   };
 
   const panelClass = presentation === 'page'
-    ? 'h-[calc(100dvh-9rem)] min-h-[22rem] overflow-hidden rounded-theme border border-app'
+    ? 'min-h-[calc(100dvh-7rem)] overflow-visible rounded-theme border border-app'
     : `relative z-10 shadow-2xl border border-app ${
       fullscreenOnMobile
         ? `h-[100dvh] max-h-[100dvh] rounded-none border-x-0 border-y-0 sm:h-auto sm:max-h-[90vh] sm:rounded-theme sm:border ${sizeClasses[size]}`
@@ -153,7 +153,7 @@ export function Modal({
                 <X size={18} />
               </button>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">{children}</div>
+            <div className={presentation === 'page' ? 'p-4 sm:p-6' : 'min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6'}>{children}</div>
             {footer && (
               <div className="flex shrink-0 items-center justify-end gap-3 border-t border-app bg-surface px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 sm:p-5">
                 {footer}
