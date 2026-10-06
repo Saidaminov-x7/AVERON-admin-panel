@@ -112,6 +112,7 @@ export default function ProductsPage() {
           ...(values.sourceUrl ? { sourceUrl: values.sourceUrl } : {}),
           images,
           salePriceUzs: values.salePriceUzs,
+          stock: values.stock,
           compareAtPriceUzs: values.compareAtPriceUzs,
           colors: values.colors,
           sizeChartType: values.sizeChartType || null,

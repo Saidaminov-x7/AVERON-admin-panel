@@ -146,6 +146,7 @@ export interface ProductPayload {
   sourceUrl?: string;
   images: Array<{ mediaId: string }>;
   salePriceUzs: number;
+  stock?: number;
   compareAtPriceUzs?: number | null;
   categoryId?: string;
   color?: string;
@@ -164,6 +165,7 @@ export interface ProductUpdatePayload {
   sourceUrl?: string | null;
   images?: Array<{ id: string } | { mediaId: string }>;
   salePriceUzs: number;
+  stock?: number;
   compareAtPriceUzs?: number | null;
   country?: ProductCountry;
   sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;

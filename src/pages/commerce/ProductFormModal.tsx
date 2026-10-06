@@ -86,6 +86,7 @@ type ProductFormValues = {
   categoryId: string;
   salePriceUzs: string;
   compareAtPriceUzs: string;
+  stock: string;
   colorsText: string;
   color: string;
   size: string;
@@ -104,6 +105,7 @@ export type ProductFormSubmission = {
   descriptionEn: string;
   sourceUrl?: string;
   salePriceUzs: number;
+  stock: number;
   compareAtPriceUzs: number | null;
   colors: Array<{ name: string; hex: string }>;
   country?: ProductCountry;
@@ -162,6 +164,7 @@ const getInitialValues = (product: ProductListItem | null): ProductFormValues =>
   categoryId: product?.categoryId ?? "",
   salePriceUzs: product ? String(product.salePriceUzs) : "",
   compareAtPriceUzs: product?.compareAtPriceUzs ? String(product.compareAtPriceUzs) : "",
+  stock: product?.variants?.[0]?.stock !== undefined ? String(product.variants[0].stock) : "0",
   colorsText: product?.variants?.map((variant) => {
     const [name, hex] = (variant.color ?? "").split("::");
     return hex ? `${name} | ${hex}` : "";
@@ -587,6 +590,7 @@ export function ProductFormModal({
         descriptionUz: values.translations.uz.description.trim(),
         descriptionEn: values.translations.en.description.trim(),
         salePriceUzs: Number(values.salePriceUzs),
+        stock: Math.max(0, Math.floor(Number(values.stock || 0))),
         compareAtPriceUzs: values.compareAtPriceUzs ? Number(values.compareAtPriceUzs) : null,
         colors: values.colorsText.split("\n").map((row) => {
           const [name, hex] = row.split("|").map((part) => part.trim());
@@ -870,6 +874,17 @@ export function ProductFormModal({
             <h4 className="text-sm font-bold text-app">{t("products.priceSection")}</h4>
             <p className="mt-1 text-xs text-muted">{t("products.priceSectionHint")}</p>
           </div>
+          <Input
+            label="Наличие товара (шт.)"
+            type="number"
+            min="0"
+            step="1"
+            inputMode="numeric"
+            value={values.stock}
+            onChange={(event) => updateValue("stock", event.target.value)}
+            className="max-w-md"
+          />
+          <p className="text-xs text-muted">Если оставить 0, товар будет показан как отсутствующий или доступный по предзаказу.</p>
           <Input
             label={t("products.salePriceLabel")}
             type="number"
