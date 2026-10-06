@@ -58,6 +58,20 @@ export default function ProductsPage() {
 
   useEffect(() => {
     setCategorySlug(searchParams.get("category") ?? "");
+    const urlCountry = searchParams.get("country");
+    setCountry(urlCountry && isProductCountry(urlCountry) ? urlCountry : ALL_COUNTRIES);
+    const urlStatus = searchParams.get("status");
+    setStatus(urlStatus === "PUBLISHED" || urlStatus === "DRAFT" || urlStatus === "ARCHIVED" ? urlStatus : "ALL");
+    const urlSource = searchParams.get("source");
+    setSource(urlSource === "SOURCE_1688" || urlSource === "TAOBAO" || urlSource === "ALIBABA" || urlSource === "ALIEXPRESS" || urlSource === "MANUAL" ? urlSource : "ALL");
+    const urlSort = searchParams.get("sort");
+    setSort(urlSort === "price_asc" || urlSort === "price_desc" ? urlSort : "newest");
+    setSearch(searchParams.get("q") ?? "");
+    setSearchDraft(searchParams.get("q") ?? "");
+    const urlPage = Number(searchParams.get("page"));
+    setPage(Number.isInteger(urlPage) && urlPage > 0 ? urlPage : 1);
+    const urlLimit = Number(searchParams.get("limit"));
+    setLimit(urlLimit === 30 || urlLimit === 48 ? urlLimit : 15);
   }, [searchParams]);
 
   const updateCatalogQuery = (key: string, value: string) => {
@@ -345,8 +359,7 @@ export default function ProductsPage() {
           className="flex min-w-0 items-end gap-2 xl:col-span-2"
           onSubmit={(event) => {
             event.preventDefault();
-            setSearch(searchDraft.trim());
-            setPage(1);
+            updateCatalogQuery("q", searchDraft.trim());
           }}
         >
           <label className="min-w-0 flex-1 text-xs font-semibold text-muted">
@@ -360,8 +373,7 @@ export default function ProductsPage() {
           value={country}
           options={countryOptions}
           onChange={(value) => {
-            setCountry(value === ALL_COUNTRIES ? ALL_COUNTRIES : isProductCountry(value) ? value : ALL_COUNTRIES);
-            setPage(1);
+            updateCatalogQuery("country", value === ALL_COUNTRIES ? "" : value);
           }}
         />
         <Select
@@ -375,8 +387,7 @@ export default function ProductsPage() {
           value={status}
           options={statusOptions}
           onChange={(value) => {
-            setStatus(value === "PUBLISHED" || value === "DRAFT" || value === "ARCHIVED" ? value : "ALL");
-            setPage(1);
+            updateCatalogQuery("status", value);
           }}
         />
         <Select
@@ -384,8 +395,7 @@ export default function ProductsPage() {
           value={sort}
           options={sortOptions}
           onChange={(value) => {
-            setSort(value === "price_asc" || value === "price_desc" ? value : "newest");
-            setPage(1);
+            updateCatalogQuery("sort", value === "newest" ? "" : value);
           }}
         />
         <Select
@@ -393,8 +403,7 @@ export default function ProductsPage() {
           value={source}
           options={sourceOptions}
           onChange={(value) => {
-            setSource(value === "SOURCE_1688" || value === "TAOBAO" || value === "ALIBABA" || value === "ALIEXPRESS" || value === "MANUAL" ? value : "ALL");
-            setPage(1);
+            updateCatalogQuery("source", value);
           }}
         />
         <Select
@@ -403,8 +412,7 @@ export default function ProductsPage() {
           options={pageSizeOptions}
           onChange={(value) => {
             const nextLimit = Number(value);
-            setLimit(nextLimit === 15 || nextLimit === 30 || nextLimit === 48 ? nextLimit : 15);
-            setPage(1);
+            updateCatalogQuery("limit", String(nextLimit === 15 || nextLimit === 30 || nextLimit === 48 ? nextLimit : 15));
           }}
         />
       </div>
@@ -507,10 +515,13 @@ export default function ProductsPage() {
           totalItems={data.pagination.total}
           pageSize={limit}
           pageSizeOptions={[15, 30, 48]}
-          onPageChange={setPage}
+          onPageChange={(nextPage) => {
+            const next = new URLSearchParams(searchParams);
+            if (nextPage > 1) next.set("page", String(nextPage)); else next.delete("page");
+            setSearchParams(next, { replace: true });
+          }}
           onPageSizeChange={(nextLimit) => {
-            setLimit(nextLimit);
-            setPage(1);
+            updateCatalogQuery("limit", String(nextLimit));
           }}
         />
       )}
