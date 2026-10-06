@@ -549,6 +549,8 @@ export function ProductFormModal({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLElement | null;
+    if (submitter?.getAttribute("type") !== "submit") return;
     if (isPreparingImages || isSaving) return;
     // A submit event must never publish from an intermediate step. This guard
     // keeps the stepper safe even if a browser or wrapper treats "Далее" as submit.
