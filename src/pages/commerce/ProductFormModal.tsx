@@ -598,7 +598,9 @@ export function ProductFormModal({
       const images: ProductFormSubmission["images"] = [];
       for (const photo of photos) {
         const signature = productPhotoCropSignature(photo.crop);
-        if (photo.mediaId && (!photo.file || photo.mediaCropSignature === signature)) {
+        if (photo.id && !photo.file) {
+          images.push({ id: photo.id });
+        } else if (photo.mediaId && (!photo.file || photo.mediaCropSignature === signature)) {
           images.push({ mediaId: photo.mediaId });
         } else if (photo.file) {
           images.push({ file: await cropProductPhoto(photo.file, photo.crop) });
