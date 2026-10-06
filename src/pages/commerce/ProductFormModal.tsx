@@ -90,6 +90,7 @@ type ProductFormValues = {
   colorsText: string;
   color: string;
   size: string;
+  sizesText: string;
   sizeChartType: "" | "CLOTHING" | "SHOES" | "KIDS_CLOTHING";
   publish: boolean;
   publishTelegram: boolean;
@@ -171,6 +172,7 @@ const getInitialValues = (product: ProductListItem | null): ProductFormValues =>
   }).filter(Boolean).join("\n") ?? "",
   color: product?.source === "MANUAL" ? product.variants?.[0]?.color ?? "" : "",
   size: product?.source === "MANUAL" ? product.variants?.[0]?.size ?? "" : "",
+  sizesText: product?.variants?.map((variant) => variant.size).filter(Boolean).join(", ") ?? "",
   sizeChartType: product?.sizeChartType ?? "",
   publish: product ? product.status === "PUBLISHED" : true,
   publishTelegram: false,
@@ -207,6 +209,9 @@ export function ProductFormModal({
     focusY: number;
   } | null>(null);
   const [activeLocale, setActiveLocale] = useState<ProductLocale>("ru");
+  const [currentStep, setCurrentStep] = useState(0);
+  const steps = ["Основная информация", "Цены", "Варианты", "Фотографии", "Публикация"];
+  const parseSizes = (text: string) => text.split(/[\n,]+/).map((size) => size.trim()).filter(Boolean);
   const [values, setValues] = useState<ProductFormValues>(() => getInitialValues(product));
   const [photos, setPhotos] = useState<PhotoDraft[]>(() => (product?.images ?? []).map((image) => ({
     key: `existing-${image.id}`,
@@ -599,7 +604,7 @@ export function ProductFormModal({
         country: isProductCountry(values.country) ? values.country : undefined,
         categoryId: values.categoryId || null,
         color: values.color.trim(),
-        size: values.size.trim(),
+        size: parseSizes(values.sizesText).join(", ") || values.size.trim(),
         sizeChartType: values.sizeChartType,
         publish: values.publish,
         publishTelegram: values.publishTelegram,
@@ -704,17 +709,22 @@ export function ProductFormModal({
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={isSaving || isPreparingImages}>{t("common.cancel")}</Button>
-          <Button type="submit" form={formId} loading={isSaving || isPreparingImages} disabled={settingsLoading || isPreparingImages}>
+          {currentStep > 0 && <Button type="button" variant="outline" onClick={() => setCurrentStep((step) => step - 1)} disabled={isSaving || isPreparingImages}>Назад</Button>}
+          {currentStep < steps.length - 1 ? <Button type="button" onClick={() => setCurrentStep((step) => step + 1)}>Далее</Button> : <Button type="submit" form={formId} loading={isSaving || isPreparingImages} disabled={settingsLoading || isPreparingImages}>
             {isPreparingImages
               ? t("products.preparingPhotos")
               : isSaving
                 ? t(product ? "products.saving" : "products.creating")
                 : t(product ? "products.saveChanges" : "products.saveBtn")}
-          </Button>
+          </Button>}
         </>
       }
     >
       <form id={formId} noValidate onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-3">
+          <div className="flex gap-1">{steps.map((step, index) => <button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={step} className={`h-1 flex-1 rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-neutral-200 dark:bg-neutral-700"}`} />)}</div>
+          <div className="flex items-center justify-between text-xs text-muted"><span>Шаг {currentStep + 1} из {steps.length}</span><span className="font-medium text-app">{steps[currentStep]}</span></div>
+        </div>
         <div className="rounded-xl border border-primary-500/20 bg-primary-500/5 p-4">
           <p className="text-sm font-bold text-app">{product ? "Редактирование карточки товара" : "Новый товар — заполните по шагам"}</p>
           <p className="mt-1 text-xs leading-5 text-muted">1. Страна и категория · 2. Название и описание · 3. Цена, скидка и цвета · 4. Фотографии · 5. Публикация</p>
@@ -734,7 +744,7 @@ export function ProductFormModal({
             </ul>
           </div>
         )}
-        <section className="space-y-4 rounded-xl border border-app bg-surface p-5">
+        <section className={`${currentStep === 0 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <h4 className="text-sm font-bold text-app">{t("products.mainInformation")}</h4>
           <div className="grid gap-4 md:grid-cols-2">
             <Select
@@ -757,7 +767,7 @@ export function ProductFormModal({
           </div>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-app bg-surface p-5">
+        <section className={`${currentStep === 0 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h4 className="text-sm font-bold text-app">{t("products.localizedContent")}</h4>
@@ -869,7 +879,7 @@ export function ProductFormModal({
           </div>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-app bg-surface p-5">
+        <section className={`${currentStep === 1 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <div>
             <h4 className="text-sm font-bold text-app">{t("products.priceSection")}</h4>
             <p className="mt-1 text-xs text-muted">{t("products.priceSectionHint")}</p>
@@ -909,7 +919,7 @@ export function ProductFormModal({
           <p className="text-xs text-muted">Если цена выше текущей, на витрине автоматически появится скидка.</p>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-app bg-surface p-5">
+        <section className={`${currentStep === 2 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <div>
             <h4 className="text-sm font-bold text-app">Цвета товара</h4>
             <p className="mt-1 text-xs text-muted">Каждый цвет с новой строки: название | HEX. Например: Чёрный | #111111</p>
@@ -935,7 +945,7 @@ export function ProductFormModal({
           )}
         </section>
 
-        <section className="space-y-4 rounded-xl border border-app bg-surface p-5">
+        <section className={`${currentStep === 3 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <div>
             <h4 className="text-sm font-bold text-app">{t("products.photoSection")}</h4>
             <p className="mt-1 text-xs text-muted">
@@ -1094,7 +1104,7 @@ export function ProductFormModal({
         </section>
 
         {product && hasImageEmbeddingsCapability(capabilitiesQuery.data) && !capabilitiesQuery.isError && (
-          <section className="space-y-3 rounded-xl border border-app p-4">
+          <section className={`${currentStep === 3 ? "" : "hidden "}space-y-3 rounded-xl border border-app p-4`}>
             <div>
               <h4 className="text-sm font-bold text-app">{t("products.imageEmbeddings.title")}</h4>
               <p className="mt-1 text-xs text-muted">{t("products.imageEmbeddings.hint")}</p>
@@ -1152,11 +1162,26 @@ export function ProductFormModal({
         )}
 
         {(product?.source === "MANUAL" || !product) && (
-          <section className="space-y-4">
+          <section className={`${currentStep === 2 ? "" : "hidden "}space-y-4`}>
             <h4 className="text-sm font-bold text-app">{t("products.additionalInformation")}</h4>
             <div className="grid gap-4 md:grid-cols-2">
-              <Input label={t("products.colorLabel")} maxLength={80} value={values.color} onChange={(event) => updateValue("color", event.target.value)} />
-              <Input label={t("products.sizeLabel")} maxLength={80} value={values.size} onChange={(event) => updateValue("size", event.target.value)} />
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-app">
+                  Размеры товара
+                  <textarea
+                    value={values.sizesText}
+                    onChange={(event) => updateValue("sizesText", event.target.value)}
+                    rows={3}
+                    placeholder={'Для одежды: S, M, L, XL, XXL\nДля обуви: 35, 36, 37, 38, 39, 40\nДля детской: 86, 92, 98, 104'}
+                    className="mt-2 w-full rounded-xl border border-app bg-app px-3 py-3 text-sm text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                  />
+                </label>
+                <div className="mt-3 flex flex-wrap gap-2" aria-label="Предпросмотр размеров">
+                  {parseSizes(values.sizesText).map((size, index) => (
+                    <span key={`${size}-${index}`} className="inline-flex h-10 min-w-[44px] select-none items-center justify-center rounded-md border border-app bg-surface px-3 text-sm font-medium text-app">{size}</span>
+                  ))}
+                </div>
+              </div>
               <div className="md:col-span-2">
                 <Select
                   label={t("products.sizeChartLabel")}
@@ -1179,7 +1204,7 @@ export function ProductFormModal({
           </section>
         )}
         {product && (
-          <section className="space-y-3 rounded-xl border border-app bg-surface-muted p-4">
+          <section className={`${currentStep === 4 ? "" : "hidden "}space-y-3 rounded-xl border border-app bg-surface-muted p-4`}>
             <h4 className="text-sm font-bold text-app">{t("products.sourceInformation")}</h4>
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
@@ -1209,22 +1234,17 @@ export function ProductFormModal({
             </dl>
           </section>
         )}
-        <section className="space-y-3 rounded-xl border border-app p-4">
+        <section className={`${currentStep === 4 ? "" : "hidden "}space-y-3 rounded-xl border border-app p-4`}>
           <h4 className="text-sm font-bold text-app">{t("products.publicationSection")}</h4>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={values.publish} onChange={(event) => updateValue("publish", event.target.checked)} />
-            <span className="text-sm text-app">{t("products.publishLabel")}</span>
-          </label>
+          <div className="flex items-center justify-between gap-4 py-2">
+            <div><p className="text-sm font-medium text-app">{t("products.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Товар появится в каталоге после сохранения.</p></div>
+            <button type="button" role="switch" aria-checked={values.publish} onClick={() => updateValue("publish", !values.publish)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${values.publish ? "bg-primary-600" : "bg-neutral-300 dark:bg-neutral-600"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publish ? "translate-x-5" : "translate-x-0"}`} /></button>
+          </div>
           <div>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={values.publishTelegram}
-                disabled={!values.publish || !capabilitiesQuery.data?.telegramProductPublish}
-                onChange={(event) => updateValue("publishTelegram", event.target.checked)}
-              />
-              <span className="text-sm text-app">{t("products.telegram.publishLabel")}</span>
-            </label>
+            <div className="flex items-center justify-between gap-4 py-2">
+              <div><p className="text-sm font-medium text-app">{t("products.telegram.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Публикация выполняется после успешного сохранения товара.</p></div>
+              <button type="button" role="switch" aria-checked={values.publishTelegram} disabled={!values.publish || !capabilitiesQuery.data?.telegramProductPublish} onClick={() => updateValue("publishTelegram", !values.publishTelegram)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-40 ${values.publishTelegram ? "bg-primary-600" : "bg-neutral-300 dark:bg-neutral-600"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publishTelegram ? "translate-x-5" : "translate-x-0"}`} /></button>
+            </div>
             {!capabilitiesQuery.isLoading && !capabilitiesQuery.isError && (
               <p className="ml-6 mt-1 text-xs text-muted">
                 {!capabilitiesQuery.data?.telegramProductPublishFeatureEnabled
