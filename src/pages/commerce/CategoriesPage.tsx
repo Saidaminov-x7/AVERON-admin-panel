@@ -14,6 +14,7 @@ import {
   type ProductCategory,
   type ProductLocale,
 } from "../../lib/commerceApi";
+import { uploadMediaApi } from "../../lib/mediaApi";
 
 type CategoryValues = {
   names: Record<ProductLocale, string>;
@@ -41,6 +42,7 @@ export default function CategoriesPage() {
   const [editing, setEditing] = useState<ProductCategory | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [values, setValues] = useState<CategoryValues>(emptyValues);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const categoriesQuery = useQuery({
     queryKey: ["admin", "commerce-categories"],
     queryFn: getProductCategories,
@@ -211,6 +213,31 @@ export default function CategoriesPage() {
           />
           <Input label={t("categories.sortOrder")} type="number" min={0} max={10000} step={1} value={values.sortOrder} onChange={(event) => setValues((current) => ({ ...current, sortOrder: event.target.value }))} />
           <Input label="Фото категории (URL)" type="url" value={values.imageUrl} onChange={(event) => setValues((current) => ({ ...current, imageUrl: event.target.value }))} placeholder="https://..." />
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted">Или загрузите изображение</label>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploadingImage}
+              className="block w-full text-sm"
+              onChange={async (event) => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                setUploadingImage(true);
+                try {
+                  const uploaded = await uploadMediaApi(file);
+                  setValues((current) => ({ ...current, imageUrl: uploaded.url }));
+                  toast.success("Изображение категории загружено");
+                } catch (error: any) {
+                  toast.error(error?.response?.data?.message || "Не удалось загрузить изображение");
+                } finally {
+                  setUploadingImage(false);
+                  event.target.value = "";
+                }
+              }}
+            />
+            {values.imageUrl ? <img src={values.imageUrl} alt="Предпросмотр категории" className="h-24 w-24 object-cover" /> : null}
+          </div>
         </form>
       </Modal>
     </Layout>
