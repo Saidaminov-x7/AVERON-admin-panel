@@ -481,6 +481,11 @@ export default function ProductsPage() {
                       ? t("products.inStock")
                       : t("products.outOfStock")}</span>
                   </div>
+                  <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted" aria-label="Метрики товара">
+                    <span>Просмотры: {product._count?.recentlyViewedRecords ?? 0}</span>
+                    <span>Лайки: {product._count?.favoriteLinks ?? 0}</span>
+                    <span>Отзывы: {product._count?.reviews ?? 0}</span>
+                  </div>
                   <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-app pt-3">
                     <button
                       type="button"
