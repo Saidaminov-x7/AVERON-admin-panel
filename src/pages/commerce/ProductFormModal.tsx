@@ -292,7 +292,7 @@ export function ProductFormModal({
     setPhotoInputErrors([]);
     setSubmitAttempted(false);
     setIsPreparingImages(false);
-  }, [isOpen, product, releaseObjectUrls]);
+  }, [isOpen, product?.id, releaseObjectUrls]);
 
   useEffect(() => () => releaseObjectUrls(), [releaseObjectUrls]);
 
