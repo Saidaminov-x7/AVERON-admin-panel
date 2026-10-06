@@ -19,12 +19,14 @@ type CategoryValues = {
   names: Record<ProductLocale, string>;
   parentId: string;
   sortOrder: string;
+  imageUrl: string;
 };
 
 const emptyValues: CategoryValues = {
   names: { ru: "", uz: "", en: "" },
   parentId: "",
   sortOrder: "0",
+  imageUrl: "",
 };
 
 const localizedName = (category: ProductCategory, locale: string) => {
@@ -58,6 +60,7 @@ export default function CategoriesPage() {
         },
         parentId: values.parentId || null,
         sortOrder: Number(values.sortOrder) || 0,
+        imageUrl: values.imageUrl.trim() || null,
       };
       return editing
         ? updateProductCategory(editing.id, payload)
@@ -100,6 +103,7 @@ export default function CategoriesPage() {
       },
       parentId: category.parentId ?? "",
       sortOrder: String(category.sortOrder ?? 0),
+      imageUrl: category.imageUrl ?? "",
     });
     setIsFormOpen(true);
   };
@@ -206,6 +210,7 @@ export default function CategoriesPage() {
             onChange={(parentId) => setValues((current) => ({ ...current, parentId }))}
           />
           <Input label={t("categories.sortOrder")} type="number" min={0} max={10000} step={1} value={values.sortOrder} onChange={(event) => setValues((current) => ({ ...current, sortOrder: event.target.value }))} />
+          <Input label="Фото категории (URL)" type="url" value={values.imageUrl} onChange={(event) => setValues((current) => ({ ...current, imageUrl: event.target.value }))} placeholder="https://..." />
         </form>
       </Modal>
     </Layout>

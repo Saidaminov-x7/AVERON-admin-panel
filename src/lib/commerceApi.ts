@@ -32,6 +32,7 @@ export interface ProductCategory {
   slug: string;
   name: Record<string, string> | string;
   active?: boolean;
+  imageUrl?: string | null;
   parentId?: string | null;
   sortOrder?: number;
   _count?: { products: number; imports: number };
@@ -189,6 +190,7 @@ export const createProductCategory = (payload: {
   name: Record<ProductLocale, string>;
   parentId?: string | null;
   sortOrder?: number;
+  imageUrl?: string | null;
 }) => api.post<ProductCategory>('/api/v1/admin/categories', payload).then((r) => r.data);
 
 export const updateProductCategory = (id: string, payload: {
