@@ -369,6 +369,12 @@ button, [role="button"], summary { user-select: none; }
   .admin-page-frame > * { width: 100%; max-width: 100%; }
 }
 
+/* The sidebar is outside this frame; every page fills the remaining content area. */
+.admin-page-frame :where(.max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl, .max-w-3xl) {
+  width: 100%;
+  max-width: 100%;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;
