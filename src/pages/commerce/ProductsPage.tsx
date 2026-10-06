@@ -452,7 +452,7 @@ export default function ProductsPage() {
                       <span className="text-xs">AVERON</span>
                     </div>
                   )}
-                  <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm ${product.status === "PUBLISHED" ? "bg-emerald-600 text-white" : product.status === "DRAFT" ? "bg-amber-400 text-stone-950" : "bg-stone-900 text-white"}`}>
+                  <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm ${product.status === "PUBLISHED" ? "bg-emerald-600 text-white" : product.status === "DRAFT" ? "bg-sky-600 text-white" : "bg-neutral-700 text-white"}`}>
                     {t(`products.status.${product.status.toLowerCase()}`)}
                   </span>
                 </div>

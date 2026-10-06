@@ -155,7 +155,7 @@ export function Modal({
             </div>
             <div className={presentation === 'page' ? 'p-4 sm:p-6' : 'min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6'}>{children}</div>
             {footer && (
-              <div className="flex shrink-0 items-center justify-end gap-3 border-t border-app bg-surface px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 sm:p-5">
+              <div className="sticky bottom-0 z-20 flex shrink-0 items-center justify-end gap-3 border-t border-app bg-surface/95 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur sm:p-5">
                 {footer}
               </div>
             )}

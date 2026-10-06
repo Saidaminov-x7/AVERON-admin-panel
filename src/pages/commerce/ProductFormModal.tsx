@@ -211,7 +211,21 @@ export function ProductFormModal({
   const [activeLocale, setActiveLocale] = useState<ProductLocale>("ru");
   const [currentStep, setCurrentStep] = useState(0);
   const steps = ["Основная информация", "Цены", "Варианты", "Фотографии", "Публикация"];
-  const parseSizes = (text: string) => text.split(/[\n,]+/).map((size) => size.trim()).filter(Boolean);
+  const parseSizes = (text: string) => {
+    const clothingOrder = ["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"];
+    return text.split(/[\n,]+/).map((size) => size.trim()).filter(Boolean).sort((a, b) => {
+      const aNumber = Number(a.replace(/[^0-9.]/g, ""));
+      const bNumber = Number(b.replace(/[^0-9.]/g, ""));
+      const aHasNumber = Number.isFinite(aNumber) && /\d/.test(a);
+      const bHasNumber = Number.isFinite(bNumber) && /\d/.test(b);
+      if (aHasNumber && bHasNumber && aNumber !== bNumber) return aNumber - bNumber;
+      const aRank = clothingOrder.indexOf(a.toUpperCase());
+      const bRank = clothingOrder.indexOf(b.toUpperCase());
+      if (aRank >= 0 && bRank >= 0 && aRank !== bRank) return aRank - bRank;
+      if (aHasNumber !== bHasNumber) return aHasNumber ? -1 : 1;
+      return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
+    });
+  };
   const [values, setValues] = useState<ProductFormValues>(() => getInitialValues(product));
   const [photos, setPhotos] = useState<PhotoDraft[]>(() => (product?.images ?? []).map((image) => ({
     key: `existing-${image.id}`,
@@ -597,9 +611,10 @@ export function ProductFormModal({
         salePriceUzs: Number(values.salePriceUzs),
         stock: Math.max(0, Math.floor(Number(values.stock || 0))),
         compareAtPriceUzs: values.compareAtPriceUzs ? Number(values.compareAtPriceUzs) : null,
-        colors: values.colorsText.split("\n").map((row) => {
+        colors: values.colorsText.split("\n").map((row, index) => {
           const [name, hex] = row.split("|").map((part) => part.trim());
-          return { name, hex };
+          const normalizedHex = name && !hex && /^#[0-9a-fA-F]{6}$/.test(name) ? name : hex;
+          return { name: hex ? name : `Цвет ${index + 1}`, hex: normalizedHex };
         }).filter((item) => item.name && /^#[0-9a-fA-F]{6}$/.test(item.hex)),
         country: isProductCountry(values.country) ? values.country : undefined,
         categoryId: values.categoryId || null,
@@ -938,8 +953,15 @@ export function ProductFormModal({
             <div className="flex flex-wrap gap-2" aria-label="Предпросмотр цветов">
               {values.colorsText.split("\n").map((row, index) => {
                 const [name, hex] = row.split("|").map((part) => part.trim());
-                if (!name || !/^#[0-9a-fA-F]{6}$/.test(hex)) return null;
-                return <span key={`${name}-${index}`} className="inline-flex items-center gap-2 rounded-full border border-app px-2.5 py-1 text-xs"><span className="size-4 rounded-full border border-black/10" style={{ backgroundColor: hex }} />{name}</span>;
+                const colorName = hex ? name : `Цвет ${index + 1}`;
+                const colorHex = hex || (name && /^#[0-9a-fA-F]{6}$/.test(name) ? name : "#808080");
+                if (!/^#[0-9a-fA-F]{6}$/.test(colorHex)) return null;
+                const updateColor = (nextHex: string) => {
+                  const rows = values.colorsText.split("\n");
+                  rows[index] = `${hex ? colorName : colorName} | ${nextHex}`;
+                  updateValue("colorsText", rows.join("\n"));
+                };
+                return <span key={`${colorName}-${index}`} className="inline-flex items-center gap-2 rounded-full border border-app px-2.5 py-1 text-xs"><input aria-label={`HEX ${colorName}`} type="color" value={colorHex} onChange={(event) => updateColor(event.target.value)} className="size-5 cursor-pointer rounded-full border-0 bg-transparent p-0" /><span className="size-4 rounded-full border border-black/10" style={{ backgroundColor: colorHex }} />{colorName}<code className="text-[10px] text-muted">{colorHex}</code></span>;
               })}
             </div>
           )}
