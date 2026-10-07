@@ -40,6 +40,12 @@ function formatDate(value: string | null, locale: string) {
     : date.toLocaleString(locale === "uz" ? "uz-UZ" : locale === "en" ? "en-US" : "ru-RU");
 }
 
+function telegramFailureReason(error: unknown): string | null {
+  const data = (error as { response?: { data?: { details?: unknown; code?: unknown } } }).response?.data;
+  if (typeof data?.details === "string") return data.details;
+  return typeof data?.code === "string" ? data.code : null;
+}
+
 export function TelegramPublicationPanel({
   productId,
   locale,
@@ -206,7 +212,10 @@ export function TelegramPublicationPanel({
                 : t("products.telegram.publish")}
           </button>
           {publishMutation.isError && (
-            <p role="alert" className="text-sm text-red-700 dark:text-red-300">{t("products.telegram.publishError")}</p>
+            <p role="alert" className="text-sm text-red-700 dark:text-red-300">
+              {t("products.telegram.publishError")}
+              {telegramFailureReason(publishMutation.error) ? ` (${telegramFailureReason(publishMutation.error)})` : ""}
+            </p>
           )}
         </div>
       )}

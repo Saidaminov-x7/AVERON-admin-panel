@@ -92,6 +92,7 @@ type ProductFormValues = {
   size: string;
   sizesText: string;
   sizeChartType: "" | "CLOTHING" | "SHOES" | "KIDS_CLOTHING";
+  sizeChartText: string;
   publish: boolean;
   publishTelegram: boolean;
 };
@@ -114,6 +115,7 @@ export type ProductFormSubmission = {
   color: string;
   size: string;
   sizeChartType: ProductFormValues["sizeChartType"];
+  sizeChart?: Array<Record<string, string | number>>;
   publish: boolean;
   publishTelegram: boolean;
   images: Array<{ id: string } | { mediaId: string } | { file: File }>;
@@ -174,6 +176,7 @@ const getInitialValues = (product: ProductListItem | null): ProductFormValues =>
   size: product?.source === "MANUAL" ? product.variants?.[0]?.size ?? "" : "",
   sizesText: product?.variants?.map((variant) => variant.size).filter(Boolean).join(", ") ?? "",
   sizeChartType: product?.sizeChartType ?? "",
+  sizeChartText: product?.sizeChart ? JSON.stringify(product.sizeChart, null, 2) : "",
   publish: product ? product.status === "PUBLISHED" : true,
   publishTelegram: false,
 });
@@ -594,6 +597,17 @@ export function ProductFormModal({
       return;
     }
 
+    let sizeChart: Array<Record<string, string | number>> = [];
+    try {
+      const parsed: unknown = values.sizeChartText.trim() ? JSON.parse(values.sizeChartText) : [];
+      if (!Array.isArray(parsed) || parsed.some((row) => !row || typeof row !== "object" || typeof row.size !== "string")) throw new Error("invalid chart");
+      sizeChart = parsed as Array<Record<string, string | number>>;
+    } catch {
+      setPhotoInputErrors([t("products.sizeChartInvalid")]);
+      setCurrentStep(2);
+      return;
+    }
+
     setIsPreparingImages(true);
     setPhotoInputErrors([]);
     try {
@@ -631,6 +645,7 @@ export function ProductFormModal({
         color: values.color.trim(),
         size: parseSizes(values.sizesText).join(", ") || values.size.trim(),
         sizeChartType: values.sizeChartType,
+        sizeChart,
         publish: values.publish,
         publishTelegram: values.publishTelegram,
         images,
@@ -1231,6 +1246,13 @@ export function ProductFormModal({
                   }}
                   helperText={t("products.sizeChartHint")}
                 />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-app">
+                  {t("products.sizeChartDataLabel")}
+                  <textarea value={values.sizeChartText} onChange={(event) => updateValue("sizeChartText", event.target.value)} rows={8} placeholder={'[{"size":"M","chestCm":92,"recommendedHeightMinCm":165,"recommendedHeightMaxCm":175,"recommendedWeightMinKg":55,"recommendedWeightMaxKg":68}]'} className="mt-2 w-full rounded-xl border border-app bg-app px-3 py-3 font-mono text-xs text-app" />
+                </label>
+                <p className="mt-1 text-xs text-muted">{t("products.sizeChartDataHint")}</p>
               </div>
             </div>
           </section>
