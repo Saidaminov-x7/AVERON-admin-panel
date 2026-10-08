@@ -250,7 +250,6 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
           </button>
         )}
       </div>
-
       <nav ref={navRef} className="admin-sidebar-nav min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-3 py-5" aria-label={t("header.mobileNavigation")}>
         {sections.map(({ titleKey, items }) => (
           <section key={titleKey} aria-label={t(titleKey)}>

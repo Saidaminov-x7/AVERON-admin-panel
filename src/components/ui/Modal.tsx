@@ -92,7 +92,7 @@ export function Modal({
   };
 
   const panelClass = presentation === 'page'
-    ? 'min-h-[calc(100dvh-7rem)] overflow-visible rounded-theme border border-app'
+    ? 'admin-page-presentation mx-auto w-full max-w-5xl overflow-hidden rounded-theme border border-app shadow-sm'
     : `relative z-10 shadow-2xl border border-app ${
       fullscreenOnMobile
         ? `h-[100dvh] max-h-[100dvh] rounded-none border-x-0 border-y-0 sm:h-auto sm:max-h-[90vh] sm:rounded-theme sm:border ${sizeClasses[size]}`
