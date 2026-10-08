@@ -1,14 +1,14 @@
-import type { ComponentType, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { ComponentType, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-  AlertCircle,
   Activity,
+  AlertCircle,
   BarChart2,
   Bell,
   ClipboardCheck,
-  Gauge,
   ExternalLink,
+  Gauge,
   HeartHandshake,
   Images,
   LogOut,
@@ -33,15 +33,16 @@ import { logoutApi } from "../../lib/authApi";
 import { useAuthStore } from "../../store/authStore";
 import { LanguageFlag } from "../ui/LanguageFlag";
 
-type Item = { to: string; labelKey: string; icon: ComponentType<{ size?: number }> };
+type NavIcon = ComponentType<{ size?: number; strokeWidth?: number }>;
+type NavItem = { to: string; labelKey: string; icon: NavIcon };
+type NavSection = { titleKey: string; items: NavItem[] };
 
-const sections: { sectionKey: string; items: Item[] }[] = [
+let rememberedNavigationScroll = 0;
+
+const sections: NavSection[] = [
+  { titleKey: "sidebar.section.command", items: [{ to: "/", labelKey: "sidebar.dashboard", icon: Gauge }] },
   {
-    sectionKey: "sidebar.section.command",
-    items: [{ to: "/", labelKey: "sidebar.dashboard", icon: Gauge }],
-  },
-  {
-    sectionKey: "sidebar.section.products",
+    titleKey: "sidebar.section.products",
     items: [
       { to: "/imports", labelKey: "sidebar.review", icon: ClipboardCheck },
       { to: "/products", labelKey: "sidebar.catalog", icon: ShoppingBag },
@@ -51,7 +52,7 @@ const sections: { sectionKey: string; items: Item[] }[] = [
     ],
   },
   {
-    sectionKey: "sidebar.section.operations",
+    titleKey: "sidebar.section.operations",
     items: [
       { to: "/orders", labelKey: "sidebar.orders", icon: PackageCheck },
       { to: "/finance", labelKey: "sidebar.finance", icon: ReceiptText },
@@ -59,7 +60,7 @@ const sections: { sectionKey: string; items: Item[] }[] = [
     ],
   },
   {
-    sectionKey: "sidebar.section.management",
+    titleKey: "sidebar.section.management",
     items: [
       { to: "/users", labelKey: "sidebar.users", icon: Users },
       { to: "/analytics", labelKey: "sidebar.analytics", icon: BarChart2 },
@@ -74,47 +75,44 @@ const sections: { sectionKey: string; items: Item[] }[] = [
   },
 ];
 
-let rememberedNavigationScroll = 0;
+const languages = [
+  { code: "ru", name: "Русский" },
+  { code: "uz", name: "O‘zbekcha" },
+  { code: "en", name: "English" },
+] as const;
 
-function readPreference(key: string) {
+function readCollapsedPreference() {
   try {
-    return localStorage.getItem(key);
+    return localStorage.getItem("averon-admin-sidebar-collapsed") === "true";
   } catch {
-    return null;
+    return false;
   }
 }
 
-function savePreference(key: string, value: string) {
+function readSidebarWidth() {
   try {
-    localStorage.setItem(key, value);
+    const stored = Number(localStorage.getItem("averon-admin-sidebar-width"));
+    return Number.isFinite(stored) ? Math.min(320, Math.max(232, stored)) : 256;
   } catch {
-    // Keep the current session functional when browser storage is unavailable.
+    return 256;
   }
 }
 
-export default function Sidebar({
-  onCloseMobile,
-}: {
-  onCloseMobile?: () => void;
-}) {
+export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const siteUrl = import.meta.env.VITE_SITE_URL || "https://averon.uz";
+  const [collapsed, setCollapsed] = useState(readCollapsedPreference);
+  const [width, setWidth] = useState(readSidebarWidth);
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 1024px)").matches);
   const navRef = useRef<HTMLElement>(null);
-  const [collapsed, setCollapsed] = useState(() => readPreference("averon-admin-sidebar-collapsed") === "true");
-  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
-  const [width, setWidth] = useState(() => {
-    const stored = Number(readPreference("averon-admin-sidebar-width"));
-    return Number.isFinite(stored) ? Math.min(360, Math.max(220, stored)) : 256;
-  });
-  const compact = collapsed && isDesktop;
+  const siteUrl = import.meta.env.VITE_SITE_URL || "https://averon.uz";
 
   useEffect(() => {
-    const media = window.matchMedia('(min-width: 1024px)');
+    const media = window.matchMedia("(min-width: 1024px)");
     const sync = () => setIsDesktop(media.matches);
-    media.addEventListener('change', sync);
-    return () => media.removeEventListener('change', sync);
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
   }, []);
 
   useLayoutEffect(() => {
@@ -131,7 +129,7 @@ export default function Sidebar({
       try {
         sessionStorage.setItem("averon-admin-sidebar-scroll", String(nav.scrollTop));
       } catch {
-        // The in-memory position still survives route changes.
+        // Keep the current scroll position in memory when browser storage is unavailable.
       }
     };
     nav.addEventListener("scroll", rememberScroll, { passive: true });
@@ -142,23 +140,34 @@ export default function Sidebar({
   }, []);
 
   const toggleCollapsed = () => {
-    const next = !collapsed;
-    setCollapsed(next);
-    savePreference("averon-admin-sidebar-collapsed", String(next));
+    setCollapsed((value) => {
+      const next = !value;
+      try {
+        localStorage.setItem("averon-admin-sidebar-collapsed", String(next));
+      } catch {
+        // Sidebar remains usable for this session when browser storage is unavailable.
+      }
+      return next;
+    });
   };
 
   const startResize = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (compact) return;
+    if (!isDesktop || collapsed) return;
     event.preventDefault();
     document.documentElement.classList.add("admin-sidebar-resizing");
     let nextWidth = width;
     const move = (pointerEvent: PointerEvent) => {
-      nextWidth = Math.min(360, Math.max(220, pointerEvent.clientX));
+          const pageRect = document.querySelector(".averon-admin-shell")?.getBoundingClientRect();
+          nextWidth = Math.min(320, Math.max(232, pointerEvent.clientX - (pageRect?.left ?? 0)));
       setWidth(nextWidth);
     };
     const finish = () => {
       setWidth(nextWidth);
-      savePreference("averon-admin-sidebar-width", String(nextWidth));
+      try {
+        localStorage.setItem("averon-admin-sidebar-width", String(nextWidth));
+      } catch {
+        // Width remains adjustable for the current session.
+      }
       document.documentElement.classList.remove("admin-sidebar-resizing");
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", finish);
@@ -172,14 +181,18 @@ export default function Sidebar({
   const resizeWithKeyboard = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
     event.preventDefault();
-    const step = event.shiftKey ? 25 : 10;
+    const step = event.shiftKey ? 24 : 10;
     const nextWidth = event.key === "Home"
-      ? 220
+      ? 232
       : event.key === "End"
-        ? 360
-        : Math.min(360, Math.max(220, width + (event.key === "ArrowRight" ? step : -step)));
+        ? 320
+        : Math.min(320, Math.max(232, width + (event.key === "ArrowRight" ? step : -step)));
     setWidth(nextWidth);
-    savePreference("averon-admin-sidebar-width", String(nextWidth));
+    try {
+      localStorage.setItem("averon-admin-sidebar-width", String(nextWidth));
+    } catch {
+      // Width remains adjustable for the current session.
+    }
   };
 
   const logout = async () => {
@@ -191,83 +204,93 @@ export default function Sidebar({
     }
   };
 
+  const changeLanguage = (code: (typeof languages)[number]["code"]) => {
+    void i18n.changeLanguage(code);
+    try {
+      localStorage.setItem("i18nextLng", code);
+    } catch {
+      // The selected language still changes in the active session.
+    }
+  };
+
   return (
     <aside
-      style={{ width: isDesktop ? (compact ? 76 : width) : undefined }}
-      className="sidebar-bg safe-top safe-bottom relative flex h-dvh w-screen max-w-full shrink-0 flex-col overflow-hidden text-app transition-[width] duration-200 lg:w-auto lg:border-r lg:sidebar-border"
+      style={{ width: isDesktop ? (collapsed ? 76 : width) : undefined }}
+      className={`sidebar-bg safe-top safe-bottom admin-sidebar relative flex h-dvh w-screen max-w-full shrink-0 flex-col overflow-hidden text-app transition-[width] duration-200 lg:w-auto lg:border-r lg:sidebar-border ${collapsed ? "is-collapsed" : ""}`}
+      aria-label={t("header.mobileNavigation")}
     >
-      <div className={`sticky top-0 z-20 flex h-16 shrink-0 items-center border-b border-app bg-surface ${compact ? "justify-start px-4" : "justify-between px-5 pr-5 lg:pr-14"}`}>
-        <button onClick={() => navigate("/")} className="text-left">
-          <div className="flex items-center gap-2 text-base font-black tracking-[.2em]">{compact ? "A" : "AVERON"}<span className="h-1.5 w-1.5 bg-primary-500" /></div>
-          {!compact && <div className="mt-1 text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</div>}
+      <div className="admin-sidebar-brand sticky top-0 z-20 flex h-[72px] shrink-0 items-center justify-between border-b border-app bg-surface px-5">
+        <button type="button" onClick={() => { navigate("/"); onCloseMobile?.(); }} className="text-left" aria-label="AVERON — обзор">
+          <span className="flex items-center gap-2 text-base font-black tracking-[.2em]">
+            <span className={collapsed ? "hidden lg:inline" : ""}>AVERON</span>
+            <span className={collapsed ? "lg:hidden" : "hidden"}>A</span>
+            <span className="h-1.5 w-1.5 bg-primary-500" aria-hidden="true" />
+          </span>
+          {!collapsed && <span className="mt-1 block text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</span>}
         </button>
+
         <button
           type="button"
           onClick={toggleCollapsed}
-          title={collapsed ? "Развернуть меню" : "Свернуть меню"}
-          aria-label={collapsed ? "Развернуть меню" : "Свернуть меню"}
-          className="absolute right-3 top-1/2 hidden size-9 -translate-y-1/2 items-center justify-center rounded-lg border border-app bg-surface text-muted shadow-sm transition-colors hover:bg-app hover:text-app lg:flex"
+          title={t(collapsed ? "common.expand" : "common.collapse")}
+          aria-label={t(collapsed ? "common.expand" : "common.collapse")}
+          className="admin-sidebar-collapse hidden size-9 items-center justify-center border border-app bg-surface text-muted transition-colors hover:bg-app hover:text-app lg:flex"
         >
-          {compact ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+          {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
         </button>
+
         {onCloseMobile && (
           <button
             type="button"
             onClick={onCloseMobile}
-            aria-label={t("common.close", "Закрыть")}
-            className="flex size-10 items-center justify-center rounded-lg border border-app bg-surface text-app transition-colors hover:bg-app lg:hidden"
+            aria-label={t("common.close")}
+            className="flex size-10 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-app lg:hidden"
           >
-            <X />
+            <X size={19} />
           </button>
         )}
       </div>
-      <nav ref={navRef} className={`min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain py-5 lg:space-y-6 lg:py-6 ${compact ? "px-2" : "px-4"}`}>
-        {sections.map((s) => (
-          <div key={s.sectionKey}>
-            <p className={`mb-2 px-3 text-[10px] font-bold tracking-[.16em] text-muted ${compact ? "sr-only" : ""}`}>
-              {t(s.sectionKey)}
-            </p>
+
+      <nav ref={navRef} className="admin-sidebar-nav min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-3 py-5" aria-label={t("header.mobileNavigation")}>
+        {sections.map(({ titleKey, items }) => (
+          <section key={titleKey} aria-label={t(titleKey)}>
+            <h2 className={`admin-sidebar-section-title mb-2 px-3 text-[10px] font-bold tracking-[.12em] text-muted ${collapsed ? "lg:sr-only" : ""}`}>
+              {t(titleKey)}
+            </h2>
             <div className="space-y-1">
-              {s.items.map(({ to, labelKey, icon: Icon }) => (
+              {items.map(({ to, labelKey, icon: Icon }) => (
                 <NavLink
                   key={to}
                   to={to}
                   end={to === "/"}
                   onClick={onCloseMobile}
-                  title={compact ? t(labelKey) : undefined}
-                  className={({ isActive }) =>
-                    `admin-drawer-link flex min-h-12 items-center gap-3 border-b border-app px-1 py-2 text-sm font-semibold transition-[transform,background-color,color] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] lg:min-h-11 lg:rounded lg:border-0 lg:px-3 ${isActive ? "is-active bg-primary-600 text-white" : "text-app hover:bg-primary-500/10"}`
-                  }
+                  title={collapsed ? t(labelKey) : undefined}
+                  aria-label={t(labelKey)}
+                  className={({ isActive }) => `admin-drawer-link flex min-h-11 items-center gap-3 px-3 py-2 text-sm transition-colors ${isActive ? "is-active" : ""}`}
                 >
-                  <Icon size={18} />
-                  {!compact && <span>{t(labelKey)}</span>}
+                  <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+                  <span className="admin-sidebar-label truncate">{t(labelKey)}</span>
                 </NavLink>
               ))}
             </div>
-          </div>
+          </section>
         ))}
       </nav>
-      <div className="space-y-4 border-t border-app bg-surface px-5 py-4 lg:hidden">
+
+      <div className="admin-sidebar-mobile-tools space-y-3 border-t border-app bg-surface px-4 py-4 lg:hidden">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[10px] font-bold uppercase tracking-[.16em] text-muted">{t("common.language", "Язык")}</p>
+          <span className="text-xs font-semibold text-muted">{t("common.language")}</span>
           <ThemeToggle />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          {([
-            { code: "ru", label: "Русский" },
-            { code: "uz", label: "O‘zbekcha" },
-            { code: "en", label: "English" },
-          ] as const).map(({ code, label }) => (
+          {languages.map(({ code, name }) => (
             <button
               key={code}
               type="button"
-              onClick={() => {
-                void i18n.changeLanguage(code);
-                localStorage.setItem("i18nextLng", code);
-              }}
+              onClick={() => changeLanguage(code)}
+              aria-label={name}
               aria-pressed={i18n.language.slice(0, 2) === code}
-              aria-label={label}
-              className={`flex min-h-10 items-center justify-center gap-2 border-b px-2 text-xs font-bold transition-colors ${i18n.language.slice(0, 2) === code ? "border-current text-app" : "border-app text-muted"}`}
+              className={`flex min-h-10 items-center justify-center gap-2 border px-2 text-xs font-semibold transition-colors ${i18n.language.slice(0, 2) === code ? "border-current text-app" : "border-app text-muted"}`}
             >
               <LanguageFlag locale={code} />
               <span>{code.toUpperCase()}</span>
@@ -275,46 +298,44 @@ export default function Sidebar({
           ))}
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <NavLink to="/notifications" onClick={onCloseMobile} className="flex min-h-12 items-center gap-3 border-b border-app px-1 text-sm font-semibold text-app">
-            <Bell size={17} />
-            <span>{t("header.notifications")}</span>
+          <NavLink to="/notifications" onClick={onCloseMobile} className="flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
+            <Bell size={17} />{t("header.notifications")}
           </NavLink>
-          <NavLink to="/profile" onClick={onCloseMobile} className="flex min-h-12 items-center gap-3 border-b border-app px-1 text-sm font-semibold text-app">
-            <UserRound size={17} />
-            <span>{t("header.account")}</span>
+          <NavLink to="/profile" onClick={onCloseMobile} className="flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
+            <UserRound size={17} />{t("header.account")}
           </NavLink>
-          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="col-span-2 flex min-h-12 items-center gap-3 border-b border-app px-1 text-sm font-semibold text-app">
-            <ExternalLink size={17} />
-            <span>{t("header.goToSite")}</span>
+          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="col-span-2 flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
+            <ExternalLink size={17} />{t("header.goToSite")}
           </a>
         </div>
       </div>
-      <div className={`shrink-0 border-t border-app ${compact ? "p-2" : "p-3 lg:p-4"}`}>
-        {!compact && <div className="mb-2 px-1 py-2">
-          <p className="text-sm font-bold">{user?.name || t("sidebar.admin")}</p>
-          <p className="text-xs text-muted">{user?.adminRole || "ADMIN"}</p>
-        </div>}
-        <button
-          onClick={logout}
-          className="flex w-full items-center gap-2 rounded px-3 py-2 text-sm text-muted hover:bg-red-500/10 hover:text-red-500"
-        >
+
+      <div className="admin-sidebar-account flex shrink-0 items-center gap-3 border-t border-app px-4 py-3">
+        <div className="admin-account-avatar flex size-9 shrink-0 items-center justify-center bg-app text-xs font-bold text-app" aria-hidden="true">
+          {(user?.name || "A").slice(0, 1).toUpperCase()}
+        </div>
+        <div className={`admin-sidebar-account-details min-w-0 flex-1 ${collapsed ? "lg:hidden" : ""}`}>
+            <p className="truncate text-sm font-semibold">{user?.name || t("sidebar.admin")}</p>
+            <p className="truncate text-xs text-muted">{user?.adminRole || "ADMIN"}</p>
+        </div>
+        <button type="button" onClick={logout} className="admin-logout flex size-9 shrink-0 items-center justify-center text-muted transition-colors hover:bg-red-500/10 hover:text-red-600" aria-label={t("sidebar.logout")} title={t("sidebar.logout")}>
           <LogOut size={17} />
-          {!compact && t("sidebar.logout")}
         </button>
       </div>
-      {!compact && <div
-        role="separator"
-        aria-orientation="vertical"
-        aria-label="Изменить ширину меню"
-        aria-valuemin={220}
-        aria-valuemax={360}
-        aria-valuenow={width}
-        title="Потяните, чтобы изменить ширину"
-        tabIndex={0}
-        onPointerDown={startResize}
-        onKeyDown={resizeWithKeyboard}
-        className="absolute inset-y-0 -right-1 z-10 hidden w-2 cursor-col-resize bg-transparent hover:bg-primary-500/20 focus-visible:outline-none focus-visible:bg-primary-500/30 lg:block"
-      />}
+      {!collapsed && (
+        <div
+          role="separator"
+          aria-orientation="vertical"
+          aria-label={t("sidebar.resize", "Изменить ширину меню")}
+          aria-valuemin={232}
+          aria-valuemax={320}
+          aria-valuenow={width}
+          tabIndex={0}
+          onPointerDown={startResize}
+          onKeyDown={resizeWithKeyboard}
+          className="admin-sidebar-resizer absolute inset-y-0 -right-1 z-10 hidden w-2 cursor-col-resize bg-transparent hover:bg-primary-500/20 focus-visible:bg-primary-500/30 lg:block"
+        />
+      )}
     </aside>
   );
 }

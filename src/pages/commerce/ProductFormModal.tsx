@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useId, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
@@ -47,6 +47,8 @@ import {
   type ProductPhotoOrientation,
 } from "./productImageCrop";
 import { ProductRichTextField } from "./ProductRichTextField";
+
+const ProductFittingRoomPanel = lazy(() => import("./ProductFittingRoomPanel").then((module) => ({ default: module.ProductFittingRoomPanel })));
 
 type LocalizedContent = { title: string; description: string };
 type PhotoDraft = {
@@ -213,7 +215,7 @@ export function ProductFormModal({
   } | null>(null);
   const [activeLocale, setActiveLocale] = useState<ProductLocale>("ru");
   const [currentStep, setCurrentStep] = useState(0);
-  const steps = ["Основная информация", "Цены", "Варианты", "Фотографии", "Публикация"];
+  const steps = ["products.mainInformation", "products.pricing", "products.variants", "products.photos", "products.fittingRoom.step", "products.publicationSection"];
   const parseSizes = (text: string) => {
     const clothingOrder = ["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"];
     return text.split(/[\n,]+/).map((size) => size.trim()).filter(Boolean).sort((a, b) => {
@@ -763,11 +765,11 @@ export function ProductFormModal({
       <form id={formId} noValidate onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-3">
           <div className="flex gap-1">{steps.map((step, index) => <button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={step} className={`h-1 flex-1 rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-neutral-200 dark:bg-neutral-700"}`} />)}</div>
-          <div className="flex items-center justify-between text-xs text-muted"><span>Шаг {currentStep + 1} из {steps.length}</span><span className="font-medium text-app">{steps[currentStep]}</span></div>
+          <div className="flex items-center justify-between text-xs text-muted"><span>Шаг {currentStep + 1} из {steps.length}</span><span className="font-medium text-app">{t(steps[currentStep])}</span></div>
         </div>
         <div className="rounded-xl border border-primary-500/20 bg-primary-500/5 p-4">
           <p className="text-sm font-bold text-app">{product ? "Редактирование карточки товара" : "Новый товар — заполните по шагам"}</p>
-          <p className="mt-1 text-xs leading-5 text-muted">1. Страна и категория · 2. Название и описание · 3. Цена, скидка и цвета · 4. Фотографии · 5. Публикация</p>
+          <p className="mt-1 text-xs leading-5 text-muted">{t("products.workflowHint")}</p>
         </div>
         {submissionError && (
           <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
@@ -1258,7 +1260,7 @@ export function ProductFormModal({
           </section>
         )}
         {product && (
-          <section className={`${currentStep === 4 ? "" : "hidden "}space-y-3 rounded-xl border border-app bg-surface-muted p-4`}>
+          <section className={`${currentStep === 5 ? "" : "hidden "}space-y-3 rounded-xl border border-app bg-surface-muted p-4`}>
             <h4 className="text-sm font-bold text-app">{t("products.sourceInformation")}</h4>
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
@@ -1288,7 +1290,12 @@ export function ProductFormModal({
             </dl>
           </section>
         )}
-        <section className={`${currentStep === 4 ? "" : "hidden "}space-y-3 rounded-xl border border-app p-4`}>
+        {currentStep === 4 && <section className="space-y-3">
+          <Suspense fallback={<p role="status" className="text-sm text-muted">{t("products.fittingRoom.loading")}</p>}>
+            <ProductFittingRoomPanel productId={product?.id ?? null} variants={product?.variants ?? []} />
+          </Suspense>
+        </section>}
+        <section className={`${currentStep === 5 ? "" : "hidden "}space-y-3 rounded-xl border border-app p-4`}>
           <h4 className="text-sm font-bold text-app">{t("products.publicationSection")}</h4>
           <div className="flex items-center justify-between gap-4 py-2">
             <div><p className="text-sm font-medium text-app">{t("products.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Товар появится в каталоге после сохранения.</p></div>

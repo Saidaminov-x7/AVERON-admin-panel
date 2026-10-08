@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import Layout from '../components/Layout';
-import { downloadAnalyticsReportApi, getRangeAnalyticsApi, getFunnelAnalyticsApi } from '../lib/analyticsApi';
+import { downloadAnalyticsReportApi, getRangeAnalyticsApi, getFunnelAnalyticsApi, getCustomerJourneyAnalyticsApi } from '../lib/analyticsApi';
 
 const AnalyticsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -42,6 +42,10 @@ const AnalyticsPage: React.FC = () => {
   const { data: funnel, isError: isFunnelError, refetch: refetchFunnel } = useQuery({
     queryKey: ['admin', 'analytics', 'funnel', queryParams],
     queryFn: () => getFunnelAnalyticsApi(queryParams),
+  });
+  const { data: journey, isError: isJourneyError, refetch: refetchJourney } = useQuery({
+    queryKey: ['admin', 'analytics', 'journey', queryParams],
+    queryFn: () => getCustomerJourneyAnalyticsApi(queryParams),
   });
 
   const chartData = analytics?.chartData || [];
@@ -142,6 +146,12 @@ const AnalyticsPage: React.FC = () => {
             <button type="button" className="underline" onClick={() => void refetch()}>{t('analyticsPage.retry')}</button>
           </div>
         )}
+        {isJourneyError && (
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-700">
+            <span>{t('analyticsPage.journeyLoadError')}</span>
+            <button type="button" className="underline" onClick={() => void refetchJourney()}>{t('analyticsPage.retry')}</button>
+          </div>
+        )}
 
         {/* Метрики за период */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -187,6 +197,52 @@ const AnalyticsPage: React.FC = () => {
             <p className="text-[11px] text-muted mt-1">{t('analyticsPage.addedNote')}</p>
           </div>
         </div>
+
+        <section className="space-y-4" aria-labelledby="customer-journey-heading">
+          <div className="flex flex-col gap-1">
+            <h2 id="customer-journey-heading" className="text-lg font-semibold text-app">{t('analyticsPage.journeyTitle')}</h2>
+            <p className="text-sm text-muted">{t('analyticsPage.journeyDescription')}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-5">
+            {[
+              [t('analyticsPage.journeyVisitors'), journey?.firstTimeVisitors],
+              [t('analyticsPage.journeyBuyers'), journey?.buyers],
+              [t('analyticsPage.journeyConversion'), journey ? formatRate(journey.conversionRate) : undefined],
+              [t('analyticsPage.journeyAvgDays'), journey?.avgDaysToFirstPurchase.toFixed(1)],
+              [t('analyticsPage.journeyAvgProducts'), journey?.avgProductsInFirstOrder.toFixed(1)],
+            ].map(([label, value]) => (
+              <div key={String(label)} className="card min-w-0 p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</p>
+                <p className="mt-2 text-xl font-semibold text-app">{value === undefined ? (isLoading ? '...' : t('analyticsPage.noData')) : value}</p>
+              </div>
+            ))}
+          </div>
+          <div className="card grid gap-4 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div>
+              <h3 className="font-semibold text-app">{t('analyticsPage.journeyDay3')}</h3>
+              <p className="mt-1 text-sm text-muted">{t('analyticsPage.journeyDay3Note', { buyers: journey?.day3Buyers ?? 0, visitors: journey?.matureVisitors ?? 0 })}</p>
+            </div>
+            <p className="text-3xl font-semibold text-app">{journey ? formatRate(journey.day3ConversionRate) : (isLoading ? '...' : t('analyticsPage.noData'))}</p>
+          </div>
+          <div className="card p-4 sm:p-5">
+            <h3 className="mb-4 text-sm font-semibold text-app">{t('analyticsPage.journeyChartTitle')}</h3>
+            {!journey?.daily.length ? (
+              <div className="flex h-56 items-center justify-center text-sm text-muted">{isLoading ? '...' : t('analyticsPage.noData')}</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={journey.daily} margin={{ top: 5, right: 8, left: -22, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} interval={2} />
+                  <YAxis tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', fontSize: '12px', color: 'var(--color-text)' }} />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  <Line type="monotone" dataKey="purchases" name={t('analyticsPage.journeyPurchases')} stroke="#161616" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="units" name={t('analyticsPage.journeyUnits')} stroke="#3b82f6" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </section>
 
         {/* График динамики */}
         <div className="card">

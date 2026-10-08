@@ -491,10 +491,10 @@
   },
   "sidebar": {
     "section": {
-      "command": "COMMAND CENTER",
-      "products": "PRODUCTS",
-      "operations": "OPERATIONS",
-      "management": "MANAGEMENT"
+      "command": "WORKSPACE",
+      "products": "CATALOG",
+      "operations": "ORDERS AND PAYMENTS",
+      "management": "SETTINGS AND SERVICE"
     },
     "dashboard": "Business overview",
     "review": "Pending review",
@@ -605,6 +605,10 @@
     "saving": "Saving…",
     "productUpdated": "Product updated",
     "mainInformation": "Main information",
+
+    "workflowHint": "Complete the product details, upload photos, then add a fitting-room GLB model. Uploaded models stay hidden until approved.",
+
+    "fittingRoom": {"step":"Fitting room","title":"Virtual fitting room model","description":"Upload a GLB garment model aligned to the AVERON neutral mannequin. New uploads require review before shoppers can see them.","saveFirst":"Save the product before adding a 3D model.","layer":"Garment layer","variant":"Variant","allVariants":"All variants","glbFile":"GLB model","fileHint":"GLB 2.0 only, up to 50 MB. External resources and oversized textures are rejected.","upload":"Upload model","uploading":"Uploading…","uploadError":"Could not upload the model.","loading":"Loading model…","loadError":"Could not load fitting-room models.","noAssets":"No fitting-room models uploaded yet.","generationUnavailable":"Local AI generation is disabled. Upload a reviewed GLB manually; generation becomes available after a GPU worker is configured and validated.","status":{"NEEDS_REVIEW":"Needs review","APPROVED":"Approved","REJECTED":"Rejected"},"validationPassed":"GLB structure validated. Check the model visually before approval.","previewError":"The 3D preview is unavailable.","left":"Rotate left","right":"Rotate right","scale":"Scale","positionY":"Vertical position", "positionX": "Horizontal position", "positionZ": "Depth position", "updateError": "Could not update the model settings.","approve":"Approve","reject":"Reject","rejectionReason":"Reason for rejection","reviewError":"Could not update review status.","delete":"Delete model","confirmDelete":"Delete this fitting-room model?","deleteError":"Could not delete the model."},
     "localizedContent": "Localized content",
     "localizedContentHint": "Enter a title and description separately for each language.",
     "aiFill": {
@@ -865,6 +869,19 @@
     "funnelVisits": "Visits for period",
     "funnelConversion": "Conversion: {{rate}}%",
     "funnelFromFav": "From favorites to request: {{rate}}%",
+    "journeyTitle": "New customer journey",
+    "journeyDescription": "First visit → first paid purchase. Device data is shown only in aggregate.",
+    "journeyLoadError": "Could not load the customer journey.",
+    "journeyVisitors": "First time visitors",
+    "journeyBuyers": "First time buyers",
+    "journeyConversion": "Purchase conversion",
+    "journeyAvgDays": "Average days to purchase",
+    "journeyAvgProducts": "Items in first order",
+    "journeyDay3": "Purchase within 3 days",
+    "journeyDay3Note": "{{buyers}} purchases among {{visitors}} visitors whose 3 day window has elapsed",
+    "journeyChartTitle": "First purchases by days after first visit",
+    "journeyPurchases": "Buyers",
+    "journeyUnits": "Items",
     "lineVisitors": "Unique visitors",
     "lineRegistrations": "Registrations",
     "lineProducts": "Published products",
