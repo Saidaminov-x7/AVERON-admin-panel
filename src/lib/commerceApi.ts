@@ -105,6 +105,7 @@ export interface ProductListItem {
   slug: string;
   publicId?: string | null;
   sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
+  sizeChart?: Array<Record<string, string | number | undefined>> | null;
   country: string;
   source: string;
   sourceProductId?: string;
@@ -141,6 +142,7 @@ export interface ProductPayload {
   title: string;
   country: ProductCountry;
   sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
+  sizeChart?: Array<Record<string, string | number | undefined>>;
   titleUz: string;
   titleEn: string;
   description?: string;
@@ -172,6 +174,7 @@ export interface ProductUpdatePayload {
   compareAtPriceUzs?: number | null;
   country?: ProductCountry;
   sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
+  sizeChart?: Array<Record<string, string | number | undefined>>;
   categoryId?: string | null;
   publish?: boolean;
   color?: string;

@@ -152,6 +152,7 @@ export default function ProductsPage() {
           compareAtPriceUzs: values.compareAtPriceUzs,
           colors: values.colors,
           sizeChartType: values.sizeChartType || null,
+          sizeChart: values.sizeChart,
         };
 
         if (productId) {
@@ -267,9 +268,16 @@ export default function ProductsPage() {
       setTelegramRetryProductId(null);
       toast.success(t("products.telegram.published"));
       closeForm();
-    } catch {
-      setTelegramPublishError(t("products.telegram.failedAfterSave"));
-      toast.error(t("products.telegram.publishError"));
+    } catch (error: unknown) {
+      const responseData = (error as { response?: { data?: { details?: unknown; code?: unknown } } }).response?.data;
+      const reason = typeof responseData?.details === "string"
+        ? responseData.details
+        : typeof responseData?.code === "string"
+          ? responseData.code
+          : null;
+      const failure = `${t("products.telegram.failedAfterSave")}${reason ? ` (${reason})` : ""}`;
+      setTelegramPublishError(failure);
+      toast.error(failure);
     } finally {
       setIsRetryingTelegram(false);
     }
