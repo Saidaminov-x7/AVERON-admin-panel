@@ -105,6 +105,19 @@
   color: var(--color-on-primary) !important;
 }
 
+.admin-sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-text-muted) 45%, transparent) transparent;
+}
+.admin-sidebar-nav::-webkit-scrollbar { width: 4px; }
+.admin-sidebar-nav::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-text-muted) 42%, transparent);
+  border: 0;
+}
+.admin-sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-text-muted) 68%, transparent);
+}
+
 #login-submit {
   background-color: var(--color-primary);
   color: var(--color-on-primary);
@@ -390,6 +403,11 @@ button, [role="button"], summary { user-select: none; }
 .admin-page-frame :where(.max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl, .max-w-3xl) {
   width: 100%;
   max-width: 100%;
+}
+
+.admin-page-frame .admin-page-presentation {
+  width: 100%;
+  max-width: 64rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
