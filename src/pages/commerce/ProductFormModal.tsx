@@ -762,7 +762,7 @@ export function ProductFormModal({
     >
       <form id={formId} noValidate onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-3">
-          <div className="flex gap-1">{steps.map((step, index) => <button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={step} className={`h-1 flex-1 rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-neutral-200 dark:bg-neutral-700"}`} />)}</div>
+          <div className="flex gap-1" aria-label="Шаги создания товара">{steps.map((step, index) => <button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={step} aria-current={index === currentStep ? "step" : undefined} className="group flex min-h-0 flex-1 items-center rounded-full bg-transparent p-0"><span className={`h-1 w-full rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-neutral-200 dark:bg-neutral-700 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-600"}`} /></button>)}</div>
           <div className="flex items-center justify-between text-xs text-muted"><span>Шаг {currentStep + 1} из {steps.length}</span><span className="font-medium text-app">{steps[currentStep]}</span></div>
         </div>
         <div className="rounded-xl border border-primary-500/20 bg-primary-500/5 p-4">
@@ -962,34 +962,34 @@ export function ProductFormModal({
         <section className={`${currentStep === 2 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <div>
             <h4 className="text-sm font-bold text-app">Цвета товара</h4>
-            <p className="mt-1 text-xs text-muted">Каждый цвет с новой строки: название | HEX. Например: Чёрный | #111111</p>
+            <p className="mt-1 text-xs text-muted">Задайте название и выберите оттенок в палитре или введите HEX-код.</p>
           </div>
-          <label className="block max-w-2xl text-sm font-medium text-app">
-            Названия и HEX-цвета
-            <textarea
-              value={values.colorsText}
-              onChange={(event) => updateValue("colorsText", event.target.value)}
-              rows={5}
-              placeholder={'Чёрный | #111111\nБелый | #FFFFFF\nСиний | #234A8B'}
-              className="mt-2 w-full rounded-xl border border-app bg-app px-3 py-3 font-mono text-sm text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
-            />
-          </label>
-          {values.colorsText && (
-            <div className="flex flex-wrap gap-2" aria-label="Предпросмотр цветов">
-              {values.colorsText.split("\n").map((row, index) => {
-                const [name, hex] = row.split("|").map((part) => part.trim());
-                const colorName = hex ? name : `Цвет ${index + 1}`;
-                const colorHex = hex || (name && /^#[0-9a-fA-F]{6}$/.test(name) ? name : "#808080");
-                if (!/^#[0-9a-fA-F]{6}$/.test(colorHex)) return null;
-                const updateColor = (nextHex: string) => {
-                  const rows = values.colorsText.split("\n");
-                  rows[index] = `${hex ? colorName : colorName} | ${nextHex}`;
-                  updateValue("colorsText", rows.join("\n"));
-                };
-                return <span key={`${colorName}-${index}`} className="inline-flex items-center gap-2 rounded-full border border-app px-2.5 py-1 text-xs"><input aria-label={`HEX ${colorName}`} type="color" value={colorHex} onChange={(event) => updateColor(event.target.value)} className="size-5 cursor-pointer rounded-full border-0 bg-transparent p-0" /><span className="size-4 rounded-full border border-black/10" style={{ backgroundColor: colorHex }} />{colorName}<code className="text-[10px] text-muted">{colorHex}</code></span>;
-              })}
-            </div>
-          )}
+          <div className="space-y-2">
+            {values.colorsText.split("\n").map((row, rowIndex) => ({ row, rowIndex })).filter(({ row }) => row.trim()).map(({ row, rowIndex }) => {
+              const [rawName, rawHex] = row.split("|").map((part) => part.trim());
+              const name = rawHex ? rawName : `Цвет ${rowIndex + 1}`;
+              const hex = /^#[0-9a-fA-F]{6}$/.test(rawHex ?? "") ? rawHex.toUpperCase() : /^#[0-9a-fA-F]{6}$/.test(rawName ?? "") ? rawName.toUpperCase() : "#808080";
+              const rows = values.colorsText.split("\n");
+              const displayHex = rawHex ?? rawName;
+              const hexInput = /^#[0-9a-fA-F]{0,6}$/.test(displayHex ?? "") ? displayHex : hex;
+              const updateRow = (nextName: string, nextHex: string) => {
+                rows[rowIndex] = `${nextName} | ${nextHex.toUpperCase()}`;
+                updateValue("colorsText", rows.join("\n"));
+              };
+              return <div key={`${rowIndex}-${name}`} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-app bg-app p-2.5 sm:grid-cols-[auto_minmax(0,1fr)_8.5rem_auto]">
+                <label className="relative row-span-2 size-10 cursor-pointer overflow-hidden rounded-full border border-app shadow-sm sm:row-span-1" title={`Выбрать цвет ${name}`}>
+                  <span className="absolute inset-0" style={{ backgroundColor: hex }} />
+                  <input aria-label={`Выбрать цвет ${name}`} type="color" value={hex} onChange={(event) => updateRow(name, event.target.value)} className="absolute inset-0 size-full cursor-pointer opacity-0" />
+                </label>
+                <input aria-label={`Название цвета ${rowIndex + 1}`} value={name} onChange={(event) => updateRow(event.target.value, hex)} placeholder="Например, Графитовый" className="h-10 min-w-0 rounded-md border border-app bg-surface px-3 text-sm text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" />
+                <div className="relative col-start-2 sm:col-start-auto">
+                  <input aria-label={`HEX цвет ${name}`} value={hexInput} maxLength={7} onChange={(event) => { const next = event.target.value.startsWith("#") ? event.target.value : `#${event.target.value}`; if (/^#[0-9a-fA-F]{0,6}$/.test(next)) updateRow(name, next); }} onBlur={() => { if (!/^#[0-9a-fA-F]{6}$/.test(hexInput)) updateRow(name, "#808080"); }} className="h-10 w-full rounded-md border border-app bg-surface px-2 font-mono text-sm uppercase text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" />
+                </div>
+                <button type="button" aria-label={`Удалить цвет ${name}`} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-red-500/10 hover:text-red-600 sm:row-span-1"><Trash2 size={16} /></button>
+              </div>;
+            })}
+            <button type="button" onClick={() => updateValue("colorsText", [values.colorsText, `Цвет ${values.colorsText.split("\n").filter(Boolean).length + 1} | #808080`].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold text-app transition-colors hover:bg-app"><span aria-hidden="true">+</span> Добавить цвет</button>
+          </div>
         </section>
 
         <section className={`${currentStep === 3 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>

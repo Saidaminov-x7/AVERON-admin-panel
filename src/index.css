@@ -6,21 +6,22 @@
 
 /* Central AVERON palette and layout tokens for the complete admin application. */
 :root {
-  --color-bg:          #faf9f7;
+  --color-bg:          #ffffff;
   --color-surface:     #ffffff;
-  --color-surface-soft: #f4f3f1;
-  --color-border:      #e5e3df;
-  --color-text:        #202124;
+  --color-surface-soft: #f5f5f5;
+  --color-border:      #dddddd;
+  --color-text:        #111111;
   --color-text-muted:  #707276;
   --color-text-secondary: #55585b;
   --color-sidebar-bg:  #ffffff;
-  --color-sidebar-border: #e5e3df;
-  --color-primary:     #34383c;
-  --color-primary-hover: #25282b;
-  --color-success:     #24734b;
-  --color-warning:     #9a6417;
-  --color-error:       #b42318;
-  --color-info:        #436d91;
+  --color-sidebar-border: #dddddd;
+  --color-primary:     #1a1a1a;
+  --color-primary-hover: #333333;
+  --color-on-primary:  #ffffff;
+  --color-success:     #78bd94;
+  --color-warning:     #e1b966;
+  --color-error:       #ff8d83;
+  --color-info:        #93b9d7;
   --radius:            0.5rem;
   --radius-control:    var(--radius);
   --radius-xs:         0.25rem;
@@ -63,23 +64,24 @@
   --duration-press:    140ms;
   --duration-ui:       180ms;
   --duration-enter:    220ms;
-  --shadow-drawer:     -18px 0 48px rgb(0 0 0 / .18);
+  --shadow-drawer:     -18px 0 48px rgb(0 0 0 / .38);
 }
 
 /* ─── Dark Mode CSS Variables ─────────────────────────────────────────────── */
 .dark {
   color-scheme: dark;
-  --color-bg:          #111315;
-  --color-surface:     #181b1f;
-  --color-surface-soft: #20242a;
-  --color-border:      #30353c;
+  --color-bg:          #181818;
+  --color-surface:     #1e1e1e;
+  --color-surface-soft: #272727;
+  --color-border:      #3a3a3a;
   --color-text:        #f2f3f3;
   --color-text-muted:  #9ba2a9;
   --color-text-secondary: #c3c7cb;
-  --color-sidebar-bg:  #2a2f35;
-  --color-sidebar-border: #454c54;
-  --color-primary:     #72777d;
-  --color-primary-hover: #858b91;
+  --color-sidebar-bg:  #181818;
+  --color-sidebar-border: #3a3a3a;
+  --color-primary:     #f2f3f3;
+  --color-primary-hover: #d7dadd;
+  --color-on-primary:  #111111;
   --color-success:     #78bd94;
   --color-warning:     #e1b966;
   --color-error:       #ff8d83;
@@ -96,6 +98,33 @@
   user-select: none !important;
 }
 .admin-sidebar-resizing aside { transition: none !important; }
+
+.admin-drawer-link.is-active {
+  border-color: var(--color-primary) !important;
+  background-color: var(--color-primary) !important;
+  color: var(--color-on-primary) !important;
+}
+
+.admin-sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-text-muted) 45%, transparent) transparent;
+}
+.admin-sidebar-nav::-webkit-scrollbar { width: 4px; }
+.admin-sidebar-nav::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-text-muted) 42%, transparent);
+  border: 0;
+}
+.admin-sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-text-muted) 68%, transparent);
+}
+
+#login-submit {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+#login-submit:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
 
 [data-sonner-toaster] [data-sonner-toast] {
   border: 1px solid var(--color-border) !important;
@@ -237,11 +266,12 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-primary) 3%, var(--c
 
   /* Кнопка primary */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 h-11 px-4 rounded font-semibold text-sm text-white
+    @apply inline-flex items-center justify-center gap-2 h-11 px-4 rounded font-semibold text-sm
            transition-[transform,background-color,box-shadow] duration-150 cursor-pointer border-0 active:scale-[.98];
     background-color: var(--color-primary);
+    color: var(--color-on-primary);
   }
-  .btn-primary:hover { background-color: var(--color-primary-hover); }
+  .btn-primary:hover { background-color: var(--color-primary-hover); color: var(--color-on-primary); }
 
   /* Кнопка ghost */
   .btn-ghost {
@@ -359,9 +389,9 @@ button, [role="button"], summary { user-select: none; }
   .admin-page-frame :where(h2) { font-size: 1.125rem; }
   .admin-page-frame :where(button, a, input, select, textarea) { max-width: 100%; }
   .admin-drawer-link.is-active {
-    background: transparent !important;
-    color: var(--color-text) !important;
-    border-color: var(--color-text);
+    background: var(--color-primary) !important;
+    color: var(--color-on-primary) !important;
+    border-color: var(--color-primary);
   }
 }
 
@@ -373,6 +403,11 @@ button, [role="button"], summary { user-select: none; }
 .admin-page-frame :where(.max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl, .max-w-3xl) {
   width: 100%;
   max-width: 100%;
+}
+
+.admin-page-frame .admin-page-presentation {
+  width: 100%;
+  max-width: 64rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

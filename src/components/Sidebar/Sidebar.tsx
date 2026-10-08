@@ -221,7 +221,7 @@ export default function Sidebar({
           </button>
         )}
       </div>
-      <nav ref={navRef} className={`min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain py-5 lg:space-y-6 lg:py-6 ${compact ? "px-2" : "px-4"}`}>
+      <nav ref={navRef} className={`admin-sidebar-nav min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain py-5 lg:space-y-6 lg:py-6 ${compact ? "px-2" : "px-4"}`}>
         {sections.map((s) => (
           <div key={s.sectionKey}>
             <p className={`mb-2 px-3 text-[10px] font-bold tracking-[.16em] text-muted ${compact ? "sr-only" : ""}`}>
