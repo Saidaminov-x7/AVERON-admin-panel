@@ -491,10 +491,10 @@
   },
   "sidebar": {
     "section": {
-      "command": "BOSHQARUV MARKAZI",
-      "products": "MAHSULOTLAR",
-      "operations": "OPERATSIYALAR",
-      "management": "BOSHQARUV"
+      "command": "ISH MAYDONI",
+      "products": "KATALOG",
+      "operations": "BUYURTMALAR VA TO‘LOVLAR",
+      "management": "SOZLAMALAR VA XIZMAT"
     },
     "dashboard": "Biznes sharhi",
     "review": "Tekshiruv kutilmoqda",
@@ -605,6 +605,10 @@
     "saving": "Saqlanmoqda…",
     "productUpdated": "Mahsulot yangilandi",
     "mainInformation": "Asosiy ma'lumotlar",
+
+    "workflowHint": "Mahsulot ma'lumotlari va rasmlarini kiriting, so'ng kiyib ko'rish uchun GLB modelini yuklang. Xaridorlar modelni faqat tekshiruvdan keyin ko'radi.",
+
+    "fittingRoom": {"step":"Kiyib ko'rish","title":"Virtual kiyib ko‘rish modeli","description":"AVERON neytral manekeniga moslangan kiyim GLB modelini yuklang. Yangi model xaridorlarga tekshiruvdan so‘ng ko‘rinadi.","saveFirst":"3D model qo‘shishdan oldin mahsulotni saqlang.","layer":"Kiyim qatlami","variant":"Variant","allVariants":"Barcha variantlar","glbFile":"GLB model","fileHint":"Faqat GLB 2.0, 50 MB gacha. Tashqi resurslar va juda katta teksturalar rad etiladi.","upload":"Modelni yuklash","uploading":"Yuklanmoqda…","uploadError":"Model yuklanmadi.","loading":"Model yuklanmoqda…","loadError":"Kiyib ko‘rish modellari yuklanmadi.","noAssets":"Kiyib ko‘rish modellari hali yuklanmagan.","generationUnavailable":"Mahalliy AI generatsiyasi o‘chirilgan. GLB modelini qo‘lda yuklang; GPU worker sozlanib tekshirilgach generatsiya yoqiladi.","status":{"NEEDS_REVIEW":"Tekshiruv kerak","APPROVED":"Tasdiqlangan","REJECTED":"Rad etilgan"},"validationPassed":"GLB tuzilishi tekshirildi. Tasdiqlashdan oldin modelni ko‘zdan kechiring.","previewError":"3D ko‘rinish mavjud emas.","left":"Chapga burish","right":"O‘ngga burish","scale":"Masshtab","positionY":"Vertikal holat", "positionX": "Gorizontal holat", "positionZ": "Chuqurlik holati", "updateError": "Model sozlamalari o‘zgartirilmadi.","approve":"Tasdiqlash","reject":"Rad etish","rejectionReason":"Rad etish sababi","reviewError":"Tekshiruv holati o‘zgartirilmadi.","delete":"Modelni o‘chirish","confirmDelete":"Kiyib ko‘rish modelini o‘chirasizmi?","deleteError":"Model o‘chirilmadi."},
     "localizedContent": "Tarjima qilingan kontent",
     "localizedContentHint": "Har bir til uchun nom va tavsifni alohida kiriting.",
     "aiFill": {
@@ -865,6 +869,19 @@
     "funnelVisits": "Davr bo'yicha tashriflar",
     "funnelConversion": "Konversiya: {{rate}}%",
     "funnelFromFav": "Sevimlidan so'rovga: {{rate}}%",
+    "journeyTitle": "Yangi xaridor yo'li",
+    "journeyDescription": "Birinchi tashrif → birinchi to'langan xarid. Qurilma ma'lumotlari faqat jamlangan holda ko'rsatiladi.",
+    "journeyLoadError": "Xaridor yo'lini yuklab bo'lmadi.",
+    "journeyVisitors": "Birinchi tashrif buyuruvchilar",
+    "journeyBuyers": "Birinchi marta xarid qilganlar",
+    "journeyConversion": "Xarid konversiyasi",
+    "journeyAvgDays": "Xaridgacha o'rtacha kunlar",
+    "journeyAvgProducts": "Birinchi buyurtmadagi mahsulotlar",
+    "journeyDay3": "3 kun ichida xarid",
+    "journeyDay3Note": "3 kun o'tgan {{visitors}} tashrif buyuruvchidan {{buyers}} tasi xarid qildi",
+    "journeyChartTitle": "Birinchi tashrifdan keyingi kunlarda xaridlar",
+    "journeyPurchases": "Xaridorlar",
+    "journeyUnits": "Mahsulot birliklari",
     "lineVisitors": "Noyob tashrif buyuruvchilar",
     "lineRegistrations": "Ro'yxatdan o'tishlar",
     "lineProducts": "Nashr qilingan mahsulotlar",

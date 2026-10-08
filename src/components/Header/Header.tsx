@@ -139,7 +139,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
   return (
     <header
       className="
-        h-16 w-full
+        averon-admin-topbar h-16 w-full
         bg-surface border-b border-app
         flex-shrink-0 transition-colors duration-200 relative z-30
       "

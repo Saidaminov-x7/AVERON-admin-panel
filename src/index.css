@@ -14,14 +14,14 @@
   --color-text-muted:  #707276;
   --color-text-secondary: #55585b;
   --color-sidebar-bg:  #ffffff;
-  --color-sidebar-border: #dddddd;
-  --color-primary:     #1a1a1a;
-  --color-primary-hover: #333333;
+  --color-sidebar-border: #e5e3df;
+  --color-primary:     #34383c;
+  --color-primary-hover: #25282b;
   --color-on-primary:  #ffffff;
-  --color-success:     #78bd94;
-  --color-warning:     #e1b966;
-  --color-error:       #ff8d83;
-  --color-info:        #93b9d7;
+  --color-success:     #24734b;
+  --color-warning:     #9a6417;
+  --color-error:       #b42318;
+  --color-info:        #436d91;
   --radius:            0.5rem;
   --radius-control:    var(--radius);
   --radius-xs:         0.25rem;
@@ -193,6 +193,10 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-primary) 3%, var(--c
   font-family: var(--font-family);
   transition: border-color var(--duration-enter) var(--ease-out-ui), box-shadow var(--duration-enter) var(--ease-out-ui), background-color var(--duration-enter) var(--ease-out-ui);
 }
+.averon-admin-shell :where(input, textarea)::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
+}
 .averon-admin-shell :where(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):not([type="range"]), textarea, select):focus-visible {
   outline: 2px solid color-mix(in srgb, var(--color-primary) 42%, transparent);
   outline-offset: 1px;
@@ -216,6 +220,18 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-primary) 3%, var(--c
 .averon-admin-shell :where(button, [role="button"]):disabled {
   cursor: not-allowed;
 }
+.averon-admin-shell :where(.bg-primary-500, .bg-primary-600, .bg-primary-700, .btn-primary) {
+  color: var(--color-on-primary) !important;
+}
+.averon-admin-shell [class~="bg-[var(--color-primary)]"] {
+  color: var(--color-on-primary) !important;
+}
+.dark .averon-admin-shell :where(.text-gray-300, .text-gray-400, .text-gray-500, .text-slate-300, .text-slate-400, .text-zinc-300, .text-zinc-400) {
+  color: var(--color-text-muted) !important;
+}
+.dark .averon-admin-shell :where(.text-red-500, .text-red-600, .text-rose-500, .text-rose-600) { color: #fb7185 !important; }
+.dark .averon-admin-shell :where(.text-amber-500, .text-amber-600, .text-orange-500, .text-orange-600) { color: #fbbf24 !important; }
+.dark .averon-admin-shell :where(.text-green-500, .text-green-600, .text-emerald-500, .text-emerald-600) { color: #4ade80 !important; }
 .averon-admin-menu {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-control, var(--radius));
@@ -436,4 +452,280 @@ button, [role="button"], summary { user-select: none; }
   background-color: var(--color-surface) !important;
   border-color: var(--color-border) !important;
   color: var(--color-text) !important;
+}
+
+/* AVERON retail language: clean white canvas, ink typography, fine borders. */
+:root {
+  --color-bg: #f7f7f7;
+  --color-surface: #fff;
+  --color-surface-soft: #f2f2f2;
+  --color-border: #e4e4e4;
+  --color-text: #111;
+  --color-text-muted: #737373;
+  --color-text-secondary: #4a4a4a;
+  --color-sidebar-bg: #fff;
+  --color-sidebar-border: #e4e4e4;
+  --color-primary: #1a1a1a;
+  --color-primary-hover: #000;
+  --color-on-primary: #fff;
+  --radius: 0.25rem;
+  --radius-control: 0.25rem;
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.1875rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+  --border-radius: 0.25rem;
+  --font-family: Inter, Arial, sans-serif;
+  --shadow-drawer: -12px 0 32px rgb(0 0 0 / 0.14);
+}
+
+:root.dark {
+  color-scheme: dark;
+  --color-bg: #181818;
+  --color-surface: #1e1e1e;
+  --color-surface-soft: #252525;
+  --color-border: #3a3a3a;
+  --color-text: #f2f2f2;
+  --color-text-muted: #a3a3a3;
+  --color-text-secondary: #c3c3c3;
+  --color-sidebar-bg: #1e1e1e;
+  --color-sidebar-border: #3a3a3a;
+  --color-primary: #f1f1f1;
+  --color-primary-hover: #fff;
+  --color-on-primary: #181818;
+  --shadow-drawer: -12px 0 32px rgb(0 0 0 / 0.44);
+}
+
+.averon-admin-shell {
+  min-width: 320px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family);
+}
+
+.averon-admin-shell :where(h1, h2, h3, h4) {
+  color: var(--color-text);
+  font-family: var(--font-family);
+  letter-spacing: -0.035em;
+}
+
+.averon-admin-shell .sidebar-bg {
+  width: 256px;
+  background: var(--color-sidebar-bg);
+  border-color: var(--color-sidebar-border);
+}
+
+.averon-admin-shell .admin-sidebar.is-collapsed { width: 76px; }
+
+.admin-sidebar-resizer { touch-action: none; }
+.admin-sidebar-resizer:focus-visible { outline: 2px solid var(--color-info); outline-offset: -2px; }
+.admin-sidebar-resizing, .admin-sidebar-resizing * { cursor: col-resize !important; user-select: none !important; }
+
+.averon-admin-shell .sidebar-bg > div:first-child {
+  min-height: 72px;
+  height: 72px;
+  border-color: var(--color-sidebar-border);
+  padding-inline: 22px;
+}
+
+.averon-admin-shell .sidebar-bg > div:first-child > button:first-child > div:first-child {
+  font-size: 17px;
+  letter-spacing: 0.22em;
+}
+
+.averon-admin-shell .sidebar-bg nav {
+  padding: 20px 14px;
+}
+
+.averon-admin-shell .sidebar-bg nav > section > h2 {
+  margin: 0 0 8px;
+  padding-inline: 12px;
+  color: var(--color-text-muted);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.averon-admin-shell .admin-drawer-link {
+  min-height: 42px;
+  gap: 12px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 3px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.averon-admin-shell .admin-drawer-link svg {
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+}
+
+.averon-admin-shell .admin-drawer-link:not(.is-active):hover {
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+}
+
+.averon-admin-shell .admin-drawer-link.is-active {
+  background: var(--color-primary) !important;
+  color: var(--color-on-primary) !important;
+  font-weight: 650;
+}
+
+.averon-admin-shell .admin-drawer-link.is-active svg {
+  color: currentColor;
+}
+
+.averon-admin-shell .admin-sidebar.is-collapsed .admin-sidebar-label { display: none; }
+.averon-admin-shell .admin-sidebar.is-collapsed .admin-drawer-link { justify-content: center; padding-inline: 8px; }
+.averon-admin-shell .admin-sidebar.is-collapsed nav { padding-inline: 8px; }
+
+.averon-admin-shell .sidebar-bg > div:last-of-type {
+  border-color: var(--color-sidebar-border);
+}
+
+.averon-admin-topbar {
+  z-index: 30;
+  min-height: 64px;
+  height: 64px;
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  box-shadow: none;
+}
+
+.averon-admin-topbar > div {
+  max-width: 1440px;
+  padding-inline: clamp(16px, 3vw, 40px);
+}
+
+.averon-admin-topbar h1 {
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.averon-admin-topbar :where(button, a) {
+  border-radius: 3px;
+}
+
+.averon-admin-shell > div.flex.min-w-0.flex-1 {
+  min-width: 0;
+  background: var(--color-bg);
+}
+
+.averon-admin-shell main.admin-scroll {
+  padding: clamp(16px, 3vw, 36px);
+  overscroll-behavior: contain;
+}
+
+.averon-admin-shell .admin-page-frame {
+  width: 100%;
+  max-width: 1320px;
+  margin-inline: auto;
+  min-width: 0;
+}
+
+.averon-admin-shell .admin-page-frame :where(.bg-surface, .bg-white, .dark\:bg-dark-surface) {
+  border-color: var(--color-border);
+}
+
+.averon-admin-shell .admin-page-frame :where(.border-app, .border-gray-100, .border-gray-200) {
+  border-color: var(--color-border);
+}
+
+.averon-admin-shell .admin-page-frame :where(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):not([type="range"]), select, textarea) {
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+.averon-admin-shell .admin-page-frame :where(button, [role="button"], a) {
+  text-underline-offset: 3px;
+}
+
+.averon-admin-shell .admin-page-frame :where(.rounded-3xl, .rounded-2xl, .rounded-xl) {
+  border-radius: 4px !important;
+}
+
+.averon-admin-shell .admin-page-frame :where(.rounded-lg, .rounded-md, .rounded) {
+  border-radius: 3px !important;
+}
+
+.admin-mobile-navigation {
+  width: auto;
+  box-shadow: none;
+}
+
+@media (max-width: 1023px) {
+  .admin-mobile-navigation {
+    position: fixed;
+    left: auto;
+    right: 0;
+    width: min(88vw, 340px);
+    box-shadow: -18px 0 48px rgb(0 0 0 / .18);
+    visibility: hidden;
+    transform: translateX(102%);
+  }
+
+  .admin-mobile-navigation.is-open {
+    visibility: visible;
+    transform: translateX(0);
+  }
+
+  .admin-mobile-navigation.is-closed {
+    visibility: hidden;
+    transform: translateX(102%);
+    pointer-events: none;
+  }
+
+  .averon-admin-shell .sidebar-bg {
+    width: 100% !important;
+    max-width: none;
+  }
+
+  .averon-admin-shell .admin-sidebar.is-collapsed { width: 100% !important; }
+
+  .averon-admin-shell .admin-sidebar-label { display: inline; }
+
+  .averon-admin-shell .admin-sidebar-section-title { clip: auto; clip-path: none; height: auto; overflow: visible; position: static; white-space: normal; width: auto; }
+
+  .averon-admin-shell .admin-sidebar-account-details { display: block; }
+
+  .averon-admin-shell .sidebar-bg > div:first-child {
+    padding-inline: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-mobile-navigation {
+    position: relative;
+    inset: auto;
+    visibility: visible;
+    transform: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .averon-admin-shell main.admin-scroll {
+    padding: 16px 12px calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .averon-admin-topbar > div {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+
+  .averon-admin-topbar h1 {
+    font-size: 14px;
+  }
+
+  .averon-admin-shell .admin-page-frame :where(.flex.flex-wrap) {
+    row-gap: 10px;
+  }
+
+  .averon-admin-shell .admin-page-frame :where(.overflow-x-auto) {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-mobile-navigation { transition-duration: 1ms !important; }
 }
