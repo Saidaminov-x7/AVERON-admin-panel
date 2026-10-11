@@ -443,7 +443,7 @@ export default function ProductsPage() {
       {isLoading ? (
         <div className="card">{t("products.loading")}</div>
       ) : isError && !data ? (
-        <div className="card flex flex-wrap items-center justify-between gap-3 text-muted">
+        <div className="card flex flex-wrap items-center justify-between gap-3 text-muted" role="alert">
           <p>{t("products.loadError")}</p>
           <button type="button" onClick={() => void refetch()} className="btn-ghost">
             {t("common.refresh")}

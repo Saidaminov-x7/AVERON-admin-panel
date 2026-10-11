@@ -117,12 +117,12 @@ export function ProductFittingRoomPanel({ productId, variants = [], sourceImages
 
   return <section className="space-y-5 rounded-lg border border-app bg-surface p-4">
     <div><h4 className="text-sm font-bold text-app">{t('products.fittingRoom.title')}</h4><p className="mt-1 text-xs leading-5 text-muted">{t('products.fittingRoom.description')}</p></div>
+    {formError && <p role="alert" className="text-sm text-red-600 dark:text-red-300">{formError}</p>}
     <div className="grid gap-3 rounded-lg border border-app bg-surface-muted p-4 sm:grid-cols-2">
       <Select label={t('products.fittingRoom.layer')} value={layer} options={layerOptions} onChange={(value) => setLayer(value as FittingLayer)} />
       <Select label={t('products.fittingRoom.variant')} value={variantId} options={variantOptions} onChange={setVariantId} />
       <label className="sm:col-span-2 min-w-0"><span className="mb-1 block text-xs font-semibold text-app">{t('products.fittingRoom.glbFile')}</span><input type="file" accept=".glb,model/gltf-binary" onChange={(event) => setFile(event.target.files?.[0] ?? null)} className="block min-h-11 min-w-0 w-full rounded-md border border-app bg-surface px-2 py-2 text-xs text-app file:mr-2 file:border-0 file:bg-transparent file:text-xs file:font-semibold"/><span className="mt-1 block text-xs text-muted">{t('products.fittingRoom.fileHint')}</span></label>
       <div className="sm:col-span-2"><Button type="button" loading={uploadMutation.isPending} disabled={!file} onClick={() => uploadMutation.mutate()}>{uploadMutation.isPending ? t('products.fittingRoom.uploading') : t('products.fittingRoom.upload')}</Button></div>
-      {formError && <p role="alert" className="sm:col-span-2 text-sm text-red-600 dark:text-red-300">{formError}</p>}
     </div>
     <div className="space-y-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-xs leading-5 text-app">
       <p>{t('products.fittingRoom.generationUnavailable')}</p>
@@ -151,7 +151,6 @@ export function ProductFittingRoomPanel({ productId, variants = [], sourceImages
           {['QUEUED', 'RUNNING', 'POSTPROCESSING'].includes(job.status) && <Button type="button" variant="outline" loading={jobActionMutation.isPending} onClick={() => jobActionMutation.mutate({ job, action: 'cancel' })}>{language === 'ru' ? 'Отменить' : language === 'uz' ? 'Bekor qilish' : 'Cancel'}</Button>}
         </article>)}
       </div> : null}
-      {formError && <p role="alert" className="text-red-600 dark:text-red-300">{formError}</p>}
     </div>
     {assetsQuery.isLoading ? <p role="status" className="text-sm text-muted">{t('products.fittingRoom.loading')}</p>
       : assetsQuery.isError ? <p role="alert" className="text-sm text-red-600 dark:text-red-300">{t('products.fittingRoom.loadError')}</p>
