@@ -32,6 +32,7 @@ const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={toggleTheme}
+      data-action-id="admin.theme.toggle"
       aria-label={isDark ? t('header.switchToLightTheme') : t('header.switchToDarkTheme')}
       title={isDark ? t('header.lightTheme') : t('header.darkTheme')}
       className={`

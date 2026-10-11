@@ -1,3 +1,5 @@
+import { parseUzsPriceInput } from "../../lib/priceInput";
+
 export const PRODUCT_VALIDATION_FIELDS = [
   "titleRu",
   "titleUz",
@@ -46,8 +48,8 @@ export function validateProductDraft(
     && !isProductCountry(input.country);
   if (!isProductCountry(input.country) && !unchangedCountry) errors.country = "country";
 
-  const salePriceUzs = Number(input.salePriceUzs);
-  if (!Number.isFinite(salePriceUzs) || salePriceUzs <= 0) {
+  const salePriceUzs = parseUzsPriceInput(input.salePriceUzs);
+  if (salePriceUzs === null || salePriceUzs <= 0) {
     errors.salePriceUzs = "salePriceUzs";
   }
 

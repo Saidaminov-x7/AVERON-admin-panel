@@ -1,13 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { patch } = vi.hoisted(() => ({ patch: vi.fn() }));
-vi.mock('./axios', () => ({ api: { patch } }));
+const { patch, post } = vi.hoisted(() => ({ patch: vi.fn(), post: vi.fn() }));
+vi.mock('./axios', () => ({ api: { patch, post } }));
 
-import { updateOrderShipping, updateOrderStatus } from './commerceApi';
+import { createManualProduct, updateOrderShipping, updateOrderStatus } from './commerceApi';
 
 describe('admin order status API', () => {
   beforeEach(() => {
     patch.mockReset().mockResolvedValue({ data: { status: 'PAID' } });
+    post.mockReset().mockResolvedValue({ data: { id: 'product-1' } });
   });
 
   it('sends only the requested sequential status and a trimmed optional note', async () => {
@@ -43,6 +44,19 @@ describe('admin order status API', () => {
       provider: 'Local courier',
       estimatedDeliveryAt: '2026-10-08T12:00:00.000Z',
       note: '  Collected by courier  ',
+    });
+  });
+
+  it('sends the stable idempotency key with a manual product create request', async () => {
+    const payload = {
+      title: 'Jacket', titleUz: 'Kurtka', titleEn: 'Jacket', country: 'CN' as const,
+      images: [{ mediaId: 'media-1' }], salePriceUzs: 180000, publish: false,
+    };
+
+    await createManualProduct(payload, 'product-create-key');
+
+    expect(post).toHaveBeenCalledWith('/api/v1/admin/products', payload, {
+      headers: { 'Idempotency-Key': 'product-create-key' },
     });
   });
 });

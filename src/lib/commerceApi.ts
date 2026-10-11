@@ -118,7 +118,8 @@ export interface ProductListItem {
   category?: ProductCategory | null;
   translations?: Partial<Record<ProductLocale, { title?: string } | string>>;
   description?: Partial<Record<ProductLocale, string>> | null;
-  images?: Array<{ id: string; mediaId?: string | null; url: string; sortOrder: number }>;
+  attributes?: Record<string, unknown> | null;
+  images?: Array<{ id: string; mediaId?: string | null; url: string; sortOrder: number; coverCrop?: { x: number; y: number; zoom: number } | null }>;
   variants?: Array<{ id: string; color?: string | null; size?: string | null; stock?: number; available?: boolean }>;
   salePriceUzs: string | number;
   compareAtPriceUzs?: string | number | null;
@@ -146,15 +147,19 @@ export interface ProductPayload {
   description?: string;
   descriptionUz?: string;
   descriptionEn?: string;
+  composition?: Record<ProductLocale, string>;
+  careInstructions?: Record<ProductLocale, string>;
   sourceUrl?: string;
-  images: Array<{ mediaId: string }>;
+  images: Array<{ mediaId: string; coverCrop?: { x: number; y: number; zoom: number } | null }>;
   salePriceUzs: number;
   stock?: number;
+  variantStocks?: Array<{ color: string | null; size: string | null; stock: number }>;
   compareAtPriceUzs?: number | null;
   categoryId?: string;
   color?: string;
   colors?: Array<{ name: string; hex: string }>;
   size?: string;
+  sizes?: string[];
   publish: boolean;
 }
 
@@ -165,10 +170,13 @@ export interface ProductUpdatePayload {
   description?: string;
   descriptionUz?: string;
   descriptionEn?: string;
+  composition?: Record<ProductLocale, string>;
+  careInstructions?: Record<ProductLocale, string>;
   sourceUrl?: string | null;
-  images?: Array<{ id: string } | { mediaId: string }>;
+  images?: Array<{ id: string; coverCrop?: { x: number; y: number; zoom: number } | null } | { mediaId: string; coverCrop?: { x: number; y: number; zoom: number } | null }>;
   salePriceUzs: number;
   stock?: number;
+  variantStocks?: Array<{ color: string | null; size: string | null; stock: number }>;
   compareAtPriceUzs?: number | null;
   country?: ProductCountry;
   sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
@@ -177,6 +185,7 @@ export interface ProductUpdatePayload {
   color?: string;
   colors?: Array<{ name: string; hex: string }>;
   size?: string;
+  sizes?: string[];
 }
 
 // ─── Дашборд ──────────────────────────────────────────────────────────────────
@@ -262,8 +271,10 @@ export const getProducts = (params?: {
     },
   }).then((r) => r.data);
 
-export const createManualProduct = (payload: ProductPayload) =>
-  api.post<ProductListItem>('/api/v1/admin/products', payload).then((r) => r.data);
+export const createManualProduct = (payload: ProductPayload, idempotencyKey: string) =>
+  api.post<ProductListItem>('/api/v1/admin/products', payload, {
+    headers: { 'Idempotency-Key': idempotencyKey },
+  }).then((r) => r.data);
 
 export const updateManualProduct = (id: string, payload: ProductUpdatePayload) =>
   api.put<ProductListItem>(`/api/v1/admin/products/${id}`, payload).then((r) => r.data);

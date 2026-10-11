@@ -157,6 +157,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           <button
             type="button"
             onClick={onToggleMobileMenu}
+            data-action-id="admin.sidebar.toggle-mobile-navigation"
             aria-label={t(isMobileMenuOpen ? 'header.closeMenu' : 'header.openMenu')}
             aria-expanded={isMobileMenuOpen}
             aria-controls="admin-mobile-navigation"
@@ -204,7 +205,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
               <LanguageFlag
                 locale={i18n.language?.startsWith('uz') ? 'uz' : i18n.language?.startsWith('en') ? 'en' : 'ru'}
               />
-              <span className="sr-only">{t('common.language', 'Язык')}</span>
+              <span data-action-id="admin.header.language-indicator" className="sr-only">{t('common.language', 'Язык')}</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-muted">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -222,6 +223,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
               <button
                 key={lang.code}
                 type="button"
+                data-action-id={`admin.header.select-language.${lang.code}`}
                 onClick={() => {
                   i18n.changeLanguage(lang.code);
                   localStorage.setItem('i18nextLng', lang.code);

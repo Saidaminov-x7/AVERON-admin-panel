@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Archive, ImageOff, Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -63,6 +63,8 @@ export default function ProductsPage() {
   const [telegramPublishError, setTelegramPublishError] = useState<string | null>(null);
   const [telegramRetryProductId, setTelegramRetryProductId] = useState<string | null>(null);
   const [isRetryingTelegram, setIsRetryingTelegram] = useState(false);
+  const productCreationKey = useRef<string | null>(null);
+  const productSubmissionInFlight = useRef(false);
   const qc = useQueryClient();
 
   useEffect(() => {
@@ -125,16 +127,16 @@ export default function ProductsPage() {
     mutationFn: async ({ productId, values }: { productId: string | null; values: ProductFormSubmission }) => {
       const uploadedIds: string[] = [];
       try {
-        const images: Array<{ id: string } | { mediaId: string }> = [];
+        const images: Array<{ id: string; coverCrop: ProductFormSubmission["images"][number]["coverCrop"] } | { mediaId: string; coverCrop: ProductFormSubmission["images"][number]["coverCrop"] }> = [];
         for (const image of values.images) {
           if ("id" in image) {
-            images.push({ id: image.id });
+            images.push({ id: image.id, coverCrop: image.coverCrop });
           } else if ("mediaId" in image) {
-            images.push({ mediaId: image.mediaId });
+            images.push({ mediaId: image.mediaId, coverCrop: image.coverCrop });
           } else {
             const uploaded = await uploadProductPhotoApi(image.file);
             if (uploaded.isNewUpload) uploadedIds.push(uploaded.id);
-            images.push({ mediaId: uploaded.id });
+            images.push({ mediaId: uploaded.id, coverCrop: image.coverCrop });
           }
         }
 
@@ -145,13 +147,17 @@ export default function ProductsPage() {
           description: values.description,
           descriptionUz: values.descriptionUz,
           descriptionEn: values.descriptionEn,
+          composition: values.composition,
+          careInstructions: values.careInstructions,
           ...(values.sourceUrl ? { sourceUrl: values.sourceUrl } : {}),
           images,
           salePriceUzs: values.salePriceUzs,
           stock: values.stock,
+          variantStocks: values.variantStocks,
           compareAtPriceUzs: values.compareAtPriceUzs,
           colors: values.colors,
           sizeChartType: values.sizeChartType || null,
+          sizes: values.sizes,
         };
 
         if (productId) {
@@ -175,14 +181,15 @@ export default function ProductsPage() {
           country: values.country,
           images: images.map((image) => {
             if (!("mediaId" in image)) throw new Error("New products require uploaded photo references");
-            return { mediaId: image.mediaId };
+            return { mediaId: image.mediaId, coverCrop: image.coverCrop };
           }),
           categoryId: values.categoryId || undefined,
           color: values.color,
           size: values.size,
           publish: values.publish,
         };
-        return await createManualProduct(payload);
+        productCreationKey.current ??= crypto.randomUUID();
+        return await createManualProduct(payload, productCreationKey.current);
       } catch (error) {
         await Promise.allSettled(uploadedIds.map((id) => deleteUnattachedMediaApi(id)));
         throw error;
@@ -221,6 +228,9 @@ export default function ProductsPage() {
       setSubmissionError(`${message}${requestId}`);
       toast.error(`${message}${requestId}`);
     },
+    onSettled: () => {
+      productSubmissionInFlight.current = false;
+    },
   });
   const archiveMutation = useMutation({
     mutationFn: archiveProduct,
@@ -256,6 +266,7 @@ export default function ProductsPage() {
     setTelegramRetryProductId(null);
     setIsFormOpen(false);
     setEditingProduct(null);
+    productCreationKey.current = null;
     if (isEditorRoute) navigate("/products");
   };
 
@@ -297,6 +308,8 @@ export default function ProductsPage() {
   }, [editorProductQuery.data, editorProductQuery.isLoading, identifier, isEditorRoute, isNewProductRoute]);
 
   const handleFormSubmit = (values: ProductFormSubmission) => {
+    if (productSubmissionInFlight.current) return;
+    productSubmissionInFlight.current = true;
     setSubmissionError(null);
     mutation.mutate({ productId: editingProduct?.id ?? null, values });
   };
@@ -348,15 +361,15 @@ export default function ProductsPage() {
   return (
     <Layout title={t("products.page")}>
       {!isEditorRoute && <>
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-bold tracking-widest text-primary-500">{t("products.sectionLabel")}</p>
-          <h1 className="truncate text-2xl font-black">{t("products.catalog")}</h1>
+          <h1 className="text-xl font-black sm:text-2xl">{t("products.catalog")}</h1>
         </div>
         <button
           type="button"
           onClick={() => navigate("/products/new")}
-          className="btn-primary shrink-0"
+          className="btn-primary shrink-0 self-end sm:self-auto"
         >
           <Plus size={18} />
           {t("products.add")}
@@ -373,9 +386,9 @@ export default function ProductsPage() {
         >
           <label className="min-w-0 flex-1 text-xs font-semibold text-muted">
             {t("products.searchProducts")}
-            <input className="input mt-1.5 w-full" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} />
+            <input id="admin-product-search" name="searchProducts" type="search" className="input mt-1.5 w-full" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} />
           </label>
-          <button type="submit" className="btn-primary h-10">{t("common.search")}</button>
+          <button type="submit" className="btn-primary h-10">{t("products.searchAction")}</button>
         </form>
         <Select
           label={t("products.countryFilterLabel")}
@@ -437,7 +450,7 @@ export default function ProductsPage() {
           </button>
         </div>
       ) : products.length ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))] gap-4">
           {products.map((product) => {
             const russianTranslation = product.translations?.ru;
             const title = typeof russianTranslation === "string"

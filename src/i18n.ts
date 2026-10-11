@@ -4,16 +4,17 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { repairMojibake } from './lib/repairMojibake';
 
 import ru from './messages/ru.json';
 import uz from './messages/uz.json';
 import en from './messages/en.json';
 
-export const resources = {
+export const resources = repairMojibake({
   ru: { translation: ru },
   uz: { translation: uz },
   en: { translation: en },
-};
+});
 
 i18n
   .use(LanguageDetector)

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { caretAfterFormatting, formatUzsPriceInput, normalizeUzsPriceInput, parseUzsPriceInput } from "../../lib/priceInput";
 import {
   fileIdentity,
   formatPhotoSize,
@@ -80,5 +81,30 @@ describe("product photo helpers", () => {
     expect(formatPhotoSize(Math.round(1.8 * 1024 * 1024))).toBe("1.8 MB");
     expect(fileIdentity({ name: "Photo.JPG", size: 1024, lastModified: 42 }))
       .toBe(fileIdentity({ name: "photo.jpg", size: 1024, lastModified: 42 }));
+  });
+});
+
+describe("UZS price input", () => {
+  it.each([
+    ["1 234 567", "1234567"],
+    ["1,234,567", "1234567"],
+    ["1.234.567", "1234567"],
+    ["1.234,50", "1234.50"],
+    ["1 234 567,89", "1234567.89"],
+    ["1234.50", "1234.50"],
+  ])("normalizes pasted %s to %s", (input, expected) => {
+    expect(normalizeUzsPriceInput(input)).toBe(expected);
+  });
+
+  it("groups thousands without changing the numeric value and maps the caret by digits", () => {
+    const formatted = formatUzsPriceInput("1234567.89");
+    expect(formatted).toBe("1\u202f234\u202f567.89");
+    expect(parseUzsPriceInput(formatted)).toBe(1234567.89);
+    expect(caretAfterFormatting("180\u202f000", 4)).toBe(5);
+  });
+
+  it("rejects empty and non-finite values", () => {
+    expect(parseUzsPriceInput("")).toBeNull();
+    expect(parseUzsPriceInput("1e999")).toBeNull();
   });
 });

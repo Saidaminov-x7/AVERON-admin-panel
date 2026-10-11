@@ -16,6 +16,7 @@ import {
   type ProductLocale,
 } from '../../lib/commerceApi';
 import { uploadProductPhotoApi, type MediaItem } from '../../lib/mediaApi';
+import { parseUzsPriceInput } from '../../lib/priceInput';
 import {
   applyProductAiSuggestions,
   getProductAiSuggestionsApi,
@@ -25,6 +26,7 @@ import {
 import { useAdminCapabilities } from '../../hooks/useAdminCapabilities';
 import { useDebounce } from '../../hooks/useDebounce';
 import { EmptyState, Input, Button, Select, Textarea, Modal, Pagination } from '../../components/ui';
+import { UzsPriceInput } from '../../components/ui/UzsPriceInput';
 
 type ImportStatus = ImportedProduct['status'];
 type LocalizedDraft = Record<ProductLocale, ProductLocalizedContent & { characteristics: Record<string, string> }>;
@@ -407,9 +409,10 @@ export default function ImportsPage() {
           <Button
             loading={approveMutation.isPending}
             leftIcon={<Check size={15} />}
-            disabled={!approveItem || !priceInput || Number(priceInput) <= 0 || !isProductCountry(country) || locales.some((locale) => localizedDraft[locale].title.trim().length < 2) || (publishNow && uploadedImages.length === 0)}
+            disabled={!approveItem || (parseUzsPriceInput(priceInput) ?? 0) <= 0 || !isProductCountry(country) || locales.some((locale) => localizedDraft[locale].title.trim().length < 2) || (publishNow && uploadedImages.length === 0)}
             onClick={() => {
-              if (!approveItem || !isProductCountry(country) || Number(priceInput) <= 0) return;
+              const salePriceUzs = parseUzsPriceInput(priceInput);
+              if (!approveItem || !isProductCountry(country) || salePriceUzs === null || salePriceUzs <= 0) return;
               const translations = Object.fromEntries(locales.map((locale) => [locale, {
                 title: localizedDraft[locale].title.trim(),
                 description: localizedDraft[locale].description.trim(),
@@ -419,7 +422,7 @@ export default function ImportsPage() {
                 item: approveItem,
                 form: {
                   translations,
-                  salePriceUzs: Number(priceInput),
+                  salePriceUzs,
                   ...(Number(exchangeRateInput) > 0 ? { exchangeRate: Number(exchangeRateInput) } : {}),
                   country,
                   sizeChartType: sizeChartType || null,
@@ -439,7 +442,7 @@ export default function ImportsPage() {
             <p className="mt-1 break-all"><a href={approveItem.sourceUrl} target="_blank" rel="noreferrer" className="text-primary-600 underline">{approveItem.sourceUrl}</a></p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Input label={t('imports.salePriceLabel', 'Цена продажи (UZS)')} type="number" min={1} value={priceInput} onChange={(event) => setPriceInput(event.target.value)} />
+            <UzsPriceInput label={t('imports.salePriceLabel', 'Цена продажи (UZS)')} value={priceInput} onValueChange={setPriceInput} />
             <Input label={t('imports.exchangeRate', 'Курс CNY → UZS (необязательно)')} type="number" min={0} step="any" value={exchangeRateInput} onChange={(event) => setExchangeRateInput(event.target.value)} />
             <Select label={t('products.countryLabel')} value={country} options={countryOptions} onChange={(value) => setCountry(isProductCountry(value) ? value : '')} />
             <Select

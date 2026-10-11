@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { ImageOff, MoveDown, MoveUp, RefreshCw, Sparkles, Star, Trash2, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button, Input, Modal, Select } from "../../components/ui";
+import { UzsPriceInput } from "../../components/ui/UzsPriceInput";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { LanguageFlag } from "../../components/ui/LanguageFlag";
 import { useAdminCapabilities } from "../../hooks/useAdminCapabilities";
@@ -40,20 +41,21 @@ import {
 } from "./productFormValidation";
 import {
   calculateProductPhotoCropRect,
-  cropProductPhoto,
   DEFAULT_PRODUCT_PHOTO_CROP,
   productPhotoCropSignature,
   type ProductPhotoCrop,
   type ProductPhotoOrientation,
 } from "./productImageCrop";
 import { ProductRichTextField } from "./ProductRichTextField";
+import { buildProductVariantStocks, MAX_PRODUCT_STOCK, parseProductColorOptions, productVariantStockKey, sumProductVariantStocks } from "./productVariantInventory";
+
+const ProductFittingRoomPanel = lazy(() => import("./ProductFittingRoomPanel").then((module) => ({ default: module.ProductFittingRoomPanel })));
 
 type LocalizedContent = { title: string; description: string };
 type PhotoDraft = {
   key: string;
   id?: string;
   mediaId?: string | null;
-  mediaCropSignature?: string;
   naturalWidth?: number;
   naturalHeight?: number;
   url: string;
@@ -65,10 +67,8 @@ function getPhotoPreviewStyle(photo: PhotoDraft) {
   if (productPhotoCropSignature(photo.crop) === productPhotoCropSignature(DEFAULT_PRODUCT_PHOTO_CROP)) {
     return undefined;
   }
-  if (!photo.file || !photo.naturalWidth || !photo.naturalHeight) {
-    return photo.file
-      ? { objectPosition: `${photo.crop.x}% ${photo.crop.y}%`, transform: `scale(${photo.crop.zoom})` }
-      : undefined;
+  if (!photo.naturalWidth || !photo.naturalHeight) {
+    return { objectPosition: `${photo.crop.x}% ${photo.crop.y}%`, transform: `scale(${photo.crop.zoom})`, transformOrigin: `${photo.crop.x}% ${photo.crop.y}%` };
   }
 
   const rect = calculateProductPhotoCropRect(photo.naturalWidth, photo.naturalHeight, photo.crop);
@@ -82,11 +82,14 @@ function getPhotoPreviewStyle(photo: PhotoDraft) {
 }
 type ProductFormValues = {
   translations: Record<ProductLocale, LocalizedContent>;
+  composition: Record<ProductLocale, string>;
+  careInstructions: Record<ProductLocale, string>;
   country: string;
   categoryId: string;
   salePriceUzs: string;
   compareAtPriceUzs: string;
   stock: string;
+  variantStocks: Record<string, string>;
   colorsText: string;
   color: string;
   size: string;
@@ -104,19 +107,23 @@ export type ProductFormSubmission = {
   description: string;
   descriptionUz: string;
   descriptionEn: string;
+  composition: Record<ProductLocale, string>;
+  careInstructions: Record<ProductLocale, string>;
   sourceUrl?: string;
   salePriceUzs: number;
   stock: number;
+  variantStocks: Array<{ color: string | null; size: string | null; stock: number }>;
   compareAtPriceUzs: number | null;
   colors: Array<{ name: string; hex: string }>;
   country?: ProductCountry;
   categoryId?: string | null;
   color: string;
   size: string;
+  sizes: string[];
   sizeChartType: ProductFormValues["sizeChartType"];
   publish: boolean;
   publishTelegram: boolean;
-  images: Array<{ id: string } | { mediaId: string } | { file: File }>;
+  images: Array<{ id: string; coverCrop: ProductPhotoCrop } | { mediaId: string; coverCrop: ProductPhotoCrop } | { file: File; coverCrop: ProductPhotoCrop }>;
 };
 
 interface ProductFormModalProps {
@@ -155,26 +162,42 @@ const readDescription = (product: ProductListItem, locale: ProductLocale): strin
   return typeof value === "string" ? value : "";
 };
 
-const getInitialValues = (product: ProductListItem | null): ProductFormValues => ({
+const readLocalizedAttribute = (product: ProductListItem | null, key: "composition" | "careInstructions", locale: ProductLocale): string => {
+  const value = product?.attributes?.[key];
+  if (typeof value === "string") return value;
+  if (!value || typeof value !== "object" || Array.isArray(value)) return "";
+  const localized = value as Record<string, unknown>;
+  const text = localized[locale] ?? localized.text ?? localized.value;
+  return typeof text === "string" ? text : "";
+};
+
+export const getInitialValues = (product: ProductListItem | null): ProductFormValues => ({
   translations: {
     ru: { title: product ? readTitle(product, "ru") : "", description: product ? readDescription(product, "ru") : "" },
     uz: { title: product ? readTitle(product, "uz") : "", description: product ? readDescription(product, "uz") : "" },
     en: { title: product ? readTitle(product, "en") : "", description: product ? readDescription(product, "en") : "" },
   },
+  composition: Object.fromEntries(locales.map((locale) => [locale, readLocalizedAttribute(product, "composition", locale)])) as Record<ProductLocale, string>,
+  careInstructions: Object.fromEntries(locales.map((locale) => [locale, readLocalizedAttribute(product, "careInstructions", locale)])) as Record<ProductLocale, string>,
   country: product?.country ?? "",
   categoryId: product?.categoryId ?? "",
   salePriceUzs: product ? String(product.salePriceUzs) : "",
   compareAtPriceUzs: product?.compareAtPriceUzs ? String(product.compareAtPriceUzs) : "",
-  stock: product?.variants?.[0]?.stock !== undefined ? String(product.variants[0].stock) : "0",
-  colorsText: product?.variants?.map((variant) => {
+  stock: product?.variants?.length ? String(Math.min(MAX_PRODUCT_STOCK, product.variants.reduce((total, variant) => total + (variant.stock ?? 0), 0))) : "0",
+  variantStocks: Object.fromEntries((product?.variants ?? []).map((variant) => [
+    productVariantStockKey(variant.color ?? null, variant.size ?? null),
+    String(variant.stock ?? 0),
+  ])),
+  colorsText: [...new Map((product?.variants ?? []).map((variant) => {
     const [name, hex] = (variant.color ?? "").split("::");
     return hex ? `${name} | ${hex}` : "";
-  }).filter(Boolean).join("\n") ?? "",
+  }).filter(Boolean).map((color) => [color.toLocaleLowerCase(), color])).values()].join("\n"),
   color: product?.source === "MANUAL" ? product.variants?.[0]?.color ?? "" : "",
   size: product?.source === "MANUAL" ? product.variants?.[0]?.size ?? "" : "",
   sizesText: product?.variants?.map((variant) => variant.size).filter(Boolean).join(", ") ?? "",
   sizeChartType: product?.sizeChartType ?? "",
-  publish: product ? product.status === "PUBLISHED" : true,
+  // A new listing must remain a draft until the administrator explicitly opts in.
+  publish: product ? product.status === "PUBLISHED" : false,
   publishTelegram: false,
 });
 
@@ -195,6 +218,8 @@ export function ProductFormModal({
   onClose,
   onSubmit,
 }: ProductFormModalProps) {
+  const finalSubmissionStarted = useRef(false);
+  const finalSubmissionRequested = useRef(false);
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const formId = useId();
@@ -210,10 +235,16 @@ export function ProductFormModal({
   } | null>(null);
   const [activeLocale, setActiveLocale] = useState<ProductLocale>("ru");
   const [currentStep, setCurrentStep] = useState(0);
-  const steps = ["Основная информация", "Цены", "Варианты", "Фотографии", "Публикация"];
+  const steps = ["Основная информация", "Цены", "Варианты", "Фотографии", t("products.fittingRoom.step"), "Публикация"];
   const parseSizes = (text: string) => {
     const clothingOrder = ["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"];
-    return text.split(/[\n,]+/).map((size) => size.trim()).filter(Boolean).sort((a, b) => {
+    const uniqueSizeMap = new Map<string, string>();
+    for (const size of text.split(/[\n,]+/).map((value) => value.trim()).filter(Boolean)) {
+      const key = size.toLocaleLowerCase();
+      if (!uniqueSizeMap.has(key)) uniqueSizeMap.set(key, size);
+    }
+    const uniqueSizes = [...uniqueSizeMap.values()];
+    return uniqueSizes.sort((a, b) => {
       const aNumber = Number(a.replace(/[^0-9.]/g, ""));
       const bNumber = Number(b.replace(/[^0-9.]/g, ""));
       const aHasNumber = Number.isFinite(aNumber) && /\d/.test(a);
@@ -232,7 +263,7 @@ export function ProductFormModal({
     id: image.id,
     mediaId: image.mediaId,
     url: image.url,
-    crop: { ...DEFAULT_PRODUCT_PHOTO_CROP },
+    crop: { ...DEFAULT_PRODUCT_PHOTO_CROP, ...(image.coverCrop ?? {}) },
   })));
   const [errors, setErrors] = useState<FormErrors>({});
   const [photoInputErrors, setPhotoInputErrors] = useState<string[]>([]);
@@ -268,6 +299,7 @@ export function ProductFormModal({
     setAiSuggestions(null);
     setAiError("");
     if (!isOpen) {
+      finalSubmissionRequested.current = false;
       releaseObjectUrls();
       setValues(getInitialValues(null));
       setPhotos([]);
@@ -286,7 +318,7 @@ export function ProductFormModal({
       id: image.id,
       mediaId: image.mediaId,
       url: image.url,
-      crop: { ...DEFAULT_PRODUCT_PHOTO_CROP },
+      crop: { ...DEFAULT_PRODUCT_PHOTO_CROP, ...(image.coverCrop ?? {}) },
     })));
     setErrors({});
     setPhotoInputErrors([]);
@@ -310,6 +342,13 @@ export function ProductFormModal({
         ? { ...current, [errorKey]: undefined }
         : current);
     }
+  };
+
+  const updateLocalizedAttribute = (field: "composition" | "careInstructions", value: string) => {
+    setValues((current) => ({
+      ...current,
+      [field]: { ...current[field], [activeLocale]: value },
+    }));
   };
 
   const updateValue = <K extends keyof ProductFormValues>(key: K, value: ProductFormValues[K]) => {
@@ -423,19 +462,16 @@ export function ProductFormModal({
       }
       const mediaIds: string[] = [];
       for (const photo of photos) {
-        if (photo.mediaId && (
-          !photo.file || photo.mediaCropSignature === productPhotoCropSignature(photo.crop)
-        )) {
+        if (photo.mediaId && !photo.file) {
           mediaIds.push(photo.mediaId);
           continue;
         }
         if (!photo.file) throw new Error("PRODUCT_IMAGE_NOT_AVAILABLE");
-        const croppedFile = await cropProductPhoto(photo.file, photo.crop);
-        const uploaded = await uploadProductPhotoApi(croppedFile);
+        const uploaded = await uploadProductPhotoApi(photo.file);
         mediaIds.push(uploaded.id);
         setPhotos((current) => current.map((item) =>
           item.key === photo.key
-            ? { ...item, mediaId: uploaded.id, mediaCropSignature: productPhotoCropSignature(photo.crop) }
+            ? { ...item, mediaId: uploaded.id }
             : item,
         ));
       }
@@ -549,9 +585,10 @@ export function ProductFormModal({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLElement | null;
-    if (submitter?.getAttribute("type") !== "submit") return;
-    if (isPreparingImages || isSaving) return;
+    const explicitlyRequested = finalSubmissionRequested.current;
+    finalSubmissionRequested.current = false;
+    if (!explicitlyRequested) return;
+    if (isPreparingImages || isSaving || finalSubmissionStarted.current) return;
     // A submit event must never publish from an intermediate step. This guard
     // keeps the stepper safe even if a browser or wrapper treats "Далее" as submit.
     if (currentStep < steps.length - 1) {
@@ -594,20 +631,26 @@ export function ProductFormModal({
       return;
     }
 
+    const variantStocks = buildProductVariantStocks(parseProductColorOptions(values.colorsText), parseSizes(values.sizesText), values.variantStocks, "0");
+    if (sumProductVariantStocks(variantStocks) > MAX_PRODUCT_STOCK) {
+      setCurrentStep(2);
+      return;
+    }
+
+    finalSubmissionStarted.current = true;
     setIsPreparingImages(true);
     setPhotoInputErrors([]);
     try {
       const images: ProductFormSubmission["images"] = [];
       for (const photo of photos) {
-        const signature = productPhotoCropSignature(photo.crop);
         if (photo.id && !photo.file) {
-          images.push({ id: photo.id });
-        } else if (photo.mediaId && (!photo.file || photo.mediaCropSignature === signature)) {
-          images.push({ mediaId: photo.mediaId });
+          images.push({ id: photo.id, coverCrop: photo.crop });
+        } else if (photo.mediaId && !photo.file) {
+          images.push({ mediaId: photo.mediaId, coverCrop: photo.crop });
         } else if (photo.file) {
-          images.push({ file: await cropProductPhoto(photo.file, photo.crop) });
+          images.push({ file: photo.file, coverCrop: photo.crop });
         } else if (photo.id) {
-          images.push({ id: photo.id });
+          images.push({ id: photo.id, coverCrop: photo.crop });
         }
       }
 
@@ -618,8 +661,14 @@ export function ProductFormModal({
         description: values.translations.ru.description.trim(),
         descriptionUz: values.translations.uz.description.trim(),
         descriptionEn: values.translations.en.description.trim(),
+        composition: Object.fromEntries(locales.map((locale) => [locale, values.composition[locale].trim()])) as Record<ProductLocale, string>,
+        careInstructions: Object.fromEntries(locales.map((locale) => [locale, values.careInstructions[locale].trim()])) as Record<ProductLocale, string>,
         salePriceUzs: Number(values.salePriceUzs),
-        stock: Math.max(0, Math.floor(Number(values.stock || 0))),
+        stock: (() => {
+          const variantStocks = buildProductVariantStocks(parseProductColorOptions(values.colorsText), parseSizes(values.sizesText), values.variantStocks, "0");
+          return variantStocks.length ? sumProductVariantStocks(variantStocks) : Math.max(0, Math.floor(Number(values.stock || 0)));
+        })(),
+        variantStocks: buildProductVariantStocks(parseProductColorOptions(values.colorsText), parseSizes(values.sizesText), values.variantStocks, "0"),
         compareAtPriceUzs: values.compareAtPriceUzs ? Number(values.compareAtPriceUzs) : null,
         colors: values.colorsText.split("\n").map((row, index) => {
           const [name, hex] = row.split("|").map((part) => part.trim());
@@ -630,17 +679,23 @@ export function ProductFormModal({
         categoryId: values.categoryId || null,
         color: values.color.trim(),
         size: parseSizes(values.sizesText).join(", ") || values.size.trim(),
+        sizes: parseSizes(values.sizesText),
         sizeChartType: values.sizeChartType,
         publish: values.publish,
         publishTelegram: values.publishTelegram,
         images,
       });
     } catch {
+      finalSubmissionStarted.current = false;
       setPhotoInputErrors([t("products.photoCropError")]);
     } finally {
       setIsPreparingImages(false);
     }
   };
+
+  useEffect(() => {
+    if (!isSaving && !isPreparingImages) finalSubmissionStarted.current = false;
+  }, [isPreparingImages, isSaving]);
 
   const localeName = (locale: ProductLocale) => t(`products.contentLocale.${locale}`);
   const localizedCategoryName = (category: ProductCategory) => {
@@ -735,7 +790,7 @@ export function ProductFormModal({
         <>
           <Button variant="ghost" onClick={onClose} disabled={isSaving || isPreparingImages}>{t("common.cancel")}</Button>
           {currentStep > 0 && <Button type="button" variant="outline" onClick={() => setCurrentStep((step) => step - 1)} disabled={isSaving || isPreparingImages}>Назад</Button>}
-          {currentStep < steps.length - 1 ? <Button type="button" onClick={() => setCurrentStep((step) => step + 1)}>Далее</Button> : <Button type="submit" form={formId} loading={isSaving || isPreparingImages} disabled={settingsLoading || isPreparingImages}>
+          {currentStep < steps.length - 1 ? <Button type="button" onClick={() => setCurrentStep((step) => step + 1)}>Далее</Button> : <Button type="submit" form={formId} onClick={() => { finalSubmissionRequested.current = true; }} loading={isSaving || isPreparingImages} disabled={settingsLoading || isPreparingImages}>
             {isPreparingImages
               ? t("products.preparingPhotos")
               : isSaving
@@ -745,14 +800,30 @@ export function ProductFormModal({
         </>
       }
     >
-      <form id={formId} noValidate onSubmit={handleSubmit} className="space-y-6">
+      <form
+        id={formId}
+        noValidate
+        onSubmit={handleSubmit}
+        onKeyDown={(event) => {
+          const target = event.target;
+          if (
+            event.key === "Enter"
+            && currentStep === steps.length - 1
+            && target instanceof HTMLElement
+            && !target.closest("textarea, button, [contenteditable='true']")
+          ) {
+            finalSubmissionRequested.current = true;
+          }
+        }}
+        className="space-y-6"
+      >
         <div className="space-y-3">
           <div className="flex gap-1" aria-label="Шаги создания товара">{steps.map((step, index) => <button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={step} aria-current={index === currentStep ? "step" : undefined} className="group flex min-h-0 flex-1 items-center rounded-full bg-transparent p-0"><span className={`h-1 w-full rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-neutral-200 dark:bg-neutral-700 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-600"}`} /></button>)}</div>
           <div className="flex items-center justify-between text-xs text-muted"><span>Шаг {currentStep + 1} из {steps.length}</span><span className="font-medium text-app">{steps[currentStep]}</span></div>
         </div>
         <div className="rounded-xl border border-primary-500/20 bg-primary-500/5 p-4">
           <p className="text-sm font-bold text-app">{product ? "Редактирование карточки товара" : "Новый товар — заполните по шагам"}</p>
-          <p className="mt-1 text-xs leading-5 text-muted">1. Страна и категория · 2. Название и описание · 3. Цена, скидка и цвета · 4. Фотографии · 5. Публикация</p>
+          <p className="mt-1 text-xs leading-5 text-muted">{t("products.workflowHint")}</p>
         </div>
         {submissionError && (
           <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
@@ -901,6 +972,26 @@ export function ProductFormModal({
                 hint: t("products.richText.hint"),
               }}
             />
+            <label className="grid gap-1.5 text-sm font-medium text-app md:col-span-1">
+              {t("products.compositionLabel")}
+              <textarea
+                value={values.composition[activeLocale]}
+                onChange={(event) => updateLocalizedAttribute("composition", event.target.value)}
+                maxLength={4000}
+                rows={4}
+                className="min-h-24 w-full rounded-md border border-app bg-surface px-3 py-2 text-sm font-normal text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+              />
+            </label>
+            <label className="grid gap-1.5 text-sm font-medium text-app md:col-span-1">
+              {t("products.careInstructionsLabel")}
+              <textarea
+                value={values.careInstructions[activeLocale]}
+                onChange={(event) => updateLocalizedAttribute("careInstructions", event.target.value)}
+                maxLength={8000}
+                rows={4}
+                className="min-h-24 w-full rounded-md border border-app bg-surface px-3 py-2 text-sm font-normal text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+              />
+            </label>
           </div>
         </section>
 
@@ -920,25 +1011,17 @@ export function ProductFormModal({
             className="max-w-md"
           />
           <p className="text-xs text-muted">Если оставить 0, товар будет показан как отсутствующий или доступный по предзаказу.</p>
-          <Input
+          <UzsPriceInput
             label={t("products.salePriceLabel")}
-            type="number"
-            min="0.01"
-            step="0.01"
-            inputMode="decimal"
             value={values.salePriceUzs}
-            onChange={(event) => updateValue("salePriceUzs", event.target.value)}
+            onValueChange={(value) => updateValue("salePriceUzs", value)}
             error={errors.salePriceUzs}
             className="max-w-md"
           />
-          <Input
+          <UzsPriceInput
             label="Старая цена до скидки (необязательно)"
-            type="number"
-            min="0.01"
-            step="0.01"
-            inputMode="decimal"
             value={values.compareAtPriceUzs}
-            onChange={(event) => updateValue("compareAtPriceUzs", event.target.value)}
+            onValueChange={(value) => updateValue("compareAtPriceUzs", value)}
             className="max-w-md"
           />
           <p className="text-xs text-muted">Если цена выше текущей, на витрине автоматически появится скидка.</p>
@@ -1033,7 +1116,7 @@ export function ProductFormModal({
                             ? { ...item, naturalWidth, naturalHeight }
                             : item));
                         }}
-                        className={photo.file && photo.naturalWidth && productPhotoCropSignature(photo.crop) !== productPhotoCropSignature(DEFAULT_PRODUCT_PHOTO_CROP)
+                        className={photo.naturalWidth && productPhotoCropSignature(photo.crop) !== productPhotoCropSignature(DEFAULT_PRODUCT_PHOTO_CROP)
                           ? "absolute max-w-none select-none"
                           : "h-full w-full object-contain"}
                         style={getPhotoPreviewStyle(photo)}
@@ -1215,6 +1298,33 @@ export function ProductFormModal({
                 </div>
               </div>
               <div className="md:col-span-2">
+                {(() => {
+                  const colors = parseProductColorOptions(values.colorsText);
+                  const sizes = parseSizes(values.sizesText);
+                  if (!colors.length && !sizes.length) return null;
+                  const colorOptions: Array<{ value: string | null; name: string; hex: string | null }> = colors.length
+                    ? colors.map((color) => ({ value: color.value, name: color.name, hex: color.hex }))
+                    : [{ value: null, name: "Все цвета", hex: null }];
+                  const sizeOptions: Array<string | null> = sizes.length ? sizes : [null];
+                  return <div className="md:col-span-2 rounded-xl border border-app bg-surface p-4">
+                    <h5 className="text-sm font-bold text-app">Наличие по вариантам</h5>
+                    <p className="mt-1 text-xs text-muted">Укажите количество для каждого сочетания цвета и размера. Общий остаток равен сумме вариантов; если варианты не нужны, укажите остаток на шаге «Цены». Остатки проверяются при оформлении заказа.</p>
+                    {sumProductVariantStocks(buildProductVariantStocks(colors, sizes, values.variantStocks, "0")) > MAX_PRODUCT_STOCK && <p role="alert" className="mt-2 text-sm font-medium text-red-600">Сумма остатков вариантов превышает допустимый предел.</p>}
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                      {colorOptions.flatMap((color) => sizeOptions.map((size) => {
+                        const key = productVariantStockKey(color.value, size);
+                        const label = `Остаток: ${color.name}${size ? `, размер ${size}` : ""}`;
+                        return <label key={key} className="grid min-w-0 gap-1.5 text-xs font-medium text-muted">
+                          <span className="flex min-w-0 items-center gap-2 truncate">
+                            {color.hex && <span aria-hidden="true" className="size-3.5 shrink-0 rounded-full border border-app" style={{ backgroundColor: color.hex }} />}
+                            {color.name}{size ? ` · ${size}` : ""}
+                          </span>
+                          <input aria-label={label} type="number" min="0" max={MAX_PRODUCT_STOCK} step="1" inputMode="numeric" value={values.variantStocks[key] ?? "0"} onChange={(event) => updateValue("variantStocks", { ...values.variantStocks, [key]: event.target.value })} className="h-10 w-full rounded-md border border-app bg-app px-3 text-sm font-semibold text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" />
+                        </label>;
+                      }))}
+                    </div>
+                  </div>;
+                })()}
                 <Select
                   label={t("products.sizeChartLabel")}
                   value={values.sizeChartType}
@@ -1236,7 +1346,7 @@ export function ProductFormModal({
           </section>
         )}
         {product && (
-          <section className={`${currentStep === 4 ? "" : "hidden "}space-y-3 rounded-xl border border-app bg-surface-muted p-4`}>
+          <section className={`${currentStep === 5 ? "" : "hidden "}space-y-3 rounded-xl border border-app bg-surface-muted p-4`}>
             <h4 className="text-sm font-bold text-app">{t("products.sourceInformation")}</h4>
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
@@ -1266,7 +1376,12 @@ export function ProductFormModal({
             </dl>
           </section>
         )}
-        <section className={`${currentStep === 4 ? "" : "hidden "}space-y-3 rounded-xl border border-app p-4`}>
+        {currentStep === 4 && <section className="space-y-3">
+          <Suspense fallback={<p role="status" className="text-sm text-muted">{t("products.fittingRoom.loading")}</p>}>
+            <ProductFittingRoomPanel productId={product?.id ?? null} variants={product?.variants ?? []} sourceImages={product?.images ?? []} />
+          </Suspense>
+        </section>}
+        <section className={`${currentStep === 5 ? "" : "hidden "}space-y-3 rounded-xl border border-app p-4`}>
           <h4 className="text-sm font-bold text-app">{t("products.publicationSection")}</h4>
           <div className="flex items-center justify-between gap-4 py-2">
             <div><p className="text-sm font-medium text-app">{t("products.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Товар появится в каталоге после сохранения.</p></div>

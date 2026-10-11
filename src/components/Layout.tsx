@@ -17,6 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
   const updatePersistentTitle = useContext(PersistentLayoutContext);
   const [pageTitle, setPageTitle] = useState(title);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [desktopSidebarWidth, setDesktopSidebarWidth] = useState(272);
   const drawerRef = useRef<HTMLDivElement>(null);
   const focusRestoreFrameRef = useRef<number | null>(null);
 
@@ -50,11 +51,32 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        if (event.target instanceof Element && event.target.closest('[data-admin-drawer-portal]')) return;
         event.preventDefault();
         setIsMobileMenuOpen(false);
         return;
       }
       if (event.key !== 'Tab' || !drawerRef.current) return;
+      const portalMenu = event.target instanceof Element
+        ? event.target.closest<HTMLElement>('[data-admin-drawer-portal]')
+        : null;
+      if (portalMenu) {
+        const trigger = drawerRef.current.querySelector<HTMLElement>(`[aria-controls="${portalMenu.id}"]`);
+        if (trigger) {
+          event.preventDefault();
+          const drawerItems = Array.from(drawerRef.current.querySelectorAll<HTMLElement>(
+            'a[href]:not([tabindex="-1"]), button:not(:disabled):not([tabindex="-1"]), input:not(:disabled):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
+          ));
+          const triggerIndex = drawerItems.indexOf(trigger);
+          if (triggerIndex >= 0) {
+          const next = event.shiftKey
+            ? trigger
+            : drawerItems[triggerIndex + 1] ?? drawerItems[0];
+            next?.focus();
+          }
+          return;
+        }
+      }
       const focusable = Array.from(drawerRef.current.querySelectorAll<HTMLElement>(
         'a[href]:not([tabindex="-1"]), button:not(:disabled):not([tabindex="-1"]), input:not(:disabled):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
       ));
@@ -111,11 +133,13 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
         aria-modal={isMobileMenuOpen ? true : undefined}
         aria-label={isMobileMenuOpen ? t('header.mobileNavigation') : undefined}
         tabIndex={-1}
-        className={`fixed inset-y-0 right-0 z-50 transform transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:right-auto lg:translate-x-0 ${
+        data-open={isMobileMenuOpen ? 'true' : 'false'}
+        style={{ '--admin-sidebar-width': `${desktopSidebarWidth}px` } as React.CSSProperties}
+        className={`admin-mobile-navigation fixed inset-y-0 right-0 z-50 h-dvh w-[min(92vw,25rem)] max-w-full transform border-l border-app bg-surface shadow-2xl transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:inset-y-auto lg:right-auto lg:left-auto lg:translate-x-0 lg:h-auto lg:w-[var(--admin-sidebar-width)] lg:max-w-none lg:shrink-0 lg:border-0 lg:bg-transparent lg:shadow-none ${
           isMobileMenuOpen ? 'visible translate-x-0' : 'invisible translate-x-full'
         }`}
       >
-        <Sidebar onCloseMobile={() => setIsMobileMenuOpen(false)} />
+        <Sidebar isMobileOpen={isMobileMenuOpen} onCloseMobile={() => setIsMobileMenuOpen(false)} onDesktopWidthChange={setDesktopSidebarWidth} />
       </div>
 
       {/* Основная область */}

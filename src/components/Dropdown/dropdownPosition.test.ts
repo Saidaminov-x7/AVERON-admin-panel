@@ -39,4 +39,15 @@ describe('getDropdownPosition', () => {
     expect(result.top).toBe(116);
     expect(result.maxWidth).toBe(304);
   });
+
+  it('opens above a drawer language switcher when the fixed account footer leaves no room below', () => {
+    expect(getDropdownPosition({
+      anchor: { top: 539, right: 374, bottom: 583, left: 48 },
+      panelWidth: 326,
+      panelHeight: 144,
+      viewportWidth: 390,
+      viewportHeight: 715,
+      align: 'left',
+    })).toEqual({ top: 389, left: 48, maxHeight: 144, maxWidth: 374 });
+  });
 });
