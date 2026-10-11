@@ -256,6 +256,11 @@
 }
 
 @media (max-width: 1023px) {
+  /* Theme changes should not tween active-link colors through low-contrast grays. */
+  .admin-mobile-navigation .admin-drawer-link {
+    transition-property: transform;
+  }
+
   .dark .averon-admin-shell .admin-mobile-navigation .admin-drawer-link.is-active {
     background-color: #272727 !important;
     color: #f2f3f3 !important;

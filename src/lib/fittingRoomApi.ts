@@ -76,7 +76,6 @@ export async function uploadFittingAsset(productId: string, file: File, garmentL
   form.append('file', file);
   const { data } = await api.post(`/api/v1/admin/products/${encodeURIComponent(productId)}/fitting-room/assets`, form, {
     params: { layer: garmentLayer, ...(variantId ? { variantId } : {}) },
-    headers: { 'Content-Type': 'multipart/form-data' },
   });
   return data as { id: string; status: FittingAssetStatus; previewUrl: string | null };
 }
