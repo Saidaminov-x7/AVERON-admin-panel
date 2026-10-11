@@ -255,6 +255,16 @@
   }
 }
 
+@media (max-width: 1023px) {
+  .dark .averon-admin-shell .admin-mobile-navigation .admin-drawer-link.is-active {
+    background-color: #272727 !important;
+    color: #f2f3f3 !important;
+  }
+  .dark .averon-admin-shell .admin-mobile-navigation .admin-drawer-link.is-active > span:first-child {
+    color: #f2f3f3 !important;
+  }
+}
+
 .admin-sidebar-nav {
   scrollbar-width: thin;
   scrollbar-color: color-mix(in srgb, var(--color-text-muted) 45%, transparent) transparent;
