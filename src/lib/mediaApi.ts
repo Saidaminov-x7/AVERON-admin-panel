@@ -41,7 +41,7 @@ export const uploadMediaApi = async (file: File): Promise<MediaItem> => {
   const formData = new FormData();
   formData.append('file', file);
   const { data } = await api.post('/media/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+    headers: { 'Content-Type': undefined },
   });
   return data;
 };
@@ -50,7 +50,7 @@ export const uploadProductPhotoApi = async (file: File): Promise<MediaItem> => {
   const formData = new FormData();
   formData.append('file', file);
   const { data } = await api.post('/media/upload?purpose=productPhoto', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+    headers: { 'Content-Type': undefined },
   });
   return data;
 };
