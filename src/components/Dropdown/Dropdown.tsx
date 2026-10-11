@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { getDropdownPosition } from './dropdownPosition';
 
 interface DropdownProps {
@@ -7,6 +8,7 @@ interface DropdownProps {
   align?: 'left' | 'right';
   className?: string;
   contentClassName?: string;
+  portal?: boolean;
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
@@ -15,6 +17,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   align = 'left',
   className = '',
   contentClassName = '',
+  portal = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState<{ top: number; left: number; maxHeight: number; maxWidth: number } | null>(null);
@@ -30,15 +33,20 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
     const rect = triggerElement.getBoundingClientRect();
     const panelRect = panelElement.getBoundingClientRect();
+    const drawer = portal ? triggerElement.closest<HTMLElement>('.admin-mobile-navigation') : null;
+    const drawerFooter = drawer?.querySelector<HTMLElement>('[data-admin-drawer-footer]');
+    const drawerFooterTop = drawerFooter?.getBoundingClientRect().top;
     setPosition(getDropdownPosition({
       anchor: { top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left },
       panelWidth: panelRect.width,
       panelHeight: panelElement.scrollHeight,
       viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
+      viewportHeight: typeof drawerFooterTop === 'number' && drawerFooterTop > 0
+        ? Math.min(window.innerHeight, drawerFooterTop)
+        : window.innerHeight,
       align,
     }));
-  }, [align]);
+  }, [align, portal]);
 
   useLayoutEffect(() => {
     if (!isOpen) return;
@@ -54,7 +62,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     const handlePointerDown = (event: PointerEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) setIsOpen(false);
+      const target = event.target as Node;
+      if (!rootRef.current?.contains(target) && !panelRef.current?.contains(target)) setIsOpen(false);
     };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -62,7 +71,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
         triggerRef.current?.focus();
         return;
       }
-      if (!rootRef.current?.contains(event.target as Node)) return;
+      const target = event.target as Node;
+      if (!rootRef.current?.contains(target) && !panelRef.current?.contains(target)) return;
       if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
       const items = Array.from(panelRef.current?.querySelectorAll<HTMLElement>(
         'button:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])',
@@ -101,6 +111,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         type="button"
         aria-expanded={isOpen}
         aria-controls={panelId}
+        aria-haspopup="menu"
         onClick={() => isOpen ? setIsOpen(false) : openAndFocus()}
         onKeyDown={(event) => {
           if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
@@ -113,10 +124,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
         {trigger}
       </button>
 
-      {isOpen && (
+      {isOpen && (() => {
+        const panel = (
         <div
           ref={panelRef}
           id={panelId}
+          role="menu"
+          data-admin-drawer-portal={portal ? '' : undefined}
           className={`fixed z-50 w-48 overflow-y-auto overscroll-contain rounded-xl border border-app bg-surface shadow-xl animate-fade-in ${contentClassName}`}
           style={{
             top: position?.top ?? 0,
@@ -135,7 +149,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
         >
           {children}
         </div>
-      )}
+        );
+        return portal ? createPortal(panel, document.body) : panel;
+      })()}
     </div>
   );
 };

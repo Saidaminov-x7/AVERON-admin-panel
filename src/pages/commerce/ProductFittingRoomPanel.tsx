@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Select } from '../../components/ui';
-import { FittingAssetPreview } from '../../components/commerce/FittingAssetPreview';
 import {
   deleteFittingAsset,
   listFittingAssets,
@@ -15,6 +14,7 @@ import {
 } from '../../lib/fittingRoomApi';
 
 const layers: FittingLayer[] = ['BASE_TOP', 'MID_LAYER', 'OUTERWEAR', 'BOTTOM', 'FOOTWEAR', 'ACCESSORY'];
+const FittingAssetPreview = lazy(() => import('../../components/commerce/FittingAssetPreview').then((module) => ({ default: module.FittingAssetPreview })));
 
 export function ProductFittingRoomPanel({ productId, variants = [] }: { productId: string | null; variants?: Array<{ id: string; color?: string | null; size?: string | null }> }) {
   const { t } = useTranslation();
@@ -98,7 +98,7 @@ export function ProductFittingRoomPanel({ productId, variants = [] }: { productI
             </div>}
             <Button type="button" variant="danger" loading={deleteMutation.isPending} onClick={() => { if (window.confirm(t('products.fittingRoom.confirmDelete'))) deleteMutation.mutate(asset.id); }}>{t('products.fittingRoom.delete')}</Button>
           </div>
-          {asset.previewUrl ? <FittingAssetPreview url={asset.previewUrl} transform={{ scale: asset.scale, positionX: asset.positionX, positionY: asset.positionY, positionZ: asset.positionZ }} labels={{ loading: t('products.fittingRoom.loading'), unavailable: t('products.fittingRoom.previewError'), left: t('products.fittingRoom.left'), right: t('products.fittingRoom.right') }} /> : <p role="alert" className="grid min-h-48 place-items-center rounded-lg border border-app p-4 text-center text-xs text-muted">{t('products.fittingRoom.previewError')}</p>}
+          {asset.previewUrl ? <Suspense fallback={<p role="status" className="grid min-h-56 place-items-center rounded-lg border border-app p-4 text-center text-xs text-muted">{t('products.fittingRoom.loading')}</p>}><FittingAssetPreview url={asset.previewUrl} transform={{ scale: asset.scale, positionX: asset.positionX, positionY: asset.positionY, positionZ: asset.positionZ }} labels={{ loading: t('products.fittingRoom.loading'), unavailable: t('products.fittingRoom.previewError'), left: t('products.fittingRoom.left'), right: t('products.fittingRoom.right') }} /></Suspense> : <p role="alert" className="grid min-h-48 place-items-center rounded-lg border border-app p-4 text-center text-xs text-muted">{t('products.fittingRoom.previewError')}</p>}
         </article>)}</div>
         : <p className="text-sm text-muted">{t('products.fittingRoom.noAssets')}</p>}
   </section>;

@@ -510,7 +510,7 @@ button, [role="button"], summary { user-select: none; }
 }
 
 .averon-admin-shell .sidebar-bg {
-  width: 256px;
+  width: var(--admin-sidebar-width, 256px);
   background: var(--color-sidebar-bg);
   border-color: var(--color-sidebar-border);
 }
@@ -657,12 +657,16 @@ button, [role="button"], summary { user-select: none; }
 @media (max-width: 1023px) {
   .admin-mobile-navigation {
     position: fixed;
-    left: auto;
+    inset: 0;
     right: 0;
-    width: min(88vw, 340px);
-    box-shadow: -18px 0 48px rgb(0 0 0 / .18);
+    width: 100vw;
+    max-width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--color-sidebar-bg);
+    box-shadow: none;
     visibility: hidden;
-    transform: translateX(102%);
+    transform: translateX(100%);
   }
 
   .admin-mobile-navigation.is-open {
@@ -672,7 +676,7 @@ button, [role="button"], summary { user-select: none; }
 
   .admin-mobile-navigation.is-closed {
     visibility: hidden;
-    transform: translateX(102%);
+    transform: translateX(100%);
     pointer-events: none;
   }
 
@@ -692,6 +696,88 @@ button, [role="button"], summary { user-select: none; }
   .averon-admin-shell .sidebar-bg > div:first-child {
     padding-inline: 18px;
   }
+
+  .averon-admin-shell .admin-mobile-navigation .admin-sidebar {
+    background: var(--color-sidebar-bg);
+    height: 100dvh;
+    min-height: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .averon-admin-shell .admin-mobile-navigation .admin-sidebar-brand,
+  .averon-admin-shell .admin-mobile-navigation .admin-sidebar-nav,
+  .averon-admin-shell .admin-mobile-navigation [data-admin-mobile-utilities],
+  .averon-admin-shell .admin-mobile-navigation [data-admin-drawer-footer] {
+    width: min(100%, 32rem);
+    margin-inline: auto;
+  }
+
+  .averon-admin-shell .admin-mobile-navigation .admin-sidebar-brand {
+    height: 64px;
+    min-height: 64px;
+    padding-inline: 20px;
+  }
+
+  .averon-admin-shell .admin-mobile-navigation .admin-sidebar-nav {
+    padding: 1rem 1.25rem 1.25rem;
+    overscroll-behavior: contain;
+  }
+
+  .averon-admin-shell .admin-mobile-navigation .admin-drawer-link {
+    position: relative;
+    min-height: 3.25rem;
+    gap: .875rem;
+    border: 0;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    padding: .5rem .25rem;
+    color: var(--color-text-secondary);
+  }
+
+  .averon-admin-shell .admin-mobile-navigation .admin-drawer-link:hover,
+  .averon-admin-shell .admin-mobile-navigation .admin-drawer-link.is-active {
+    border-color: var(--color-border) !important;
+    background: var(--color-surface-soft) !important;
+    color: var(--color-text) !important;
+  }
+
+  .averon-admin-shell .admin-mobile-navigation .admin-drawer-link.is-active::after {
+    position: absolute;
+    inset-inline-end: .25rem;
+    width: 3px;
+    height: 1.125rem;
+    border-radius: 999px;
+    background: var(--color-primary);
+    content: "";
+  }
+
+  .averon-admin-shell .admin-mobile-navigation .admin-sidebar-section-title {
+    margin-bottom: .25rem;
+    padding-inline: .25rem;
+  }
+
+  .averon-admin-shell .admin-mobile-navigation [data-admin-mobile-utilities] {
+    padding: .875rem 1.25rem;
+    border-top-color: var(--color-border);
+    background: var(--color-surface-soft);
+  }
+
+  .averon-admin-shell .admin-mobile-navigation [data-admin-drawer-footer] {
+    padding: .875rem max(1.25rem, calc((100% - 32rem) / 2)) max(.875rem, env(safe-area-inset-bottom));
+    background: var(--color-surface-soft);
+  }
+}
+
+@media (max-width: 1023px) and (max-height: 720px) {
+  .averon-admin-shell .admin-mobile-navigation .admin-sidebar-nav {
+    padding-top: .5rem;
+    padding-bottom: .625rem;
+    row-gap: .625rem;
+  }
+  .averon-admin-shell .admin-mobile-navigation .admin-drawer-link { min-height: 2.75rem; }
+  .averon-admin-shell .admin-mobile-navigation [data-admin-mobile-utilities] { padding-block: .5rem; }
+  .averon-admin-shell .admin-mobile-navigation [data-admin-drawer-footer] { padding-block: .5rem; }
 }
 
 @media (min-width: 1024px) {

@@ -145,12 +145,22 @@ export default function ProductsPage() {
           description: values.description,
           descriptionUz: values.descriptionUz,
           descriptionEn: values.descriptionEn,
+          composition: values.composition,
+          compositionUz: values.compositionUz,
+          compositionEn: values.compositionEn,
+          careInstructions: values.careInstructions,
+          careInstructionsUz: values.careInstructionsUz,
+          careInstructionsEn: values.careInstructionsEn,
           ...(values.sourceUrl ? { sourceUrl: values.sourceUrl } : {}),
           images,
           salePriceUzs: values.salePriceUzs,
           stock: values.stock,
+          ...(values.variantStocks && (values.variantMatrixChanged || values.variantStocks.some((variant) => variant.stock !== values.stock))
+            ? { variantStocks: values.variantStocks }
+            : {}),
           compareAtPriceUzs: values.compareAtPriceUzs,
           colors: values.colors,
+          sizes: values.sizes,
           sizeChartType: values.sizeChartType || null,
           sizeChart: values.sizeChart,
         };
@@ -381,9 +391,9 @@ export default function ProductsPage() {
         >
           <label className="min-w-0 flex-1 text-xs font-semibold text-muted">
             {t("products.searchProducts")}
-            <input className="input mt-1.5 w-full" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} />
+            <input id="admin-product-search" name="searchProducts" type="search" className="input mt-1.5 w-full" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} />
           </label>
-          <button type="submit" className="btn-primary h-10">{t("common.search")}</button>
+          <button type="submit" className="btn-primary h-10">{t("products.searchAction")}</button>
         </form>
         <Select
           label={t("products.countryFilterLabel")}

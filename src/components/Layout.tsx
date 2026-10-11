@@ -50,11 +50,33 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        if (activeElement?.closest('[data-admin-drawer-portal]')) return;
         event.preventDefault();
         setIsMobileMenuOpen(false);
         return;
       }
       if (event.key !== 'Tab' || !drawerRef.current) return;
+      const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      const activePortalMenu = activeElement?.closest<HTMLElement>('[data-admin-drawer-portal]');
+      if (activePortalMenu?.id) {
+        const languageTrigger = Array.from(drawerRef.current.querySelectorAll<HTMLButtonElement>('button[aria-controls]'))
+          .find((button) => button.getAttribute('aria-controls') === activePortalMenu.id);
+        if (languageTrigger) {
+          event.preventDefault();
+          if (event.shiftKey) {
+            languageTrigger.focus();
+          } else {
+            const drawerFocusable = Array.from(drawerRef.current.querySelectorAll<HTMLElement>(
+              'a[href]:not([tabindex="-1"]), button:not(:disabled):not([tabindex="-1"]), input:not(:disabled):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
+            ));
+            const triggerIndex = drawerFocusable.indexOf(languageTrigger);
+            const next = drawerFocusable[triggerIndex + 1] ?? drawerFocusable[0];
+            next?.focus();
+          }
+          return;
+        }
+      }
       const focusable = Array.from(drawerRef.current.querySelectorAll<HTMLElement>(
         'a[href]:not([tabindex="-1"]), button:not(:disabled):not([tabindex="-1"]), input:not(:disabled):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
       ));
@@ -107,15 +129,16 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
       <div
         ref={drawerRef}
         id="admin-mobile-navigation"
+        data-open={String(isMobileMenuOpen)}
         role={isMobileMenuOpen ? 'dialog' : undefined}
         aria-modal={isMobileMenuOpen ? true : undefined}
         aria-label={isMobileMenuOpen ? t('header.mobileNavigation') : undefined}
         tabIndex={-1}
-        className={`admin-mobile-navigation fixed inset-y-0 right-0 z-50 transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative ${
+        className={`admin-mobile-navigation fixed inset-0 z-50 h-dvh w-screen max-w-full transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:inset-y-0 lg:right-auto lg:h-auto lg:w-[var(--admin-sidebar-width)] lg:max-w-none ${
           isMobileMenuOpen ? 'is-open' : 'is-closed'
         }`}
       >
-        <Sidebar onCloseMobile={() => setIsMobileMenuOpen(false)} />
+        <Sidebar isMobileOpen={isMobileMenuOpen} onCloseMobile={() => setIsMobileMenuOpen(false)} />
       </div>
 
       {/* Основная область */}

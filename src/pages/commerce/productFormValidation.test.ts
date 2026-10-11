@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   fileIdentity,
   formatPhotoSize,
+  normalizeProductSizes,
   reorderItem,
   validateProductDraft,
   type ProductDraftValidationInput,
@@ -65,6 +66,20 @@ describe("product form validation", () => {
       photoCount: 16,
       maxPhotos: 99,
     }, isProductCountry).photos).toBe("photoCount");
+  });
+
+  it("requires descriptive color names and valid HEX values instead of generated placeholders", () => {
+    expect(validateProductDraft({ ...validDraft, colorsText: "Тёмно-синий | #000080" }, isProductCountry).colors).toBeUndefined();
+    expect(validateProductDraft({ ...validDraft, colorsText: "Цвет 1 | #000080" }, isProductCountry).colors).toBe("color");
+    expect(validateProductDraft({ ...validDraft, colorsText: " | #000080" }, isProductCountry).colors).toBe("color");
+    expect(validateProductDraft({ ...validDraft, colorsText: "Красный | #FF0000\nСиний | #12" }, isProductCountry).colors).toBe("color");
+    expect(validateProductDraft({ ...validDraft, colorsText: "" }, isProductCountry).colors).toBeUndefined();
+  });
+});
+
+describe("product variant size normalization", () => {
+  it("sends a sorted, case-insensitive unique size list", () => {
+    expect(normalizeProductSizes(" L, m\nM, 41, 40, XS ")).toEqual(["40", "41", "XS", "M", "L"]);
   });
 });
 

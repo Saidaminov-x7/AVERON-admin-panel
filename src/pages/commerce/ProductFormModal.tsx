@@ -33,6 +33,7 @@ import {
 import {
   fileIdentity,
   formatPhotoSize,
+  normalizeProductSizes,
   PRODUCT_VALIDATION_FIELDS,
   reorderItem,
   validateProductDraft,
@@ -50,7 +51,7 @@ import { ProductRichTextField } from "./ProductRichTextField";
 
 const ProductFittingRoomPanel = lazy(() => import("./ProductFittingRoomPanel").then((module) => ({ default: module.ProductFittingRoomPanel })));
 
-type LocalizedContent = { title: string; description: string };
+type LocalizedContent = { title: string; description: string; composition: string; careInstructions: string };
 type PhotoDraft = {
   key: string;
   id?: string;
@@ -89,6 +90,7 @@ type ProductFormValues = {
   salePriceUzs: string;
   compareAtPriceUzs: string;
   stock: string;
+  variantStockOverrides: Record<string, string>;
   colorsText: string;
   color: string;
   size: string;
@@ -107,11 +109,20 @@ export type ProductFormSubmission = {
   description: string;
   descriptionUz: string;
   descriptionEn: string;
+  composition: string;
+  compositionUz: string;
+  compositionEn: string;
+  careInstructions: string;
+  careInstructionsUz: string;
+  careInstructionsEn: string;
   sourceUrl?: string;
   salePriceUzs: number;
   stock: number;
+  variantStocks: Array<{ color: string | null; size: string | null; stock: number }> | null;
+  variantMatrixChanged: boolean;
   compareAtPriceUzs: number | null;
   colors: Array<{ name: string; hex: string }>;
+  sizes: string[];
   country?: ProductCountry;
   categoryId?: string | null;
   color: string;
@@ -159,17 +170,30 @@ const readDescription = (product: ProductListItem, locale: ProductLocale): strin
   return typeof value === "string" ? value : "";
 };
 
+const readLocalizedAttribute = (product: ProductListItem, name: "composition" | "careInstructions", locale: ProductLocale): string => {
+  const value = product.attributes?.[name];
+  if (typeof value === "string") return value;
+  if (!value || typeof value !== "object" || Array.isArray(value)) return "";
+  const localized = value as Record<string, unknown>;
+  const text = localized[locale] ?? localized.text ?? localized.value;
+  return typeof text === "string" ? text : "";
+};
+
 const getInitialValues = (product: ProductListItem | null): ProductFormValues => ({
   translations: {
-    ru: { title: product ? readTitle(product, "ru") : "", description: product ? readDescription(product, "ru") : "" },
-    uz: { title: product ? readTitle(product, "uz") : "", description: product ? readDescription(product, "uz") : "" },
-    en: { title: product ? readTitle(product, "en") : "", description: product ? readDescription(product, "en") : "" },
+    ru: { title: product ? readTitle(product, "ru") : "", description: product ? readDescription(product, "ru") : "", composition: product ? readLocalizedAttribute(product, "composition", "ru") : "", careInstructions: product ? readLocalizedAttribute(product, "careInstructions", "ru") : "" },
+    uz: { title: product ? readTitle(product, "uz") : "", description: product ? readDescription(product, "uz") : "", composition: product ? readLocalizedAttribute(product, "composition", "uz") : "", careInstructions: product ? readLocalizedAttribute(product, "careInstructions", "uz") : "" },
+    en: { title: product ? readTitle(product, "en") : "", description: product ? readDescription(product, "en") : "", composition: product ? readLocalizedAttribute(product, "composition", "en") : "", careInstructions: product ? readLocalizedAttribute(product, "careInstructions", "en") : "" },
   },
   country: product?.country ?? "",
   categoryId: product?.categoryId ?? "",
   salePriceUzs: product ? String(product.salePriceUzs) : "",
   compareAtPriceUzs: product?.compareAtPriceUzs ? String(product.compareAtPriceUzs) : "",
   stock: product?.variants?.[0]?.stock !== undefined ? String(product.variants[0].stock) : "0",
+  variantStockOverrides: Object.fromEntries((product?.variants ?? []).map((variant) => [
+    `${variant.color ?? ""}::${variant.size ?? ""}`,
+    String(variant.stock ?? 0),
+  ])),
   colorsText: product?.variants?.map((variant) => {
     const [name, hex] = (variant.color ?? "").split("::");
     return hex ? `${name} | ${hex}` : "";
@@ -216,21 +240,6 @@ export function ProductFormModal({
   const [activeLocale, setActiveLocale] = useState<ProductLocale>("ru");
   const [currentStep, setCurrentStep] = useState(0);
   const steps = ["products.mainInformation", "products.pricing", "products.variants", "products.photos", "products.fittingRoom.step", "products.publicationSection"];
-  const parseSizes = (text: string) => {
-    const clothingOrder = ["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"];
-    return text.split(/[\n,]+/).map((size) => size.trim()).filter(Boolean).sort((a, b) => {
-      const aNumber = Number(a.replace(/[^0-9.]/g, ""));
-      const bNumber = Number(b.replace(/[^0-9.]/g, ""));
-      const aHasNumber = Number.isFinite(aNumber) && /\d/.test(a);
-      const bHasNumber = Number.isFinite(bNumber) && /\d/.test(b);
-      if (aHasNumber && bHasNumber && aNumber !== bNumber) return aNumber - bNumber;
-      const aRank = clothingOrder.indexOf(a.toUpperCase());
-      const bRank = clothingOrder.indexOf(b.toUpperCase());
-      if (aRank >= 0 && bRank >= 0 && aRank !== bRank) return aRank - bRank;
-      if (aHasNumber !== bHasNumber) return aHasNumber ? -1 : 1;
-      return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
-    });
-  };
   const [values, setValues] = useState<ProductFormValues>(() => getInitialValues(product));
   const [photos, setPhotos] = useState<PhotoDraft[]>(() => (product?.images ?? []).map((image) => ({
     key: `existing-${image.id}`,
@@ -534,7 +543,10 @@ export function ProductFormModal({
     if (!result.appliedCount) return;
     setValues((current) => ({
       ...current,
-      translations: result.translations,
+      translations: Object.fromEntries(locales.map((locale) => [
+        locale,
+        { ...current.translations[locale], ...result.translations[locale] },
+      ])) as Record<ProductLocale, LocalizedContent>,
       color: result.variant.color ?? current.color,
       size: result.variant.size ?? current.size,
     }));
@@ -578,6 +590,7 @@ export function ProductFormModal({
       photoSizes: photos.flatMap((photo) => photo.file ? [photo.file.size] : []),
       maxPhotos: maxProductPhotos,
       maxPhotoSizeMb: maxProductPhotoSizeMb,
+      colorsText: values.colorsText,
     }, isProductCountry);
     const validationMessages = {
       title: t("products.validationTitleLocale"),
@@ -586,6 +599,7 @@ export function ProductFormModal({
       photos: t("products.validationPhotos"),
       photoCount: t("products.photoLimitReached", { max: Math.min(15, maxProductPhotos) }),
       photoSize: t("products.photoSizeLimit", { size: maxProductPhotoSizeMb }),
+      color: t("products.colorNameRequired"),
     };
     for (const field of PRODUCT_VALIDATION_FIELDS) {
       const code = validationCodes[field];
@@ -634,8 +648,36 @@ export function ProductFormModal({
         description: values.translations.ru.description.trim(),
         descriptionUz: values.translations.uz.description.trim(),
         descriptionEn: values.translations.en.description.trim(),
+        composition: values.translations.ru.composition.trim(),
+        compositionUz: values.translations.uz.composition.trim(),
+        compositionEn: values.translations.en.composition.trim(),
+        careInstructions: values.translations.ru.careInstructions.trim(),
+        careInstructionsUz: values.translations.uz.careInstructions.trim(),
+        careInstructionsEn: values.translations.en.careInstructions.trim(),
         salePriceUzs: Number(values.salePriceUzs),
         stock: Math.max(0, Math.floor(Number(values.stock || 0))),
+        variantStocks: (() => {
+          const colors = values.colorsText.split("\n").map((row) => {
+            const [name, rawHex] = row.split("|").map((part) => part.trim());
+            const hex = rawHex || name;
+            return name && /^#[0-9a-fA-F]{6}$/.test(hex ?? "")
+              ? `${name}::${hex.toUpperCase()}`
+              : null;
+          }).filter((color): color is string => Boolean(color));
+          const sizes = normalizeProductSizes(values.sizesText);
+          if (!colors.length && !sizes.length) return null;
+          const colorOptions = colors.length ? colors : [null];
+          const sizeOptions = sizes.length ? sizes : [null];
+          return colorOptions.flatMap((color) => sizeOptions.map((size) => {
+            const stockKey = `${color ?? ""}::${size ?? ""}`;
+            const stockValue = values.variantStockOverrides[stockKey] ?? values.stock;
+            return { color, size, stock: Math.max(0, Math.floor(Number(stockValue || 0))) };
+          }));
+        })(),
+        variantMatrixChanged: !product || values.colorsText !== (product.variants?.map((variant) => {
+          const [name, hex] = (variant.color ?? "").split("::");
+          return hex ? `${name} | ${hex}` : "";
+        }).filter(Boolean).join("\n") || "") || normalizeProductSizes(values.sizesText).join(", ") !== normalizeProductSizes(product.variants?.map((variant) => variant.size).filter(Boolean).join(", ") ?? "").join(", "),
         compareAtPriceUzs: values.compareAtPriceUzs ? Number(values.compareAtPriceUzs) : null,
         colors: values.colorsText.split("\n").map((row, index) => {
           const [name, hex] = row.split("|").map((part) => part.trim());
@@ -645,7 +687,8 @@ export function ProductFormModal({
         country: isProductCountry(values.country) ? values.country : undefined,
         categoryId: values.categoryId || null,
         color: values.color.trim(),
-        size: parseSizes(values.sizesText).join(", ") || values.size.trim(),
+        size: normalizeProductSizes(values.sizesText).join(", ") || values.size.trim(),
+        sizes: normalizeProductSizes(values.sizesText),
         sizeChartType: values.sizeChartType,
         sizeChart,
         publish: values.publish,
@@ -695,6 +738,7 @@ export function ProductFormModal({
     country: t("products.countryLabel"),
     salePriceUzs: t("products.salePriceLabel"),
     photos: t("products.photoSection"),
+    colors: t("products.productColors"),
   };
   const photoOrientations: Array<{
     value: ProductPhotoOrientation;
@@ -918,6 +962,40 @@ export function ProductFormModal({
                 hint: t("products.richText.hint"),
               }}
             />
+            <ProductRichTextField
+              label={t("products.compositionLabel")}
+              maxLength={2000}
+              value={values.translations[activeLocale].composition}
+              onChange={(value) => updateLocalizedValue("composition", value)}
+              multiline
+              containerClassName="md:col-span-2"
+              copy={{
+                bold: t("products.richText.bold"),
+                italic: t("products.richText.italic"),
+                strikethrough: t("products.richText.strikethrough"),
+                bulletList: t("products.richText.bulletList"),
+                insertText: t("products.richText.insertText"),
+                preview: t("products.richText.preview"),
+                hint: t("products.richText.hint"),
+              }}
+            />
+            <ProductRichTextField
+              label={t("products.careInstructionsLabel")}
+              maxLength={3000}
+              value={values.translations[activeLocale].careInstructions}
+              onChange={(value) => updateLocalizedValue("careInstructions", value)}
+              multiline
+              containerClassName="md:col-span-2"
+              copy={{
+                bold: t("products.richText.bold"),
+                italic: t("products.richText.italic"),
+                strikethrough: t("products.richText.strikethrough"),
+                bulletList: t("products.richText.bulletList"),
+                insertText: t("products.richText.insertText"),
+                preview: t("products.richText.preview"),
+                hint: t("products.richText.hint"),
+              }}
+            />
           </div>
         </section>
 
@@ -926,17 +1004,7 @@ export function ProductFormModal({
             <h4 className="text-sm font-bold text-app">{t("products.priceSection")}</h4>
             <p className="mt-1 text-xs text-muted">{t("products.priceSectionHint")}</p>
           </div>
-          <Input
-            label="Наличие товара (шт.)"
-            type="number"
-            min="0"
-            step="1"
-            inputMode="numeric"
-            value={values.stock}
-            onChange={(event) => updateValue("stock", event.target.value)}
-            className="max-w-md"
-          />
-          <p className="text-xs text-muted">Если оставить 0, товар будет показан как отсутствующий или доступный по предзаказу.</p>
+          <p className="text-sm text-muted">Остатки для каждого размера и цвета указываются отдельно на шаге «Варианты товара».</p>
           <Input
             label={t("products.salePriceLabel")}
             type="number"
@@ -990,7 +1058,7 @@ export function ProductFormModal({
                 <button type="button" aria-label={`Удалить цвет ${name}`} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-red-500/10 hover:text-red-600 sm:row-span-1"><Trash2 size={16} /></button>
               </div>;
             })}
-            <button type="button" onClick={() => updateValue("colorsText", [values.colorsText, `Цвет ${values.colorsText.split("\n").filter(Boolean).length + 1} | #808080`].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold text-app transition-colors hover:bg-app"><span aria-hidden="true">+</span> Добавить цвет</button>
+            <button type="button" onClick={() => updateValue("colorsText", [values.colorsText, " | #808080"].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold text-app transition-colors hover:bg-app"><span aria-hidden="true">+</span> Добавить цвет</button>
           </div>
         </section>
 
@@ -1226,7 +1294,7 @@ export function ProductFormModal({
                   />
                 </label>
                 <div className="mt-3 flex flex-wrap gap-2" aria-label="Предпросмотр размеров">
-                  {parseSizes(values.sizesText).map((size, index) => (
+                  {normalizeProductSizes(values.sizesText).map((size, index) => (
                     <span key={`${size}-${index}`} className="inline-flex h-10 min-w-[44px] select-none items-center justify-center rounded-md border border-app bg-surface px-3 text-sm font-medium text-app">{size}</span>
                   ))}
                 </div>
@@ -1257,6 +1325,43 @@ export function ProductFormModal({
                 <p className="mt-1 text-xs text-muted">{t("products.sizeChartDataHint")}</p>
               </div>
             </div>
+          </section>
+        )}
+        {(product?.source === "MANUAL" || !product) && (
+          <section className={`${currentStep === 2 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
+            <div>
+              <h4 className="text-sm font-bold text-app">Остатки по вариантам</h4>
+              <p className="mt-1 text-xs text-muted">Количество задаётся отдельно для каждой пары цвета и размера. Для товара без вариантов используется одно общее поле.</p>
+            </div>
+            {(() => {
+              const colors = values.colorsText.split("\n").map((row) => {
+                const [name, rawHex] = row.split("|").map((part) => part.trim());
+                const hex = rawHex || name;
+                return name && /^#[0-9a-fA-F]{6}$/.test(hex ?? "") ? `${name}::${hex.toUpperCase()}` : null;
+              }).filter((color): color is string => Boolean(color));
+              const sizes = normalizeProductSizes(values.sizesText);
+              const colorOptions = colors.length ? colors : [null];
+              const sizeOptions = sizes.length ? sizes : [null];
+              if (!colors.length && !sizes.length) {
+                return <Input label="Наличие товара (шт.)" type="number" min="0" max="2147483647" step="1" inputMode="numeric" value={values.stock} onChange={(event) => updateValue("stock", event.target.value)} className="max-w-md" />;
+              }
+              const parsedStock = (raw: string | undefined) => {
+                const number = Number(raw ?? values.stock ?? 0);
+                return Number.isSafeInteger(number) ? Math.max(0, Math.min(number, 2_147_483_647)) : 0;
+              };
+              return <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {colorOptions.flatMap((color) => sizeOptions.map((size) => {
+                  const key = `${color ?? ""}::${size ?? ""}`;
+                  const stock = values.variantStockOverrides[key] ?? values.stock;
+                  const label = [color?.split("::")[0], size].filter(Boolean).join(" · ") || "Стандартный вариант";
+                  return <Input key={key} label={`${label} — наличие (шт.)`} type="number" min="0" max="2147483647" step="1" inputMode="numeric" value={stock} onChange={(event) => {
+                    const value = event.target.value;
+                    if (value !== "" && !/^\d{1,10}$/.test(value)) return;
+                    updateValue("variantStockOverrides", { ...values.variantStockOverrides, [key]: value });
+                  }} onBlur={() => updateValue("variantStockOverrides", { ...values.variantStockOverrides, [key]: String(parsedStock(stock)) })} />;
+                }))}
+              </div>;
+            })()}
           </section>
         )}
         {product && (

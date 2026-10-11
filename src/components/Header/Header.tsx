@@ -160,6 +160,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
             aria-label={t(isMobileMenuOpen ? 'header.closeMenu' : 'header.openMenu')}
             aria-expanded={isMobileMenuOpen}
             aria-controls="admin-mobile-navigation"
+            data-action-id="admin.sidebar.toggle-mobile-navigation"
             className="inline-flex h-10 w-10 items-center justify-center rounded border border-app bg-surface text-app transition-colors hover:bg-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 lg:hidden"
           >
             {isMobileMenuOpen ? (

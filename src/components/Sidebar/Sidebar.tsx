@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import type { ComponentType, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -6,6 +6,8 @@ import {
   AlertCircle,
   BarChart2,
   Bell,
+  Check,
+  ChevronDown,
   ClipboardCheck,
   ExternalLink,
   Gauge,
@@ -26,12 +28,14 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+import { getSidebarWidthPreference } from "./sidebarPreferences";
 import { useTranslation } from "react-i18next";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import { useAuth } from "../../hooks/useAuth";
 import { logoutApi } from "../../lib/authApi";
 import { useAuthStore } from "../../store/authStore";
 import { LanguageFlag } from "../ui/LanguageFlag";
+import { Dropdown } from "../Dropdown";
 
 type NavIcon = ComponentType<{ size?: number; strokeWidth?: number }>;
 type NavItem = { to: string; labelKey: string; icon: NavIcon };
@@ -91,20 +95,20 @@ function readCollapsedPreference() {
 
 function readSidebarWidth() {
   try {
-    const stored = Number(localStorage.getItem("averon-admin-sidebar-width"));
-    return Number.isFinite(stored) ? Math.min(320, Math.max(232, stored)) : 256;
+    return getSidebarWidthPreference(localStorage.getItem("averon-admin-sidebar-width"));
   } catch {
     return 256;
   }
 }
 
-export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void }) {
+export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onCloseMobile?: () => void; isMobileOpen?: boolean }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [collapsed, setCollapsed] = useState(readCollapsedPreference);
   const [width, setWidth] = useState(readSidebarWidth);
   const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 1024px)").matches);
+  const compact = collapsed && isDesktop;
   const navRef = useRef<HTMLElement>(null);
   const siteUrl = import.meta.env.VITE_SITE_URL || "https://averon.uz";
 
@@ -152,13 +156,13 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
   };
 
   const startResize = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!isDesktop || collapsed) return;
+    if (!isDesktop || compact) return;
     event.preventDefault();
     document.documentElement.classList.add("admin-sidebar-resizing");
     let nextWidth = width;
     const move = (pointerEvent: PointerEvent) => {
-          const pageRect = document.querySelector(".averon-admin-shell")?.getBoundingClientRect();
-          nextWidth = Math.min(320, Math.max(232, pointerEvent.clientX - (pageRect?.left ?? 0)));
+        const pageRect = document.querySelector(".averon-admin-shell")?.getBoundingClientRect();
+        nextWidth = Math.min(320, Math.max(232, pointerEvent.clientX - (pageRect?.left ?? 0)));
       setWidth(nextWidth);
     };
     const finish = () => {
@@ -215,28 +219,29 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
 
   return (
     <aside
-      style={{ width: isDesktop ? (collapsed ? 76 : width) : undefined }}
-      className={`sidebar-bg safe-top safe-bottom admin-sidebar relative flex h-dvh w-screen max-w-full shrink-0 flex-col overflow-hidden text-app transition-[width] duration-200 lg:w-auto lg:border-r lg:sidebar-border ${collapsed ? "is-collapsed" : ""}`}
+      style={{ "--admin-sidebar-width": `${compact ? 76 : width}px` } as CSSProperties}
+      className={`sidebar-bg safe-top safe-bottom admin-sidebar relative flex h-dvh w-screen max-w-full shrink-0 flex-col overflow-hidden text-app transition-[width] duration-200 lg:w-[var(--admin-sidebar-width)] lg:border-r lg:sidebar-border ${compact ? "is-collapsed" : ""}`}
       aria-label={t("header.mobileNavigation")}
     >
       <div className="admin-sidebar-brand sticky top-0 z-20 flex h-[72px] shrink-0 items-center justify-between border-b border-app bg-surface px-5">
-        <button type="button" onClick={() => { navigate("/"); onCloseMobile?.(); }} className="text-left" aria-label="AVERON — обзор">
+        <button type="button" onClick={() => { navigate("/"); onCloseMobile?.(); }} className="text-left" aria-label={t("sidebar.dashboard")}>
           <span className="flex items-center gap-2 text-base font-black tracking-[.2em]">
-            <span className={collapsed ? "hidden lg:inline" : ""}>AVERON</span>
-            <span className={collapsed ? "lg:hidden" : "hidden"}>A</span>
-            <span className="h-1.5 w-1.5 bg-primary-500" aria-hidden="true" />
+            <span className={compact ? "hidden lg:inline" : ""}>AVERON</span>
+            <span className={compact ? "lg:hidden" : "hidden"}>A</span>
           </span>
-          {!collapsed && <span className="mt-1 block text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</span>}
+          {!compact && <span className="mt-1 block text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</span>}
         </button>
 
         <button
           type="button"
           onClick={toggleCollapsed}
-          title={t(collapsed ? "common.expand" : "common.collapse")}
-          aria-label={t(collapsed ? "common.expand" : "common.collapse")}
+          data-action-id="admin.sidebar.toggle-collapse"
+          aria-pressed={collapsed}
+          title={t(compact ? "common.expand" : "common.collapse")}
+          aria-label={t(compact ? "common.expand" : "common.collapse")}
           className="admin-sidebar-collapse hidden size-9 items-center justify-center border border-app bg-surface text-muted transition-colors hover:bg-app hover:text-app lg:flex"
         >
-          {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+          {compact ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
         </button>
 
         {onCloseMobile && (
@@ -244,6 +249,7 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
             type="button"
             onClick={onCloseMobile}
             aria-label={t("common.close")}
+            data-action-id="admin.sidebar.close-mobile-navigation"
             className="flex size-10 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-app lg:hidden"
           >
             <X size={19} />
@@ -253,7 +259,7 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
       <nav ref={navRef} className="admin-sidebar-nav min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-3 py-5" aria-label={t("header.mobileNavigation")}>
         {sections.map(({ titleKey, items }) => (
           <section key={titleKey} aria-label={t(titleKey)}>
-            <h2 className={`admin-sidebar-section-title mb-2 px-3 text-[10px] font-bold tracking-[.12em] text-muted ${collapsed ? "lg:sr-only" : ""}`}>
+            <h2 className={`admin-sidebar-section-title mb-2 px-3 text-[10px] font-bold tracking-[.12em] text-muted ${compact ? "lg:sr-only" : ""}`}>
               {t(titleKey)}
             </h2>
             <div className="space-y-1">
@@ -263,12 +269,12 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
                   to={to}
                   end={to === "/"}
                   onClick={onCloseMobile}
-                  title={collapsed ? t(labelKey) : undefined}
+                  title={compact ? t(labelKey) : undefined}
                   aria-label={t(labelKey)}
                   className={({ isActive }) => `admin-drawer-link flex min-h-11 items-center gap-3 px-3 py-2 text-sm transition-colors ${isActive ? "is-active" : ""}`}
                 >
                   <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
-                  <span className="admin-sidebar-label truncate">{t(labelKey)}</span>
+                  {!compact && <span className="admin-sidebar-label truncate">{t(labelKey)}</span>}
                 </NavLink>
               ))}
             </div>
@@ -276,26 +282,44 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
         ))}
       </nav>
 
-      <div className="admin-sidebar-mobile-tools space-y-3 border-t border-app bg-surface px-4 py-4 lg:hidden">
+      <div data-admin-mobile-utilities="" className="admin-sidebar-mobile-tools space-y-3 border-t border-app bg-surface px-4 py-4 lg:hidden">
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs font-semibold text-muted">{t("common.language")}</span>
           <ThemeToggle />
         </div>
-        <div className="grid grid-cols-3 gap-2">
-          {languages.map(({ code, name }) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => changeLanguage(code)}
-              aria-label={name}
-              aria-pressed={i18n.language.slice(0, 2) === code}
-              className={`flex min-h-10 items-center justify-center gap-2 border px-2 text-xs font-semibold transition-colors ${i18n.language.slice(0, 2) === code ? "border-current text-app" : "border-app text-muted"}`}
-            >
-              <LanguageFlag locale={code} />
-              <span>{code.toUpperCase()}</span>
-            </button>
-          ))}
-        </div>
+        <Dropdown
+          key={isMobileOpen ? "mobile-open" : "mobile-closed"}
+          portal
+          className="min-w-0 flex-1"
+          contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
+          trigger={(
+            <span className="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)]">
+              <span className="flex min-w-0 items-center gap-2.5">
+                <LanguageFlag locale={i18n.language.startsWith("uz") ? "uz" : i18n.language.startsWith("en") ? "en" : "ru"} />
+                <span className="truncate">{languages.find(({ code }) => i18n.language.startsWith(code))?.name ?? languages[0].name}</span>
+              </span>
+              <ChevronDown size={16} className="shrink-0 text-muted" />
+            </span>
+          )}
+        >
+          {languages.map(({ code, name }) => {
+            const active = i18n.language.slice(0, 2) === code;
+            return (
+              <button
+                key={code}
+                type="button"
+                role="menuitemradio"
+                aria-checked={active}
+                data-action-id={`admin.sidebar.language.${code}`}
+                onClick={() => changeLanguage(code)}
+                className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${active ? "bg-[var(--color-surface-soft)] font-semibold text-app" : "text-app hover:bg-[var(--color-surface-soft)]"}`}
+              >
+                <span className="flex items-center gap-3"><LanguageFlag locale={code} />{name}</span>
+                {active && <Check size={16} className="text-primary-500" />}
+              </button>
+            );
+          })}
+        </Dropdown>
         <div className="grid grid-cols-2 gap-2">
           <NavLink to="/notifications" onClick={onCloseMobile} className="flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
             <Bell size={17} />{t("header.notifications")}
@@ -309,11 +333,11 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
         </div>
       </div>
 
-      <div className="admin-sidebar-account flex shrink-0 items-center gap-3 border-t border-app px-4 py-3">
+      <div data-admin-drawer-footer="" className="admin-sidebar-account flex shrink-0 items-center gap-3 border-t border-app px-4 py-3">
         <div className="admin-account-avatar flex size-9 shrink-0 items-center justify-center bg-app text-xs font-bold text-app" aria-hidden="true">
           {(user?.name || "A").slice(0, 1).toUpperCase()}
         </div>
-        <div className={`admin-sidebar-account-details min-w-0 flex-1 ${collapsed ? "lg:hidden" : ""}`}>
+        <div className={`admin-sidebar-account-details min-w-0 flex-1 ${compact ? "lg:hidden" : ""}`}>
             <p className="truncate text-sm font-semibold">{user?.name || t("sidebar.admin")}</p>
             <p className="truncate text-xs text-muted">{user?.adminRole || "ADMIN"}</p>
         </div>
@@ -321,7 +345,7 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
           <LogOut size={17} />
         </button>
       </div>
-      {!collapsed && (
+      {!compact && (
         <div
           role="separator"
           aria-orientation="vertical"
@@ -332,7 +356,8 @@ export default function Sidebar({ onCloseMobile }: { onCloseMobile?: () => void 
           tabIndex={0}
           onPointerDown={startResize}
           onKeyDown={resizeWithKeyboard}
-          className="admin-sidebar-resizer absolute inset-y-0 -right-1 z-10 hidden w-2 cursor-col-resize bg-transparent hover:bg-primary-500/20 focus-visible:bg-primary-500/30 lg:block"
+          data-action-id="admin.sidebar.resize"
+          className="admin-sidebar-resizer absolute inset-y-0 right-0 z-10 hidden w-3 cursor-col-resize border-r border-transparent hover:border-primary-500/30 focus-visible:border-primary-500/40 lg:block"
         />
       )}
     </aside>

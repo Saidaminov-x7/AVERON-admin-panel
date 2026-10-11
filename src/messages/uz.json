@@ -562,6 +562,7 @@
     "allCountries": "Barcha mamlakatlar",
     "countryFilterLabel": "Mamlakat bo'yicha filtrlash",
     "searchProducts": "Mahsulotlardan qidirish",
+    "searchAction": "Mahsulotlarni topish",
     "categoryFilter": "Kategoriya",
     "statusFilter": "Nashr holati",
     "sortLabel": "Saralash",
@@ -610,7 +611,11 @@
 
     "fittingRoom": {"step":"Kiyib ko'rish","title":"Virtual kiyib ko‘rish modeli","description":"AVERON neytral manekeniga moslangan kiyim GLB modelini yuklang. Yangi model xaridorlarga tekshiruvdan so‘ng ko‘rinadi.","saveFirst":"3D model qo‘shishdan oldin mahsulotni saqlang.","layer":"Kiyim qatlami","variant":"Variant","allVariants":"Barcha variantlar","glbFile":"GLB model","fileHint":"Faqat GLB 2.0, 50 MB gacha. Tashqi resurslar va juda katta teksturalar rad etiladi.","upload":"Modelni yuklash","uploading":"Yuklanmoqda…","uploadError":"Model yuklanmadi.","loading":"Model yuklanmoqda…","loadError":"Kiyib ko‘rish modellari yuklanmadi.","noAssets":"Kiyib ko‘rish modellari hali yuklanmagan.","generationUnavailable":"Mahalliy AI generatsiyasi o‘chirilgan. GLB modelini qo‘lda yuklang; GPU worker sozlanib tekshirilgach generatsiya yoqiladi.","status":{"NEEDS_REVIEW":"Tekshiruv kerak","APPROVED":"Tasdiqlangan","REJECTED":"Rad etilgan"},"validationPassed":"GLB tuzilishi tekshirildi. Tasdiqlashdan oldin modelni ko‘zdan kechiring.","previewError":"3D ko‘rinish mavjud emas.","left":"Chapga burish","right":"O‘ngga burish","scale":"Masshtab","positionY":"Vertikal holat", "positionX": "Gorizontal holat", "positionZ": "Chuqurlik holati", "updateError": "Model sozlamalari o‘zgartirilmadi.","approve":"Tasdiqlash","reject":"Rad etish","rejectionReason":"Rad etish sababi","reviewError":"Tekshiruv holati o‘zgartirilmadi.","delete":"Modelni o‘chirish","confirmDelete":"Kiyib ko‘rish modelini o‘chirasizmi?","deleteError":"Model o‘chirilmadi."},
     "localizedContent": "Tarjima qilingan kontent",
-    "localizedContentHint": "Har bir til uchun nom va tavsifni alohida kiriting.",
+    "localizedContentHint": "Har bir til uchun nom, tavsif, mato tarkibi va parvarish ko‘rsatmalarini alohida kiriting.",
+    "productColors": "Mahsulot ranglari",
+    "colorNameRequired": "Har bir rang uchun tushunarli nom va to‘g‘ri HEX-kod kiriting; «Rang 1» yetarli emas.",
+    "compositionLabel": "Mato tarkibi",
+    "careInstructionsLabel": "Buyumni parvarishlash",
     "aiFill": {
       "action": "Matn taklif qilish",
       "generating": "Tayyorlanmoqda…",
@@ -782,6 +787,7 @@
     "createError": "Mahsulotni yaratib bo'lmadi"
   },
   "categories": {
+    "all": "Barcha kategoriyalar",
     "page": "Kategoriyalar",
     "title": "Kategoriyalarni boshqarish",
     "add": "Kategoriya qo‘shish",
