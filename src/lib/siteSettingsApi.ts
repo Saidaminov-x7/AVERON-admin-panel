@@ -34,8 +34,6 @@ export interface SiteSettings {
   webPushEnabled?: boolean;
   oneIdAuthEnabled?: boolean;
   openTelemetryEnabled?: boolean;
-  yandexMetrikaId?: string;
-  yandexMetrikaEnabled?: boolean;
   maintenancePasswordEnabled?: boolean;
   maintenanceBypassPassword?: string | null;
   mobilePinchZoomEnabled?: boolean;
