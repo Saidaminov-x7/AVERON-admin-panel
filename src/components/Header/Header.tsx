@@ -139,7 +139,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
   return (
     <header
       className="
-        h-16 w-full
+        averon-admin-topbar h-16 w-full
         bg-surface border-b border-app
         flex-shrink-0 transition-colors duration-200 relative z-30
       "
@@ -160,6 +160,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
             aria-label={t(isMobileMenuOpen ? 'header.closeMenu' : 'header.openMenu')}
             aria-expanded={isMobileMenuOpen}
             aria-controls="admin-mobile-navigation"
+            data-action-id="admin.sidebar.toggle-mobile-navigation"
             className="inline-flex h-10 w-10 items-center justify-center rounded border border-app bg-surface text-app transition-colors hover:bg-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 lg:hidden"
           >
             {isMobileMenuOpen ? (
@@ -200,7 +201,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
         <Dropdown
           align="right"
           trigger={
-            <div className="flex items-center justify-between gap-1.5 h-10 px-3 rounded text-xs font-semibold bg-surface border border-app text-app hover:border-primary-500 transition-colors cursor-pointer select-none">
+            <div data-action-id="admin.header.language-indicator" className="flex items-center justify-between gap-1.5 h-10 px-3 rounded text-xs font-semibold bg-surface border border-app text-app hover:border-primary-500 transition-colors cursor-pointer select-none">
               <LanguageFlag
                 locale={i18n.language?.startsWith('uz') ? 'uz' : i18n.language?.startsWith('en') ? 'en' : 'ru'}
               />
@@ -222,6 +223,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
               <button
                 key={lang.code}
                 type="button"
+                data-action-id={`admin.header.select-language.${lang.code}`}
                 onClick={() => {
                   i18n.changeLanguage(lang.code);
                   localStorage.setItem('i18nextLng', lang.code);

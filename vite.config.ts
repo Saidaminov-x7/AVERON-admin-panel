@@ -1,4 +1,4 @@
-import { defineConfig, type Plugin, type ViteDevServer } from 'vite';
+import { defineConfig, loadEnv, type Plugin, type ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -26,6 +26,41 @@ function releaseManifest(): Plugin {
 }
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react(), releaseManifest()],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd());
+  const apiTarget = env.VITE_API_URL || 'https://averon-backend-production.up.railway.app';
+
+  return {
+    plugins: [react(), releaseManifest()],
+    build: {
+      // The lazy Three.js runtime is 737 kB raw / 187 kB gzip; keep it below the tuned ceiling.
+      chunkSizeWarningLimit: 800,
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              { name: 'three-core', test: /[\\/]node_modules[\\/]three[\\/]build[\\/]/ },
+              { name: 'three-loaders', test: /[\\/]node_modules[\\/]three[\\/]examples[\\/]jsm[\\/]/ },
+              { name: 'react-three', test: /[\\/]node_modules[\\/]@react-three[\\/]/ },
+            ],
+          },
+        },
+      },
+    },
+    server: {
+      proxy: {
+        '/api/backend': {
+          target: apiTarget,
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/api\/backend/, ''),
+          configure: (proxy) => {
+            // TEMPORARY LOCAL DEV ONLY: do not add localhost to production CORS.
+            // The backend receives a server-to-server request, not browser localhost Origin.
+            proxy.on('proxyReq', (proxyRequest) => proxyRequest.removeHeader('origin'));
+          },
+        },
+      },
+    },
+  };
 });

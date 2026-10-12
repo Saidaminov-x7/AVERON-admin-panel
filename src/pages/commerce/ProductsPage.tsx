@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Archive, ImageOff, Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -35,7 +35,7 @@ function formatPublishedAt(value: string | null | undefined): string | null {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  const days = Math.max(0, Math.floor((Date.now() - date.getTime()) / 86_400_000));
+  const days = Math.max(0, Math.floor((new Date().getTime() - date.getTime()) / 86_400_000));
   const time = date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
   return `${days} дн. назад · ${time}`;
 }
@@ -60,11 +60,14 @@ export default function ProductsPage() {
   const [limit, setLimit] = useState(15);
   const [editingProduct, setEditingProduct] = useState<ProductListItem | null>(null);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const productCreateIdempotencyKeyRef = useRef<string | null>(null);
   const [telegramPublishError, setTelegramPublishError] = useState<string | null>(null);
   const [telegramRetryProductId, setTelegramRetryProductId] = useState<string | null>(null);
   const [isRetryingTelegram, setIsRetryingTelegram] = useState(false);
   const qc = useQueryClient();
 
+  // Route query parameters are external state; keep the editable filters synchronized on navigation.
+  // oxlint-disable react/set-state-in-effect
   useEffect(() => {
     setCategorySlug(searchParams.get("category") ?? "");
     const urlCountry = searchParams.get("country");
@@ -82,6 +85,7 @@ export default function ProductsPage() {
     const urlLimit = Number(searchParams.get("limit"));
     setLimit(urlLimit === 30 || urlLimit === 48 ? urlLimit : 15);
   }, [searchParams]);
+  // oxlint-enable react/set-state-in-effect
 
   const updateCatalogQuery = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
@@ -145,12 +149,22 @@ export default function ProductsPage() {
           description: values.description,
           descriptionUz: values.descriptionUz,
           descriptionEn: values.descriptionEn,
+          composition: values.composition,
+          compositionUz: values.compositionUz,
+          compositionEn: values.compositionEn,
+          careInstructions: values.careInstructions,
+          careInstructionsUz: values.careInstructionsUz,
+          careInstructionsEn: values.careInstructionsEn,
           ...(values.sourceUrl ? { sourceUrl: values.sourceUrl } : {}),
           images,
           salePriceUzs: values.salePriceUzs,
           stock: values.stock,
+          ...(values.variantStocks && (values.variantMatrixChanged || values.variantStocks.some((variant) => variant.stock !== values.stock))
+            ? { variantStocks: values.variantStocks }
+            : {}),
           compareAtPriceUzs: values.compareAtPriceUzs,
           colors: values.colors,
+          sizes: values.sizes,
           sizeChartType: values.sizeChartType || null,
           sizeChart: values.sizeChart,
         };
@@ -183,7 +197,9 @@ export default function ProductsPage() {
           size: values.size,
           publish: values.publish,
         };
-        return await createManualProduct(payload);
+        const idempotencyKey = productCreateIdempotencyKeyRef.current ?? crypto.randomUUID();
+        productCreateIdempotencyKeyRef.current = idempotencyKey;
+        return await createManualProduct(payload, idempotencyKey);
       } catch (error) {
         await Promise.allSettled(uploadedIds.map((id) => deleteUnattachedMediaApi(id)));
         throw error;
@@ -191,6 +207,7 @@ export default function ProductsPage() {
     },
     onSuccess: async (result, variables) => {
       setSubmissionError(null);
+      productCreateIdempotencyKeyRef.current = null;
       toast.success(t(variables.productId ? "products.productUpdated" : "products.done"));
       void qc.invalidateQueries({ queryKey: ["commerce-products"] });
       if (variables.values.publishTelegram) {
@@ -256,6 +273,7 @@ export default function ProductsPage() {
     setTelegramPublishError(null);
     setTelegramRetryProductId(null);
     setIsFormOpen(false);
+    productCreateIdempotencyKeyRef.current = null;
     setEditingProduct(null);
     if (isEditorRoute) navigate("/products");
   };
@@ -283,6 +301,8 @@ export default function ProductsPage() {
     }
   };
 
+  // The route and loaded product query jointly determine whether the editor modal should be open.
+  // oxlint-disable react/set-state-in-effect
   useEffect(() => {
     if (!isEditorRoute) {
       setIsFormOpen(false);
@@ -303,9 +323,13 @@ export default function ProductsPage() {
       setIsFormOpen(true);
     }
   }, [editorProductQuery.data, editorProductQuery.isLoading, identifier, isEditorRoute, isNewProductRoute]);
+  // oxlint-enable react/set-state-in-effect
 
   const handleFormSubmit = (values: ProductFormSubmission) => {
     setSubmissionError(null);
+    if (!editingProduct && !productCreateIdempotencyKeyRef.current) {
+      productCreateIdempotencyKeyRef.current = crypto.randomUUID();
+    }
     mutation.mutate({ productId: editingProduct?.id ?? null, values });
   };
 
@@ -381,9 +405,9 @@ export default function ProductsPage() {
         >
           <label className="min-w-0 flex-1 text-xs font-semibold text-muted">
             {t("products.searchProducts")}
-            <input className="input mt-1.5 w-full" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} />
+            <input id="admin-product-search" name="searchProducts" type="search" className="input mt-1.5 w-full" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} />
           </label>
-          <button type="submit" className="btn-primary h-10">{t("common.search")}</button>
+          <button type="submit" className="btn-primary h-10">{t("products.searchAction")}</button>
         </form>
         <Select
           label={t("products.countryFilterLabel")}

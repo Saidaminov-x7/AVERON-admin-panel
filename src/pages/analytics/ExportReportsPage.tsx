@@ -28,7 +28,7 @@ const reportTypes = [
 
 const ExportReportsPage: React.FC = () => {
   const todayStr = new Date().toISOString().slice(0, 10);
-  const monthAgoStr = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const monthAgoStr = new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   const [dateFrom, setDateFrom] = useState(monthAgoStr);
   const [dateTo, setDateTo] = useState(todayStr);

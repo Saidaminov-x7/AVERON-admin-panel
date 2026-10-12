@@ -75,6 +75,18 @@ export interface FunnelAnalyticsResponse {
   orderRate?: number;
 }
 
+export interface CustomerJourneyResponse {
+  firstTimeVisitors: number;
+  buyers: number;
+  conversionRate: number;
+  avgDaysToFirstPurchase: number;
+  avgProductsInFirstOrder: number;
+  matureVisitors: number;
+  day3Buyers: number;
+  day3ConversionRate: number;
+  daily: Array<{ day: string; purchases: number; units: number; revenueUzs: number }>;
+}
+
 const asRecord = (value: unknown): Record<string, unknown> =>
   typeof value === 'object' && value !== null ? value as Record<string, unknown> : {};
 
@@ -133,4 +145,38 @@ export const getFunnelAnalyticsApi = async (params: {
 }): Promise<FunnelAnalyticsResponse> => {
   const { data } = await api.get<unknown>('/analytics/funnel', { params });
   return parseFunnelAnalyticsResponse(data);
+};
+
+export const parseCustomerJourneyResponse = (value: unknown): CustomerJourneyResponse => {
+  const source = asRecord(value);
+  const daily = Array.isArray(source.daily) ? source.daily.flatMap((value) => {
+    const row = asRecord(value);
+    if (typeof row.day !== 'string') return [];
+    return [{
+      day: row.day,
+      purchases: asFiniteNumber(row.purchases) ?? 0,
+      units: asFiniteNumber(row.units) ?? 0,
+      revenueUzs: asFiniteNumber(row.revenueUzs) ?? 0,
+    }];
+  }) : [];
+  return {
+    firstTimeVisitors: asFiniteNumber(source.firstTimeVisitors) ?? 0,
+    buyers: asFiniteNumber(source.buyers) ?? 0,
+    conversionRate: asFiniteNumber(source.conversionRate) ?? 0,
+    avgDaysToFirstPurchase: asFiniteNumber(source.avgDaysToFirstPurchase) ?? 0,
+    avgProductsInFirstOrder: asFiniteNumber(source.avgProductsInFirstOrder) ?? 0,
+    matureVisitors: asFiniteNumber(source.matureVisitors) ?? 0,
+    day3Buyers: asFiniteNumber(source.day3Buyers) ?? 0,
+    day3ConversionRate: asFiniteNumber(source.day3ConversionRate) ?? 0,
+    daily,
+  };
+};
+
+export const getCustomerJourneyAnalyticsApi = async (params: {
+  from?: string;
+  to?: string;
+  days?: number;
+}): Promise<CustomerJourneyResponse> => {
+  const { data } = await api.get<unknown>('/analytics/admin/journey', { params });
+  return parseCustomerJourneyResponse(data);
 };

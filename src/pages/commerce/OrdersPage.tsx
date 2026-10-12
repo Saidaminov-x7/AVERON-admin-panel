@@ -142,9 +142,12 @@ export default function OrdersPage() {
   );
 
   const order = selectedOrderQuery.data;
+  // Reset the editable delivery status when the selected order changes.
+  // oxlint-disable react/set-state-in-effect
   useEffect(() => {
     setDeliveryStatus(order?.delivery?.status ?? 'PENDING');
   }, [order?.orderNumber, order?.delivery?.status]);
+  // oxlint-enable react/set-state-in-effect
   const nextStatus = order ? getNextOrderTransition(order.status) : null;
   const nextDeliveryStatuses = order ? getNextDeliveryTransitions(order.delivery?.status ?? 'PENDING') : [];
   const fulfillment = fulfillmentCopy[locale];

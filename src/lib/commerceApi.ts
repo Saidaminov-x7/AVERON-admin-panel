@@ -119,6 +119,7 @@ export interface ProductListItem {
   category?: ProductCategory | null;
   translations?: Partial<Record<ProductLocale, { title?: string } | string>>;
   description?: Partial<Record<ProductLocale, string>> | null;
+  attributes?: Record<string, unknown> | null;
   images?: Array<{ id: string; mediaId?: string | null; url: string; sortOrder: number }>;
   variants?: Array<{ id: string; color?: string | null; size?: string | null; stock?: number; available?: boolean }>;
   salePriceUzs: string | number;
@@ -148,15 +149,23 @@ export interface ProductPayload {
   description?: string;
   descriptionUz?: string;
   descriptionEn?: string;
+  composition?: string;
+  compositionUz?: string;
+  compositionEn?: string;
+  careInstructions?: string;
+  careInstructionsUz?: string;
+  careInstructionsEn?: string;
   sourceUrl?: string;
   images: Array<{ mediaId: string }>;
   salePriceUzs: number;
   stock?: number;
+  variantStocks?: Array<{ color: string | null; size: string | null; stock: number }>;
   compareAtPriceUzs?: number | null;
   categoryId?: string;
   color?: string;
   colors?: Array<{ name: string; hex: string }>;
   size?: string;
+  sizes?: string[];
   publish: boolean;
 }
 
@@ -167,10 +176,17 @@ export interface ProductUpdatePayload {
   description?: string;
   descriptionUz?: string;
   descriptionEn?: string;
+  composition?: string;
+  compositionUz?: string;
+  compositionEn?: string;
+  careInstructions?: string;
+  careInstructionsUz?: string;
+  careInstructionsEn?: string;
   sourceUrl?: string | null;
   images?: Array<{ id: string } | { mediaId: string }>;
   salePriceUzs: number;
   stock?: number;
+  variantStocks?: Array<{ color: string | null; size: string | null; stock: number }>;
   compareAtPriceUzs?: number | null;
   country?: ProductCountry;
   sizeChartType?: 'CLOTHING' | 'SHOES' | 'KIDS_CLOTHING' | null;
@@ -180,6 +196,7 @@ export interface ProductUpdatePayload {
   color?: string;
   colors?: Array<{ name: string; hex: string }>;
   size?: string;
+  sizes?: string[];
 }
 
 // ─── Дашборд ──────────────────────────────────────────────────────────────────
@@ -265,8 +282,10 @@ export const getProducts = (params?: {
     },
   }).then((r) => r.data);
 
-export const createManualProduct = (payload: ProductPayload) =>
-  api.post<ProductListItem>('/api/v1/admin/products', payload).then((r) => r.data);
+export const createManualProduct = (payload: ProductPayload, idempotencyKey: string) =>
+  api.post<ProductListItem>('/api/v1/admin/products', payload, {
+    headers: { 'Idempotency-Key': idempotencyKey },
+  }).then((r) => r.data);
 
 export const updateManualProduct = (id: string, payload: ProductUpdatePayload) =>
   api.put<ProductListItem>(`/api/v1/admin/products/${id}`, payload).then((r) => r.data);

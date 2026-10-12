@@ -2,7 +2,7 @@ import type { ProductLocale } from '../../lib/commerceApi';
 
 const languageNames: Record<ProductLocale, string> = {
   ru: 'Русский',
-  uz: 'O‘zbekcha',
+  uz: 'Oʻzbekcha',
   en: 'English',
 };
 
