@@ -216,7 +216,7 @@ const LoginPage: React.FC = () => {
         <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <div className="flex items-center gap-2">
             <span className="text-xl font-black tracking-[0.2em] text-app">AVERON</span>
-            <span className="bg-primary-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white">ADMIN</span>
+            <span className="bg-primary-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-on-primary)]">ADMIN</span>
           </div>
           <ThemeToggle />
         </div>
@@ -289,9 +289,10 @@ const LoginPage: React.FC = () => {
                   />
                   <button
                     type="button"
+                    aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                    aria-pressed={showPassword}
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-app transition-colors"
-                    tabIndex={-1}
+                    className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-muted transition-colors hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                   >
                     {showPassword ? (
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -93,6 +93,13 @@
   --shadow-drawer:     -18px 0 48px rgb(0 0 0 / .38);
 }
 
+/* Primary fills invert in dark mode; keep legacy white foreground utilities
+   aligned with the primary foreground token on those fills. */
+.dark .bg-primary-500.text-white,
+.dark .bg-primary-600.text-white {
+  color: var(--color-on-primary);
+}
+
 .admin-sidebar-resizing, .admin-sidebar-resizing * {
   cursor: col-resize !important;
   user-select: none !important;
