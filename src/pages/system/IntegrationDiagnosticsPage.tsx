@@ -4,9 +4,27 @@ import Layout from '../../components/Layout';
 import { getIntegrationDiagnostics } from '../../lib/integrationDiagnosticsApi';
 
 const copy = {
-  ru: { title: 'Диагностика интеграций', loading: 'Загрузка…', error: 'Диагностику загрузить не удалось.', enabled: 'Функция включена', configured: 'Настроена', implementation: 'Реализация', verification: 'Проверка', lastSuccess: 'Последняя успешная операция', degraded: 'Работает с ограничениями', yes: 'Да', no: 'Нет', none: 'Нет данных', warning: 'Секреты, ключи и приватные адреса здесь не отображаются.' },
-  uz: { title: 'Integratsiyalar diagnostikasi', loading: 'Yuklanmoqda…', error: 'Diagnostikani yuklab bo‘lmadi.', enabled: 'Funksiya yoqilgan', configured: 'Sozlangan', implementation: 'Amalga oshirilishi', verification: 'Tekshiruv', lastSuccess: 'Oxirgi muvaffaqiyatli amal', degraded: 'Cheklangan holatda ishlayapti', yes: 'Ha', no: 'Yo‘q', none: 'Ma’lumot yo‘q', warning: 'Maxfiy kalitlar va yopiq manzillar ko‘rsatilmaydi.' },
-  en: { title: 'Integration diagnostics', loading: 'Loading…', error: 'Diagnostics could not be loaded.', enabled: 'Feature enabled', configured: 'Configured', implementation: 'Implementation', verification: 'Verification', lastSuccess: 'Last successful operation', degraded: 'Degraded', yes: 'Yes', no: 'No', none: 'No data', warning: 'Secrets, API keys, and private URLs are not shown.' },
+  ru: {
+    title: 'Диагностика интеграций', loading: 'Загрузка…', error: 'Не удалось загрузить диагностику.',
+    empty: 'Для интеграций пока нет диагностических данных.', enabled: 'Функция включена', configured: 'Настроена',
+    implementation: 'Реализация', verification: 'Проверка', lastSuccess: 'Последняя успешная операция',
+    degraded: 'Работает с ограничениями', yes: 'Да', no: 'Нет', none: 'Нет данных',
+    warning: 'Секреты, ключи и приватные адреса здесь не отображаются.',
+  },
+  uz: {
+    title: 'Integratsiyalar diagnostikasi', loading: 'Yuklanmoqda…', error: 'Diagnostikani yuklab bo‘lmadi.',
+    empty: 'Integratsiyalar uchun hozircha diagnostika ma’lumotlari yo‘q.', enabled: 'Funksiya yoqilgan', configured: 'Sozlangan',
+    implementation: 'Amalga oshirilishi', verification: 'Tekshiruv', lastSuccess: 'Oxirgi muvaffaqiyatli amal',
+    degraded: 'Cheklangan holatda ishlayapti', yes: 'Ha', no: 'Yo‘q', none: 'Ma’lumot yo‘q',
+    warning: 'Maxfiy kalitlar va yopiq manzillar ko‘rsatilmaydi.',
+  },
+  en: {
+    title: 'Integration diagnostics', loading: 'Loading…', error: 'Diagnostics could not be loaded.',
+    empty: 'No diagnostic data is available for integrations yet.', enabled: 'Feature enabled', configured: 'Configured',
+    implementation: 'Implementation', verification: 'Verification', lastSuccess: 'Last successful operation',
+    degraded: 'Degraded', yes: 'Yes', no: 'No', none: 'No data',
+    warning: 'Secrets, API keys, and private URLs are not shown.',
+  },
 } as const;
 
 const rateCopy = {
@@ -25,7 +43,7 @@ export default function IntegrationDiagnosticsPage() {
     <Layout title={text.title}>
       <main className="mx-auto max-w-7xl space-y-4 pb-12">
         <p className="text-sm text-muted">{text.warning}</p>
-        {query.isPending ? <p role="status" className="card p-5">{text.loading}</p> : query.isError ? <p role="alert" className="card p-5 text-rose-600">{text.error}</p> : (
+        {query.isPending ? <p role="status" className="card p-5">{text.loading}</p> : query.isError ? <p role="alert" className="card p-5 text-rose-600">{text.error}</p> : query.data?.length === 0 ? <p role="status" className="card p-5 text-muted">{text.empty}</p> : (
           <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {query.data?.map((item) => <li key={item.name} className="card space-y-3 p-5">
               <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-bold">{item.name}</h2>{item.degraded && <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-900">{text.degraded}</span>}</div>

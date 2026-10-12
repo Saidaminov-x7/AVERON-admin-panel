@@ -71,6 +71,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
         triggerRef.current?.focus();
         return;
       }
+      if (event.key === 'Tab') {
+        const target = event.target as Node;
+        if (rootRef.current?.contains(target) || panelRef.current?.contains(target)) {
+          setIsOpen(false);
+        }
+        return;
+      }
       const target = event.target as Node;
       if (!rootRef.current?.contains(target) && !panelRef.current?.contains(target)) return;
       if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;

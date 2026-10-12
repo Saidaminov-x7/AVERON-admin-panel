@@ -64,6 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
           .find((button) => button.getAttribute('aria-controls') === activePortalMenu.id);
         if (languageTrigger) {
           event.preventDefault();
+          languageTrigger.click();
           if (event.shiftKey) {
             languageTrigger.focus();
           } else {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Archive, ImageOff, Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -60,6 +60,7 @@ export default function ProductsPage() {
   const [limit, setLimit] = useState(15);
   const [editingProduct, setEditingProduct] = useState<ProductListItem | null>(null);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const productCreateIdempotencyKeyRef = useRef<string | null>(null);
   const [telegramPublishError, setTelegramPublishError] = useState<string | null>(null);
   const [telegramRetryProductId, setTelegramRetryProductId] = useState<string | null>(null);
   const [isRetryingTelegram, setIsRetryingTelegram] = useState(false);
@@ -193,7 +194,9 @@ export default function ProductsPage() {
           size: values.size,
           publish: values.publish,
         };
-        return await createManualProduct(payload);
+        const idempotencyKey = productCreateIdempotencyKeyRef.current ?? crypto.randomUUID();
+        productCreateIdempotencyKeyRef.current = idempotencyKey;
+        return await createManualProduct(payload, idempotencyKey);
       } catch (error) {
         await Promise.allSettled(uploadedIds.map((id) => deleteUnattachedMediaApi(id)));
         throw error;
@@ -201,6 +204,7 @@ export default function ProductsPage() {
     },
     onSuccess: async (result, variables) => {
       setSubmissionError(null);
+      productCreateIdempotencyKeyRef.current = null;
       toast.success(t(variables.productId ? "products.productUpdated" : "products.done"));
       void qc.invalidateQueries({ queryKey: ["commerce-products"] });
       if (variables.values.publishTelegram) {
@@ -266,6 +270,7 @@ export default function ProductsPage() {
     setTelegramPublishError(null);
     setTelegramRetryProductId(null);
     setIsFormOpen(false);
+    productCreateIdempotencyKeyRef.current = null;
     setEditingProduct(null);
     if (isEditorRoute) navigate("/products");
   };
@@ -316,6 +321,9 @@ export default function ProductsPage() {
 
   const handleFormSubmit = (values: ProductFormSubmission) => {
     setSubmissionError(null);
+    if (!editingProduct && !productCreateIdempotencyKeyRef.current) {
+      productCreateIdempotencyKeyRef.current = crypto.randomUUID();
+    }
     mutation.mutate({ productId: editingProduct?.id ?? null, values });
   };
 

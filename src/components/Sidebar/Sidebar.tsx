@@ -81,7 +81,7 @@ const sections: NavSection[] = [
 
 const languages = [
   { code: "ru", name: "Русский" },
-  { code: "uz", name: "O‘zbekcha" },
+  { code: "uz", name: "Oʻzbekcha" },
   { code: "en", name: "English" },
 ] as const;
 

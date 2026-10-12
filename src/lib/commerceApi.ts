@@ -282,8 +282,10 @@ export const getProducts = (params?: {
     },
   }).then((r) => r.data);
 
-export const createManualProduct = (payload: ProductPayload) =>
-  api.post<ProductListItem>('/api/v1/admin/products', payload).then((r) => r.data);
+export const createManualProduct = (payload: ProductPayload, idempotencyKey: string) =>
+  api.post<ProductListItem>('/api/v1/admin/products', payload, {
+    headers: { 'Idempotency-Key': idempotencyKey },
+  }).then((r) => r.data);
 
 export const updateManualProduct = (id: string, payload: ProductUpdatePayload) =>
   api.put<ProductListItem>(`/api/v1/admin/products/${id}`, payload).then((r) => r.data);

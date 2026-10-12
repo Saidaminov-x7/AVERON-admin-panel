@@ -6,7 +6,9 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://averon-backend-production-128zjje.up.railway.app';
+const API_URL = import.meta.env.DEV
+  ? '/api/backend'
+  : import.meta.env.VITE_API_URL || 'https://averon-backend-production.up.railway.app';
 export { API_URL };
 const PROACTIVE_REFRESH_BEFORE_MS = 5 * 60 * 1000; // 5 минут
 

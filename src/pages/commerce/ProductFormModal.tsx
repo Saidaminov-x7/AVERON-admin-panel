@@ -259,6 +259,7 @@ export function ProductFormModal({
   const [imageEmbeddingError, setImageEmbeddingError] = useState("");
   const [imageEmbeddingSuccess, setImageEmbeddingSuccess] = useState("");
   const aiRequestRef = useRef<AbortController | null>(null);
+  const submitInFlightRef = useRef(false);
 
   const capabilitiesQuery = useAdminCapabilities(isOpen);
   const imageEmbeddingQuery = useQuery({
@@ -568,7 +569,7 @@ export function ProductFormModal({
     event.preventDefault();
     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLElement | null;
     if (submitter?.getAttribute("type") !== "submit") return;
-    if (isPreparingImages || isSaving) return;
+    if (isPreparingImages || isSaving || submitInFlightRef.current) return;
     // A submit event must never publish from an intermediate step. This guard
     // keeps the stepper safe even if a browser or wrapper treats "Далее" as submit.
     if (currentStep < steps.length - 1) {
@@ -624,6 +625,7 @@ export function ProductFormModal({
       return;
     }
 
+    submitInFlightRef.current = true;
     setIsPreparingImages(true);
     setPhotoInputErrors([]);
     try {
@@ -698,6 +700,7 @@ export function ProductFormModal({
     } catch {
       setPhotoInputErrors([t("products.photoCropError")]);
     } finally {
+      submitInFlightRef.current = false;
       setIsPreparingImages(false);
     }
   };
