@@ -35,7 +35,7 @@ function formatPublishedAt(value: string | null | undefined): string | null {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  const days = Math.max(0, Math.floor((Date.now() - date.getTime()) / 86_400_000));
+  const days = Math.max(0, Math.floor((new Date().getTime() - date.getTime()) / 86_400_000));
   const time = date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
   return `${days} дн. назад · ${time}`;
 }
@@ -66,6 +66,8 @@ export default function ProductsPage() {
   const [isRetryingTelegram, setIsRetryingTelegram] = useState(false);
   const qc = useQueryClient();
 
+  // Route query parameters are external state; keep the editable filters synchronized on navigation.
+  // oxlint-disable react/set-state-in-effect
   useEffect(() => {
     setCategorySlug(searchParams.get("category") ?? "");
     const urlCountry = searchParams.get("country");
@@ -83,6 +85,7 @@ export default function ProductsPage() {
     const urlLimit = Number(searchParams.get("limit"));
     setLimit(urlLimit === 30 || urlLimit === 48 ? urlLimit : 15);
   }, [searchParams]);
+  // oxlint-enable react/set-state-in-effect
 
   const updateCatalogQuery = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
@@ -298,6 +301,8 @@ export default function ProductsPage() {
     }
   };
 
+  // The route and loaded product query jointly determine whether the editor modal should be open.
+  // oxlint-disable react/set-state-in-effect
   useEffect(() => {
     if (!isEditorRoute) {
       setIsFormOpen(false);
@@ -318,6 +323,7 @@ export default function ProductsPage() {
       setIsFormOpen(true);
     }
   }, [editorProductQuery.data, editorProductQuery.isLoading, identifier, isEditorRoute, isNewProductRoute]);
+  // oxlint-enable react/set-state-in-effect
 
   const handleFormSubmit = (values: ProductFormSubmission) => {
     setSubmissionError(null);

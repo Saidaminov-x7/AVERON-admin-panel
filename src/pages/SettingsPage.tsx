@@ -21,6 +21,8 @@ const SettingsPage: React.FC = () => {
   const [saved, setSaved] = useState(false);
 
   // Синхронизируем локальное состояние с данными API
+  // The query loads asynchronously; this intentionally hydrates an editable form from the server response.
+  // oxlint-disable react/set-state-in-effect
   useEffect(() => {
     if (settings) {
       setMaintenanceMode(settings.maintenanceMode);
@@ -29,6 +31,7 @@ const SettingsPage: React.FC = () => {
       setNavLinks(settings.navLinks || []);
     }
   }, [settings]);
+  // oxlint-enable react/set-state-in-effect
 
   const mutation = useMutation({
     mutationFn: updateSiteSettingsApi,

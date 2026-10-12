@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "node scripts/check-no-native-select.mjs && tsc -b && vite build",
     "check:no-native-select": "node scripts/check-no-native-select.mjs",
-    "lint": "oxlint",
+    "lint": "oxlint src scripts",
     "test": "vitest run",
     "preview": "vite preview"
   },

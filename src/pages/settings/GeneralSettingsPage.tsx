@@ -56,6 +56,8 @@ const GeneralSettingsPage: React.FC = () => {
     { label: 'О нас', href: '/about', position: 'header' },
   ]);
 
+  // The query loads asynchronously; this intentionally hydrates an editable form from the server response.
+  // oxlint-disable react/set-state-in-effect
   useEffect(() => {
     if (settings) {
       setSiteName(settings.siteName?.toLowerCase().includes('ijara') ? 'AVERON' : settings.siteName || 'AVERON');
@@ -74,6 +76,7 @@ const GeneralSettingsPage: React.FC = () => {
       }
     }
   }, [settings]);
+  // oxlint-enable react/set-state-in-effect
 
   const mutation = useMutation({
     mutationFn: updateSiteSettingsApi,

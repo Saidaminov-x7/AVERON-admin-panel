@@ -276,6 +276,8 @@ export function ProductFormModal({
     objectUrlsRef.current.clear();
   }, []);
 
+  // Reset draft state only when opening/closing the modal or switching product identity.
+  // oxlint-disable react/set-state-in-effect, react-hooks/exhaustive-deps
   useEffect(() => {
     aiRequestRef.current?.abort();
     aiRequestRef.current = null;
@@ -308,6 +310,7 @@ export function ProductFormModal({
     setSubmitAttempted(false);
     setIsPreparingImages(false);
   }, [isOpen, product?.id, releaseObjectUrls]);
+  // oxlint-enable react/set-state-in-effect, react-hooks/exhaustive-deps
 
   useEffect(() => () => releaseObjectUrls(), [releaseObjectUrls]);
 

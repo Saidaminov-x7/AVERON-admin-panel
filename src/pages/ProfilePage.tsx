@@ -43,6 +43,8 @@ const ProfilePage: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   // Синхронизируем начальные данные
+  // The query loads asynchronously; this intentionally hydrates an editable form from the server response.
+  // oxlint-disable react/set-state-in-effect
   React.useEffect(() => {
     if (profile) {
       setName(profile.name || '');
@@ -50,6 +52,7 @@ const ProfilePage: React.FC = () => {
       setTelegramId(profile.telegramId || '');
     }
   }, [profile]);
+  // oxlint-enable react/set-state-in-effect
 
   // Состояния формы смены пароля
   const [currentPassword, setCurrentPassword] = useState('');

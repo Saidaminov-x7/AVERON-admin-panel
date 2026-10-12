@@ -31,6 +31,8 @@ const LoginPage: React.FC = () => {
   const codeInputRef = useRef<HTMLInputElement>(null);
 
   // Загружаем сохранённый email при монтировании
+  // localStorage is only available in the browser; restore the opt-in saved email after mount.
+  // oxlint-disable react/set-state-in-effect
   useEffect(() => {
     const saved = localStorage.getItem(REMEMBER_EMAIL_KEY);
     if (saved) {
@@ -38,6 +40,7 @@ const LoginPage: React.FC = () => {
       setRememberMe(true);
     }
   }, []);
+  // oxlint-enable react/set-state-in-effect
 
   // Таймер для повторной отправки кода
   useEffect(() => {

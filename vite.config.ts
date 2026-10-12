@@ -32,6 +32,21 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react(), releaseManifest()],
+    build: {
+      // The lazy Three.js runtime is 737 kB raw / 187 kB gzip; keep it below the tuned ceiling.
+      chunkSizeWarningLimit: 800,
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              { name: 'three-core', test: /[\\/]node_modules[\\/]three[\\/]build[\\/]/ },
+              { name: 'three-loaders', test: /[\\/]node_modules[\\/]three[\\/]examples[\\/]jsm[\\/]/ },
+              { name: 'react-three', test: /[\\/]node_modules[\\/]@react-three[\\/]/ },
+            ],
+          },
+        },
+      },
+    },
     server: {
       proxy: {
         '/api/backend': {
