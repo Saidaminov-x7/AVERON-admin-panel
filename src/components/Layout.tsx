@@ -3,6 +3,7 @@ import Sidebar from './Sidebar/Sidebar';
 import Header from './Header/Header';
 import { CommandPalette } from './CommandPalette/CommandPalette';
 import { useTranslation } from 'react-i18next';
+import { getVisibleFocusableElements } from './focusableElements';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -64,9 +65,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
         const trigger = drawerRef.current.querySelector<HTMLElement>(`[aria-controls="${portalMenu.id}"]`);
         if (trigger) {
           event.preventDefault();
-          const drawerItems = Array.from(drawerRef.current.querySelectorAll<HTMLElement>(
-            'a[href]:not([tabindex="-1"]), button:not(:disabled):not([tabindex="-1"]), input:not(:disabled):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
-          ));
+          const drawerItems = getVisibleFocusableElements(drawerRef.current);
           const triggerIndex = drawerItems.indexOf(trigger);
           if (triggerIndex >= 0) {
           const next = event.shiftKey
@@ -77,9 +76,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
           return;
         }
       }
-      const focusable = Array.from(drawerRef.current.querySelectorAll<HTMLElement>(
-        'a[href]:not([tabindex="-1"]), button:not(:disabled):not([tabindex="-1"]), input:not(:disabled):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])',
-      ));
+      const focusable = getVisibleFocusableElements(drawerRef.current);
       if (!focusable.length) {
         event.preventDefault();
         drawerRef.current.focus();
