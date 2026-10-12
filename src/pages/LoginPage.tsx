@@ -2,7 +2,8 @@
 // Страница входа в административную панель с поддержкой Telegram 2FA
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import { useAuthStore } from '../store/authStore';
 import { loginApi, verify2faApi, resend2faApi, verifyAdminTotpLoginApi } from '../lib/authApi';
 import ThemeToggle from '../components/ThemeToggle/ThemeToggle';
@@ -11,6 +12,7 @@ const REMEMBER_EMAIL_KEY = 'admin_remembered_email';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, isAdmin, isInitialized } = useAuth();
   const { setAuth } = useAuthStore();
 
   const [step, setStep] = useState<'credentials' | 'telegram' | 'totp'>('credentials');
@@ -209,6 +211,10 @@ const LoginPage: React.FC = () => {
     setError('');
     setInfoMessage('');
   };
+
+  if (isInitialized && isAuthenticated && isAdmin) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="averon-admin-shell min-h-screen bg-app">
