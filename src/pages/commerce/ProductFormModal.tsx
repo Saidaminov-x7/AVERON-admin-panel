@@ -318,14 +318,19 @@ export function ProductFormModal({
       telegramDefaultAppliedRef.current = false;
       return;
     }
-    if (product?.id || telegramDefaultAppliedRef.current || capabilitiesQuery.isLoading || capabilitiesQuery.isError) return;
+    const capabilitiesSettled = capabilitiesQuery.isError || (
+      capabilitiesQuery.data !== undefined
+      && !capabilitiesQuery.isLoading
+      && !capabilitiesQuery.isFetching
+    );
+    if (product?.id || telegramDefaultAppliedRef.current || !capabilitiesSettled) return;
 
     telegramDefaultAppliedRef.current = true;
     setValues((current) => ({
       ...current,
       publishTelegram: capabilitiesQuery.data?.telegramProductPublish === true,
     }));
-  }, [isOpen, product?.id, capabilitiesQuery.data?.telegramProductPublish, capabilitiesQuery.isLoading, capabilitiesQuery.isError]);
+  }, [isOpen, product?.id, capabilitiesQuery.data?.telegramProductPublish, capabilitiesQuery.data, capabilitiesQuery.isLoading, capabilitiesQuery.isFetching, capabilitiesQuery.isError]);
   // oxlint-enable react/set-state-in-effect, react-hooks/exhaustive-deps
 
   useEffect(() => () => releaseObjectUrls(), [releaseObjectUrls]);
