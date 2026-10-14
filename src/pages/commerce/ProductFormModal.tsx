@@ -262,6 +262,7 @@ export function ProductFormModal({
   const submitInFlightRef = useRef(false);
 
   const capabilitiesQuery = useAdminCapabilities(isOpen);
+  const telegramDefaultAppliedRef = useRef(false);
   const imageEmbeddingQuery = useQuery({
     queryKey: ["admin", "products", product?.id, "image-embedding"],
     queryFn: ({ signal }) => getProductImageEmbeddingApi(product!.id, signal),
@@ -310,6 +311,21 @@ export function ProductFormModal({
     setSubmitAttempted(false);
     setIsPreparingImages(false);
   }, [isOpen, product?.id, releaseObjectUrls]);
+
+  // Apply the configured Telegram default once after capabilities load; edits stay opt-in to avoid duplicate posts.
+  useEffect(() => {
+    if (!isOpen) {
+      telegramDefaultAppliedRef.current = false;
+      return;
+    }
+    if (product?.id || telegramDefaultAppliedRef.current || capabilitiesQuery.isLoading || capabilitiesQuery.isError) return;
+
+    telegramDefaultAppliedRef.current = true;
+    setValues((current) => ({
+      ...current,
+      publishTelegram: capabilitiesQuery.data?.telegramProductPublish === true,
+    }));
+  }, [isOpen, product?.id, capabilitiesQuery.data?.telegramProductPublish, capabilitiesQuery.isLoading, capabilitiesQuery.isError]);
   // oxlint-enable react/set-state-in-effect, react-hooks/exhaustive-deps
 
   useEffect(() => () => releaseObjectUrls(), [releaseObjectUrls]);
