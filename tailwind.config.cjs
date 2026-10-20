@@ -9,6 +9,22 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        secondary: 'var(--color-secondary)',
+        page: 'var(--color-bg)',
+        surface: 'var(--color-surface)',
+        'surface-soft': 'var(--color-surface-soft)',
+        'image-surface': 'var(--color-image-surface)',
+        base: 'var(--color-text)',
+        'muted-strong': 'var(--color-text-secondary)',
+        muted: 'var(--color-muted)',
+        'border-default': 'var(--color-border)',
+        'border-hover': 'var(--color-border-hover)',
+        sale: 'var(--color-sale)',
+        'on-primary': 'var(--color-on-primary)',
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        error: 'var(--color-error)',
+        info: 'var(--color-info)',
         // Акцентный primary — динамический через CSS-переменные (AdminThemeInjector)
         primary: {
           DEFAULT: 'var(--color-primary)',
