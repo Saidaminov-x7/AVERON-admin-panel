@@ -21,6 +21,7 @@
   --color-sidebar-border: #e5e3df;
   --color-primary:     #34383c;
   --color-primary-hover: #25282b;
+  --color-secondary: var(--color-primary-hover);
   --color-on-primary:  #ffffff;
   --color-success:     #24734b;
   --color-warning:     #9a6417;
@@ -89,6 +90,7 @@
   --color-sidebar-border: #3a3a3a;
   --color-primary:     #f2f3f3;
   --color-primary-hover: #d7dadd;
+  --color-secondary: var(--color-primary-hover);
   --color-on-primary:  #111111;
   --color-success:     #78bd94;
   --color-warning:     #e1b966;
@@ -479,6 +481,7 @@ button, [role="button"], summary { user-select: none; }
   --color-sidebar-border: #e4e4e4;
   --color-primary: #1a1a1a;
   --color-primary-hover: #000;
+  --color-secondary: var(--color-primary-hover);
   --color-on-primary: #fff;
   --radius: 0.25rem;
   --radius-control: 0.25rem;
@@ -508,6 +511,7 @@ button, [role="button"], summary { user-select: none; }
   --color-sidebar-border: #3a3a3a;
   --color-primary: #f1f1f1;
   --color-primary-hover: #fff;
+  --color-secondary: var(--color-primary-hover);
   --color-on-primary: #181818;
   --shadow-drawer: -12px 0 32px rgb(0 0 0 / 0.44);
 }
