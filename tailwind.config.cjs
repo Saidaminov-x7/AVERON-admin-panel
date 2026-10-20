@@ -21,7 +21,12 @@ module.exports = {
         success: "var(--color-success)",
         warning: "var(--color-warning)",
         error: "var(--color-error)",
-        info: "var(--color-info)",
+        info: "var(--color-info)",        // Kebab-case utility aliases match the documented class spellings.
+        "surface-soft": "var(--color-surface-soft)",
+        "image-surface": "var(--color-image-surface)",
+        "ink-soft": "var(--color-text-secondary)",
+        "line-hover": "var(--color-border-hover)",
+        "on-primary": "var(--color-on-primary)",
         "primary-50": "color-mix(in srgb, var(--color-primary) 5%, white)",
         "primary-100": "color-mix(in srgb, var(--color-primary) 10%, white)",
         "primary-200": "color-mix(in srgb, var(--color-primary) 20%, white)",
