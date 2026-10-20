@@ -58,7 +58,7 @@ export default function NotificationsPage() {
                 }}
                 className={`card flex w-full items-start gap-3 text-left transition-colors hover:border-primary-500/40 ${item.isRead ? "" : "border-primary-500/30 bg-primary-500/5"}`}
               >
-                <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${item.isRead ? "bg-transparent" : "bg-primary-500"}`} />
+                <span className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${item.isRead ? "bg-transparent" : "bg-primary-500"}`} />
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-start justify-between gap-2">
                     <strong className="text-sm text-app">{item.title}</strong>

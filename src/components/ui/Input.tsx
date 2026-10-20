@@ -59,8 +59,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               clsx(
                 fieldControlClass,
                 'h-10 font-theme',
-                leftIcon ? 'pl-9' : '',
-                rightIcon ? 'pr-9' : '',
+                leftIcon ? 'pl-10' : '',
+                rightIcon ? 'pr-10' : '',
                 error && fieldErrorClass,
               ),
               className,

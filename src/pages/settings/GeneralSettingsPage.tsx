@@ -290,7 +290,7 @@ const GeneralSettingsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleLogoDelete}
-                    className="absolute -top-2 -right-2 bg-surface-soft hover:bg-surface-soft text-white rounded-full p-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-2 -right-2 bg-surface-soft hover:bg-surface-soft text-error rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                     title={t('settings.deleteLogo', 'Удалить логотип')}
                   >
                     <Trash2 size={14} />
@@ -303,7 +303,7 @@ const GeneralSettingsPage: React.FC = () => {
                 </div>
               )}
 
-              <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-app bg-surface hover:bg-surface-soft dark:hover:bg-white/5 text-app text-sm font-medium cursor-pointer transition-colors">
+              <label className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-app bg-surface hover:bg-surface-soft dark:hover:bg-white/5 text-app text-sm font-medium cursor-pointer transition-colors">
                 <Upload size={16} />
                 <span>{t('settings.uploadNewLogo', 'Загрузить новый логотип')}</span>
                 <input
@@ -374,7 +374,7 @@ const GeneralSettingsPage: React.FC = () => {
               {navLinks.map((link, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-col sm:flex-row items-center gap-3 p-3.5 rounded-xl border border-app bg-surface"
+                  className="flex flex-col sm:flex-row items-center gap-3 p-4 rounded-xl border border-app bg-surface"
                 >
                   <div className="flex-1 w-full sm:w-auto">
                     <Input

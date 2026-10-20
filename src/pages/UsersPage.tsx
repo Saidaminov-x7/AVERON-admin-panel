@@ -304,18 +304,18 @@ export const UsersPage: React.FC = () => {
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-app tracking-tight flex items-center gap-2.5">
+            <h1 className="text-xl sm:text-2xl font-black text-app tracking-tight flex items-center gap-3">
               <span>{t('users.subtitle', 'База пользователей')}</span>
               <Badge variant="primary" size="sm">
                 {t('users.totalRecords', { count: total, defaultValue: `Всего: ${total} записей` })}
               </Badge>
             </h1>
-            <p className="text-xs text-muted mt-0.5">
+            <p className="text-xs text-muted mt-1">
               {t('users.subtitleDesc', 'Управление профилями, верификация, права доступа и блокировки')}
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -369,7 +369,7 @@ export const UsersPage: React.FC = () => {
 
         {/* Bulk Action Bar */}
         {selectedIds.length > 0 && (
-          <div className="p-3.5 rounded-2xl bg-primary-50 dark:bg-primary-950/40 border border-primary-200 dark:border-primary-800/40 flex items-center justify-between gap-4 animate-fade-in">
+          <div className="p-4 rounded-2xl bg-primary-50 dark:bg-primary-950/40 border border-primary-200 dark:border-primary-800/40 flex items-center justify-between gap-4 animate-fade-in">
             <span className="text-xs font-bold text-primary-900 dark:text-primary-200">
               {t('users.selectedCount', { count: selectedIds.length, defaultValue: `Выбрано пользователей: ${selectedIds.length}` })}
             </span>
@@ -413,7 +413,7 @@ export const UsersPage: React.FC = () => {
               <table className="w-full text-left text-xs">
                 <thead className="bg-surface-soft dark:bg-white/5 border-b border-app text-muted font-bold">
                   <tr>
-                    <th className="p-3.5 w-10">
+                    <th className="p-4 w-10">
                       <button
                         type="button"
                         onClick={handleSelectAll}
@@ -426,12 +426,12 @@ export const UsersPage: React.FC = () => {
                         )}
                       </button>
                     </th>
-                    <th className="p-3.5">{t('users.name', 'Пользователь')}</th>
-                    <th className="p-3.5">{t('users.phone', 'Контакты')}</th>
-                    <th className="p-3.5">{t('users.role', 'Роль')}</th>
-                    <th className="p-3.5">{t('common.status', 'Статус')}</th>
-                    <th className="p-3.5">{t('users.registeredAt', 'Дата регистрации')}</th>
-                    <th className="p-3.5 text-right">{t('common.actions', 'Действия')}</th>
+                    <th className="p-4">{t('users.name', 'Пользователь')}</th>
+                    <th className="p-4">{t('users.phone', 'Контакты')}</th>
+                    <th className="p-4">{t('users.role', 'Роль')}</th>
+                    <th className="p-4">{t('common.status', 'Статус')}</th>
+                    <th className="p-4">{t('users.registeredAt', 'Дата регистрации')}</th>
+                    <th className="p-4 text-right">{t('common.actions', 'Действия')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-app">
@@ -452,7 +452,7 @@ export const UsersPage: React.FC = () => {
                             isSelected ? 'bg-primary-50/30 dark:bg-primary-950/20' : ''
                           }`}
                         >
-                          <td className="p-3.5">
+                          <td className="p-4">
                             <button
                               type="button"
                               onClick={() => handleToggleSelect(user.id)}
@@ -466,7 +466,7 @@ export const UsersPage: React.FC = () => {
                             </button>
                           </td>
 
-                          <td className="p-3.5">
+                          <td className="p-4">
                             <div className="flex items-center gap-3">
                               <div className="h-9 w-9 rounded-full bg-primary-50 dark:bg-primary-950/40 text-primary-600 font-bold flex items-center justify-center shrink-0">
                                 {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
@@ -478,21 +478,21 @@ export const UsersPage: React.FC = () => {
                                 >
                                   {user.name || t('users.noName', 'Без имени')}
                                 </div>
-                                <span className="text-[10px] text-muted font-mono block">
+                                <span className="text-[length:var(--font-size-caption)] text-muted font-mono block">
                                   ID: {user.id.slice(-6).toUpperCase()}
                                 </span>
                               </div>
                             </div>
                           </td>
 
-                          <td className="p-3.5 text-muted">
-                            <div className="space-y-0.5">
-                              <div className="flex items-center gap-1.5 text-app">
+                          <td className="p-4 text-muted">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2 text-app">
                                 <Mail size={12} className="text-muted shrink-0" />
                                 <span className="truncate max-w-[160px]">{user.email}</span>
                               </div>
                               {user.phone && (
-                                <div className="flex items-center gap-1.5 text-[11px]">
+                                <div className="flex items-center gap-2 text-[length:var(--font-size-caption)]">
                                   <Phone size={12} className="text-muted shrink-0" />
                                   <span>{user.phone}</span>
                                 </div>
@@ -500,9 +500,9 @@ export const UsersPage: React.FC = () => {
                             </div>
                           </td>
 
-                          <td className="p-3.5">{getRoleBadge(user.role)}</td>
+                          <td className="p-4">{getRoleBadge(user.role)}</td>
 
-                          <td className="p-3.5">
+                          <td className="p-4">
                             {isBlocked ? (
                               <Badge variant="danger" dot>
                                 {t('users.block', 'Заблокирован')}
@@ -514,11 +514,11 @@ export const UsersPage: React.FC = () => {
                             )}
                           </td>
 
-                          <td className="p-3.5 text-muted font-mono text-[11px]">
+                          <td className="p-4 text-muted font-mono text-[length:var(--font-size-caption)]">
                             {new Date(user.createdAt).toLocaleDateString()}
                           </td>
 
-                          <td className="p-3.5 text-right">
+                          <td className="p-4 text-right">
                             <div className="flex items-center justify-end gap-1">
                               <Button
                                 variant="ghost"

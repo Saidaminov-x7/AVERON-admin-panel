@@ -164,18 +164,18 @@ export const StaffPage: React.FC = () => {
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-app tracking-tight flex items-center gap-2.5">
+            <h1 className="text-xl sm:text-2xl font-black text-app tracking-tight flex items-center gap-3">
               <span>Сотрудники и права доступа</span>
               <Badge variant="primary" size="sm">
                 {staffList.length} сотрудников
               </Badge>
             </h1>
-            <p className="text-xs text-muted mt-0.5">
+            <p className="text-xs text-muted mt-1">
               Разграничение прав (RBAC), приглашение администраторов и аудит операций
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -237,7 +237,7 @@ export const StaffPage: React.FC = () => {
                       padding="sm"
                       className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                     >
-                      <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="flex items-center gap-4 min-w-0">
                         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 font-bold text-base">
                           {member.name ? member.name.charAt(0).toUpperCase() : member.email.charAt(0).toUpperCase()}
                         </div>
@@ -247,7 +247,7 @@ export const StaffPage: React.FC = () => {
                               {member.name || 'Без имени'}
                             </h4>
                             {isSelf && (
-                              <span className="text-[10px] bg-primary-500/10 text-primary-600 px-2 py-0.5 rounded-md font-semibold">
+                              <span className="text-[length:var(--font-size-caption)] bg-primary-500/10 text-primary-600 px-2 py-1 rounded-md font-semibold">
                                 Это вы
                               </span>
                             )}
@@ -255,7 +255,7 @@ export const StaffPage: React.FC = () => {
                               {member.adminRole || 'SUPPORT'}
                             </Badge>
                             {member.telegramId && (
-                              <span className="inline-flex items-center rounded-md bg-primary-500/10 px-2 py-0.5 font-mono text-[11px] text-primary-700 dark:text-primary-300">
+                              <span className="inline-flex items-center rounded-md bg-primary-500/10 px-2 py-1 font-mono text-[length:var(--font-size-caption)] text-primary-700 dark:text-primary-300">
                                 Telegram ID: {member.telegramId}
                               </span>
                             )}
@@ -329,7 +329,7 @@ export const StaffPage: React.FC = () => {
             ) : (
               <div className="rounded-2xl border border-app bg-surface overflow-hidden divide-y divide-app">
                 {auditLogs.map((log: AuditLogItem) => (
-                  <div key={log.id} className="p-3.5 flex items-center justify-between gap-4 text-xs">
+                  <div key={log.id} className="p-4 flex items-center justify-between gap-4 text-xs">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface-soft dark:bg-white/5 text-muted font-mono shrink-0">
                         <ShieldCheck size={16} />
@@ -338,12 +338,12 @@ export const StaffPage: React.FC = () => {
                         <p className="font-semibold text-app truncate">
                           {log.action} • {log.resource || 'SYSTEM'}
                         </p>
-                        <p className="text-muted text-[11px] truncate mt-0.5">
+                        <p className="text-muted text-[length:var(--font-size-caption)] truncate mt-1">
                           {log.meta ? JSON.stringify(log.meta) : 'Без деталей'}
                         </p>
                       </div>
                     </div>
-                    <span className="text-[11px] text-muted font-mono shrink-0">
+                    <span className="text-[length:var(--font-size-caption)] text-muted font-mono shrink-0">
                       {new Date(log.timestamp).toLocaleString()}
                     </span>
                   </div>

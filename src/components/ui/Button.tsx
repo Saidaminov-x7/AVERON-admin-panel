@@ -14,17 +14,17 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] active:brightness-90 shadow-xs',
-  ghost: 'bg-transparent text-app hover:bg-[var(--color-surface-soft)]',
-  danger: 'bg-surface-soft text-white hover:bg-surface-soft shadow-xs',
-  outline: 'bg-surface border border-app text-app hover:bg-[var(--color-surface-soft)]',
+  primary: 'bg-[var(--color-primary)] text-[var(--color-on-primary)] hover:bg-[var(--color-primary-hover)] active:brightness-95 disabled:bg-surface-soft disabled:text-muted disabled:border-line shadow-xs',
+  ghost: 'bg-transparent text-ink hover:bg-surface-soft active:bg-surface-soft disabled:text-muted',
+  danger: 'bg-error text-[var(--color-on-primary)] hover:brightness-90 dark:hover:brightness-110 active:brightness-75 dark:active:brightness-90 disabled:bg-surface-soft disabled:text-muted disabled:border-line shadow-xs',
+  outline: 'bg-surface border border-app text-app hover:bg-surface-soft active:bg-surface-soft disabled:bg-surface-soft disabled:text-muted disabled:border-line',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-xs gap-1.5 min-w-fit',
-  md: 'h-11 px-4 text-sm gap-2 min-w-fit',
-  lg: 'h-12 px-6 text-base gap-2 min-w-fit',
-  icon: 'h-11 w-11 p-0 justify-center shrink-0',
+  sm: 'h-9 px-3 text-[length:var(--font-size-button)] gap-2 min-w-fit',
+  md: 'h-11 px-4 text-[length:var(--font-size-button)] gap-2 min-w-fit',
+  lg: 'h-12 px-6 text-[length:var(--font-size-button)] gap-2 min-w-fit',
+  icon: 'h-11 min-h-11 w-11 p-0 justify-center shrink-0',
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -51,8 +51,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         ref={ref}
         disabled={disabled || loading}
+        aria-busy={loading || undefined}
         className={[
-          'inline-flex items-center justify-center rounded-theme font-theme font-semibold whitespace-nowrap transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer outline-none select-none',
+          'averon-button relative inline-flex items-center justify-center rounded-theme font-theme font-semibold whitespace-nowrap transition-[transform,background-color,border-color,color,box-shadow,filter] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] disabled:cursor-not-allowed disabled:pointer-events-none disabled:active:scale-100 disabled:active:brightness-100 cursor-pointer outline-none select-none',
           variantClasses[variant],
           sizeClasses[size],
           className,
@@ -60,12 +61,23 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {loading ? (
-          <div className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin shrink-0" />
+          <>
+            <span className="inline-flex items-center gap-2 opacity-0 pointer-events-none">
+              {effectiveLeftIcon && <span className="shrink-0">{effectiveLeftIcon}</span>}
+              {children && <span>{children}</span>}
+              {rightIcon && <span className="shrink-0">{rightIcon}</span>}
+            </span>
+            <span aria-hidden="true" className="absolute inset-0 grid place-items-center">
+              <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin motion-reduce:animate-none" />
+            </span>
+          </>
         ) : (
-          effectiveLeftIcon && <span className="shrink-0">{effectiveLeftIcon}</span>
+          <>
+            {effectiveLeftIcon && <span className="shrink-0">{effectiveLeftIcon}</span>}
+            {children && <span className="truncate">{children}</span>}
+            {rightIcon && <span className="shrink-0">{rightIcon}</span>}
+          </>
         )}
-        {children && <span className="truncate">{children}</span>}
-        {!loading && rightIcon && <span className="shrink-0">{rightIcon}</span>}
       </Comp>
     );
   },

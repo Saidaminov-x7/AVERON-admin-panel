@@ -83,10 +83,10 @@ const SystemHealthPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
-              <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
+              <span className="text-xs font-semibold uppercase flex items-center gap-2">
                 <Server size={16} className="text-success" /> Backend API
               </span>
-              <span className={`px-2 py-0.5 rounded text-xs font-bold ${data?.backend.status === 'UP' ? 'bg-surface-soft text-success dark:bg-surface-soft' : 'bg-surface-soft text-error dark:bg-surface-soft'}`}>
+              <span className={`px-2 py-1 rounded text-xs font-bold ${data?.backend.status === 'UP' ? 'bg-surface-soft text-success dark:bg-surface-soft' : 'bg-surface-soft text-error dark:bg-surface-soft'}`}>
                 {data?.backend.status ?? 'DOWN'}
               </span>
             </div>
@@ -97,11 +97,11 @@ const SystemHealthPage: React.FC = () => {
           {/* PostgreSQL */}
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
-              <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
+              <span className="text-xs font-semibold uppercase flex items-center gap-2">
                 <Database size={16} className="text-info" /> PostgreSQL
               </span>
               <span
-                className={`px-2 py-0.5 rounded text-xs font-bold ${
+                className={`px-2 py-1 rounded text-xs font-bold ${
                   data?.database.status === 'UP'
                     ? 'bg-surface-soft text-success dark:bg-surface-soft'
                     : 'bg-surface-soft text-error dark:bg-surface-soft'
@@ -119,11 +119,11 @@ const SystemHealthPage: React.FC = () => {
           {/* Redis */}
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
-              <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
+              <span className="text-xs font-semibold uppercase flex items-center gap-2">
                 <Activity size={16} className="text-error" /> Redis Cache
               </span>
               <span
-                className={`px-2 py-0.5 rounded text-xs font-bold ${
+                className={`px-2 py-1 rounded text-xs font-bold ${
                   data?.redis.status === 'UP'
                     ? 'bg-surface-soft text-success dark:bg-surface-soft'
                     : 'bg-surface-soft text-error dark:bg-surface-soft'
@@ -141,7 +141,7 @@ const SystemHealthPage: React.FC = () => {
           {/* Node.js Memory */}
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
-              <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
+              <span className="text-xs font-semibold uppercase flex items-center gap-2">
                 <Cpu size={16} className="text-primary-500" /> {t('system.nodeMemory', 'Память Node.js')}
               </span>
               <span className="text-xs font-mono text-muted">{data?.nodeVersion}</span>

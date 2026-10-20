@@ -144,7 +144,7 @@ export const CommandPalette: React.FC = () => {
           shouldFilter={false}
         >
           {/* Инпут поиска */}
-          <div className="flex items-center gap-3 px-4 py-3.5 border-b border-app">
+          <div className="flex items-center gap-3 px-4 py-4 border-b border-app">
             <Search size={20} className="text-muted shrink-0" />
             <Command.Input
               value={query}
@@ -157,12 +157,12 @@ export const CommandPalette: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="text-xs text-muted hover:text-app px-1.5 py-0.5 rounded bg-surface-soft dark:bg-white/10"
+                className="text-xs text-muted hover:text-app px-2 py-1 rounded bg-surface-soft dark:bg-white/10"
               >
                 Очистить
               </button>
             )}
-            <kbd className="hidden sm:inline-block px-2 py-0.5 text-[11px] font-mono rounded bg-surface-soft dark:bg-white/10 text-muted border border-app">
+            <kbd className="hidden sm:inline-block px-2 py-1 text-[length:var(--font-size-caption)] font-mono rounded bg-surface-soft dark:bg-white/10 text-muted border border-app">
               ESC
             </kbd>
           </div>
@@ -191,10 +191,10 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={r.path}
                       onSelect={() => go(r.path)}
-                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
+                      className="flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="p-1.5 rounded-lg bg-surface-soft dark:bg-white/5 text-muted">
+                        <span className="p-2 rounded-lg bg-surface-soft dark:bg-white/5 text-muted">
                           {r.icon}
                         </span>
                         <span className="text-sm font-medium">
@@ -221,10 +221,10 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={l.id}
                       onSelect={() => go(`/products?highlight=${l.id}`)}
-                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
+                      className="flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="p-1.5 rounded-lg bg-surface-soft dark:bg-surface-soft text-info dark:text-info shrink-0">
+                        <span className="p-2 rounded-lg bg-surface-soft dark:bg-surface-soft text-info dark:text-info shrink-0">
                           <List size={16} />
                         </span>
                         <div className="min-w-0">
@@ -234,7 +234,7 @@ export const CommandPalette: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs px-2 py-0.5 rounded-md bg-surface-soft dark:bg-white/10 text-muted shrink-0">
+                      <span className="text-xs px-2 py-1 rounded-md bg-surface-soft dark:bg-white/10 text-muted shrink-0">
                         {l.status || 'ACTIVE'}
                       </span>
                     </Command.Item>
@@ -254,10 +254,10 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={u.id}
                       onSelect={() => go(`/users/${u.id}`)}
-                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
+                      className="flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="p-1.5 rounded-lg bg-surface-soft dark:bg-surface-soft text-success dark:text-success shrink-0">
+                        <span className="p-2 rounded-lg bg-surface-soft dark:bg-surface-soft text-success dark:text-success shrink-0">
                           <User size={16} />
                         </span>
                         <div className="min-w-0">
@@ -265,7 +265,7 @@ export const CommandPalette: React.FC = () => {
                           <p className="text-xs text-muted truncate">{u.email}</p>
                         </div>
                       </div>
-                      <span className="text-xs px-2 py-0.5 rounded-md bg-surface-soft dark:bg-white/10 text-muted shrink-0">
+                      <span className="text-xs px-2 py-1 rounded-md bg-surface-soft dark:bg-white/10 text-muted shrink-0">
                         {u.role || 'USER'}
                       </span>
                     </Command.Item>
@@ -276,14 +276,14 @@ export const CommandPalette: React.FC = () => {
           </Command.List>
 
           {/* Футер палитры */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-t border-app text-xs text-muted bg-surface-soft dark:bg-white/5 select-none">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-app text-xs text-muted bg-surface-soft dark:bg-white/5 select-none">
             <div className="flex items-center gap-3">
               <span>
-                <kbd className="font-mono bg-surface px-1.5 py-0.5 rounded border border-app">↑</kbd>{' '}
-                <kbd className="font-mono bg-surface px-1.5 py-0.5 rounded border border-app">↓</kbd> Навигация
+                <kbd className="font-mono bg-surface px-2 py-1 rounded border border-app">↑</kbd>{' '}
+                <kbd className="font-mono bg-surface px-2 py-1 rounded border border-app">↓</kbd> Навигация
               </span>
               <span>
-                <kbd className="font-mono bg-surface px-1.5 py-0.5 rounded border border-app">↵</kbd> Выбрать
+                <kbd className="font-mono bg-surface px-2 py-1 rounded border border-app">↵</kbd> Выбрать
               </span>
             </div>
             <span>AVERON Command Center</span>

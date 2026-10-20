@@ -41,7 +41,7 @@ export function Tabs<T extends string = string>({
               disabled={tab.disabled}
               onClick={() => !tab.disabled && onChange(tab.id)}
               className={clsx(
-                'flex items-center gap-2 pb-2.5 px-1 font-medium transition-all border-b-2 cursor-pointer outline-none',
+                'flex items-center gap-2 pb-3 px-1 font-medium transition-all border-b-2 cursor-pointer outline-none',
                 isSm ? 'text-xs' : 'text-sm',
                 isActive
                   ? 'border-primary-500 text-primary-600 dark:text-primary-400 font-semibold'
@@ -61,7 +61,7 @@ export function Tabs<T extends string = string>({
 
   if (variant === 'pills') {
     return (
-      <div className={twMerge('flex flex-wrap gap-1.5', className)}>
+      <div className={twMerge('flex flex-wrap gap-2', className)}>
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
           return (
@@ -71,8 +71,8 @@ export function Tabs<T extends string = string>({
               disabled={tab.disabled}
               onClick={() => !tab.disabled && onChange(tab.id)}
               className={clsx(
-                'flex items-center gap-1.5 font-medium rounded-xl transition-all cursor-pointer outline-none',
-                isSm ? 'px-2.5 py-1 text-xs' : 'px-3.5 py-1.5 text-sm',
+                'flex items-center gap-2 font-medium rounded-xl transition-all cursor-pointer outline-none',
+                isSm ? 'px-3 py-1 text-xs' : 'px-4 py-2 text-sm',
                 isActive
                   ? 'bg-primary-500 text-white shadow-xs font-semibold'
                   : 'bg-surface text-muted hover:text-app hover:bg-surface-soft dark:hover:bg-white/5 border border-app',
@@ -106,8 +106,8 @@ export function Tabs<T extends string = string>({
             disabled={tab.disabled}
             onClick={() => !tab.disabled && onChange(tab.id)}
             className={clsx(
-              'flex items-center justify-center gap-1.5 rounded-lg transition-all cursor-pointer outline-none select-none font-medium',
-              isSm ? 'px-2.5 py-1 text-xs' : 'px-3.5 py-1.5 text-xs sm:text-sm',
+              'flex items-center justify-center gap-2 rounded-lg transition-all cursor-pointer outline-none select-none font-medium',
+              isSm ? 'px-3 py-1 text-xs' : 'px-4 py-2 text-xs sm:text-sm',
               isActive
                 ? 'bg-surface text-app shadow-xs font-bold dark:bg-white/15 dark:text-white border border-line dark:border-white/10'
                 : 'text-muted hover:text-app hover:bg-black/5 dark:hover:bg-white/5',

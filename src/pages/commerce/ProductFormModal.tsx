@@ -775,7 +775,7 @@ export function ProductFormModal({
             tabIndex={activeLocale === locale ? 0 : -1}
             onClick={() => setActiveLocale(locale)}
             onKeyDown={handleTabKeyDown}
-            className={`inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:flex-none ${
+            className={`inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:flex-none ${
               activeLocale === locale ? "bg-surface text-primary-600 shadow-sm dark:text-primary-400" : "text-muted hover:text-app"
             }`}
           >
@@ -1052,7 +1052,7 @@ export function ProductFormModal({
                 rows[rowIndex] = `${nextName} | ${nextHex.toUpperCase()}`;
                 updateValue("colorsText", rows.join("\n"));
               };
-              return <div key={`${rowIndex}-${name}`} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-app bg-app p-2.5 sm:grid-cols-[auto_minmax(0,1fr)_8.5rem_auto]">
+              return <div key={`${rowIndex}-${name}`} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-app bg-app p-3 sm:grid-cols-[auto_minmax(0,1fr)_8.5rem_auto]">
                 <label className="relative row-span-2 size-10 cursor-pointer overflow-hidden rounded-full border border-app shadow-sm sm:row-span-1" title={`Выбрать цвет ${name}`}>
                   <span className="absolute inset-0" style={{ backgroundColor: hex }} />
                   <input aria-label={`Выбрать цвет ${name}`} type="color" value={hex} onChange={(event) => updateRow(name, event.target.value)} className="absolute inset-0 size-full cursor-pointer opacity-0" />
@@ -1130,7 +1130,7 @@ export function ProductFormModal({
                         style={getPhotoPreviewStyle(photo)}
                       />
                     ) : <ImageOff size={24} className="text-muted" />}
-                    {index === 0 && <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary-600 px-2.5 py-1 text-xs font-bold text-white"><Star size={12} fill="currentColor" />{t("products.mainPhoto")}</span>}
+                    {index === 0 && <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary-600 px-3 py-1 text-xs font-bold text-white"><Star size={12} fill="currentColor" />{t("products.mainPhoto")}</span>}
                     <span className="absolute right-2 top-2 rounded-full bg-black/70 px-2 py-1 text-xs font-semibold text-white">{index + 1}</span>
                   </div>
                   <div className="space-y-2 p-3">
@@ -1146,7 +1146,7 @@ export function ProductFormModal({
                               type="button"
                               aria-pressed={photo.crop.orientation === value}
                               onClick={() => updatePhotoCrop(photo.key, { orientation: value })}
-                              className={`min-w-0 rounded-lg border px-2 py-1.5 text-[11px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                              className={`min-w-0 rounded-lg border px-2 py-2 text-[length:var(--font-size-caption)] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                                 photo.crop.orientation === value
                                   ? "border-primary-600 bg-primary-600 text-white"
                                   : "border-app text-muted hover:bg-app hover:text-app"
@@ -1409,12 +1409,12 @@ export function ProductFormModal({
         <section className={`${currentStep === 5 ? "" : "hidden "}space-y-3 rounded-xl border border-app p-4`}>
           <h4 className="text-sm font-bold text-app">{t("products.publicationSection")}</h4>
           <div className="flex items-center justify-between gap-4 py-2">
-            <div><p className="text-sm font-medium text-app">{t("products.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Товар появится в каталоге после сохранения.</p></div>
+            <div><p className="text-sm font-medium text-app">{t("products.publishLabel")}</p><p className="mt-1 text-xs text-muted">Товар появится в каталоге после сохранения.</p></div>
             <button type="button" role="switch" aria-checked={values.publish} onClick={() => updateValue("publish", !values.publish)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${values.publish ? "bg-primary-600" : "bg-surface-soft dark:bg-surface-soft"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publish ? "translate-x-5" : "translate-x-0"}`} /></button>
           </div>
           <div>
             <div className="flex items-center justify-between gap-4 py-2">
-              <div><p className="text-sm font-medium text-app">{t("products.telegram.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Публикация выполняется после успешного сохранения товара.</p></div>
+              <div><p className="text-sm font-medium text-app">{t("products.telegram.publishLabel")}</p><p className="mt-1 text-xs text-muted">Публикация выполняется после успешного сохранения товара.</p></div>
               <button type="button" role="switch" aria-checked={values.publishTelegram} disabled={!values.publish || !capabilitiesQuery.data?.telegramProductPublish} onClick={() => updateValue("publishTelegram", !values.publishTelegram)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-40 ${values.publishTelegram ? "bg-primary-600" : "bg-surface-soft dark:bg-surface-soft"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publishTelegram ? "translate-x-5" : "translate-x-0"}`} /></button>
             </div>
             {!capabilitiesQuery.isLoading && !capabilitiesQuery.isError && (

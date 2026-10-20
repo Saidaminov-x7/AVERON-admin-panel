@@ -19,11 +19,11 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         <label
           htmlFor={checkboxId}
           className={clsx(
-            'inline-flex items-start gap-2.5 cursor-pointer select-none group',
+            'inline-flex items-start gap-3 cursor-pointer select-none group',
             disabled && 'opacity-50 cursor-not-allowed',
           )}
         >
-          <div className="relative flex items-center justify-center mt-0.5">
+          <div className="relative flex items-center justify-center mt-1">
             <input
               ref={ref}
               id={checkboxId}
@@ -52,7 +52,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           {(label || description) && (
             <div className="text-xs">
               {label && <span className="font-medium text-app block">{label}</span>}
-              {description && <span className="text-muted block mt-0.5">{description}</span>}
+              {description && <span className="text-muted block mt-1">{description}</span>}
             </div>
           )}
         </label>

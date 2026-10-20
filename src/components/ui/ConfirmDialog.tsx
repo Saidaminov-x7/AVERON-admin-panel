@@ -51,7 +51,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       title={title}
       size="sm"
       footer={
-        <div className="flex items-center justify-end gap-2.5 w-full">
+        <div className="flex items-center justify-end gap-3 w-full">
           <Button variant="ghost" size="sm" onClick={onClose} disabled={loading}>
             {cancelLabel}
           </Button>

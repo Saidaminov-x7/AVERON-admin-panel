@@ -114,7 +114,7 @@ export function ProductRichTextField({
           error={error}
         />
       )}
-      <div className="mt-2 flex flex-wrap items-center gap-1.5" aria-label={copy.hint}>
+      <div className="mt-2 flex flex-wrap items-center gap-2" aria-label={copy.hint}>
         {toolbarButton("bold", copy.bold, <Bold size={15} />)}
         {toolbarButton("italic", copy.italic, <Italic size={15} />)}
         {toolbarButton("strikethrough", copy.strikethrough, <Strikethrough size={15} />)}
@@ -123,7 +123,7 @@ export function ProductRichTextField({
       </div>
       {value.trim() && (
         <div className="mt-3 rounded-lg border border-app bg-surface-secondary p-3">
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-muted">{copy.preview}</p>
+          <p className="mb-2 text-[length:var(--font-size-caption)] font-semibold uppercase tracking-wide text-muted">{copy.preview}</p>
           <div className="break-words text-sm text-app">
             <ReactMarkdown
               allowedElements={multiline ? blockElements : inlineElements}

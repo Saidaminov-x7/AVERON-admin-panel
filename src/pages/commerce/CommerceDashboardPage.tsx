@@ -37,7 +37,7 @@ export default function CommerceDashboardPage() {
   return (
     <Layout title={t('commerce.commandCenter', 'AVERON Command Center')}>
       {/* Hero-баннер */}
-      <section className="overflow-hidden rounded-3xl bg-surface border border-app p-7 text-app shadow-sm">
+      <section className="overflow-hidden rounded-3xl bg-surface border border-app p-8 text-app shadow-sm">
         <p className="text-xs font-bold tracking-[.2em] text-warning">{t('commerce.route', 'КИТАЙ → УЗБЕКИСТАН')}</p>
         <h1 className="mt-3 text-3xl font-black text-app">{t('commerce.heroTitle', 'Товары, доставка и реальная прибыль')}</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">

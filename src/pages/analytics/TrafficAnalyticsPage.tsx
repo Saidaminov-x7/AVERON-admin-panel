@@ -69,7 +69,7 @@ const TrafficAnalyticsPage: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+                  tick={{ fontSize: 'var(--font-size-caption)', fill: 'var(--color-text-muted)' }}
                   tickFormatter={(v) =>
                     new Date(v).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
                   }
@@ -77,7 +77,7 @@ const TrafficAnalyticsPage: React.FC = () => {
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+                  tick={{ fontSize: 'var(--font-size-caption)', fill: 'var(--color-text-muted)' }}
                   axisLine={false}
                   tickLine={false}
                   allowDecimals={false}
@@ -87,7 +87,7 @@ const TrafficAnalyticsPage: React.FC = () => {
                     backgroundColor: 'var(--color-surface)',
                     border: '1px solid var(--color-border)',
                     borderRadius: '0.75rem',
-                    fontSize: '12px',
+                    fontSize: 'var(--font-size-label)',
                     color: 'var(--color-text)',
                   }}
                 />

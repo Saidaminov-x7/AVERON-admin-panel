@@ -118,14 +118,14 @@ const WebhooksPage: React.FC = () => {
                       <td className="p-3">
                         <div className="flex flex-wrap gap-1">
                           {w.events.map((ev, i) => (
-                            <span key={i} className="px-2 py-0.5 rounded text-xs bg-surface-soft dark:bg-white/10 font-mono">
+                            <span key={i} className="px-2 py-1 rounded text-xs bg-surface-soft dark:bg-white/10 font-mono">
                               {ev}
                             </span>
                           ))}
                         </div>
                       </td>
                       <td className="p-3">
-                        <span className="px-2 py-0.5 rounded text-xs font-semibold bg-surface-soft dark:bg-surface-soft text-success dark:text-success">
+                        <span className="px-2 py-1 rounded text-xs font-semibold bg-surface-soft dark:bg-surface-soft text-success dark:text-success">
                           {t('common.active', 'Активен')}
                         </span>
                       </td>
@@ -133,12 +133,12 @@ const WebhooksPage: React.FC = () => {
                         {format(new Date(w.createdAt), 'd MMM yyyy', { locale: currentLocale })}
                       </td>
                       <td className="p-3 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
+                        <div className="flex items-center justify-end gap-2">
                           <button
                             type="button"
                             onClick={() => handleTestWebhook(w.id)}
                             disabled={testingId === w.id}
-                            className="px-2.5 py-1 rounded-lg text-xs font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/40 transition-colors cursor-pointer disabled:opacity-50"
+                            className="px-3 py-1 rounded-lg text-xs font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/40 transition-colors cursor-pointer disabled:opacity-50"
                             title="Тестовая отправка пинга"
                           >
                             {testingId === w.id ? 'Отправка...' : 'Тест'}
@@ -146,7 +146,7 @@ const WebhooksPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => deleteMutation.mutate(w.id)}
-                            className="p-1.5 rounded-lg text-error hover:bg-surface-soft dark:hover:bg-surface-soft transition-colors cursor-pointer"
+                            className="p-2 rounded-lg text-error hover:bg-surface-soft dark:hover:bg-surface-soft transition-colors cursor-pointer"
                             title={t('common.delete', 'Удалить')}
                           >
                             <Trash2 size={15} />

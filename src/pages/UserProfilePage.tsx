@@ -186,7 +186,7 @@ const UserProfilePage: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('ai')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-1.5 ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-2 ${
                 activeTab === 'ai' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
               }`}
             >
@@ -208,7 +208,7 @@ const UserProfilePage: React.FC = () => {
             >
               {t('auditLog.title', 'Админ-аудит')} ({auditLogs?.length || 0})
             </button>
-            <button onClick={() => setActiveTab('sessions')} className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-1.5 ${activeTab === 'sessions' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'}`}>
+            <button onClick={() => setActiveTab('sessions')} className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-2 ${activeTab === 'sessions' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'}`}>
               <MonitorSmartphone size={14}/> Сессии ({sessions.length})
             </button>
           </nav>
@@ -280,7 +280,7 @@ const UserProfilePage: React.FC = () => {
                 {userActivity.items.map((act) => (
                   <div key={act.id} className="p-4 hover:bg-surface-soft dark:hover:bg-white/5 transition-colors">
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-0.5">
+                      <div className="flex-shrink-0 mt-1">
                         <Activity size={18} className="text-primary-500" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -294,7 +294,7 @@ const UserProfilePage: React.FC = () => {
                                 : act.action}
                             </span>
                             {act.ip && (
-                              <span className="text-xs px-2 py-0.5 rounded bg-surface-soft dark:bg-white/10 text-muted font-mono">
+                              <span className="text-xs px-2 py-1 rounded bg-surface-soft dark:bg-white/10 text-muted font-mono">
                                 {act.ip}
                               </span>
                             )}
@@ -309,7 +309,7 @@ const UserProfilePage: React.FC = () => {
                           </pre>
                         )}
                         {act.userAgent && (
-                          <div className="text-[11px] text-muted truncate mt-1">
+                          <div className="text-[length:var(--font-size-caption)] text-muted truncate mt-1">
                             {act.userAgent}
                           </div>
                         )}

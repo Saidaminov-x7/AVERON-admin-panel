@@ -173,7 +173,7 @@ export default function OrdersPage() {
           <label className="relative min-w-64 flex-1">
             <span className="sr-only">{copy.search}</span>
             <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={copy.search} className="input w-full pl-9" />
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={copy.search} className="input w-full pl-10" />
           </label>
           <Select
             value={statusFilter}
@@ -231,7 +231,7 @@ export default function OrdersPage() {
               <h3 className="font-bold">{copy.items}</h3>
               <ul className="mt-2 divide-y divide-app">{order.items.map((item) => (
                 <li key={item.id} className="flex flex-wrap justify-between gap-3 py-3 text-sm">
-                  <span>{item.title}{item.variantSnapshot ? ` · ${[item.variantSnapshot.color, item.variantSnapshot.size].filter(Boolean).join(' · ')}` : ''} × {item.quantity}{item.isPreorder && <span className="ml-2 rounded bg-surface-soft px-2 py-0.5 text-xs font-semibold text-info dark:bg-surface-soft dark:text-info">{fulfillment.preorder}</span>}</span>
+                  <span>{item.title}{item.variantSnapshot ? ` · ${[item.variantSnapshot.color, item.variantSnapshot.size].filter(Boolean).join(' · ')}` : ''} × {item.quantity}{item.isPreorder && <span className="ml-2 rounded bg-surface-soft px-2 py-1 text-xs font-semibold text-info dark:bg-surface-soft dark:text-info">{fulfillment.preorder}</span>}</span>
                   <span className="font-semibold">{formatUzs(item.totalPrice, locale)}</span>
                 </li>
               ))}</ul>

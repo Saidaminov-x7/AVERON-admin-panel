@@ -129,8 +129,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                     <FileIcon size={24} />
                   </div>
                 )}
-                <span className="text-[11px] font-medium text-app truncate w-full">{file.name}</span>
-                <span className="text-[10px] text-muted">{(file.size / 1024 / 1024).toFixed(2)} МБ</span>
+                <span className="text-[length:var(--font-size-caption)] font-medium text-app truncate w-full">{file.name}</span>
+                <span className="text-[length:var(--font-size-caption)] text-muted">{(file.size / 1024 / 1024).toFixed(2)} МБ</span>
                 <button
                   type="button"
                   onClick={(e) => {

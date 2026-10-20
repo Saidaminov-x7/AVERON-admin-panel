@@ -13,8 +13,8 @@ export default function NotFoundPage() {
             <div className="relative"><p className="text-8xl font-semibold leading-none tracking-[-.08em]">404</p><p className="mt-4 text-sm text-on-primary opacity-70">Запрошенный раздел панели недоступен.</p></div>
           </div>
           <div className="flex flex-col justify-center p-8 md:p-12">
-            <div className="mb-7 flex h-12 w-12 items-center justify-center border border-app text-primary-600"><SearchX size={22} /></div>
-            <p className="text-[11px] font-bold uppercase tracking-[.14em] text-primary-600">Навигация</p>
+            <div className="mb-8 flex h-12 w-12 items-center justify-center border border-app text-primary-600"><SearchX size={22} /></div>
+            <p className="text-[length:var(--font-size-caption)] font-bold uppercase tracking-[.14em] text-primary-600">Навигация</p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight text-app">Страница не найдена</h1>
             <p className="mt-4 max-w-md text-sm leading-6 text-muted">Адрес мог измениться, либо у вашей роли нет доступа к этому разделу.</p>
             <Link to="/" className="btn-primary mt-8 w-fit"><ArrowLeft size={16} />Вернуться в панель</Link>

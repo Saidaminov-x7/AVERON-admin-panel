@@ -112,14 +112,14 @@ const AnalyticsPage: React.FC = () => {
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="input py-1 px-2.5 text-xs w-36"
+                  className="input py-1 px-3 text-xs w-36"
                 />
                 <span className="text-xs text-muted">—</span>
                 <input
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="input py-1 px-2.5 text-xs w-36"
+                  className="input py-1 px-3 text-xs w-36"
                 />
               </div>
             )}
@@ -162,7 +162,7 @@ const AnalyticsPage: React.FC = () => {
             <div className="text-2xl font-extrabold text-app">
               {formatMetric(summary?.totalVisitors)}
             </div>
-            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.dedupeNote')}</p>
+            <p className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.dedupeNote')}</p>
           </div>
 
           <div className="card p-5">
@@ -172,7 +172,7 @@ const AnalyticsPage: React.FC = () => {
             <div className="text-2xl font-extrabold text-app">
               {formatMetric(summary?.totalPaidOrders)}
             </div>
-            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.paidOrdersNote')}</p>
+            <p className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.paidOrdersNote')}</p>
           </div>
 
           <div className="card p-5">
@@ -184,7 +184,7 @@ const AnalyticsPage: React.FC = () => {
                 ? t('analyticsPage.noData')
                 : `${formatMetric(summary?.revenueUzs)} UZS`}
             </div>
-            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.netRevenueNote')}</p>
+            <p className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.netRevenueNote')}</p>
           </div>
 
           <div className="card p-5">
@@ -194,7 +194,7 @@ const AnalyticsPage: React.FC = () => {
             <div className="text-2xl font-extrabold text-app">
               {formatMetric(summary?.totalProducts)}
             </div>
-            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.addedNote')}</p>
+            <p className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.addedNote')}</p>
           </div>
         </div>
 
@@ -212,7 +212,7 @@ const AnalyticsPage: React.FC = () => {
               [t('analyticsPage.journeyAvgProducts'), journey?.avgProductsInFirstOrder.toFixed(1)],
             ].map(([label, value]) => (
               <div key={String(label)} className="card min-w-0 p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</p>
+                <p className="text-[length:var(--font-size-caption)] font-semibold uppercase tracking-wide text-muted">{label}</p>
                 <p className="mt-2 text-xl font-semibold text-app">{value === undefined ? (isLoading ? '...' : t('analyticsPage.noData')) : value}</p>
               </div>
             ))}
@@ -232,10 +232,10 @@ const AnalyticsPage: React.FC = () => {
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={journey.daily} margin={{ top: 5, right: 8, left: -22, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} interval={2} />
-                  <YAxis tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} />
-                  <Tooltip contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', fontSize: '12px', color: 'var(--color-text)' }} />
-                  <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  <XAxis dataKey="day" tick={{ fontSize: 'var(--font-size-caption)', fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} interval={2} />
+                  <YAxis tick={{ fontSize: 'var(--font-size-caption)', fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', fontSize: 'var(--font-size-label)', color: 'var(--color-text)' }} />
+                  <Legend wrapperStyle={{ fontSize: 'var(--font-size-label)' }} />
                   <Line type="monotone" dataKey="purchases" name={t('analyticsPage.journeyPurchases')} stroke="var(--color-primary)" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey="units" name={t('analyticsPage.journeyUnits')} stroke="var(--color-info)" strokeWidth={2} dot={false} />
                 </LineChart>
@@ -259,7 +259,7 @@ const AnalyticsPage: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+                  tick={{ fontSize: 'var(--font-size-caption)', fill: 'var(--color-text-muted)' }}
                   tickFormatter={(v) =>
                     new Date(v).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short' })
                   }
@@ -268,7 +268,7 @@ const AnalyticsPage: React.FC = () => {
                   interval={Math.max(0, Math.floor(chartData.length / 6))}
                 />
                 <YAxis
-                  tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+                  tick={{ fontSize: 'var(--font-size-caption)', fill: 'var(--color-text-muted)' }}
                   axisLine={false}
                   tickLine={false}
                   allowDecimals={false}
@@ -278,7 +278,7 @@ const AnalyticsPage: React.FC = () => {
                     backgroundColor: 'var(--color-surface)',
                     border: '1px solid var(--color-border)',
                     borderRadius: '0.75rem',
-                    fontSize: '12px',
+                    fontSize: 'var(--font-size-label)',
                     color: 'var(--color-text)',
                   }}
                   labelFormatter={(v) =>
@@ -289,7 +289,7 @@ const AnalyticsPage: React.FC = () => {
                     })
                   }
                 />
-                <Legend wrapperStyle={{ fontSize: '12px' }} />
+                <Legend wrapperStyle={{ fontSize: 'var(--font-size-label)' }} />
                 <Line
                   type="monotone"
                   dataKey="visitors"
@@ -340,17 +340,17 @@ const AnalyticsPage: React.FC = () => {
               <div className="p-4 rounded-xl bg-primary-500/10 border border-primary-500/20">
                 <div className="text-xs font-semibold text-primary-600 dark:text-primary-400">{t('analyticsPage.funnelViews')}</div>
                 <div className="text-2xl font-bold text-app mt-1">{formatMetric(funnel.visits)}</div>
-                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelVisits')}</div>
+                <div className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.funnelVisits')}</div>
               </div>
               <div className="p-4 rounded-xl bg-surface-soft border border-line">
                 <div className="text-xs font-semibold text-info dark:text-info">{t('analyticsPage.funnelFavorites')}</div>
                 <div className="text-2xl font-bold text-app mt-1">{formatMetric(funnel.favorites)}</div>
-                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: formatRate(funnel.favoriteRate) })}</div>
+                <div className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: formatRate(funnel.favoriteRate) })}</div>
               </div>
               <div className="p-4 rounded-xl bg-surface-soft border border-line">
                 <div className="text-xs font-semibold text-success dark:text-success">{t('analyticsPage.funnelOrders')}</div>
                 <div className="text-2xl font-bold text-app mt-1">{formatMetric(funnel.paidOrders)}</div>
-                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: formatRate(funnel.orderRate) })}</div>
+                <div className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: formatRate(funnel.orderRate) })}</div>
               </div>
             </div>
           </div>

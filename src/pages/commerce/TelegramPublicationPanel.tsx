@@ -182,7 +182,7 @@ export function TelegramPublicationPanel({
               <div className="space-y-2 p-3">
                 <h4 className="font-bold">{preview.title}</h4>
                 <p className="whitespace-pre-wrap break-words text-sm">{preview.captionText}</p>
-                <a href={preview.productUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center rounded-lg bg-surface-soft px-4 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                <a href={preview.productUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center rounded-lg bg-primary px-4 text-sm font-bold text-[var(--color-on-primary)] hover:bg-[var(--color-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                   {preview.buttonText}
                 </a>
               </div>

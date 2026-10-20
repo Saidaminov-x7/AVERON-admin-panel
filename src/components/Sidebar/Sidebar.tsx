@@ -229,7 +229,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
             <span className={compact ? "hidden lg:inline" : ""}>AVERON</span>
             <span className={compact ? "lg:hidden" : "hidden"}>A</span>
           </span>
-          {!compact && <span className="mt-1 block text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</span>}
+          {!compact && <span className="mt-1 block text-[length:var(--font-size-caption)] font-bold tracking-[.18em] text-muted">ADMIN</span>}
         </button>
 
         <button
@@ -259,7 +259,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
       <nav ref={navRef} className="admin-sidebar-nav min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-3 py-5" aria-label={t("header.mobileNavigation")}>
         {sections.map(({ titleKey, items }) => (
           <section key={titleKey} aria-label={t(titleKey)}>
-            <h2 className={`admin-sidebar-section-title mb-2 px-3 text-[10px] font-bold tracking-[.12em] text-muted ${compact ? "lg:sr-only" : ""}`}>
+            <h2 className={`admin-sidebar-section-title mb-2 px-3 text-[length:var(--font-size-caption)] font-bold tracking-[.12em] text-muted ${compact ? "lg:sr-only" : ""}`}>
               {t(titleKey)}
             </h2>
             <div className="space-y-1">
@@ -291,10 +291,10 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
           key={isMobileOpen ? "mobile-open" : "mobile-closed"}
           portal
           className="min-w-0 flex-1"
-          contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
+          contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-2"
           trigger={(
             <span className="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)]">
-              <span className="flex min-w-0 items-center gap-2.5">
+              <span className="flex min-w-0 items-center gap-3">
                 <LanguageFlag locale={i18n.language.startsWith("uz") ? "uz" : i18n.language.startsWith("en") ? "en" : "ru"} />
                 <span className="truncate">{languages.find(({ code }) => i18n.language.startsWith(code))?.name ?? languages[0].name}</span>
               </span>

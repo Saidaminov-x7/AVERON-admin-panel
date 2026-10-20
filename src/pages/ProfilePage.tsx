@@ -179,7 +179,7 @@ const ProfilePage: React.FC = () => {
               )}
               <label
                 htmlFor="avatar-upload"
-                className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-surface border border-app shadow-md cursor-pointer hover:bg-surface-soft dark:hover:bg-white/10 text-muted hover:text-app transition-all"
+                className="absolute -bottom-1 -right-1 p-2 rounded-lg bg-surface border border-app shadow-md cursor-pointer hover:bg-surface-soft dark:hover:bg-white/10 text-muted hover:text-app transition-all"
                 title="Загрузить новое фото"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -200,11 +200,11 @@ const ProfilePage: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold text-app">{profile?.name}</h2>
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400">
+                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400">
                   {roleTitles[profile?.adminRole || 'SUPER_ADMIN'] || 'Администратор'}
                 </span>
               </div>
-              <p className="text-sm text-muted mt-0.5">{profile?.email}</p>
+              <p className="text-sm text-muted mt-1">{profile?.email}</p>
               <div className="flex items-center gap-4 text-xs text-muted mt-2">
                 <span>
                   Вход:{' '}
@@ -251,7 +251,7 @@ const ProfilePage: React.FC = () => {
 
           <form onSubmit={handleProfileSubmit} className="space-y-4 max-w-md">
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Имя</label>
+              <label className="block text-sm font-medium text-app mb-2">Имя</label>
               <input
                 type="text"
                 value={name}
@@ -262,7 +262,7 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Email (только чтение)</label>
+              <label className="block text-sm font-medium text-app mb-2">Email (только чтение)</label>
               <input
                 type="email"
                 value={profile?.email || ''}
@@ -272,7 +272,7 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Телефон</label>
+              <label className="block text-sm font-medium text-app mb-2">Телефон</label>
               <input
                 type="text"
                 value={profile?.phone || ''}
@@ -282,7 +282,7 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="profile-telegram-id" className="block text-sm font-medium text-app mb-1.5">{t('profile.telegramId')}</label>
+              <label htmlFor="profile-telegram-id" className="block text-sm font-medium text-app mb-2">{t('profile.telegramId')}</label>
               <input
                 id="profile-telegram-id"
                 type="text"
@@ -326,7 +326,7 @@ const ProfilePage: React.FC = () => {
 
           <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-md">
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Текущий пароль</label>
+              <label className="block text-sm font-medium text-app mb-2">Текущий пароль</label>
               <input
                 type="password"
                 value={currentPassword}
@@ -337,7 +337,7 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Новый пароль</label>
+              <label className="block text-sm font-medium text-app mb-2">Новый пароль</label>
               <input
                 type="password"
                 value={newPassword}
@@ -351,7 +351,7 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Подтверждение нового пароля</label>
+              <label className="block text-sm font-medium text-app mb-2">Подтверждение нового пароля</label>
               <input
                 type="password"
                 value={confirmPassword}

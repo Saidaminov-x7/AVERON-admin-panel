@@ -74,7 +74,7 @@ const ExportReportsPage: React.FC = () => {
                 <label
                   key={r.id}
                   className={`
-                    flex items-start gap-3.5 p-4 rounded-xl border cursor-pointer transition-all
+                    flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all
                     ${
                       selectedType === r.id
                         ? 'border-primary-500 bg-primary-50/40 dark:bg-primary-950/40 ring-2 ring-primary-500/20'
@@ -105,7 +105,7 @@ const ExportReportsPage: React.FC = () => {
           {/* Выбор дат */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 pt-4 border-t border-app">
             <div>
-              <label className="block text-xs font-semibold text-app mb-1.5">Дата начала</label>
+              <label className="block text-xs font-semibold text-app mb-2">Дата начала</label>
               <input
                 type="date"
                 value={dateFrom}
@@ -114,7 +114,7 @@ const ExportReportsPage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-app mb-1.5">Дата окончания</label>
+              <label className="block text-xs font-semibold text-app mb-2">Дата окончания</label>
               <input
                 type="date"
                 value={dateTo}

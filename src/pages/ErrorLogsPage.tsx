@@ -52,7 +52,7 @@ const ErrorLogsPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => { setResolvedFilter('unresolved'); setPage(1); }}
-                className={`px-3 py-1.5 transition-colors cursor-pointer ${
+                className={`px-3 py-2 transition-colors cursor-pointer ${
                   resolvedFilter === 'unresolved' ? 'bg-primary-500 text-white' : 'text-muted hover:text-app'
                 }`}
               >
@@ -61,7 +61,7 @@ const ErrorLogsPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => { setResolvedFilter('resolved'); setPage(1); }}
-                className={`px-3 py-1.5 transition-colors cursor-pointer ${
+                className={`px-3 py-2 transition-colors cursor-pointer ${
                   resolvedFilter === 'resolved' ? 'bg-primary-500 text-white' : 'text-muted hover:text-app'
                 }`}
               >
@@ -70,7 +70,7 @@ const ErrorLogsPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => { setResolvedFilter('all'); setPage(1); }}
-                className={`px-3 py-1.5 transition-colors cursor-pointer ${
+                className={`px-3 py-2 transition-colors cursor-pointer ${
                   resolvedFilter === 'all' ? 'bg-primary-500 text-white' : 'text-muted hover:text-app'
                 }`}
               >
@@ -122,7 +122,7 @@ const ErrorLogsPage: React.FC = () => {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className="flex-shrink-0 mt-0.5">
+                      <div className="flex-shrink-0 mt-1">
                         <AlertTriangle
                           size={18}
                           className={
@@ -182,7 +182,7 @@ const ErrorLogsPage: React.FC = () => {
                           resolveMutation.mutate(err.id);
                         }}
                         disabled={resolveMutation.isPending}
-                        className="btn-ghost text-xs py-1 px-2.5 flex-shrink-0 text-success dark:text-success hover:bg-surface-soft dark:hover:bg-surface-soft cursor-pointer"
+                        className="btn-ghost text-xs py-1 px-3 flex-shrink-0 text-success dark:text-success hover:bg-surface-soft dark:hover:bg-surface-soft cursor-pointer"
                       >
                         {t('reports.resolved', 'Решено')}
                       </button>

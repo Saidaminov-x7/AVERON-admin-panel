@@ -130,7 +130,7 @@ export const MediaLibraryPage: React.FC = () => {
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-app tracking-tight flex items-center gap-2.5">
+            <h1 className="text-xl sm:text-2xl font-black text-app tracking-tight flex items-center gap-3">
               <span>{t('media.title', 'Медиа-библиотека')}</span>
               <Badge variant="primary" size="sm">
                 {t('media.filesCount', { count: total, defaultValue: `${total} файлов` })}
@@ -139,12 +139,12 @@ export const MediaLibraryPage: React.FC = () => {
                 {formatFileSize(data?.meta?.totalBytes || 0)} {t('media.used', 'занято')}
               </Badge>
             </h1>
-            <p className="text-xs text-muted mt-0.5">
+            <p className="text-xs text-muted mt-1">
               {t('media.subtitle', 'Хранилище загруженных изображений и медиаресурсов платформы')}
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -192,7 +192,7 @@ export const MediaLibraryPage: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 self-end sm:self-auto">
+          <div className="flex items-center gap-2 self-end sm:self-auto">
             <button
               type="button"
               onClick={() => setViewMode('grid')}
@@ -278,7 +278,7 @@ export const MediaLibraryPage: React.FC = () => {
                   </div>
 
                   {/* Footer overlay */}
-                  <div className="p-2 flex items-center justify-between text-[11px] text-muted border-t border-app">
+                  <div className="p-2 flex items-center justify-between text-[length:var(--font-size-caption)] text-muted border-t border-app">
                     <span className="truncate">{formatFileSize(item.size)}</span>
                     <div className="flex items-center gap-1">
                       <button
@@ -342,7 +342,7 @@ export const MediaLibraryPage: React.FC = () => {
                     >
                       {item.url.split('/').pop()}
                     </p>
-                    <p className="text-[11px] text-muted font-mono mt-0.5">
+                    <p className="text-[length:var(--font-size-caption)] text-muted font-mono mt-1">
                       {formatFileSize(item.size)} • {item.mimeType} • {new Date(item.createdAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -440,7 +440,7 @@ export const MediaLibraryPage: React.FC = () => {
                     href={selectedImage.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="btn-primary text-xs flex items-center gap-1.5"
+                    className="btn-primary text-xs flex items-center gap-2"
                   >
                     {t('media.openNewTab', 'Открыть в новой вкладке')} <ExternalLink size={14} />
                   </a>
@@ -459,25 +459,25 @@ export const MediaLibraryPage: React.FC = () => {
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">{t('media.fileSize', 'Размер файла')}:</span>
+                  <span className="text-muted block text-[length:var(--font-size-caption)]">{t('media.fileSize', 'Размер файла')}:</span>
                   <strong className="text-app">{formatFileSize(selectedImage.size)}</strong>
                 </Card>
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">MIME-{t('media.type', 'тип')}:</span>
+                  <span className="text-muted block text-[length:var(--font-size-caption)]">MIME-{t('media.type', 'тип')}:</span>
                   <strong className="text-app font-mono">{selectedImage.mimeType}</strong>
                 </Card>
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">{t('media.createdAt', 'Дата создания')}:</span>
+                  <span className="text-muted block text-[length:var(--font-size-caption)]">{t('media.createdAt', 'Дата создания')}:</span>
                   <strong className="text-app">{new Date(selectedImage.createdAt).toLocaleDateString()}</strong>
                 </Card>
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">{t('media.fileId', 'ID файла')}:</span>
-                  <strong className="text-app font-mono text-[10px] truncate block">{selectedImage.id}</strong>
+                  <span className="text-muted block text-[length:var(--font-size-caption)]">{t('media.fileId', 'ID файла')}:</span>
+                  <strong className="text-app font-mono text-[length:var(--font-size-caption)] truncate block">{selectedImage.id}</strong>
                 </Card>
               </div>
 
               <div className="p-3 rounded-xl bg-surface-soft dark:bg-white/5 border border-app text-xs flex items-center justify-between gap-3">
-                <span className="font-mono text-muted truncate text-[11px]">{selectedImage.url}</span>
+                <span className="font-mono text-muted truncate text-[length:var(--font-size-caption)]">{selectedImage.url}</span>
                 <Button
                   variant="ghost"
                   size="sm"

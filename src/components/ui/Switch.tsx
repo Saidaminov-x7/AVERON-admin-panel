@@ -38,7 +38,7 @@ export const Switch: React.FC<SwitchProps> = ({
       {(label || description) && (
         <div className="text-xs mr-2">
           {label && <span className="font-medium text-app block">{label}</span>}
-          {description && <span className="text-muted block mt-0.5">{description}</span>}
+          {description && <span className="text-muted block mt-1">{description}</span>}
         </div>
       )}
       <button

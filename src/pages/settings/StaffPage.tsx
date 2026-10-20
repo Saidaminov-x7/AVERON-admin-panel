@@ -128,7 +128,7 @@ const StaffPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold text-app">{t('nav.staff', 'Администраторы и персонал')}</h2>
-            <p className="text-xs text-muted mt-0.5">
+            <p className="text-xs text-muted mt-1">
               Управление правами доступа к модулям админ-панели. Доступно исключительно Супер-Администратору.
             </p>
           </div>
@@ -150,11 +150,11 @@ const StaffPage: React.FC = () => {
             <table className="w-full text-left text-sm">
               <thead className="bg-surface-soft dark:bg-white/5 border-b border-app text-xs uppercase text-muted font-semibold">
                 <tr>
-                  <th className="px-6 py-3.5">{t('users.name', 'Сотрудник')}</th>
-                  <th className="px-6 py-3.5">{t('users.role', 'Роль в панели')}</th>
-                  <th className="px-6 py-3.5">{t('users.lastActive', 'Последний вход')}</th>
-                  <th className="px-6 py-3.5">{t('users.registeredAt', 'Дата добавления')}</th>
-                  <th className="px-6 py-3.5 text-right">{t('common.actions', 'Действия')}</th>
+                  <th className="px-6 py-4">{t('users.name', 'Сотрудник')}</th>
+                  <th className="px-6 py-4">{t('users.role', 'Роль в панели')}</th>
+                  <th className="px-6 py-4">{t('users.lastActive', 'Последний вход')}</th>
+                  <th className="px-6 py-4">{t('users.registeredAt', 'Дата добавления')}</th>
+                  <th className="px-6 py-4 text-right">{t('common.actions', 'Действия')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-app">
@@ -193,10 +193,10 @@ const StaffPage: React.FC = () => {
                               </div>
                             )}
                             <div>
-                              <div className="font-semibold text-app flex items-center gap-1.5">
+                              <div className="font-semibold text-app flex items-center gap-2">
                                 {staff.name}
                                 {isSelf && (
-                                  <span className="text-[10px] bg-surface-soft dark:bg-white/10 px-1.5 py-0.2 rounded text-muted">
+                                  <span className="text-[length:var(--font-size-caption)] bg-surface-soft dark:bg-white/10 px-2 py-1 rounded text-muted">
                                     Вы
                                   </span>
                                 )}
@@ -208,7 +208,7 @@ const StaffPage: React.FC = () => {
 
                         <td className="px-6 py-4">
                           {isPrimarySuperAdmin ? (
-                            <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${roleMeta.color}`}>
+                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${roleMeta.color}`}>
                               {roleMeta.label}
                             </span>
                           ) : (
@@ -269,8 +269,8 @@ const StaffPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {(Object.entries(roleLabels) as [AdminRoleType, (typeof roleLabels)[AdminRoleType]][]).map(
               ([key, meta]) => (
-                <div key={key} className="p-3.5 rounded-xl border border-app bg-surface-soft dark:bg-white/5 space-y-1.5">
-                  <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${meta.color}`}>
+                <div key={key} className="p-4 rounded-xl border border-app bg-surface-soft dark:bg-white/5 space-y-2">
+                  <span className={`inline-block px-2 py-1 rounded text-[length:var(--font-size-caption)] font-bold ${meta.color}`}>
                     {meta.label}
                   </span>
                   <p className="text-xs text-muted leading-relaxed">{meta.desc}</p>
@@ -319,7 +319,7 @@ const StaffPage: React.FC = () => {
                     required
                     className="input"
                   />
-                  <p className="text-[11px] text-muted mt-1">
+                  <p className="text-[length:var(--font-size-caption)] text-muted mt-1">
                     Если аккаунт уже зарегистрирован на сайте — ему будет назначена выбранная роль. Если нет — аккаунт будет создан.
                   </p>
                 </div>

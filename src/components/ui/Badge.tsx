@@ -42,8 +42,8 @@ export const Badge: React.FC<BadgeProps> = ({
     <span
       className={twMerge(
         clsx(
-          'inline-flex items-center gap-1.5 font-semibold rounded-full border transition-colors select-none',
-          size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs',
+          'inline-flex items-center gap-2 font-semibold rounded-full border transition-colors select-none',
+          size === 'sm' ? 'px-2 py-1 text-[length:var(--font-size-caption)]' : 'px-3 py-1 text-xs',
           variantStyles,
         ),
         className,

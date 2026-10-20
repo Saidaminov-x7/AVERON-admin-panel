@@ -47,7 +47,7 @@ export function Table<T extends { id?: string | number }>({
             {columns.map((col, idx) => (
               <th
                 key={idx}
-                className={`py-3.5 px-4 ${col.headerClassName || ''}`}
+                className={`py-4 px-4 ${col.headerClassName || ''}`}
               >
                 {col.header}
               </th>
@@ -68,7 +68,7 @@ export function Table<T extends { id?: string | number }>({
               {columns.map((col, colIdx) => (
                 <td
                   key={colIdx}
-                  className={`py-3.5 px-4 text-text ${col.className || ''}`}
+                  className={`py-4 px-4 text-text ${col.className || ''}`}
                 >
                   {typeof col.accessor === 'function'
                     ? col.accessor(row)

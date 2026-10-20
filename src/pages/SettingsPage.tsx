@@ -93,7 +93,7 @@ const SettingsPage: React.FC = () => {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h2 className="text-base font-semibold text-app">Режим обслуживания сайта</h2>
-              <p className="text-sm text-muted mt-0.5">
+              <p className="text-sm text-muted mt-1">
                 При включении пользователи будут перенаправлены на страницу технических работ.
                 Вы всегда сможете зайти в админку и отключить режим.
               </p>
@@ -130,7 +130,7 @@ const SettingsPage: React.FC = () => {
 
           {/* Сообщение */}
           <div>
-            <label htmlFor="maintenance-message" className="block text-sm font-medium text-app mb-1.5">
+            <label htmlFor="maintenance-message" className="block text-sm font-medium text-app mb-2">
               Сообщение для пользователей
             </label>
             <textarea
@@ -201,7 +201,7 @@ const SettingsPage: React.FC = () => {
                 <button
                   onClick={handleDeleteLogo}
                   disabled={deleteLogoMutation.isPending}
-                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-surface-soft text-white flex items-center justify-center text-xs hover:bg-surface-soft disabled:opacity-50"
+                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-surface-soft text-error flex items-center justify-center text-xs hover:bg-surface-soft disabled:opacity-50"
                 >
                   ×
                 </button>
@@ -287,7 +287,7 @@ const SettingsPage: React.FC = () => {
                     newLinks.splice(index, 1);
                     setNavLinks(newLinks);
                   }}
-                  className="p-1.5 text-error hover:bg-surface-soft dark:hover:bg-surface-soft rounded-lg"
+                  className="p-2 text-error hover:bg-surface-soft dark:hover:bg-surface-soft rounded-lg"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <polyline points="3 6 5 6 21 6" />
@@ -323,7 +323,7 @@ const SettingsPage: React.FC = () => {
               { label: 'Admin Panel', value: 'Vite + React + TanStack Query' },
               { label: 'API URL', value: import.meta.env.VITE_API_URL || 'localhost:3000' },
             ].map(({ label, value }) => (
-              <div key={label} className="flex items-center justify-between py-1.5 border-b border-app last:border-0">
+              <div key={label} className="flex items-center justify-between py-2 border-b border-app last:border-0">
                 <dt className="text-muted">{label}</dt>
                 <dd className="font-medium text-app font-mono text-xs">{value}</dd>
               </div>

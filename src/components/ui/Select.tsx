@@ -238,7 +238,7 @@ export const Select: React.FC<SelectProps> = ({
                 e.stopPropagation();
                 onChange('');
               }}
-              className="p-0.5 hover:text-app rounded-md hover:bg-surface-soft dark:hover:bg-white/10"
+              className="p-1 hover:text-app rounded-md hover:bg-surface-soft dark:hover:bg-white/10"
             >
               <X size={14} />
             </span>
@@ -276,13 +276,13 @@ export const Select: React.FC<SelectProps> = ({
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Поиск..."
-                  className="w-full h-8 pl-8 pr-2.5 text-xs rounded-lg bg-surface-soft dark:bg-white/5 border border-app text-app outline-none focus:border-primary-500"
+                  className="w-full h-8 pl-8 pr-3 text-xs rounded-lg bg-surface-soft dark:bg-white/5 border border-app text-app outline-none focus:border-primary-500"
                 />
               </div>
             </div>
           )}
 
-          <div className="min-h-0 flex-1 overflow-y-auto p-1 space-y-0.5">
+          <div className="min-h-0 flex-1 overflow-y-auto p-1 space-y-1">
             {filteredOptions.length === 0 ? (
               <div className="py-4 text-center text-xs text-muted">Ничего не найдено</div>
             ) : (
@@ -315,7 +315,7 @@ export const Select: React.FC<SelectProps> = ({
                       {option.description && (
                         <span
                           className={clsx(
-                            'text-[10px] truncate',
+                            'text-[length:var(--font-size-caption)] truncate',
                             isSelected ? 'text-white/80' : 'text-muted',
                           )}
                         >

@@ -134,7 +134,7 @@ export function Modal({
               <div className="col-start-1 row-start-1 min-w-0">
                 <div className="min-w-0">
                   <h3 id={`${dialogId}-title`} className="text-base font-bold text-app truncate">{title}</h3>
-                  {subtitle && <p id={`${dialogId}-description`} className="text-xs text-muted truncate mt-0.5">{subtitle}</p>}
+                  {subtitle && <p id={`${dialogId}-description`} className="text-xs text-muted truncate mt-1">{subtitle}</p>}
                 </div>
               </div>
               {headerContent && (
