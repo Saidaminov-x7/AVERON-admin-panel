@@ -138,7 +138,7 @@ export default function CategoriesPage() {
       {categoriesQuery.isLoading ? (
         <div className="card">{t("products.loading")}</div>
       ) : categoriesQuery.isError ? (
-        <div role="alert" className="card text-red-500">{t("categories.loadError")}</div>
+        <div role="alert" className="card text-error">{t("categories.loadError")}</div>
       ) : categories.length ? (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {categories.map((category) => (
@@ -169,7 +169,7 @@ export default function CategoriesPage() {
                   {category.active === false ? (
                     <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: true })} className="btn-ghost" aria-label={t("categories.restore")}><RotateCcw size={16} /></button>
                   ) : (
-                    <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: false })} className="btn-ghost text-red-500" aria-label={t("categories.archive")}><Archive size={16} /></button>
+                    <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: false })} className="btn-ghost text-error" aria-label={t("categories.archive")}><Archive size={16} /></button>
                   )}
                 </div>
               </div>

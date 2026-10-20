@@ -405,7 +405,7 @@ export default function ProductsPage() {
         >
           <label className="min-w-0 flex-1 text-xs font-semibold text-muted">
             {t("products.searchProducts")}
-            <input id="admin-product-search" name="searchProducts" type="search" className="input mt-1.5 w-full" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} />
+            <input id="admin-product-search" name="searchProducts" type="search" className="input mt-2 w-full" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} />
           </label>
           <button type="submit" className="btn-primary h-10">{t("products.searchAction")}</button>
         </form>
@@ -493,21 +493,21 @@ export default function ProductsPage() {
                       <span className="text-xs">AVERON</span>
                     </div>
                   )}
-                  <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm ${product.status === "PUBLISHED" ? "bg-emerald-600 text-white" : product.status === "DRAFT" ? "bg-sky-600 text-white" : "bg-neutral-700 text-white"}`}>
+                  <span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[length:var(--font-size-caption)] font-bold uppercase tracking-wide shadow-sm ${product.status === "PUBLISHED" ? "bg-success text-on-primary" : product.status === "DRAFT" ? "bg-warning text-ink" : "bg-error text-on-primary"}`}>
                     {t(`products.status.${product.status.toLowerCase()}`)}
                   </span>
                 </div>
                 <div className="p-4">
                   {product.variants?.some((variant) => variant.color?.includes("::")) ? (
-                    <div className="mb-3 flex items-center gap-1.5">
+                    <div className="mb-3 flex items-center gap-2">
                       {product.variants.filter((variant) => variant.color?.includes("::")).slice(0, 6).map((variant) => {
                         const [name, hex] = variant.color!.split("::");
                         return <span key={variant.id} title={name} className="size-3.5 rounded-full border border-black/10" style={{ backgroundColor: hex }} />;
                       })}
-                      {product.variants.filter((variant) => variant.color?.includes("::")).length > 6 ? <span className="text-[11px] text-muted">+{product.variants.filter((variant) => variant.color?.includes("::")).length - 6}</span> : null}
+                      {product.variants.filter((variant) => variant.color?.includes("::")).length > 6 ? <span className="text-[length:var(--font-size-caption)] text-muted">+{product.variants.filter((variant) => variant.color?.includes("::")).length - 6}</span> : null}
                     </div>
                   ) : null}
-                  <p className="text-[10px] font-semibold uppercase tracking-[.12em] text-muted">{getCountryLabel(product.country)}</p>
+                  <p className="text-[length:var(--font-size-caption)] font-semibold uppercase tracking-[.12em] text-muted">{getCountryLabel(product.country)}</p>
                   <h2 className="mt-1 line-clamp-2 min-h-10 text-sm font-semibold leading-5">{title}</h2>
                   <p className="mt-1 text-xs text-muted">{product.category
                     ? (typeof product.category.name === "string" ? product.category.name : product.category.name.ru || product.category.name.en || product.category.slug)
@@ -546,7 +546,7 @@ export default function ProductsPage() {
                     )}
                     <button type="button" disabled={permanentDeleteMutation.isPending} onClick={() => {
                       if (window.confirm(`Удалить «${title}» навсегда? Это действие нельзя отменить.`)) permanentDeleteMutation.mutate(product.id);
-                    }} className="inline-flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50" aria-label={`Удалить ${title} навсегда`}><Trash2 size={15} /></button>
+                    }} className="inline-flex size-9 items-center justify-center rounded-lg border border-line text-error hover:bg-surface-soft disabled:opacity-50" aria-label={`Удалить ${title} навсегда`}><Trash2 size={15} /></button>
                   </div>
                 </div>
               </article>

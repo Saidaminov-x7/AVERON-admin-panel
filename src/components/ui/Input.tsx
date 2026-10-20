@@ -59,8 +59,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               clsx(
                 fieldControlClass,
                 'h-10 font-theme',
-                leftIcon ? 'pl-9' : '',
-                rightIcon ? 'pr-9' : '',
+                leftIcon ? 'pl-10' : '',
+                rightIcon ? 'pr-10' : '',
                 error && fieldErrorClass,
               ),
               className,
@@ -74,7 +74,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error ? (
-          <p id={errorId} className={`${fieldMessageClass} text-red-500`}>{error}</p>
+          <p id={errorId} className={`${fieldMessageClass} text-error`}>{error}</p>
         ) : helperText ? (
           <p id={helperTextId} className="text-xs text-muted">{helperText}</p>
         ) : null}

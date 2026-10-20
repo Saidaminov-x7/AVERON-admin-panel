@@ -29,7 +29,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         className,
       )}
     >
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-muted mb-4 shadow-xs">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-soft dark:bg-white/5 text-muted mb-4 shadow-xs">
         {icon || <Inbox size={28} strokeWidth={1.5} />}
       </div>
       <h3 className="text-base font-bold text-app">{title}</h3>

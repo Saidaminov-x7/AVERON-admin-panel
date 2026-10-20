@@ -18,7 +18,7 @@ const DropdownItem: React.FC<DropdownItemProps> = ({ children, onClick, classNam
       disabled={disabled}
       className={`
         w-full px-4 py-2 text-left text-sm transition-colors
-        ${disabled ? 'text-muted cursor-not-allowed' : 'text-app hover:bg-gray-100 dark:hover:bg-white/5'}
+        ${disabled ? 'text-muted cursor-not-allowed' : 'text-app hover:bg-surface-soft dark:hover:bg-white/5'}
         ${className}
       `}
     >

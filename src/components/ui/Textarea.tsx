@@ -83,7 +83,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           {...props}
         />
         {error ? (
-          <p id={errorId} className={`${fieldMessageClass} text-red-500`}>{error}</p>
+          <p id={errorId} className={`${fieldMessageClass} text-error`}>{error}</p>
         ) : helperText ? (
           <p id={helperTextId} className="text-xs text-muted">{helperText}</p>
         ) : null}

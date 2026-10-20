@@ -28,13 +28,13 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 }) => {
   const iconConfig = {
     danger: {
-      icon: <AlertTriangle size={24} className="text-red-500" />,
-      bg: 'bg-red-50 dark:bg-red-950/40',
+      icon: <AlertTriangle size={24} className="text-error" />,
+      bg: 'bg-surface-soft dark:bg-surface-soft',
       btnVariant: 'danger' as const,
     },
     warning: {
-      icon: <AlertTriangle size={24} className="text-amber-500" />,
-      bg: 'bg-amber-50 dark:bg-amber-950/40',
+      icon: <AlertTriangle size={24} className="text-warning" />,
+      bg: 'bg-surface-soft dark:bg-surface-soft',
       btnVariant: 'primary' as const,
     },
     primary: {
@@ -51,7 +51,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       title={title}
       size="sm"
       footer={
-        <div className="flex items-center justify-end gap-2.5 w-full">
+        <div className="flex items-center justify-end gap-3 w-full">
           <Button variant="ghost" size="sm" onClick={onClose} disabled={loading}>
             {cancelLabel}
           </Button>

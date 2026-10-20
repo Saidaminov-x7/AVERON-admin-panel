@@ -1,5 +1,5 @@
 export function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse rounded-lg bg-gray-200 dark:bg-white/10 ${className}`} />;
+  return <div className={`animate-pulse rounded-lg bg-surface-soft dark:bg-white/10 ${className}`} />;
 }
 
 export function TableSkeleton({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {

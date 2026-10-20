@@ -153,7 +153,7 @@ const UserProfilePage: React.FC = () => {
               <div className="flex gap-2 mt-6">
                 {user.isBlocked ? (
                   <button
-                    className="btn-ghost gap-1 cursor-pointer text-emerald-600"
+                    className="btn-ghost gap-1 cursor-pointer text-success"
                     onClick={() => unblockMutation.mutate()}
                     disabled={unblockMutation.isPending}
                   >
@@ -186,7 +186,7 @@ const UserProfilePage: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('ai')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-1.5 ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-2 ${
                 activeTab === 'ai' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
               }`}
             >
@@ -208,7 +208,7 @@ const UserProfilePage: React.FC = () => {
             >
               {t('auditLog.title', 'Админ-аудит')} ({auditLogs?.length || 0})
             </button>
-            <button onClick={() => setActiveTab('sessions')} className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-1.5 ${activeTab === 'sessions' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'}`}>
+            <button onClick={() => setActiveTab('sessions')} className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-2 ${activeTab === 'sessions' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'}`}>
               <MonitorSmartphone size={14}/> Сессии ({sessions.length})
             </button>
           </nav>
@@ -254,7 +254,7 @@ const UserProfilePage: React.FC = () => {
                     </div>
                     <div className="space-y-2">
                       {session.messages.map((message: any) => (
-                        <div key={message.id} className={`max-w-full break-words rounded-lg px-3 py-2 text-xs ${message.role === 'user' ? 'ml-auto bg-primary-500 text-white' : 'bg-gray-100 text-app dark:bg-white/5'}`}>
+                        <div key={message.id} className={`max-w-full break-words rounded-lg px-3 py-2 text-xs ${message.role === 'user' ? 'ml-auto bg-primary-500 text-white' : 'bg-surface-soft text-app dark:bg-white/5'}`}>
                           <span className="mb-1 block font-semibold">{message.role === 'user' ? 'Пользователь' : 'AVERON AI'}</span>
                           {message.content}
                         </div>
@@ -278,9 +278,9 @@ const UserProfilePage: React.FC = () => {
             ) : (
               <div className="divide-y divide-app">
                 {userActivity.items.map((act) => (
-                  <div key={act.id} className="p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                  <div key={act.id} className="p-4 hover:bg-surface-soft dark:hover:bg-white/5 transition-colors">
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-0.5">
+                      <div className="flex-shrink-0 mt-1">
                         <Activity size={18} className="text-primary-500" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -294,7 +294,7 @@ const UserProfilePage: React.FC = () => {
                                 : act.action}
                             </span>
                             {act.ip && (
-                              <span className="text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-white/10 text-muted font-mono">
+                              <span className="text-xs px-2 py-1 rounded bg-surface-soft dark:bg-white/10 text-muted font-mono">
                                 {act.ip}
                               </span>
                             )}
@@ -304,12 +304,12 @@ const UserProfilePage: React.FC = () => {
                           </span>
                         </div>
                         {act.meta && Object.keys(act.meta).length > 0 && (
-                          <pre className="text-xs text-emerald-400 bg-gray-900 dark:bg-black/90 p-2 rounded-xl mt-1 font-mono overflow-x-auto max-w-full border border-app">
+                          <pre className="text-xs text-success bg-page dark:bg-black/90 p-2 rounded-xl mt-1 font-mono overflow-x-auto max-w-full border border-app">
                             {JSON.stringify(act.meta, null, 2)}
                           </pre>
                         )}
                         {act.userAgent && (
-                          <div className="text-[11px] text-muted truncate mt-1">
+                          <div className="text-[length:var(--font-size-caption)] text-muted truncate mt-1">
                             {act.userAgent}
                           </div>
                         )}
@@ -331,15 +331,15 @@ const UserProfilePage: React.FC = () => {
             ) : (
               <div className="divide-y divide-app">
                 {auditLogs?.map((log) => (
-                  <div key={log.id} className="p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                  <div key={log.id} className="p-4 hover:bg-surface-soft dark:hover:bg-white/5 transition-colors">
                     <div className="flex items-start gap-3">
                       <div className="flex-shrink-0">
                         {log.action === 'USER_BLOCKED' ? (
-                          <Lock size={18} className="text-red-500" />
+                          <Lock size={18} className="text-error" />
                         ) : log.action === 'USER_UNBLOCKED' ? (
-                          <Unlock size={18} className="text-emerald-500" />
+                          <Unlock size={18} className="text-success" />
                         ) : log.action === 'USER_ROLE_CHANGED' ? (
-                          <Shield size={18} className="text-blue-500" />
+                          <Shield size={18} className="text-info" />
                         ) : (
                           <Clock size={18} className="text-muted" />
                         )}
@@ -373,7 +373,7 @@ const UserProfilePage: React.FC = () => {
             )}
           </div>
         )}
-        {activeTab === 'sessions' && <div className="card p-5"><h2 className="text-lg font-semibold text-app">Активные сессии</h2><p className="mt-1 text-sm text-muted">Устройства, на которых пользователь сейчас авторизован.</p><div className="mt-4 divide-y divide-app">{isSessionsLoading ? <div className="py-8 text-center text-muted">Загрузка…</div> : sessions.map((session) => <div key={session.id} className="flex items-center gap-3 py-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500"><MonitorSmartphone size={18}/></div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-app">{session.userAgent || 'Неизвестное устройство'}</p><p className="mt-1 text-xs text-muted">{session.ipAddress || 'IP скрыт'} · {format(new Date(session.lastSeenAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</p></div><button onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app text-muted hover:text-red-500" title="Завершить сессию"><X size={16}/></button></div>)}{!isSessionsLoading && !sessions.length ? <div className="py-8 text-center text-muted">Активных сессий нет.</div> : null}</div></div>}
+        {activeTab === 'sessions' && <div className="card p-5"><h2 className="text-lg font-semibold text-app">Активные сессии</h2><p className="mt-1 text-sm text-muted">Устройства, на которых пользователь сейчас авторизован.</p><div className="mt-4 divide-y divide-app">{isSessionsLoading ? <div className="py-8 text-center text-muted">Загрузка…</div> : sessions.map((session) => <div key={session.id} className="flex items-center gap-3 py-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500"><MonitorSmartphone size={18}/></div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-app">{session.userAgent || 'Неизвестное устройство'}</p><p className="mt-1 text-xs text-muted">{session.ipAddress || 'IP скрыт'} · {format(new Date(session.lastSeenAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</p></div><button onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app text-muted hover:text-error" title="Завершить сессию"><X size={16}/></button></div>)}{!isSessionsLoading && !sessions.length ? <div className="py-8 text-center text-muted">Активных сессий нет.</div> : null}</div></div>}
       </div>
     </Layout>
   );

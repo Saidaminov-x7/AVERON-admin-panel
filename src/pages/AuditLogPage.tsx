@@ -145,7 +145,7 @@ export const AuditLogPage: React.FC = () => {
         </div>
 
         {/* Фильтры */}
-        <Card className="border-stone-300/70 bg-surface p-4 dark:border-stone-700/80">
+        <Card className="border-line bg-surface p-4 dark:border-line">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <Input
               placeholder={t('auditLog.searchPlaceholder', 'Поиск по пользователю, ресурсу или ID...')}
@@ -180,23 +180,23 @@ export const AuditLogPage: React.FC = () => {
             description={debouncedSearch || actionFilter ? t('auditLog.noResultsFilter', 'Попробуйте изменить параметры поиска или фильтр') : t('auditLog.emptyLog', 'Журнал действий пока пуст')}
           />
         ) : (
-          <Card className="overflow-hidden border-stone-300/70 bg-surface p-0 shadow-xs dark:border-stone-700/80">
+          <Card className="overflow-hidden border-line bg-surface p-0 shadow-xs dark:border-line">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-stone-200 dark:border-stone-800 bg-gray-50/60 dark:bg-white/[0.02] text-muted font-semibold uppercase tracking-wider">
-                    <th className="py-3.5 px-4">{t('auditLog.actor', 'Инициатор')}</th>
-                    <th className="py-3.5 px-4">{t('auditLog.action', 'Действие')}</th>
-                    <th className="py-3.5 px-4">{t('auditLog.resource', 'Объект / Ресурс')}</th>
-                    <th className="py-3.5 px-4">{t('auditLog.details', 'Детали')}</th>
-                    <th className="py-3.5 px-4 text-right">{t('auditLog.timestamp', 'Время')}</th>
+                  <tr className="border-b border-line dark:border-line bg-surface-soft dark:bg-white/[0.02] text-muted font-semibold uppercase tracking-wider">
+                    <th className="py-4 px-4">{t('auditLog.actor', 'Инициатор')}</th>
+                    <th className="py-4 px-4">{t('auditLog.action', 'Действие')}</th>
+                    <th className="py-4 px-4">{t('auditLog.resource', 'Объект / Ресурс')}</th>
+                    <th className="py-4 px-4">{t('auditLog.details', 'Детали')}</th>
+                    <th className="py-4 px-4 text-right">{t('auditLog.timestamp', 'Время')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-200 dark:divide-stone-800">
                   {paginatedLogs.map((log: AuditLogItem) => (
                     <tr
                       key={log.id}
-                      className="hover:bg-gray-50/80 dark:hover:bg-white/[0.02] transition-colors"
+                      className="hover:bg-surface-soft dark:hover:bg-white/[0.02] transition-colors"
                     >
                       {/* Кто */}
                       <td className="py-3 px-4">
@@ -209,7 +209,7 @@ export const AuditLogPage: React.FC = () => {
                               {log.user?.name || (log.action === 'SECURITY_DENIED' ? t('auditLog.unauthorizedRequest', 'Неавторизованный запрос') : t('auditLog.system', 'Система'))}
                             </div>
                             {log.user?.email && (
-                              <div className="text-[11px] text-muted">{log.user.email}</div>
+                              <div className="text-[length:var(--font-size-caption)] text-muted">{log.user.email}</div>
                             )}
                           </div>
                         </div>
@@ -226,7 +226,7 @@ export const AuditLogPage: React.FC = () => {
                           {log.resource || '—'}
                         </div>
                         {log.resourceId && (
-                          <div className="text-[11px] text-muted font-mono truncate max-w-[200px]" title={log.resourceId}>
+                          <div className="text-[length:var(--font-size-caption)] text-muted font-mono truncate max-w-[200px]" title={log.resourceId}>
                             ID: {log.resourceId}
                           </div>
                         )}
@@ -238,12 +238,12 @@ export const AuditLogPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setSelectedMeta({ action: log.action, meta: log.meta! })}
-                            className="inline-flex items-center gap-1 text-[11px] font-medium text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
+                            className="inline-flex items-center gap-1 text-[length:var(--font-size-caption)] font-medium text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
                           >
                             <Info size={12} /> {t('common.details', 'Детали')}
                           </button>
                         ) : (
-                          <span className="text-muted text-[11px]">—</span>
+                          <span className="text-muted text-[length:var(--font-size-caption)]">—</span>
                         )}
                       </td>
 
@@ -252,7 +252,7 @@ export const AuditLogPage: React.FC = () => {
                         <div className="font-medium text-app">
                           {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true, locale: currentLocale })}
                         </div>
-                        <div className="text-[11px]">
+                        <div className="text-[length:var(--font-size-caption)]">
                           {new Date(log.timestamp).toLocaleString(i18n.language?.startsWith('en') ? 'en-US' : 'ru-RU')}
                         </div>
                       </td>
@@ -286,7 +286,7 @@ export const AuditLogPage: React.FC = () => {
           title={`${t('auditLog.details', 'Детали действия')}: ${selectedMeta?.action || ''}`}
         >
           <div className="p-4">
-            <pre className="p-3.5 rounded-xl bg-gray-900 text-emerald-400 dark:bg-black/90 dark:text-emerald-400 text-xs font-mono overflow-x-auto max-h-96 border border-app">
+            <pre className="p-4 rounded-xl bg-page text-success dark:bg-black/90 dark:text-success text-xs font-mono overflow-x-auto max-h-96 border border-app">
               {JSON.stringify(selectedMeta?.meta, null, 2)}
             </pre>
           </div>

@@ -219,7 +219,7 @@ const LoginPage: React.FC = () => {
         <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <div className="flex items-center gap-2">
             <span className="text-xl font-black tracking-[0.2em] text-app">AVERON</span>
-            <span className="bg-primary-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white">ADMIN</span>
+            <span className="bg-primary-500 px-2 py-1 text-[length:var(--font-size-caption)] font-bold uppercase tracking-widest text-white">ADMIN</span>
           </div>
           <ThemeToggle />
         </div>
@@ -259,7 +259,7 @@ const LoginPage: React.FC = () => {
             <form onSubmit={handleCredentialsSubmit} className="space-y-4">
               {/* Email */}
               <div>
-                <label htmlFor="login-email" className="block text-sm font-medium text-app mb-1.5">
+                <label htmlFor="login-email" className="block text-sm font-medium text-app mb-2">
                   Email
                 </label>
                 <input
@@ -276,7 +276,7 @@ const LoginPage: React.FC = () => {
 
               {/* Пароль */}
               <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-app mb-1.5">
+                <label htmlFor="login-password" className="block text-sm font-medium text-app mb-2">
                   Пароль
                 </label>
                 <div className="relative">
@@ -293,7 +293,7 @@ const LoginPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-app transition-colors"
+                    className="absolute right-1 top-1/2 grid size-11 -translate-y-1/2 place-items-center text-muted hover:text-app transition-colors"
                     tabIndex={-1}
                   >
                     {showPassword ? (
@@ -312,13 +312,13 @@ const LoginPage: React.FC = () => {
               </div>
 
               <div className="flex items-center text-sm">
-                <label className="flex items-center gap-2 cursor-pointer select-none text-app">
+                <label className="flex min-h-11 items-center gap-2 cursor-pointer select-none text-app">
                   <input
                     type="checkbox"
                     id="remember-me"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-4 h-4 cursor-pointer"
+                    className="rounded border-line text-primary-600 focus:ring-primary-500 w-4 h-4 cursor-pointer"
                   />
                   <span className="text-xs text-muted hover:text-app transition-colors">Запомнить меня</span>
                 </label>
@@ -326,8 +326,8 @@ const LoginPage: React.FC = () => {
 
               {/* Ошибка */}
               {error && (
-                <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5">
+                <div className="flex items-start gap-2 p-3 bg-surface-soft dark:bg-surface-soft border border-line dark:border-line rounded-lg text-sm text-error dark:text-error">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-1">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
                     <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -342,7 +342,7 @@ const LoginPage: React.FC = () => {
                 id="login-submit"
                 disabled={loading}
                 className="
-                  w-full py-2.5 px-4 rounded-lg font-medium text-sm text-white
+                  w-full py-3 px-4 rounded-lg font-medium text-sm text-white
                   bg-primary-500 hover:bg-primary-600 active:bg-primary-700
                   disabled:opacity-60 disabled:cursor-not-allowed
                   transition-all duration-150
@@ -370,14 +370,14 @@ const LoginPage: React.FC = () => {
                   </svg>
                 </div>
                 <div className="leading-tight">
-                  <p className="font-semibold text-sm mb-0.5">Telegram 2FA</p>
+                  <p className="font-semibold text-sm mb-1">Telegram 2FA</p>
                   <p className="opacity-90">{infoMessage || 'Проверьте сообщения в Telegram-боте'}</p>
                 </div>
               </div>
 
               {/* Поле ввода 6-значного кода */}
               <div>
-                <label htmlFor="2fa-code" className="block text-sm font-medium text-app mb-1.5">
+                <label htmlFor="2fa-code" className="block text-sm font-medium text-app mb-2">
                   6-значный код подтверждения
                 </label>
                 <input
@@ -398,8 +398,8 @@ const LoginPage: React.FC = () => {
 
               {/* Ошибка */}
               {error && (
-                <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5">
+                <div className="flex items-start gap-2 p-3 bg-surface-soft dark:bg-surface-soft border border-line dark:border-line rounded-lg text-sm text-error dark:text-error">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-1">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
                     <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -414,7 +414,7 @@ const LoginPage: React.FC = () => {
                 id="verify-2fa-submit"
                 disabled={loading || twoFactorCode.length !== 6}
                 className="
-                  w-full py-2.5 px-4 rounded-lg font-medium text-sm text-white
+                  w-full py-3 px-4 rounded-lg font-medium text-sm text-white
                   bg-primary-500 hover:bg-primary-600 active:bg-primary-700
                   disabled:opacity-60 disabled:cursor-not-allowed
                   transition-all duration-150
@@ -458,7 +458,7 @@ const LoginPage: React.FC = () => {
                 Подтвердите вход кодом из приложения-аутентификатора. Вместо него можно использовать резервный код.
               </div>
               <div>
-                <label htmlFor="totp-code" className="mb-1.5 block text-sm font-medium text-app">
+                <label htmlFor="totp-code" className="mb-2 block text-sm font-medium text-app">
                   Код подтверждения
                 </label>
                 <input
@@ -474,11 +474,11 @@ const LoginPage: React.FC = () => {
                   className="input text-center font-mono font-bold tracking-widest"
                 />
               </div>
-              {error && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">{error}</div>}
+              {error && <div role="alert" className="rounded-lg border border-line bg-surface-soft p-3 text-sm text-error dark:border-line dark:bg-surface-soft dark:text-error">{error}</div>}
               <button
                 type="submit"
                 disabled={loading || twoFactorCode.trim().length < 6}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-500 px-4 py-3 text-sm font-medium text-white transition-all hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? 'Проверка…' : 'Подтвердить и войти'}
               </button>

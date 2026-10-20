@@ -65,7 +65,6 @@ const GeneralSettingsPage: React.FC = () => {
       setContactPhone(settings.contactPhone === '+998 71 200-00-00' ? '' : settings.contactPhone || '');
       setMaintenanceMode(settings.maintenanceMode ?? false);
       setMaintenanceMessage(settings.maintenanceMessage || '');
-      setMaintenanceBypassPassword((settings as any).maintenanceBypassPassword || '');
       setMaintenancePasswordEnabled((settings as any).maintenancePasswordEnabled ?? false);
       setMobilePinchZoomEnabled((settings as any).mobilePinchZoomEnabled ?? true);
       setMaxProductPhotos(settings.maxProductPhotos ?? 15);
@@ -131,7 +130,7 @@ const GeneralSettingsPage: React.FC = () => {
       maintenanceMode,
       maintenanceMessage: maintenanceMessage.trim() || null,
       maintenancePasswordEnabled,
-      maintenanceBypassPassword: maintenanceBypassPassword.trim() || null,
+      ...(maintenanceBypassPassword.trim() ? { maintenanceBypassPassword: maintenanceBypassPassword.trim() } : {}),
       mobilePinchZoomEnabled,
       maxProductPhotos,
       maxProductPhotoSizeMb,
@@ -216,12 +215,12 @@ const GeneralSettingsPage: React.FC = () => {
           <Card
             title={t('settings.maintenanceMode', 'Режим технического обслуживания')}
             description={t('settings.maintenanceModeDesc', 'Если включено, публичная часть сайта будет недоступна для посетителей')}
-            className="border-amber-500/20 bg-amber-500/5"
+            className="border-line bg-surface-soft"
           >
             <div className="space-y-4 pt-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-soft text-warning dark:bg-surface-soft dark:text-warning">
                     <AlertTriangle size={20} />
                   </div>
                   <div>
@@ -256,7 +255,9 @@ const GeneralSettingsPage: React.FC = () => {
                         type="password"
                         value={maintenanceBypassPassword}
                         onChange={(e) => setMaintenanceBypassPassword(e.target.value)}
-                        placeholder={t('common.enterPassword', 'Введите пароль')}
+                        placeholder={(settings as any).maintenanceBypassPasswordConfigured
+                          ? t('settings.leaveBlankToKeepPassword', 'Оставьте пустым, чтобы сохранить текущий пароль')
+                          : t('common.enterPassword', 'Введите пароль')}
                         className="input max-w-xs"
                       />
                       <p className="text-xs text-muted mt-1">{t('settings.bypassPasswordHint', 'Пароль позволит входить в сайт, когда включён режим обслуживания.')}</p>
@@ -289,7 +290,7 @@ const GeneralSettingsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleLogoDelete}
-                    className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-2 -right-2 bg-surface-soft hover:bg-surface-soft text-error rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                     title={t('settings.deleteLogo', 'Удалить логотип')}
                   >
                     <Trash2 size={14} />
@@ -302,7 +303,7 @@ const GeneralSettingsPage: React.FC = () => {
                 </div>
               )}
 
-              <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-app bg-surface hover:bg-gray-50 dark:hover:bg-white/5 text-app text-sm font-medium cursor-pointer transition-colors">
+              <label className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-app bg-surface hover:bg-surface-soft dark:hover:bg-white/5 text-app text-sm font-medium cursor-pointer transition-colors">
                 <Upload size={16} />
                 <span>{t('settings.uploadNewLogo', 'Загрузить новый логотип')}</span>
                 <input
@@ -373,7 +374,7 @@ const GeneralSettingsPage: React.FC = () => {
               {navLinks.map((link, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-col sm:flex-row items-center gap-3 p-3.5 rounded-xl border border-app bg-surface"
+                  className="flex flex-col sm:flex-row items-center gap-3 p-4 rounded-xl border border-app bg-surface"
                 >
                   <div className="flex-1 w-full sm:w-auto">
                     <Input
@@ -419,7 +420,7 @@ const GeneralSettingsPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setNavLinks((prev) => prev.filter((_, i) => i !== idx))}
-                      className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+                      className="p-2 text-error hover:bg-surface-soft dark:hover:bg-surface-soft rounded-xl transition-colors"
                       title={t('settings.removeMenuItem', 'Удалить пункт меню')}
                     >
                       <Trash2 size={16} />

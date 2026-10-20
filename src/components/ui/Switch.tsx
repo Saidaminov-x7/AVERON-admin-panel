@@ -38,7 +38,7 @@ export const Switch: React.FC<SwitchProps> = ({
       {(label || description) && (
         <div className="text-xs mr-2">
           {label && <span className="font-medium text-app block">{label}</span>}
-          {description && <span className="text-muted block mt-0.5">{description}</span>}
+          {description && <span className="text-muted block mt-1">{description}</span>}
         </div>
       )}
       <button
@@ -51,7 +51,7 @@ export const Switch: React.FC<SwitchProps> = ({
           clsx(
             'relative inline-flex shrink-0 transition-colors duration-200 ease-in-out rounded-full border-2 border-transparent cursor-pointer outline-none focus:ring-2 focus:ring-primary-500/20',
             isSm ? 'h-5 w-9' : 'h-6 w-11',
-            checked ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-700',
+            checked ? 'bg-primary-500' : 'bg-surface-soft dark:bg-surface-soft',
           ),
           className,
         )}
