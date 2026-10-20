@@ -312,7 +312,7 @@ const LoginPage: React.FC = () => {
               </div>
 
               <div className="flex items-center text-sm">
-                <label className="flex items-center gap-2 cursor-pointer select-none text-app">
+                <label className="flex min-h-11 items-center gap-2 cursor-pointer select-none text-app">
                   <input
                     type="checkbox"
                     id="remember-me"
