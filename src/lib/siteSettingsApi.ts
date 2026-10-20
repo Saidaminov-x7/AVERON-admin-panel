@@ -35,7 +35,7 @@ export interface SiteSettings {
   oneIdAuthEnabled?: boolean;
   openTelemetryEnabled?: boolean;
   maintenancePasswordEnabled?: boolean;
-  maintenanceBypassPassword?: string | null;
+  maintenanceBypassPasswordConfigured?: boolean;
   mobilePinchZoomEnabled?: boolean;
 
   updatedAt: string;
