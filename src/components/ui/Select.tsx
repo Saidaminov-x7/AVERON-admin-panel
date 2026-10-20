@@ -238,7 +238,7 @@ export const Select: React.FC<SelectProps> = ({
                 e.stopPropagation();
                 onChange('');
               }}
-              className="p-0.5 hover:text-app rounded-md hover:bg-gray-100 dark:hover:bg-white/10"
+              className="p-0.5 hover:text-app rounded-md hover:bg-surface-soft dark:hover:bg-white/10"
             >
               <X size={14} />
             </span>
@@ -276,7 +276,7 @@ export const Select: React.FC<SelectProps> = ({
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Поиск..."
-                  className="w-full h-8 pl-8 pr-2.5 text-xs rounded-lg bg-gray-50 dark:bg-white/5 border border-app text-app outline-none focus:border-primary-500"
+                  className="w-full h-8 pl-8 pr-2.5 text-xs rounded-lg bg-surface-soft dark:bg-white/5 border border-app text-app outline-none focus:border-primary-500"
                 />
               </div>
             </div>
@@ -333,7 +333,7 @@ export const Select: React.FC<SelectProps> = ({
       , document.body)}
 
       {error ? (
-        <p id={errorId} className={`${fieldMessageClass} text-red-500`}>{error}</p>
+        <p id={errorId} className={`${fieldMessageClass} text-error`}>{error}</p>
       ) : helperText ? (
         <p id={helperTextId} className="text-xs text-muted">{helperText}</p>
       ) : null}

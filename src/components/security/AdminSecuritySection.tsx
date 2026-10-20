@@ -103,7 +103,7 @@ export function AdminSecuritySection() {
                 ? t('security.enabled', { count: status.data.unusedRecoveryCodes })
                 : t('security.disabledStatus')}
           </p>
-          {status.isError && <p role="alert" className="mt-1 text-sm text-red-500">{t('security.statusError')}</p>}
+          {status.isError && <p role="alert" className="mt-1 text-sm text-error">{t('security.statusError')}</p>}
         </div>
         {status.data?.enabled ? (
           <div className="flex flex-wrap gap-2">
@@ -207,7 +207,7 @@ export function AdminSecuritySection() {
               />
             </>
           )}
-          {error && <p role="alert" className="text-sm text-red-500">{error}</p>}
+          {error && <p role="alert" className="text-sm text-error">{error}</p>}
         </div>
       </Modal>
     </section>

@@ -267,7 +267,7 @@ export const MediaLibraryPage: React.FC = () => {
                   {/* Thumbnail Image */}
                   <div
                     onClick={() => setSelectedImage(item)}
-                    className="aspect-square cursor-pointer overflow-hidden bg-gray-100 dark:bg-white/5 flex items-center justify-center"
+                    className="aspect-square cursor-pointer overflow-hidden bg-surface-soft dark:bg-white/5 flex items-center justify-center"
                   >
                     <img
                       src={item.url}
@@ -287,10 +287,10 @@ export const MediaLibraryPage: React.FC = () => {
                           e.stopPropagation();
                           handleCopyUrl(item.url, item.id);
                         }}
-                        className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-muted hover:text-app transition-colors"
+                        className="p-1 rounded-md hover:bg-surface-soft dark:hover:bg-white/10 text-muted hover:text-app transition-colors"
                         title={t('media.copyLink', 'Скопировать ссылку')}
                       >
-                        {isCopied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                        {isCopied ? <Check size={12} className="text-success" /> : <Copy size={12} />}
                       </button>
                       <button
                         type="button"
@@ -298,7 +298,7 @@ export const MediaLibraryPage: React.FC = () => {
                           e.stopPropagation();
                           setDeleteConfirmId(item.id);
                         }}
-                        className="p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500 transition-colors"
+                        className="p-1 rounded-md hover:bg-surface-soft dark:hover:bg-surface-soft text-error transition-colors"
                         title={t('common.delete', 'Удалить')}
                       >
                         <Trash2 size={12} />
@@ -315,7 +315,7 @@ export const MediaLibraryPage: React.FC = () => {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors gap-4"
+                className="flex items-center justify-between p-3 hover:bg-surface-soft dark:hover:bg-white/5 transition-colors gap-4"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <button
@@ -353,7 +353,7 @@ export const MediaLibraryPage: React.FC = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleCopyUrl(item.url, item.id)}
-                    icon={copiedId === item.id ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+                    icon={copiedId === item.id ? <Check size={14} className="text-success" /> : <Copy size={14} />}
                   >
                     {copiedId === item.id ? t('media.copied', 'Скопировано') : t('media.copyLink', 'Ссылка')}
                   </Button>
@@ -361,7 +361,7 @@ export const MediaLibraryPage: React.FC = () => {
                     href={item.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="p-2 rounded-xl border border-app text-muted hover:text-app hover:bg-gray-100 dark:hover:bg-white/10"
+                    className="p-2 rounded-xl border border-app text-muted hover:text-app hover:bg-surface-soft dark:hover:bg-white/10"
                     title={t('media.openNewTab', 'Открыть в новой вкладке')}
                   >
                     <ExternalLink size={14} />
@@ -370,7 +370,7 @@ export const MediaLibraryPage: React.FC = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => setDeleteConfirmId(item.id)}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+                    className="text-error hover:text-error hover:bg-surface-soft dark:hover:bg-surface-soft"
                   >
                     <Trash2 size={16} />
                   </Button>
@@ -476,7 +476,7 @@ export const MediaLibraryPage: React.FC = () => {
                 </Card>
               </div>
 
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-app text-xs flex items-center justify-between gap-3">
+              <div className="p-3 rounded-xl bg-surface-soft dark:bg-white/5 border border-app text-xs flex items-center justify-between gap-3">
                 <span className="font-mono text-muted truncate text-[11px]">{selectedImage.url}</span>
                 <Button
                   variant="ghost"

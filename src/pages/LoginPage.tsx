@@ -318,7 +318,7 @@ const LoginPage: React.FC = () => {
                     id="remember-me"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-4 h-4 cursor-pointer"
+                    className="rounded border-line text-primary-600 focus:ring-primary-500 w-4 h-4 cursor-pointer"
                   />
                   <span className="text-xs text-muted hover:text-app transition-colors">Запомнить меня</span>
                 </label>
@@ -326,7 +326,7 @@ const LoginPage: React.FC = () => {
 
               {/* Ошибка */}
               {error && (
-                <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+                <div className="flex items-start gap-2 p-3 bg-surface-soft dark:bg-surface-soft border border-line dark:border-line rounded-lg text-sm text-error dark:text-error">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
@@ -398,7 +398,7 @@ const LoginPage: React.FC = () => {
 
               {/* Ошибка */}
               {error && (
-                <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+                <div className="flex items-start gap-2 p-3 bg-surface-soft dark:bg-surface-soft border border-line dark:border-line rounded-lg text-sm text-error dark:text-error">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
@@ -474,7 +474,7 @@ const LoginPage: React.FC = () => {
                   className="input text-center font-mono font-bold tracking-widest"
                 />
               </div>
-              {error && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">{error}</div>}
+              {error && <div role="alert" className="rounded-lg border border-line bg-surface-soft p-3 text-sm text-error dark:border-line dark:bg-surface-soft dark:text-error">{error}</div>}
               <button
                 type="submit"
                 disabled={loading || twoFactorCode.trim().length < 6}

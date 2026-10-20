@@ -45,7 +45,7 @@ export default function NotificationsPage() {
       {notificationsQuery.isLoading ? (
         <div className="card">{t("products.loading")}</div>
       ) : notificationsQuery.isError ? (
-        <div role="alert" className="card text-red-500">{t("header.notificationError")}</div>
+        <div role="alert" className="card text-error">{t("header.notificationError")}</div>
       ) : notificationsQuery.data?.items.length ? (
         <ul className="space-y-3">
           {notificationsQuery.data.items.map((item) => (

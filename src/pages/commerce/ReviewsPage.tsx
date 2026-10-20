@@ -119,7 +119,7 @@ export default function ReviewsPage() {
         </section>
 
         {query.isLoading ? <p role="status" className="py-10 text-center">{t('commerceReviews.loading')}</p>
-          : query.isError ? <div role="alert" className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-rose-900">{t('commerceReviews.loadError')} <button type="button" onClick={() => void query.refetch()} className="ml-2 inline-flex min-h-9 items-center gap-2 rounded border border-current px-3"><RefreshCw size={15} />{t('common.refresh')}</button></div>
+          : query.isError ? <div role="alert" className="rounded-xl border border-line bg-surface-soft p-4 text-error">{t('commerceReviews.loadError')} <button type="button" onClick={() => void query.refetch()} className="ml-2 inline-flex min-h-9 items-center gap-2 rounded border border-current px-3"><RefreshCw size={15} />{t('common.refresh')}</button></div>
             : query.data?.items.length ? (
               <div className="space-y-3">
                 {query.data.items.map((review) => (
@@ -132,9 +132,9 @@ export default function ReviewsPage() {
                       <span className="rounded-full border border-app px-3 py-1 text-xs font-bold">{statusLabel(review.status)}</span>
                     </div>
                     <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                      <span aria-label={t('commerceReviews.rating', { rating: review.rating })} className="font-bold text-amber-600">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)} {review.rating}/5</span>
+                      <span aria-label={t('commerceReviews.rating', { rating: review.rating })} className="font-bold text-primary">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)} {review.rating}/5</span>
                       <span>{review.customer.name || t('commerceReviews.unknownCustomer')}</span>
-                      {review.verifiedPurchase && <span className="inline-flex items-center gap-1 rounded-full bg-cyan-500/10 px-2 py-1 text-xs font-bold text-cyan-800 dark:text-cyan-200"><BadgeCheck size={14} />{t('commerceReviews.verified')}</span>}
+                      {review.verifiedPurchase && <span className="inline-flex items-center gap-1 rounded-full bg-surface-soft px-2 py-1 text-xs font-bold text-primary dark:text-primary"><BadgeCheck size={14} />{t('commerceReviews.verified')}</span>}
                       {review.fitFeedback && <span className="rounded-full border border-app px-2 py-1 text-xs">{fitLabels[review.fitFeedback]}</span>}
                       <time className="text-xs text-muted" dateTime={review.createdAt}>{dateLabel(review.createdAt)}</time>
                     </div>
@@ -148,8 +148,8 @@ export default function ReviewsPage() {
                     </li>)}</ul>}
                     {review.moderatedAt && <p className="mt-2 text-xs text-muted">{t('commerceReviews.moderated')}: {dateLabel(review.moderatedAt)}</p>}
                     {(review.status === 'PENDING' || review.status === 'PUBLISHED') && <div className="mt-4 flex flex-wrap gap-2 border-t border-app pt-3">
-                      {review.status === 'PENDING' && <button type="button" disabled={moderation.isPending} onClick={() => moderation.mutate({ id: review.id, nextStatus: 'PUBLISHED' })} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-emerald-700 px-4 text-sm font-bold text-white hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:opacity-50"><Check size={16} />{t('commerceReviews.publish')}</button>}
-                      <button type="button" disabled={moderation.isPending} onClick={() => moderation.mutate({ id: review.id, nextStatus: 'REJECTED' })} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-rose-300 px-4 text-sm font-bold text-rose-800 hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 disabled:opacity-50"><X size={16} />{t('commerceReviews.reject')}</button>
+                      {review.status === 'PENDING' && <button type="button" disabled={moderation.isPending} onClick={() => moderation.mutate({ id: review.id, nextStatus: 'PUBLISHED' })} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-surface-soft px-4 text-sm font-bold text-white hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50"><Check size={16} />{t('commerceReviews.publish')}</button>}
+                      <button type="button" disabled={moderation.isPending} onClick={() => moderation.mutate({ id: review.id, nextStatus: 'REJECTED' })} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line px-4 text-sm font-bold text-error hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50"><X size={16} />{t('commerceReviews.reject')}</button>
                     </div>}
                   </article>
                 ))}

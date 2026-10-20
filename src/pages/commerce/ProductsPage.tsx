@@ -493,7 +493,7 @@ export default function ProductsPage() {
                       <span className="text-xs">AVERON</span>
                     </div>
                   )}
-                  <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm ${product.status === "PUBLISHED" ? "bg-emerald-600 text-white" : product.status === "DRAFT" ? "bg-sky-600 text-white" : "bg-neutral-700 text-white"}`}>
+                  <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm ${product.status === "PUBLISHED" ? "bg-success text-on-primary" : product.status === "DRAFT" ? "bg-warning text-ink" : "bg-error text-on-primary"}`}>
                     {t(`products.status.${product.status.toLowerCase()}`)}
                   </span>
                 </div>
@@ -546,7 +546,7 @@ export default function ProductsPage() {
                     )}
                     <button type="button" disabled={permanentDeleteMutation.isPending} onClick={() => {
                       if (window.confirm(`Удалить «${title}» навсегда? Это действие нельзя отменить.`)) permanentDeleteMutation.mutate(product.id);
-                    }} className="inline-flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50" aria-label={`Удалить ${title} навсегда`}><Trash2 size={15} /></button>
+                    }} className="inline-flex size-9 items-center justify-center rounded-lg border border-line text-error hover:bg-surface-soft disabled:opacity-50" aria-label={`Удалить ${title} навсегда`}><Trash2 size={15} /></button>
                   </div>
                 </div>
               </article>

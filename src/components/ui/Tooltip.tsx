@@ -41,7 +41,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
           className={twMerge(
             clsx(
               'absolute z-50 px-2.5 py-1 text-xs font-medium rounded-lg whitespace-nowrap shadow-md pointer-events-none transition-all duration-150 animate-fade-in',
-              'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900',
+              'bg-page text-white dark:bg-surface-soft dark:text-ink',
               positionStyles,
             ),
             className,

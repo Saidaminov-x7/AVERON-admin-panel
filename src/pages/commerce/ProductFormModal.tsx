@@ -756,7 +756,7 @@ export function ProductFormModal({
     { value: "square", label: t("products.photoSquare"), aspectClass: "aspect-square" },
   ];
   const headerContent = (
-    <div role="tablist" aria-label={t("products.contentLanguage")} className="inline-flex w-full rounded-xl border border-app bg-gray-50 p-1 dark:bg-white/5 sm:w-auto">
+    <div role="tablist" aria-label={t("products.contentLanguage")} className="inline-flex w-full rounded-xl border border-app bg-surface-soft p-1 dark:bg-white/5 sm:w-auto">
       {locales.map((locale) => {
         const error = errors[localeErrorKeys[locale]];
         const complete = values.translations[locale].title.trim().length >= 2;
@@ -780,7 +780,7 @@ export function ProductFormModal({
             }`}
           >
             <LanguageFlag locale={locale} className="h-4 w-6" />
-            {error ? <span aria-hidden="true" className="text-red-500">!</span> : complete ? <span aria-hidden="true" className="text-emerald-600">✓</span> : null}
+            {error ? <span aria-hidden="true" className="text-error">!</span> : complete ? <span aria-hidden="true" className="text-success">✓</span> : null}
           </button>
         );
       })}
@@ -814,7 +814,7 @@ export function ProductFormModal({
     >
       <form id={formId} noValidate onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-3">
-          <div className="flex gap-1" aria-label="Шаги создания товара">{steps.map((step, index) => <button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={t(step)} aria-current={index === currentStep ? "step" : undefined} className="group flex min-h-0 flex-1 items-center rounded-full bg-transparent p-0"><span className={`h-1 w-full rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-neutral-200 dark:bg-neutral-700 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-600"}`} /></button>)}</div>
+          <div className="flex gap-1" aria-label="Шаги создания товара">{steps.map((step, index) => <button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={t(step)} aria-current={index === currentStep ? "step" : undefined} className="group flex min-h-0 flex-1 items-center rounded-full bg-transparent p-0"><span className={`h-1 w-full rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-surface-soft dark:bg-surface-soft group-hover:bg-surface-soft dark:group-hover:bg-surface-soft"}`} /></button>)}</div>
           <div className="flex items-center justify-between text-xs text-muted"><span>Шаг {currentStep + 1} из {steps.length}</span><span className="font-medium text-app">{t(steps[currentStep])}</span></div>
         </div>
         <div className="rounded-xl border border-primary-500/20 bg-primary-500/5 p-4">
@@ -822,12 +822,12 @@ export function ProductFormModal({
           <p className="mt-1 text-xs leading-5 text-muted">{t("products.workflowHint")}</p>
         </div>
         {submissionError && (
-          <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
+          <div role="alert" className="rounded-xl border border-line bg-surface-soft px-4 py-3 text-sm text-error">
             {submissionError}
           </div>
         )}
         {submitAttempted && Object.keys(errors).length > 0 && (
-          <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
+          <div role="alert" className="rounded-xl border border-line bg-surface-soft px-4 py-3 text-sm text-error">
             <p className="font-semibold">{t("products.formHasErrors")}</p>
             <ul className="mt-2 list-inside list-disc space-y-1">
               {Object.entries(errors).map(([field, message]) => message && (
@@ -884,7 +884,7 @@ export function ProductFormModal({
               </div>
             )}
           </div>
-          {aiError && <p role="alert" className="text-sm text-red-500">{aiError}</p>}
+          {aiError && <p role="alert" className="text-sm text-error">{aiError}</p>}
           {aiSuggestions && (
             <div role="region" aria-label={t("products.aiFill.preview")} className="space-y-3 rounded-xl border border-primary-500/30 bg-primary-500/5 p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -1061,7 +1061,7 @@ export function ProductFormModal({
                 <div className="relative col-start-2 sm:col-start-auto">
                   <input aria-label={`HEX цвет ${name}`} value={hexInput} maxLength={7} onChange={(event) => { const next = event.target.value.startsWith("#") ? event.target.value : `#${event.target.value}`; if (/^#[0-9a-fA-F]{0,6}$/.test(next)) updateRow(name, next); }} onBlur={() => { if (!/^#[0-9a-fA-F]{6}$/.test(hexInput)) updateRow(name, "#808080"); }} className="h-10 w-full rounded-md border border-app bg-surface px-2 font-mono text-sm uppercase text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" />
                 </div>
-                <button type="button" aria-label={`Удалить цвет ${name}`} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-red-500/10 hover:text-red-600 sm:row-span-1"><Trash2 size={16} /></button>
+                <button type="button" aria-label={`Удалить цвет ${name}`} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-surface-soft hover:text-error sm:row-span-1"><Trash2 size={16} /></button>
               </div>;
             })}
             <button type="button" onClick={() => updateValue("colorsText", [values.colorsText, " | #808080"].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold text-app transition-colors hover:bg-app"><span aria-hidden="true">+</span> Добавить цвет</button>
@@ -1076,14 +1076,14 @@ export function ProductFormModal({
             </p>
             <p className="mt-1 text-xs text-muted">{t("products.photoEditingHint")}</p>
           </div>
-          {errors.photos && <p role="alert" className="text-sm text-red-500">{errors.photos}</p>}
-          {photoInputErrors.map((issue, index) => <p key={`${issue}-${index}`} role="alert" className="text-sm text-red-500">{issue}</p>)}
+          {errors.photos && <p role="alert" className="text-sm text-error">{errors.photos}</p>}
+          {photoInputErrors.map((issue, index) => <p key={`${issue}-${index}`} role="alert" className="text-sm text-error">{issue}</p>)}
           {photos.length > 0 && (
             <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {photos.map((photo, index) => (
                 <li key={photo.key} className={`relative min-w-0 overflow-hidden rounded-xl border ${index === 0 ? "border-primary-500 ring-1 ring-primary-500/30" : "border-app"}`}>
                   <div
-                    className={`relative flex w-full items-center justify-center overflow-hidden bg-stone-100 dark:bg-stone-800 ${photo.file ? "touch-none cursor-grab active:cursor-grabbing" : ""} ${photoOrientations.find(({ value }) => value === photo.crop.orientation)?.aspectClass ?? "aspect-[4/5]"}`}
+                    className={`relative flex w-full items-center justify-center overflow-hidden bg-surface-soft dark:bg-surface-soft ${photo.file ? "touch-none cursor-grab active:cursor-grabbing" : ""} ${photoOrientations.find(({ value }) => value === photo.crop.orientation)?.aspectClass ?? "aspect-[4/5]"}`}
                     onPointerDown={(event) => {
                       if (!photo.file || event.button !== 0) return;
                       event.currentTarget.setPointerCapture(event.pointerId);
@@ -1206,7 +1206,7 @@ export function ProductFormModal({
                         <button type="button" disabled={index === 0} onClick={() => movePhoto(index, -1)} aria-label={t("products.movePhotoUp")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveUp size={16} /></button>
                         <button type="button" disabled={index === photos.length - 1} onClick={() => movePhoto(index, 1)} aria-label={t("products.movePhotoDown")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveDown size={16} /></button>
                       </div>
-                      <button type="button" onClick={() => removePhoto(photo)} aria-label={t("products.removePhoto")} className="rounded-lg p-2 text-red-500 hover:bg-red-500/10"><Trash2 size={16} /></button>
+                      <button type="button" onClick={() => removePhoto(photo)} aria-label={t("products.removePhoto")} className="rounded-lg p-2 text-error hover:bg-surface-soft"><Trash2 size={16} /></button>
                     </div>
                   </div>
                 </li>
@@ -1235,7 +1235,7 @@ export function ProductFormModal({
             {imageEmbeddingQuery.isLoading ? (
               <p role="status" className="text-sm text-muted">{t("products.imageEmbeddings.loading")}</p>
             ) : imageEmbeddingQuery.isError ? (
-              <p role="alert" className="text-sm text-red-500">{t("products.imageEmbeddings.statusError")}</p>
+              <p role="alert" className="text-sm text-error">{t("products.imageEmbeddings.statusError")}</p>
             ) : imageEmbeddingQuery.data ? (
               <div className="space-y-1 text-sm">
                 <p className="text-app">
@@ -1267,8 +1267,8 @@ export function ProductFormModal({
                 )}
               </div>
             ) : null}
-            {imageEmbeddingError && <p role="alert" className="text-sm text-red-500">{imageEmbeddingError}</p>}
-            {imageEmbeddingSuccess && <p role="status" className="text-sm text-emerald-600">{imageEmbeddingSuccess}</p>}
+            {imageEmbeddingError && <p role="alert" className="text-sm text-error">{imageEmbeddingError}</p>}
+            {imageEmbeddingSuccess && <p role="status" className="text-sm text-success">{imageEmbeddingSuccess}</p>}
             <Button
               type="button"
               variant="outline"
@@ -1410,12 +1410,12 @@ export function ProductFormModal({
           <h4 className="text-sm font-bold text-app">{t("products.publicationSection")}</h4>
           <div className="flex items-center justify-between gap-4 py-2">
             <div><p className="text-sm font-medium text-app">{t("products.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Товар появится в каталоге после сохранения.</p></div>
-            <button type="button" role="switch" aria-checked={values.publish} onClick={() => updateValue("publish", !values.publish)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${values.publish ? "bg-primary-600" : "bg-neutral-300 dark:bg-neutral-600"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publish ? "translate-x-5" : "translate-x-0"}`} /></button>
+            <button type="button" role="switch" aria-checked={values.publish} onClick={() => updateValue("publish", !values.publish)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${values.publish ? "bg-primary-600" : "bg-surface-soft dark:bg-surface-soft"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publish ? "translate-x-5" : "translate-x-0"}`} /></button>
           </div>
           <div>
             <div className="flex items-center justify-between gap-4 py-2">
               <div><p className="text-sm font-medium text-app">{t("products.telegram.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Публикация выполняется после успешного сохранения товара.</p></div>
-              <button type="button" role="switch" aria-checked={values.publishTelegram} disabled={!values.publish || !capabilitiesQuery.data?.telegramProductPublish} onClick={() => updateValue("publishTelegram", !values.publishTelegram)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-40 ${values.publishTelegram ? "bg-primary-600" : "bg-neutral-300 dark:bg-neutral-600"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publishTelegram ? "translate-x-5" : "translate-x-0"}`} /></button>
+              <button type="button" role="switch" aria-checked={values.publishTelegram} disabled={!values.publish || !capabilitiesQuery.data?.telegramProductPublish} onClick={() => updateValue("publishTelegram", !values.publishTelegram)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-40 ${values.publishTelegram ? "bg-primary-600" : "bg-surface-soft dark:bg-surface-soft"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publishTelegram ? "translate-x-5" : "translate-x-0"}`} /></button>
             </div>
             {!capabilitiesQuery.isLoading && !capabilitiesQuery.isError && (
               <p className="ml-6 mt-1 text-xs text-muted">
@@ -1432,11 +1432,11 @@ export function ProductFormModal({
               <p className="ml-6 mt-1 text-xs text-muted">{t("products.telegram.loading")}</p>
             )}
             {capabilitiesQuery.isError && (
-              <p role="alert" className="ml-6 mt-1 text-xs text-red-600">{t("products.telegram.statusError")}</p>
+              <p role="alert" className="ml-6 mt-1 text-xs text-error">{t("products.telegram.statusError")}</p>
             )}
           </div>
           {telegramPublishError && (
-            <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300">
+            <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface-soft p-3 text-sm text-error dark:text-error">
               <span>{t("products.telegram.savedButFailed")}</span>
               <Button type="button" variant="outline" onClick={onRetryTelegram} loading={isRetryingTelegram}>
                 {t("products.telegram.retry")}

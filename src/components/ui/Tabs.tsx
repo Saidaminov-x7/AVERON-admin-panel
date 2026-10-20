@@ -45,7 +45,7 @@ export function Tabs<T extends string = string>({
                 isSm ? 'text-xs' : 'text-sm',
                 isActive
                   ? 'border-primary-500 text-primary-600 dark:text-primary-400 font-semibold'
-                  : 'border-transparent text-muted hover:text-app hover:border-gray-300 dark:hover:border-gray-700',
+                  : 'border-transparent text-muted hover:text-app hover:border-line dark:hover:border-line',
                 tab.disabled && 'opacity-50 cursor-not-allowed',
               )}
             >
@@ -75,7 +75,7 @@ export function Tabs<T extends string = string>({
                 isSm ? 'px-2.5 py-1 text-xs' : 'px-3.5 py-1.5 text-sm',
                 isActive
                   ? 'bg-primary-500 text-white shadow-xs font-semibold'
-                  : 'bg-surface text-muted hover:text-app hover:bg-gray-100 dark:hover:bg-white/5 border border-app',
+                  : 'bg-surface text-muted hover:text-app hover:bg-surface-soft dark:hover:bg-white/5 border border-app',
                 tab.disabled && 'opacity-50 cursor-not-allowed',
               )}
             >
@@ -93,7 +93,7 @@ export function Tabs<T extends string = string>({
   return (
     <div
       className={twMerge(
-        'inline-flex items-center p-1 rounded-xl bg-gray-100 dark:bg-white/5 border border-app',
+        'inline-flex items-center p-1 rounded-xl bg-surface-soft dark:bg-white/5 border border-app',
         className,
       )}
     >
@@ -109,7 +109,7 @@ export function Tabs<T extends string = string>({
               'flex items-center justify-center gap-1.5 rounded-lg transition-all cursor-pointer outline-none select-none font-medium',
               isSm ? 'px-2.5 py-1 text-xs' : 'px-3.5 py-1.5 text-xs sm:text-sm',
               isActive
-                ? 'bg-surface text-app shadow-xs font-bold dark:bg-white/15 dark:text-white border border-gray-200/60 dark:border-white/10'
+                ? 'bg-surface text-app shadow-xs font-bold dark:bg-white/15 dark:text-white border border-line dark:border-white/10'
                 : 'text-muted hover:text-app hover:bg-black/5 dark:hover:bg-white/5',
               tab.disabled && 'opacity-50 cursor-not-allowed',
             )}

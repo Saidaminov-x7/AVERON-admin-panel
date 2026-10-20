@@ -39,7 +39,7 @@ const TrafficAnalyticsPage: React.FC = () => {
                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                   days === d
                     ? 'bg-primary-500 text-white'
-                    : 'border border-app text-muted hover:text-app hover:bg-gray-100 dark:hover:bg-white/5'
+                    : 'border border-app text-muted hover:text-app hover:bg-surface-soft dark:hover:bg-white/5'
                 }`}
               >
                 {d} дней
@@ -56,14 +56,14 @@ const TrafficAnalyticsPage: React.FC = () => {
         <div className="card">
           <h3 className="text-base font-semibold text-app mb-4">Уникальные визиты по дням</h3>
           {isLoading ? (
-            <div className="h-72 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />
+            <div className="h-72 bg-surface-soft dark:bg-white/5 rounded-lg animate-pulse" />
           ) : (
             <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={daily} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="visitorGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
+                    <stop offset="5%" stopColor="var(--color-info)" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="var(--color-info)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
@@ -95,7 +95,7 @@ const TrafficAnalyticsPage: React.FC = () => {
                   type="monotone"
                   dataKey="visitors"
                   name="Уникальные посетители"
-                  stroke="#14b8a6"
+                  stroke="var(--color-info)"
                   strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#visitorGradient)"
@@ -112,7 +112,7 @@ const TrafficAnalyticsPage: React.FC = () => {
           </div>
           <div className="max-h-96 overflow-y-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 dark:bg-white/5 border-b border-app text-xs uppercase text-muted font-semibold sticky top-0">
+              <thead className="bg-surface-soft dark:bg-white/5 border-b border-app text-xs uppercase text-muted font-semibold sticky top-0">
                 <tr>
                   <th className="px-6 py-3">Дата</th>
                   <th className="px-6 py-3">Уникальных устройств</th>
@@ -130,7 +130,7 @@ const TrafficAnalyticsPage: React.FC = () => {
                   [...daily].reverse().map((item) => {
                     const pct = total > 0 ? ((item.visitors / total) * 100).toFixed(1) : '0';
                     return (
-                      <tr key={item.date} className="hover:bg-gray-50/50 dark:hover:bg-white/5">
+                      <tr key={item.date} className="hover:bg-surface-soft dark:hover:bg-white/5">
                         <td className="px-6 py-3 font-medium text-app">
                           {new Date(item.date).toLocaleDateString('ru-RU', {
                             day: 'numeric',

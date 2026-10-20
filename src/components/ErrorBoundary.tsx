@@ -27,7 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-app text-center select-none">
           <div className="flex flex-col items-center justify-center max-w-md w-full p-8 sm:p-10 rounded-2xl border border-dashed border-app bg-surface/80 shadow-sm">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 mb-4 shadow-xs">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-soft dark:bg-surface-soft text-error dark:text-error mb-4 shadow-xs">
               <AlertTriangle size={28} strokeWidth={1.75} />
             </div>
             <h1 className="text-xl font-bold text-app mb-2">Что-то пошло не так</h1>

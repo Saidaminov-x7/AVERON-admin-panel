@@ -152,8 +152,8 @@ const ProfilePage: React.FC = () => {
     return (
       <Layout title="Профиль">
         <div className="max-w-4xl mx-auto space-y-6">
-          <div className="card h-48 animate-pulse bg-gray-100 dark:bg-white/5" />
-          <div className="card h-64 animate-pulse bg-gray-100 dark:bg-white/5" />
+          <div className="card h-48 animate-pulse bg-surface-soft dark:bg-white/5" />
+          <div className="card h-64 animate-pulse bg-surface-soft dark:bg-white/5" />
         </div>
       </Layout>
     );
@@ -179,7 +179,7 @@ const ProfilePage: React.FC = () => {
               )}
               <label
                 htmlFor="avatar-upload"
-                className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-surface border border-app shadow-md cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 text-muted hover:text-app transition-all"
+                className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-surface border border-app shadow-md cursor-pointer hover:bg-surface-soft dark:hover:bg-white/10 text-muted hover:text-app transition-all"
                 title="Загрузить новое фото"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -229,7 +229,7 @@ const ProfilePage: React.FC = () => {
 
           <button
             onClick={handleLogout}
-            className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer self-stretch sm:self-center"
+            className="px-4 py-2 text-sm font-medium text-error dark:text-error border border-line dark:border-line hover:bg-surface-soft dark:hover:bg-surface-soft rounded-lg transition-colors cursor-pointer self-stretch sm:self-center"
           >
             Выйти из аккаунта
           </button>
@@ -239,12 +239,12 @@ const ProfilePage: React.FC = () => {
         <div className="card">
           <h3 className="text-base font-semibold text-app mb-4">Основные данные</h3>
           {profileSuccess && (
-            <div className="p-3 mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-sm border border-green-200 dark:border-green-800">
+            <div className="p-3 mb-4 rounded-lg bg-surface-soft dark:bg-surface-soft text-success dark:text-success text-sm border border-line dark:border-line">
               {profileSuccess}
             </div>
           )}
           {profileError && (
-            <div className="p-3 mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm border border-red-200 dark:border-red-800">
+            <div className="p-3 mb-4 rounded-lg bg-surface-soft dark:bg-surface-soft text-error dark:text-error text-sm border border-line dark:border-line">
               {profileError}
             </div>
           )}
@@ -267,7 +267,7 @@ const ProfilePage: React.FC = () => {
                 type="email"
                 value={profile?.email || ''}
                 disabled
-                className="input bg-gray-100 dark:bg-white/5 opacity-70 cursor-not-allowed"
+                className="input bg-surface-soft dark:bg-white/5 opacity-70 cursor-not-allowed"
               />
             </div>
 
@@ -277,7 +277,7 @@ const ProfilePage: React.FC = () => {
                 type="text"
                 value={profile?.phone || ''}
                 disabled
-                className="input bg-gray-100 dark:bg-white/5 opacity-70 cursor-not-allowed"
+                className="input bg-surface-soft dark:bg-white/5 opacity-70 cursor-not-allowed"
               />
             </div>
 
@@ -314,12 +314,12 @@ const ProfilePage: React.FC = () => {
         <div className="card">
           <h3 className="text-base font-semibold text-app mb-4">Смена пароля</h3>
           {passwordSuccess && (
-            <div className="p-3 mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-sm border border-green-200 dark:border-green-800">
+            <div className="p-3 mb-4 rounded-lg bg-surface-soft dark:bg-surface-soft text-success dark:text-success text-sm border border-line dark:border-line">
               {passwordSuccess}
             </div>
           )}
           {passwordError && (
-            <div className="p-3 mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm border border-red-200 dark:border-red-800">
+            <div className="p-3 mb-4 rounded-lg bg-surface-soft dark:bg-surface-soft text-error dark:text-error text-sm border border-line dark:border-line">
               {passwordError}
             </div>
           )}

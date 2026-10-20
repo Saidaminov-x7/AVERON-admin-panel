@@ -41,7 +41,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                   'peer-checked:bg-primary-500 peer-checked:border-primary-500 text-white',
                   'peer-focus:ring-2 peer-focus:ring-primary-500/20',
                   'group-hover:border-primary-400',
-                  error && 'border-red-500',
+                  error && 'border-line',
                 ),
                 className,
               )}
@@ -56,7 +56,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             </div>
           )}
         </label>
-        {error && <p className="text-xs text-red-500 font-medium animate-fade-in pl-6">{error}</p>}
+        {error && <p className="text-xs text-error font-medium animate-fade-in pl-6">{error}</p>}
       </div>
     );
   },

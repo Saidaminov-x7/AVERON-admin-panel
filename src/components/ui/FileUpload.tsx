@@ -106,7 +106,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       </div>
 
       {errorMessage && (
-        <p className="text-xs text-red-500 font-medium animate-fade-in">{errorMessage}</p>
+        <p className="text-xs text-error font-medium animate-fade-in">{errorMessage}</p>
       )}
 
       {selectedFiles.length > 0 && (
@@ -125,7 +125,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                     className="h-20 w-full object-contain rounded-lg mb-2 bg-surface-muted"
                   />
                 ) : (
-                  <div className="h-20 w-full flex items-center justify-center bg-gray-100 dark:bg-white/5 rounded-lg mb-2 text-muted">
+                  <div className="h-20 w-full flex items-center justify-center bg-surface-soft dark:bg-white/5 rounded-lg mb-2 text-muted">
                     <FileIcon size={24} />
                   </div>
                 )}

@@ -145,7 +145,7 @@ export const AuditLogPage: React.FC = () => {
         </div>
 
         {/* Фильтры */}
-        <Card className="border-stone-300/70 bg-surface p-4 dark:border-stone-700/80">
+        <Card className="border-line bg-surface p-4 dark:border-line">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <Input
               placeholder={t('auditLog.searchPlaceholder', 'Поиск по пользователю, ресурсу или ID...')}
@@ -180,11 +180,11 @@ export const AuditLogPage: React.FC = () => {
             description={debouncedSearch || actionFilter ? t('auditLog.noResultsFilter', 'Попробуйте изменить параметры поиска или фильтр') : t('auditLog.emptyLog', 'Журнал действий пока пуст')}
           />
         ) : (
-          <Card className="overflow-hidden border-stone-300/70 bg-surface p-0 shadow-xs dark:border-stone-700/80">
+          <Card className="overflow-hidden border-line bg-surface p-0 shadow-xs dark:border-line">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-stone-200 dark:border-stone-800 bg-gray-50/60 dark:bg-white/[0.02] text-muted font-semibold uppercase tracking-wider">
+                  <tr className="border-b border-line dark:border-line bg-surface-soft dark:bg-white/[0.02] text-muted font-semibold uppercase tracking-wider">
                     <th className="py-3.5 px-4">{t('auditLog.actor', 'Инициатор')}</th>
                     <th className="py-3.5 px-4">{t('auditLog.action', 'Действие')}</th>
                     <th className="py-3.5 px-4">{t('auditLog.resource', 'Объект / Ресурс')}</th>
@@ -196,7 +196,7 @@ export const AuditLogPage: React.FC = () => {
                   {paginatedLogs.map((log: AuditLogItem) => (
                     <tr
                       key={log.id}
-                      className="hover:bg-gray-50/80 dark:hover:bg-white/[0.02] transition-colors"
+                      className="hover:bg-surface-soft dark:hover:bg-white/[0.02] transition-colors"
                     >
                       {/* Кто */}
                       <td className="py-3 px-4">
@@ -286,7 +286,7 @@ export const AuditLogPage: React.FC = () => {
           title={`${t('auditLog.details', 'Детали действия')}: ${selectedMeta?.action || ''}`}
         >
           <div className="p-4">
-            <pre className="p-3.5 rounded-xl bg-gray-900 text-emerald-400 dark:bg-black/90 dark:text-emerald-400 text-xs font-mono overflow-x-auto max-h-96 border border-app">
+            <pre className="p-3.5 rounded-xl bg-page text-success dark:bg-black/90 dark:text-success text-xs font-mono overflow-x-auto max-h-96 border border-app">
               {JSON.stringify(selectedMeta?.meta, null, 2)}
             </pre>
           </div>

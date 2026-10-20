@@ -341,7 +341,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
             <p className="truncate text-sm font-semibold">{user?.name || t("sidebar.admin")}</p>
             <p className="truncate text-xs text-muted">{user?.adminRole || "ADMIN"}</p>
         </div>
-        <button type="button" onClick={logout} className="admin-logout flex size-9 shrink-0 items-center justify-center text-muted transition-colors hover:bg-red-500/10 hover:text-red-600" aria-label={t("sidebar.logout")} title={t("sidebar.logout")}>
+        <button type="button" onClick={logout} className="admin-logout flex size-9 shrink-0 items-center justify-center text-muted transition-colors hover:bg-surface-soft hover:text-error" aria-label={t("sidebar.logout")} title={t("sidebar.logout")}>
           <LogOut size={17} />
         </button>
       </div>

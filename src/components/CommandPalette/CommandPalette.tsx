@@ -157,12 +157,12 @@ export const CommandPalette: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="text-xs text-muted hover:text-app px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/10"
+                className="text-xs text-muted hover:text-app px-1.5 py-0.5 rounded bg-surface-soft dark:bg-white/10"
               >
                 Очистить
               </button>
             )}
-            <kbd className="hidden sm:inline-block px-2 py-0.5 text-[11px] font-mono rounded bg-gray-100 dark:bg-white/10 text-muted border border-app">
+            <kbd className="hidden sm:inline-block px-2 py-0.5 text-[11px] font-mono rounded bg-surface-soft dark:bg-white/10 text-muted border border-app">
               ESC
             </kbd>
           </div>
@@ -194,7 +194,7 @@ export const CommandPalette: React.FC = () => {
                       className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="p-1.5 rounded-lg bg-gray-100 dark:bg-white/5 text-muted">
+                        <span className="p-1.5 rounded-lg bg-surface-soft dark:bg-white/5 text-muted">
                           {r.icon}
                         </span>
                         <span className="text-sm font-medium">
@@ -224,7 +224,7 @@ export const CommandPalette: React.FC = () => {
                       className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 shrink-0">
+                        <span className="p-1.5 rounded-lg bg-surface-soft dark:bg-surface-soft text-info dark:text-info shrink-0">
                           <List size={16} />
                         </span>
                         <div className="min-w-0">
@@ -234,7 +234,7 @@ export const CommandPalette: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs px-2 py-0.5 rounded-md bg-gray-100 dark:bg-white/10 text-muted shrink-0">
+                      <span className="text-xs px-2 py-0.5 rounded-md bg-surface-soft dark:bg-white/10 text-muted shrink-0">
                         {l.status || 'ACTIVE'}
                       </span>
                     </Command.Item>
@@ -257,7 +257,7 @@ export const CommandPalette: React.FC = () => {
                       className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <span className="p-1.5 rounded-lg bg-surface-soft dark:bg-surface-soft text-success dark:text-success shrink-0">
                           <User size={16} />
                         </span>
                         <div className="min-w-0">
@@ -265,7 +265,7 @@ export const CommandPalette: React.FC = () => {
                           <p className="text-xs text-muted truncate">{u.email}</p>
                         </div>
                       </div>
-                      <span className="text-xs px-2 py-0.5 rounded-md bg-gray-100 dark:bg-white/10 text-muted shrink-0">
+                      <span className="text-xs px-2 py-0.5 rounded-md bg-surface-soft dark:bg-white/10 text-muted shrink-0">
                         {u.role || 'USER'}
                       </span>
                     </Command.Item>
@@ -276,7 +276,7 @@ export const CommandPalette: React.FC = () => {
           </Command.List>
 
           {/* Футер палитры */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-t border-app text-xs text-muted bg-gray-50/50 dark:bg-white/5 select-none">
+          <div className="flex items-center justify-between px-4 py-2.5 border-t border-app text-xs text-muted bg-surface-soft dark:bg-white/5 select-none">
             <div className="flex items-center gap-3">
               <span>
                 <kbd className="font-mono bg-surface px-1.5 py-0.5 rounded border border-app">↑</kbd>{' '}

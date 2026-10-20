@@ -296,7 +296,7 @@ export const StaffPage: React.FC = () => {
                             variant="ghost"
                             size="icon"
                             onClick={() => setRevokeConfirmId(member.id)}
-                            className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+                            className="text-error hover:text-error hover:bg-surface-soft dark:hover:bg-surface-soft"
                             title="Отозвать доступ"
                           >
                             <Trash2 size={16} />
@@ -331,7 +331,7 @@ export const StaffPage: React.FC = () => {
                 {auditLogs.map((log: AuditLogItem) => (
                   <div key={log.id} className="p-3.5 flex items-center justify-between gap-4 text-xs">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/5 text-muted font-mono shrink-0">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface-soft dark:bg-white/5 text-muted font-mono shrink-0">
                         <ShieldCheck size={16} />
                       </div>
                       <div className="min-w-0">

@@ -18,22 +18,22 @@ import type { AdminRoleType } from '../../store/authStore';
 const roleLabels: Record<AdminRoleType, { label: string; color: string; desc: string }> = {
   SUPER_ADMIN: {
     label: 'Супер Администратор',
-    color: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400',
+    color: 'bg-surface-soft text-error dark:bg-surface-soft dark:text-error',
     desc: 'Полный доступ ко всей системе, сотрудникам и настройкам',
   },
   ADMIN: {
     label: 'Администратор',
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400',
+    color: 'bg-surface-soft text-info dark:bg-surface-soft dark:text-info',
     desc: 'Модерация, пользователи, аналитика, конструктор страниц',
   },
   MODERATOR: {
     label: 'Модератор',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400',
+    color: 'bg-surface-soft text-info dark:bg-surface-soft dark:text-info',
     desc: 'Одобрение/отклонение объявлений, просмотр пользователей',
   },
   SUPPORT: {
     label: 'Поддержка',
-    color: 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-gray-200',
+    color: 'bg-surface-soft text-ink-soft dark:bg-white/10 dark:text-ink-soft',
     desc: 'Только чтение (read-only) объявлений и пользователей',
   },
 };
@@ -116,7 +116,7 @@ const StaffPage: React.FC = () => {
     <Layout title={t('nav.staff', 'Сотрудники и роли')}>
       <div className="max-w-6xl mx-auto space-y-6 pb-12">
         {feedbackMsg && (
-          <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-sm border border-emerald-200 dark:border-emerald-800/40 flex items-center gap-2">
+          <div className="p-4 rounded-2xl bg-surface-soft dark:bg-surface-soft text-success dark:text-success text-sm border border-line dark:border-line flex items-center gap-2">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="20 6 9 17 4 12" />
             </svg>
@@ -148,7 +148,7 @@ const StaffPage: React.FC = () => {
         <div className="card overflow-hidden p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 dark:bg-white/5 border-b border-app text-xs uppercase text-muted font-semibold">
+              <thead className="bg-surface-soft dark:bg-white/5 border-b border-app text-xs uppercase text-muted font-semibold">
                 <tr>
                   <th className="px-6 py-3.5">{t('users.name', 'Сотрудник')}</th>
                   <th className="px-6 py-3.5">{t('users.role', 'Роль в панели')}</th>
@@ -178,7 +178,7 @@ const StaffPage: React.FC = () => {
                     const isPrimarySuperAdmin = staff.email === 'vosilhojasaidaminov@gmail.com';
 
                     return (
-                      <tr key={staff.id} className="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
+                      <tr key={staff.id} className="hover:bg-surface-soft dark:hover:bg-white/5 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             {staff.avatar ? (
@@ -196,7 +196,7 @@ const StaffPage: React.FC = () => {
                               <div className="font-semibold text-app flex items-center gap-1.5">
                                 {staff.name}
                                 {isSelf && (
-                                  <span className="text-[10px] bg-gray-100 dark:bg-white/10 px-1.5 py-0.2 rounded text-muted">
+                                  <span className="text-[10px] bg-surface-soft dark:bg-white/10 px-1.5 py-0.2 rounded text-muted">
                                     Вы
                                   </span>
                                 )}
@@ -248,7 +248,7 @@ const StaffPage: React.FC = () => {
                             <button
                               onClick={() => handleRevoke(staff.id, staff.name)}
                               disabled={revokeMutation.isPending}
-                              className="text-xs text-red-600 dark:text-red-400 hover:underline font-medium cursor-pointer"
+                              className="text-xs text-error dark:text-error hover:underline font-medium cursor-pointer"
                             >
                               {t('users.block', 'Отозвать доступ')}
                             </button>
@@ -269,7 +269,7 @@ const StaffPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {(Object.entries(roleLabels) as [AdminRoleType, (typeof roleLabels)[AdminRoleType]][]).map(
               ([key, meta]) => (
-                <div key={key} className="p-3.5 rounded-xl border border-app bg-gray-50/50 dark:bg-white/5 space-y-1.5">
+                <div key={key} className="p-3.5 rounded-xl border border-app bg-surface-soft dark:bg-white/5 space-y-1.5">
                   <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${meta.color}`}>
                     {meta.label}
                   </span>
@@ -301,7 +301,7 @@ const StaffPage: React.FC = () => {
         >
           <div className="space-y-4">
               {modalError && (
-                <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs border border-red-200 dark:border-red-800">
+                <div className="p-3 rounded-lg bg-surface-soft dark:bg-surface-soft text-error dark:text-error text-xs border border-line dark:border-line">
                   {modalError}
                 </div>
               )}

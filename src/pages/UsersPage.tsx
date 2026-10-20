@@ -411,7 +411,7 @@ export const UsersPage: React.FC = () => {
           <div className="rounded-2xl border border-app bg-surface overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-gray-50 dark:bg-white/5 border-b border-app text-muted font-bold">
+                <thead className="bg-surface-soft dark:bg-white/5 border-b border-app text-muted font-bold">
                   <tr>
                     <th className="p-3.5 w-10">
                       <button
@@ -448,7 +448,7 @@ export const UsersPage: React.FC = () => {
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: 0.2 }}
-                          className={`hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${
+                          className={`hover:bg-surface-soft dark:hover:bg-white/5 transition-colors ${
                             isSelected ? 'bg-primary-50/30 dark:bg-primary-950/20' : ''
                           }`}
                         >
@@ -534,7 +534,7 @@ export const UsersPage: React.FC = () => {
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => unblockMutation.mutate(user.id)}
-                                  className="text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
+                                  className="text-success hover:bg-surface-soft dark:hover:bg-surface-soft"
                                   title={t('users.unblock', 'Разблокировать')}
                                 >
                                   <Unlock size={15} />
@@ -544,7 +544,7 @@ export const UsersPage: React.FC = () => {
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => setBlockUser(user)}
-                                  className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+                                  className="text-error hover:text-error hover:bg-surface-soft dark:hover:bg-surface-soft"
                                   title={t('users.block', 'Заблокировать')}
                                 >
                                   <Lock size={15} />
@@ -556,7 +556,7 @@ export const UsersPage: React.FC = () => {
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => handleDeleteUser(user.id, user.email)}
-                                  className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                  className="text-error hover:text-error hover:bg-surface-soft dark:hover:bg-surface-soft"
                                   title={t('users.deleteUser', 'Удалить пользователя навсегда')}
                                 >
                                   <Trash2 size={15} />

@@ -145,7 +145,7 @@ export function Modal({
               <button
                 type="button"
                 onClick={onClose}
-                className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-gray-100 hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/5 cursor-pointer transition-colors ${
+                className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-soft hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/5 cursor-pointer transition-colors ${
                   headerContent ? 'col-start-2 row-start-1 sm:col-start-3 sm:justify-self-end' : 'col-start-2 row-start-1'
                 }`}
                 aria-label={closeLabel}

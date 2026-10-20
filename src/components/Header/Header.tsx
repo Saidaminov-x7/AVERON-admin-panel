@@ -182,7 +182,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           id="header-search-btn"
           className="
             hidden sm:flex items-center gap-2 pl-9 pr-3 h-10 text-sm rounded w-52 md:w-64
-            bg-gray-50 dark:bg-white/5
+            bg-surface-soft dark:bg-white/5
             border border-app hover:border-primary-500/50 dark:hover:border-primary-500/50
             text-muted hover:text-app
             transition-all duration-150 relative cursor-pointer group
@@ -192,7 +192,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
             <SearchIcon />
           </span>
           <span className="truncate text-xs md:text-sm">{t('common.search', 'Поиск по панели...')}</span>
-          <kbd className="ml-auto text-[11px] font-mono px-1.5 py-0.5 rounded bg-gray-200 dark:bg-white/10 text-muted opacity-80 group-hover:opacity-100">
+          <kbd className="ml-auto text-[11px] font-mono px-1.5 py-0.5 rounded bg-surface-soft dark:bg-white/10 text-muted opacity-80 group-hover:opacity-100">
             ⌘K
           </kbd>
         </button>
@@ -229,7 +229,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                   localStorage.setItem('i18nextLng', lang.code);
                 }}
                 className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-sm text-xs font-medium text-left transition-colors cursor-pointer ${
-                  active ? 'bg-primary-500 text-white font-semibold' : 'text-app hover:bg-gray-100 dark:hover:bg-white/5'
+                  active ? 'bg-primary-500 text-white font-semibold' : 'text-app hover:bg-surface-soft dark:hover:bg-white/5'
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -257,7 +257,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
               ${
                 isNotifOpen
                   ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10'
+                  : 'text-muted dark:text-ink-soft hover:bg-surface-soft dark:hover:bg-white/10'
               }
             `}
             aria-label={t('header.notifications')}
@@ -275,7 +275,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           {isNotifOpen && (
             <div id="header-notifications-panel" role="region" aria-label={t('header.notifications')} className="absolute right-0 mt-2 w-[min(20rem,calc(100vw-1.5rem))] sm:w-96 rounded bg-surface border border-app shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 z-50">
               {/* Шапка уведомлений */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-app bg-gray-50/50 dark:bg-white/5">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-app bg-surface-soft dark:bg-white/5">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-sm text-app">{t('header.notifications', 'Уведомления')}</span>
                   {unreadCount > 0 && (
@@ -309,7 +309,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                       type="button"
                       onClick={() => handleNotificationClick(n)}
                       className={`
-                        w-full p-3.5 text-left hover:bg-gray-50 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 transition-colors cursor-pointer flex gap-3
+                        w-full p-3.5 text-left hover:bg-surface-soft dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 transition-colors cursor-pointer flex gap-3
                         ${!n.isRead ? 'bg-primary-50/30 dark:bg-primary-950/10' : ''}
                       `}
                     >

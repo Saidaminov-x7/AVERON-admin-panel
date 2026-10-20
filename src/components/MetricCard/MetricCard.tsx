@@ -38,11 +38,11 @@ const MetricCard: React.FC<MetricCardProps> = ({
     return (
       <div className="card animate-pulse">
         <div className="flex items-center justify-between mb-3">
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24"/>
-          <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg"/>
+          <div className="h-3 bg-surface-soft dark:bg-surface-soft rounded w-24"/>
+          <div className="w-8 h-8 bg-surface-soft dark:bg-surface-soft rounded-lg"/>
         </div>
-        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2"/>
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16"/>
+        <div className="h-8 bg-surface-soft dark:bg-surface-soft rounded w-20 mb-2"/>
+        <div className="h-3 bg-surface-soft dark:bg-surface-soft rounded w-16"/>
       </div>
     );
   }
@@ -69,7 +69,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
       {/* Изменение */}
       {change !== undefined && (
         <div className={`flex items-center gap-1 text-xs font-medium ${
-          isPositive ? 'text-emerald-500' : 'text-red-500'
+          isPositive ? 'text-success' : 'text-error'
         }`}>
           {isPositive ? <ArrowUpIcon /> : <ArrowDownIcon />}
           <span>

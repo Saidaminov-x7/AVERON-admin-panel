@@ -78,7 +78,7 @@ const ExportReportsPage: React.FC = () => {
                     ${
                       selectedType === r.id
                         ? 'border-primary-500 bg-primary-50/40 dark:bg-primary-950/40 ring-2 ring-primary-500/20'
-                        : 'border-app hover:bg-gray-50 dark:hover:bg-white/5'
+                        : 'border-app hover:bg-surface-soft dark:hover:bg-white/5'
                     }
                   `}
                 >
@@ -126,7 +126,7 @@ const ExportReportsPage: React.FC = () => {
 
           {/* Кнопка скачивания */}
           <div className="flex justify-end">
-            {error && <p className="mr-4 self-center text-sm text-red-500">{error}</p>}
+            {error && <p className="mr-4 self-center text-sm text-error">{error}</p>}
             <button
               onClick={handleDownload}
               disabled={isDownloading || !dateFrom || !dateTo || dateFrom > dateTo}

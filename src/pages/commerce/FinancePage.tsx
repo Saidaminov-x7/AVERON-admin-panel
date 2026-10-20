@@ -23,22 +23,22 @@ export default function FinancePage() {
       label: t('finance.revenue', 'Выручка'),
       value: fmt(data?.finance.revenue),
       Icon: CircleDollarSign,
-      color: 'text-emerald-500',
+      color: 'text-success',
       border: '',
     },
     {
       label: t('finance.expenses', 'Все расходы'),
       value: fmt(data?.finance.expenses),
       Icon: TrendingDown,
-      color: 'text-red-500',
+      color: 'text-error',
       border: '',
     },
     {
       label: t('finance.netProfit', 'Чистая прибыль'),
       value: fmt(data?.finance.netProfit),
       Icon: TrendingUp,
-      color: 'text-amber-500',
-      border: 'border-amber-300 dark:border-amber-900/50',
+      color: 'text-warning',
+      border: 'border-line dark:border-line',
     },
   ];
 
@@ -47,7 +47,7 @@ export default function FinancePage() {
       <div className="space-y-6">
         {/* Заголовок */}
         <div>
-          <p className="text-xs font-bold tracking-widest text-amber-500">{t('finance.section', 'ACTUAL ECONOMICS')}</p>
+          <p className="text-xs font-bold tracking-widest text-warning">{t('finance.section', 'ACTUAL ECONOMICS')}</p>
           <h1 className="text-2xl font-black text-app">{t('finance.heroTitle', 'Реальная прибыль')}</h1>
         </div>
 

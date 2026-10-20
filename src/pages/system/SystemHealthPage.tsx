@@ -39,14 +39,14 @@ const SystemHealthPage: React.FC = () => {
         </div>
 
         {isError && (
-          <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-500">
+          <div className="rounded-xl border border-line bg-surface-soft p-4 text-sm text-error">
             {t('system.healthError', 'Не удалось получить состояние сервисов. Проверьте соединение с API и повторите обновление.')}
           </div>
         )}
 
         {isLoading && (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label={t('common.loading', 'Загрузка...')}>
-            {[0, 1, 2, 3].map((item) => <div key={item} className="card h-36 animate-pulse bg-gray-100 dark:bg-white/5" />)}
+            {[0, 1, 2, 3].map((item) => <div key={item} className="card h-36 animate-pulse bg-surface-soft dark:bg-white/5" />)}
           </div>
         )}
 
@@ -56,8 +56,8 @@ const SystemHealthPage: React.FC = () => {
             <div
               className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
                 data?.status === 'HEALTHY'
-                  ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50'
-                  : 'bg-amber-100 text-amber-600 dark:bg-amber-950/50'
+                  ? 'bg-surface-soft text-success dark:bg-surface-soft'
+                  : 'bg-surface-soft text-warning dark:bg-surface-soft'
               }`}
             >
               {data?.status === 'HEALTHY' ? <CheckCircle2 size={28} /> : <AlertTriangle size={28} />}
@@ -84,9 +84,9 @@ const SystemHealthPage: React.FC = () => {
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
               <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
-                <Server size={16} className="text-emerald-500" /> Backend API
+                <Server size={16} className="text-success" /> Backend API
               </span>
-              <span className={`px-2 py-0.5 rounded text-xs font-bold ${data?.backend.status === 'UP' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40' : 'bg-rose-100 text-rose-600 dark:bg-rose-950/40'}`}>
+              <span className={`px-2 py-0.5 rounded text-xs font-bold ${data?.backend.status === 'UP' ? 'bg-surface-soft text-success dark:bg-surface-soft' : 'bg-surface-soft text-error dark:bg-surface-soft'}`}>
                 {data?.backend.status ?? 'DOWN'}
               </span>
             </div>
@@ -98,13 +98,13 @@ const SystemHealthPage: React.FC = () => {
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
               <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
-                <Database size={16} className="text-blue-500" /> PostgreSQL
+                <Database size={16} className="text-info" /> PostgreSQL
               </span>
               <span
                 className={`px-2 py-0.5 rounded text-xs font-bold ${
                   data?.database.status === 'UP'
-                    ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40'
-                    : 'bg-rose-100 text-rose-600 dark:bg-rose-950/40'
+                    ? 'bg-surface-soft text-success dark:bg-surface-soft'
+                    : 'bg-surface-soft text-error dark:bg-surface-soft'
                 }`}
               >
                 {data?.database.status ?? 'DOWN'}
@@ -120,13 +120,13 @@ const SystemHealthPage: React.FC = () => {
           <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between text-muted">
               <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
-                <Activity size={16} className="text-rose-500" /> Redis Cache
+                <Activity size={16} className="text-error" /> Redis Cache
               </span>
               <span
                 className={`px-2 py-0.5 rounded text-xs font-bold ${
                   data?.redis.status === 'UP'
-                    ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40'
-                    : 'bg-rose-100 text-rose-600 dark:bg-rose-950/40'
+                    ? 'bg-surface-soft text-success dark:bg-surface-soft'
+                    : 'bg-surface-soft text-error dark:bg-surface-soft'
                 }`}
               >
                 {data?.redis.status ?? 'DOWN'}
@@ -150,9 +150,9 @@ const SystemHealthPage: React.FC = () => {
               {data?.memory.heapUsedMb ?? 0} / {data?.memory.heapTotalMb ?? 0} MB
             </div>
             <div className="text-xs text-muted">RSS: {data?.memory.rssMb ?? 0} MB</div>
-            <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
+            <div className="h-2 overflow-hidden rounded-full bg-surface-soft dark:bg-white/10">
               <div
-                className={`h-full rounded-full ${(data?.memory.heapUsagePercent ?? 0) > 85 ? 'bg-rose-500' : (data?.memory.heapUsagePercent ?? 0) > 70 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                className={`h-full rounded-full ${(data?.memory.heapUsagePercent ?? 0) > 85 ? 'bg-error' : (data?.memory.heapUsagePercent ?? 0) > 70 ? 'bg-warning' : 'bg-success'}`}
                 style={{ width: `${Math.min(data?.memory.heapUsagePercent ?? 0, 100)}%` }}
               />
             </div>

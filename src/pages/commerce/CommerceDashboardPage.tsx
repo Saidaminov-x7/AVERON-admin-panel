@@ -26,19 +26,19 @@ export default function CommerceDashboardPage() {
     `${Number(value || 0).toLocaleString(i18n.language?.startsWith('en') ? 'en-US' : 'ru-RU')} ${t('commerce.currencySuffix', 'сум')}`;
 
   const cards = [
-    { label: t('commerce.revenue', 'Выручка'),                     value: money(data?.finance.revenue),     Icon: CircleDollarSign, color: 'text-emerald-500' },
-    { label: t('commerce.netProfit', 'Чистая прибыль'),             value: money(data?.finance.netProfit),   Icon: TrendingUp,       color: 'text-amber-500' },
-    { label: t('commerce.orders', 'Заказы'),                       value: data?.orders.total ?? 0,          Icon: PackageCheck,     color: 'text-blue-500' },
-    { label: t('commerce.pendingReview', 'Ожидают проверки'),     value: data?.products.pendingReview ?? 0, Icon: ClipboardCheck,  color: 'text-orange-500' },
+    { label: t('commerce.revenue', 'Выручка'),                     value: money(data?.finance.revenue),     Icon: CircleDollarSign, color: 'text-success' },
+    { label: t('commerce.netProfit', 'Чистая прибыль'),             value: money(data?.finance.netProfit),   Icon: TrendingUp,       color: 'text-warning' },
+    { label: t('commerce.orders', 'Заказы'),                       value: data?.orders.total ?? 0,          Icon: PackageCheck,     color: 'text-info' },
+    { label: t('commerce.pendingReview', 'Ожидают проверки'),     value: data?.products.pendingReview ?? 0, Icon: ClipboardCheck,  color: 'text-warning' },
     { label: t('commerce.published', 'Опубликовано'),             value: data?.products.published ?? 0,    Icon: ShoppingBag,      color: 'text-primary-500' },
-    { label: t('commerce.users', 'Пользователи'),                 value: data?.users.total ?? 0,           Icon: Users,            color: 'text-cyan-500' },
+    { label: t('commerce.users', 'Пользователи'),                 value: data?.users.total ?? 0,           Icon: Users,            color: 'text-info' },
   ] as const;
 
   return (
     <Layout title={t('commerce.commandCenter', 'AVERON Command Center')}>
       {/* Hero-баннер */}
       <section className="overflow-hidden rounded-3xl bg-surface border border-app p-7 text-app shadow-sm">
-        <p className="text-xs font-bold tracking-[.2em] text-amber-500">{t('commerce.route', 'КИТАЙ → УЗБЕКИСТАН')}</p>
+        <p className="text-xs font-bold tracking-[.2em] text-warning">{t('commerce.route', 'КИТАЙ → УЗБЕКИСТАН')}</p>
         <h1 className="mt-3 text-3xl font-black text-app">{t('commerce.heroTitle', 'Товары, доставка и реальная прибыль')}</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
           {t('commerce.heroSubtitle', 'AI готовит карточки. Решение о публикации всегда принимает администратор.')}
@@ -47,7 +47,7 @@ export default function CommerceDashboardPage() {
 
       {/* Ошибка подключения */}
       {isError && (
-        <div className="card border-red-300 text-red-600 dark:border-red-900/50 dark:text-red-400">
+        <div className="card border-line text-error dark:border-line dark:text-error">
           {t('commerce.backendError', 'Backend AVERON недоступен. Проверьте соединение.')}
         </div>
       )}
