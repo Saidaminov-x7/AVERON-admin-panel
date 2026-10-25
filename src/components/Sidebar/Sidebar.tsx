@@ -269,7 +269,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
         >
           <Search size={17} aria-hidden="true" />
           <span className="min-w-0 flex-1 truncate text-left">{t("common.search")}</span>
-          <kbd className="rounded border border-app bg-app px-1.5 py-0.5 text-[10px] font-medium text-muted">⌘K</kbd>
+          <kbd className="whitespace-nowrap rounded border border-app bg-app px-1.5 py-0.5 text-[9px] font-medium text-muted">Ctrl/⌘ K</kbd>
         </Button>
       </div>
       <nav ref={navRef} className="admin-sidebar-nav min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-3 py-5" aria-label={t("header.mobileNavigation")}>
