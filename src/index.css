@@ -665,7 +665,8 @@ button, [role="button"], summary { user-select: none; }
     height: 100dvh;
     overflow: hidden;
     background: var(--color-sidebar-bg);
-    box-shadow: none;
+    box-shadow: var(--shadow-drawer);
+    border-left: 1px solid var(--color-border);
     visibility: hidden;
     transform: translateX(100%);
   }
@@ -707,6 +708,7 @@ button, [role="button"], summary { user-select: none; }
   }
 
   .averon-admin-shell .admin-mobile-navigation .admin-sidebar-brand,
+  .averon-admin-shell .admin-mobile-navigation .admin-drawer-search,
   .averon-admin-shell .admin-mobile-navigation .admin-sidebar-nav,
   .averon-admin-shell .admin-mobile-navigation [data-admin-mobile-utilities],
   .averon-admin-shell .admin-mobile-navigation [data-admin-drawer-footer] {
@@ -723,6 +725,10 @@ button, [role="button"], summary { user-select: none; }
   .averon-admin-shell .admin-mobile-navigation .admin-sidebar-nav {
     padding: 1rem 1.25rem 1.25rem;
     overscroll-behavior: contain;
+  }
+
+  .averon-admin-shell .admin-mobile-navigation .admin-drawer-search {
+    padding-inline: 1.25rem;
   }
 
   .averon-admin-shell .admin-mobile-navigation .admin-drawer-link {
