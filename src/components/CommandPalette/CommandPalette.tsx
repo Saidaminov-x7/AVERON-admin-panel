@@ -191,7 +191,7 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={r.path}
                       onSelect={() => go(r.path)}
-                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
+                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-[var(--color-surface-soft)] hover:text-app cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <span className="p-1.5 rounded-lg bg-gray-100 dark:bg-white/5 text-muted">
@@ -221,7 +221,7 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={l.id}
                       onSelect={() => go(`/products?highlight=${l.id}`)}
-                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
+                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-[var(--color-surface-soft)] hover:text-app cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <span className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 shrink-0">
@@ -254,7 +254,7 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={u.id}
                       onSelect={() => go(`/users/${u.id}`)}
-                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
+                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-[var(--color-surface-soft)] hover:text-app cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <span className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 shrink-0">

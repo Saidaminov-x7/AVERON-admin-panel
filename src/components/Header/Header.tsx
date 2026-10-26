@@ -350,7 +350,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
             hidden sm:flex items-center gap-1.5 px-4 py-2 text-sm font-medium
             text-primary-600 dark:text-primary-400
             border border-primary-500 rounded-lg
-            hover:bg-primary-50 dark:hover:bg-primary-900/20
+            hover:bg-[var(--color-surface-soft)]
             transition-all duration-150 cursor-pointer
           "
         >
