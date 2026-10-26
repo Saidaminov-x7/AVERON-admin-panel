@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import Layout from '../components/Layout';
 import { downloadAnalyticsReportApi, getRangeAnalyticsApi, getFunnelAnalyticsApi, getCustomerJourneyAnalyticsApi } from '../lib/analyticsApi';
+import { getAveragePaidOrderValue, validateAnalyticsDateRange } from '../lib/analyticsDateRange';
 
 const AnalyticsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -29,6 +30,7 @@ const AnalyticsPage: React.FC = () => {
   const [dateTo, setDateTo] = useState(todayStr);
 
   const isCustom = periodDays === -1;
+  const customRangeError = isCustom ? validateAnalyticsDateRange(dateFrom, dateTo) : null;
 
   const queryParams = isCustom
     ? { from: dateFrom, to: dateTo }
@@ -37,19 +39,23 @@ const AnalyticsPage: React.FC = () => {
   const { data: analytics, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin', 'analytics', 'range', queryParams],
     queryFn: () => getRangeAnalyticsApi(queryParams),
+    enabled: !customRangeError,
   });
 
   const { data: funnel, isError: isFunnelError, refetch: refetchFunnel } = useQuery({
     queryKey: ['admin', 'analytics', 'funnel', queryParams],
     queryFn: () => getFunnelAnalyticsApi(queryParams),
+    enabled: !customRangeError,
   });
   const { data: journey, isError: isJourneyError, refetch: refetchJourney } = useQuery({
     queryKey: ['admin', 'analytics', 'journey', queryParams],
     queryFn: () => getCustomerJourneyAnalyticsApi(queryParams),
+    enabled: !customRangeError,
   });
 
   const chartData = analytics?.chartData || [];
   const summary = analytics?.summary;
+  const averagePaidOrderValue = getAveragePaidOrderValue(summary?.revenueUzs, summary?.totalPaidOrders);
   const formatMetric = (value: number | undefined) => {
     if (isLoading) return '...';
     return typeof value !== 'number' || !Number.isFinite(value)
@@ -64,6 +70,7 @@ const AnalyticsPage: React.FC = () => {
       : `${(value * 100).toFixed(1)}%`;
 
   const exportReport = async () => {
+    if (customRangeError) return;
     setIsExporting(true);
     setExportError(false);
     try {
@@ -89,15 +96,17 @@ const AnalyticsPage: React.FC = () => {
 
   return (
     <Layout title={t('analytics.title')}>
-      <div className="space-y-6 max-w-7xl mx-auto">
+      <div className="analytics-page space-y-6 max-w-7xl mx-auto">
         {/* Фильтры периода и экспорт */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
             {PERIODS.map((p) => (
               <button
                 key={p.value}
+                type="button"
+                aria-pressed={periodDays === p.value}
                 onClick={() => setPeriodDays(p.value)}
-                className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${periodDays === p.value
+                className={`px-4 py-2 text-xs font-semibold transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${periodDays === p.value
                     ? 'bg-primary-500 text-white shadow-sm'
                     : 'border border-app text-muted hover:text-app hover:bg-gray-100 dark:hover:bg-white/5'
                   }`}
@@ -110,6 +119,8 @@ const AnalyticsPage: React.FC = () => {
               <div className="flex items-center gap-2 ml-2">
                 <input
                   type="date"
+                  aria-label={t('trafficPage.dateFrom')}
+                  aria-invalid={Boolean(customRangeError)}
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
                   className="input py-1 px-2.5 text-xs w-36"
@@ -117,6 +128,8 @@ const AnalyticsPage: React.FC = () => {
                 <span className="text-xs text-muted">—</span>
                 <input
                   type="date"
+                  aria-label={t('trafficPage.dateTo')}
+                  aria-invalid={Boolean(customRangeError)}
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
                   className="input py-1 px-2.5 text-xs w-36"
@@ -124,11 +137,16 @@ const AnalyticsPage: React.FC = () => {
               </div>
             )}
           </div>
+          {customRangeError && (
+            <p role="alert" className="text-sm text-red-600 dark:text-red-300">
+              {t(`analyticsPage.validation.${customRangeError}`)}
+            </p>
+          )}
 
           <button
             type="button"
             onClick={() => void exportReport()}
-            disabled={isExporting}
+            disabled={isExporting || Boolean(customRangeError)}
             className="px-4 py-2 text-xs font-semibold rounded-lg border border-app text-app hover:bg-gray-100 dark:hover:bg-white/5 flex items-center gap-2 transition-colors cursor-pointer"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -154,8 +172,8 @@ const AnalyticsPage: React.FC = () => {
         )}
 
         {/* Метрики за период */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="card p-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="card analytics-surface p-5">
             <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
               {t('analyticsPage.uniqueVisitors')}
             </div>
@@ -165,7 +183,7 @@ const AnalyticsPage: React.FC = () => {
             <p className="text-[11px] text-muted mt-1">{t('analyticsPage.dedupeNote')}</p>
           </div>
 
-          <div className="card p-5">
+          <div className="card analytics-surface p-5">
             <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
               {t('analyticsPage.paidOrders')}
             </div>
@@ -175,7 +193,7 @@ const AnalyticsPage: React.FC = () => {
             <p className="text-[11px] text-muted mt-1">{t('analyticsPage.paidOrdersNote')}</p>
           </div>
 
-          <div className="card p-5">
+          <div className="card analytics-surface p-5">
             <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
               {t('analyticsPage.netRevenue')}
             </div>
@@ -187,7 +205,7 @@ const AnalyticsPage: React.FC = () => {
             <p className="text-[11px] text-muted mt-1">{t('analyticsPage.netRevenueNote')}</p>
           </div>
 
-          <div className="card p-5">
+          <div className="card analytics-surface p-5">
             <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
               {t('analyticsPage.newProducts')}
             </div>
@@ -195,6 +213,30 @@ const AnalyticsPage: React.FC = () => {
               {formatMetric(summary?.totalProducts)}
             </div>
             <p className="text-[11px] text-muted mt-1">{t('analyticsPage.addedNote')}</p>
+          </div>
+
+          <div className="card analytics-surface p-5">
+            <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
+              {t('analyticsPage.newUsers')}
+            </div>
+            <div className="text-2xl font-extrabold text-app">
+              {formatMetric(summary?.totalUsers)}
+            </div>
+            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.registeredNote')}</p>
+          </div>
+
+          <div className="card analytics-surface p-5">
+            <div className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">
+              {t('analyticsPage.averageOrderValue')}
+            </div>
+            <div className="text-2xl font-extrabold text-app">
+              {isLoading
+                ? '...'
+                : averagePaidOrderValue === null
+                  ? t('analyticsPage.noData')
+                  : `${averagePaidOrderValue.toLocaleString(dateLocale, { maximumFractionDigits: 0 })} UZS`}
+            </div>
+            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.averageOrderValueNote')}</p>
           </div>
         </div>
 
@@ -211,20 +253,20 @@ const AnalyticsPage: React.FC = () => {
               [t('analyticsPage.journeyAvgDays'), journey?.avgDaysToFirstPurchase.toFixed(1)],
               [t('analyticsPage.journeyAvgProducts'), journey?.avgProductsInFirstOrder.toFixed(1)],
             ].map(([label, value]) => (
-              <div key={String(label)} className="card min-w-0 p-4">
+              <div key={String(label)} className="card analytics-surface min-w-0 p-4">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</p>
                 <p className="mt-2 text-xl font-semibold text-app">{value === undefined ? (isLoading ? '...' : t('analyticsPage.noData')) : value}</p>
               </div>
             ))}
           </div>
-          <div className="card grid gap-4 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div className="card analytics-surface grid gap-4 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
             <div>
               <h3 className="font-semibold text-app">{t('analyticsPage.journeyDay3')}</h3>
               <p className="mt-1 text-sm text-muted">{t('analyticsPage.journeyDay3Note', { buyers: journey?.day3Buyers ?? 0, visitors: journey?.matureVisitors ?? 0 })}</p>
             </div>
             <p className="text-3xl font-semibold text-app">{journey ? formatRate(journey.day3ConversionRate) : (isLoading ? '...' : t('analyticsPage.noData'))}</p>
           </div>
-          <div className="card p-4 sm:p-5">
+          <div className="card analytics-surface p-4 sm:p-5">
             <h3 className="mb-4 text-sm font-semibold text-app">{t('analyticsPage.journeyChartTitle')}</h3>
             {!journey?.daily.length ? (
               <div className="flex h-56 items-center justify-center text-sm text-muted">{isLoading ? '...' : t('analyticsPage.noData')}</div>
@@ -245,10 +287,10 @@ const AnalyticsPage: React.FC = () => {
         </section>
 
         {/* График динамики */}
-        <div className="card">
+        <div className="card analytics-surface">
           <h3 className="text-base font-semibold text-app mb-4">{t('analyticsPage.chartTitle')}</h3>
           {isLoading ? (
-            <div className="h-72 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />
+            <div className="analytics-surface-muted h-72 animate-pulse" aria-label={t('common.loading')} />
           ) : chartData.length === 0 ? (
             <div className="h-72 flex items-center justify-center text-muted text-sm">
               {t('analyticsPage.noData')}
@@ -334,8 +376,9 @@ const AnalyticsPage: React.FC = () => {
             <button type="button" className="underline" onClick={() => void refetchFunnel()}>{t('analyticsPage.retry')}</button>
           </div>
         ) : funnel && (
-          <div className="card">
-            <h3 className="text-base font-semibold text-app mb-4">{t('analyticsPage.engagementTitle')}</h3>
+          <div className="card analytics-surface">
+            <h3 className="text-base font-semibold text-app mb-1">{t('analyticsPage.engagementTitle')}</h3>
+            <p className="text-xs text-muted mb-4">{t('analyticsPage.funnelDescription')}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="p-4 rounded-xl bg-primary-500/10 border border-primary-500/20">
                 <div className="text-xs font-semibold text-primary-600 dark:text-primary-400">{t('analyticsPage.funnelViews')}</div>

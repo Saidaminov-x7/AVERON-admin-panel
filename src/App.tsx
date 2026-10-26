@@ -26,6 +26,7 @@ const SystemHealthPage = lazy(() => import('./pages/system/SystemHealthPage'));
 const IntegrationDiagnosticsPage = lazy(() => import('./pages/system/IntegrationDiagnosticsPage'));
 const MediaLibraryPage = lazy(() => import('./pages/MediaLibraryPage'));
 const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
+const TrafficAnalyticsPage = lazy(() => import('./pages/analytics/TrafficAnalyticsPage'));
 const ErrorLogsPage = lazy(() => import('./pages/ErrorLogsPage'));
 const VisualSearchAuditPage = lazy(() => import('./pages/VisualSearchAuditPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
@@ -64,6 +65,7 @@ export default function App() {
           <Route path="/visual-search/audit" element={<VisualSearchAuditPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/analytics/traffic" element={<TrafficAnalyticsPage />} />
           <Route path="/error-logs" element={<ErrorLogsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<Navigate to="/settings/general" replace />} />

@@ -70,6 +70,7 @@ const sections: NavSection[] = [
     items: [
       { to: "/users", labelKey: "sidebar.users", icon: Users },
       { to: "/analytics", labelKey: "sidebar.analytics", icon: BarChart2 },
+      { to: "/analytics/traffic", labelKey: "sidebar.trafficAnalytics", icon: Activity },
       { to: "/audit-log", labelKey: "sidebar.audit", icon: ShieldCheck },
       { to: "/visual-search/audit", labelKey: "sidebar.visualSearchAudit", icon: Search },
       { to: "/notifications", labelKey: "sidebar.notifications", icon: Bell },
