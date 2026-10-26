@@ -212,9 +212,9 @@ export default function CategoriesPage() {
             onChange={(parentId) => setValues((current) => ({ ...current, parentId }))}
           />
           <Input label={t("categories.sortOrder")} type="number" min={0} max={10000} step={1} value={values.sortOrder} onChange={(event) => setValues((current) => ({ ...current, sortOrder: event.target.value }))} />
-          <Input label="Фото категории (URL)" type="url" value={values.imageUrl} onChange={(event) => setValues((current) => ({ ...current, imageUrl: event.target.value }))} placeholder="https://..." />
+          <Input label={t("categories.imageUrl")} type="url" value={values.imageUrl} onChange={(event) => setValues((current) => ({ ...current, imageUrl: event.target.value }))} placeholder="https://..." />
           <div className="space-y-2">
-            <label className="text-xs font-medium text-muted">Или загрузите изображение</label>
+            <label className="text-xs font-medium text-muted">{t("categories.uploadImage")}</label>
             <input
               type="file"
               accept="image/*"
@@ -227,16 +227,16 @@ export default function CategoriesPage() {
                 try {
                   const uploaded = await uploadMediaApi(file);
                   setValues((current) => ({ ...current, imageUrl: uploaded.url }));
-                  toast.success("Изображение категории загружено");
+                  toast.success(t("categories.imageUploaded"));
                 } catch (error: any) {
-                  toast.error(error?.response?.data?.message || "Не удалось загрузить изображение");
+                  toast.error(error?.response?.data?.message || t("categories.imageUploadError"));
                 } finally {
                   setUploadingImage(false);
                   event.target.value = "";
                 }
               }}
             />
-            {values.imageUrl ? <img src={values.imageUrl} alt="Предпросмотр категории" className="h-24 w-24 object-cover" /> : null}
+            {values.imageUrl ? <img src={values.imageUrl} alt={t("categories.imagePreview")} className="h-24 w-24 object-cover" /> : null}
           </div>
         </form>
       </Modal>

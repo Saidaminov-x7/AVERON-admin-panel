@@ -138,7 +138,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           id={panelId}
           role="menu"
           data-admin-drawer-portal={portal ? '' : undefined}
-          className={`fixed z-50 w-48 overflow-y-auto overscroll-contain rounded-xl border border-app bg-surface shadow-xl animate-fade-in ${contentClassName}`}
+          className={`averon-admin-menu fixed z-50 w-48 overflow-y-auto overscroll-contain rounded-none border border-app bg-surface shadow-xl animate-fade-in ${contentClassName}`}
           style={{
             top: position?.top ?? 0,
             left: position?.left ?? 0,

@@ -3,14 +3,17 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/authStore';
 import { loginApi, verify2faApi, resend2faApi, verifyAdminTotpLoginApi } from '../lib/authApi';
 import ThemeToggle from '../components/ThemeToggle/ThemeToggle';
+import { Checkbox } from '../components/ui/Checkbox';
 
 const REMEMBER_EMAIL_KEY = 'admin_remembered_email';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { setAuth } = useAuthStore();
 
   const [step, setStep] = useState<'credentials' | 'telegram' | 'totp'>('credentials');
@@ -288,13 +291,15 @@ const LoginPage: React.FC = () => {
                     placeholder="Введите пароль"
                     required
                     autoComplete="current-password"
-                    className="input pr-10"
+                    className="input pr-11"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-app transition-colors"
-                    tabIndex={-1}
+                    aria-label={t(showPassword ? 'common.hidePassword' : 'common.showPassword')}
+                    title={t(showPassword ? 'common.hidePassword' : 'common.showPassword')}
+                    aria-pressed={showPassword}
+                    className="absolute right-0 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-none text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
                   >
                     {showPassword ? (
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -311,18 +316,12 @@ const LoginPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center text-sm">
-                <label className="flex items-center gap-2 cursor-pointer select-none text-app">
-                  <input
-                    type="checkbox"
-                    id="remember-me"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-4 h-4 cursor-pointer"
-                  />
-                  <span className="text-xs text-muted hover:text-app transition-colors">Запомнить меня</span>
-                </label>
-              </div>
+              <Checkbox
+                id="remember-me"
+                checked={rememberMe}
+                onChange={(event) => setRememberMe(event.target.checked)}
+                label={<span className="text-xs text-muted transition-colors hover:text-app">Запомнить меня</span>}
+              />
 
               {/* Ошибка */}
               {error && (
@@ -342,8 +341,8 @@ const LoginPage: React.FC = () => {
                 id="login-submit"
                 disabled={loading}
                 className="
-                  w-full py-2.5 px-4 rounded-lg font-medium text-sm text-white
-                  bg-primary-500 hover:bg-primary-600 active:bg-primary-700
+                  w-full py-2.5 px-4 rounded-none font-medium text-sm text-[var(--color-on-primary)]
+                  bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] active:brightness-90
                   disabled:opacity-60 disabled:cursor-not-allowed
                   transition-all duration-150
                   flex items-center justify-center gap-2
@@ -414,8 +413,8 @@ const LoginPage: React.FC = () => {
                 id="verify-2fa-submit"
                 disabled={loading || twoFactorCode.length !== 6}
                 className="
-                  w-full py-2.5 px-4 rounded-lg font-medium text-sm text-white
-                  bg-primary-500 hover:bg-primary-600 active:bg-primary-700
+                  w-full py-2.5 px-4 rounded-none font-medium text-sm text-[var(--color-on-primary)]
+                  bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] active:brightness-90
                   disabled:opacity-60 disabled:cursor-not-allowed
                   transition-all duration-150
                   flex items-center justify-center gap-2
@@ -478,7 +477,7 @@ const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading || twoFactorCode.trim().length < 6}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-none bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-[var(--color-on-primary)] transition-all hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? 'Проверка…' : 'Подтвердить и войти'}
               </button>

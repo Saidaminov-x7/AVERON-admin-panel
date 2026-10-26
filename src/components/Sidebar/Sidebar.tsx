@@ -309,7 +309,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
           className="min-w-0 flex-1"
           contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
           trigger={(
-            <span className="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)]">
+            <span className="flex h-11 w-full items-center justify-between gap-3 rounded-none border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)]">
               <span className="flex min-w-0 items-center gap-2.5">
                 <LanguageFlag locale={i18n.language.startsWith("uz") ? "uz" : i18n.language.startsWith("en") ? "en" : "ru"} />
                 <span className="truncate">{languages.find(({ code }) => i18n.language.startsWith(code))?.name ?? languages[0].name}</span>

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { ChevronDown, Check, Search, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { fieldContainerClass, fieldControlClass, fieldErrorClass, fieldLabelClass, fieldMessageClass } from './fieldStyles';
 
 export interface SelectOption {
@@ -40,7 +41,7 @@ export const Select: React.FC<SelectProps> = ({
   options,
   value,
   onChange,
-  placeholder = 'Выберите...',
+  placeholder,
   label,
   error,
   helperText,
@@ -52,6 +53,8 @@ export const Select: React.FC<SelectProps> = ({
   containerClassName,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t('select.choose');
   const [search, setSearch] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -189,6 +192,8 @@ export const Select: React.FC<SelectProps> = ({
       )}
       {name && <input type="hidden" name={name} value={value ?? ''} disabled={disabled} />}
 
+      {/* Keep the clear action as a separate keyboard-accessible control. */}
+      <div className="relative">
       {/* Trigger button */}
       <button
         ref={triggerRef}
@@ -218,6 +223,7 @@ export const Select: React.FC<SelectProps> = ({
           clsx(
             fieldControlClass,
             'h-11 flex items-center justify-between gap-2 text-left cursor-pointer transition-[transform,border-color,box-shadow,background-color] [transition-timing-function:var(--ease-out-ui)] active:scale-[.99]',
+            clearable && selectedOption && !disabled && 'pr-24',
             'focus-visible:ring-2 focus-visible:ring-primary-500/30',
             isOpen && 'border-primary-500 ring-2 ring-primary-500/20',
             error && fieldErrorClass,
@@ -227,28 +233,31 @@ export const Select: React.FC<SelectProps> = ({
       >
         <span className={clsx('truncate flex items-center gap-2', !selectedOption && 'text-muted')}>
           {selectedOption?.icon}
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption ? selectedOption.label : resolvedPlaceholder}
         </span>
         <div className="flex items-center gap-1 shrink-0 text-muted">
-          {clearable && selectedOption && !disabled && (
-            <span
-              role="button"
-              tabIndex={0}
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange('');
-              }}
-              className="p-0.5 hover:text-app rounded-md hover:bg-gray-100 dark:hover:bg-white/10"
-            >
-              <X size={14} />
-            </span>
-          )}
           <ChevronDown
             size={16}
             className={clsx('transition-transform duration-150', isOpen && 'rotate-180 text-primary-500')}
           />
         </div>
       </button>
+      {clearable && selectedOption && !disabled && (
+        <button
+          type="button"
+          aria-label={`${label ? `${label}: ` : ''}${t('select.clear')}`}
+          title={t('select.clear')}
+          onClick={() => {
+            onChange('');
+            setIsOpen(false);
+            triggerRef.current?.focus();
+          }}
+          className="absolute right-10 top-1/2 z-10 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-none bg-surface text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
+        >
+          <X size={14} aria-hidden="true" />
+        </button>
+      )}
+      </div>
 
       {/* Dropdown Menu */}
       {isOpen && createPortal(
@@ -275,16 +284,30 @@ export const Select: React.FC<SelectProps> = ({
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Поиск..."
-                  className="w-full h-8 pl-8 pr-2.5 text-xs rounded-lg bg-gray-50 dark:bg-white/5 border border-app text-app outline-none focus:border-primary-500"
+                  placeholder={t('select.searchPlaceholder')}
+                  className="w-full h-11 pl-8 pr-11 text-xs rounded-none bg-gray-50 dark:bg-white/5 border border-app text-app outline-none focus:border-primary-500"
                 />
+                {search && (
+                  <button
+                    type="button"
+                    aria-label={t('common.clearField')}
+                    title={t('common.clearField')}
+                    onClick={() => {
+                      setSearch('');
+                      requestAnimationFrame(() => searchInputRef.current?.focus());
+                    }}
+                    className="absolute right-0 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-none text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
+                  >
+                    <X size={14} aria-hidden="true" />
+                  </button>
+                )}
               </div>
             </div>
           )}
 
           <div className="min-h-0 flex-1 overflow-y-auto p-1 space-y-0.5">
             {filteredOptions.length === 0 ? (
-              <div className="py-4 text-center text-xs text-muted">Ничего не найдено</div>
+              <div className="py-4 text-center text-xs text-muted">{t('select.noOptions')}</div>
             ) : (
               filteredOptions.map((option) => {
                 const isSelected = option.value === value;
@@ -303,7 +326,7 @@ export const Select: React.FC<SelectProps> = ({
                     aria-selected={isSelected}
                     data-select-option
                     className={clsx(
-                      'min-h-11 w-full flex items-center justify-between px-3 py-2 text-xs rounded-theme text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500',
+                      'min-h-11 w-full flex items-center justify-between px-3 py-2 text-xs rounded-none text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500',
                       isSelected
                         ? 'bg-[var(--color-surface-soft)] text-app font-semibold'
                         : 'text-app hover:bg-[var(--color-surface-soft)]',

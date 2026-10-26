@@ -150,6 +150,11 @@ export const AuditLogPage: React.FC = () => {
             <Input
               placeholder={t('auditLog.searchPlaceholder', 'Поиск по пользователю, ресурсу или ID...')}
               value={searchInput}
+              clearable
+              onClear={() => {
+                setSearchInput('');
+                setPage(1);
+              }}
               onChange={(e) => {
                 setSearchInput(e.target.value);
                 setPage(1);

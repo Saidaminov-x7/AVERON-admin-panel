@@ -1,4 +1,17 @@
 {
+  "commandPalette": {
+    "title": "Search admin panel",
+    "noResults": "No results found for “{{query}}”",
+    "routes": "Admin sections",
+    "products": "Products",
+    "users": "Users"
+  },
+  "select": {
+    "choose": "Choose...",
+    "searchPlaceholder": "Search...",
+    "noOptions": "No results found",
+    "clear": "Clear selected value"
+  },
   "security": {
     "title": "Account security",
     "description": "Manage additional protection for administrator-panel sign-in.",
@@ -81,6 +94,9 @@
     "system": "Infrastructure"
   },
   "common": {
+    "clearField": "Clear field",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "search": "Search panel...",
     "searchPlaceholder": "Search sections, products, and users... (⌘K)",
     "save": "Save",
@@ -757,6 +773,11 @@
       "nameRu": "Name (RU)",
       "nameUz": "Name (UZ)",
       "nameEn": "Name (EN)",
+      "imageUrl": "Category image (URL)",
+      "uploadImage": "Or upload an image",
+      "imageUploaded": "Category image uploaded",
+      "imageUploadError": "Could not upload image",
+      "imagePreview": "Category preview",
       "parent": "Parent category",
       "root": "No parent",
       "sortOrder": "Sort order",
