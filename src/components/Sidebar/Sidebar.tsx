@@ -36,6 +36,8 @@ import { logoutApi } from "../../lib/authApi";
 import { useAuthStore } from "../../store/authStore";
 import { LanguageFlag } from "../ui/LanguageFlag";
 import { Dropdown } from "../Dropdown";
+import { Button } from "../ui";
+import { openDrawerSearch } from "./drawerSearch";
 
 type NavIcon = ComponentType<{ size?: number; strokeWidth?: number }>;
 type NavItem = { to: string; labelKey: string; icon: NavIcon };
@@ -239,7 +241,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
           aria-pressed={collapsed}
           title={t(compact ? "common.expand" : "common.collapse")}
           aria-label={t(compact ? "common.expand" : "common.collapse")}
-          className="admin-sidebar-collapse hidden size-9 items-center justify-center border border-app bg-surface text-muted transition-colors hover:bg-app hover:text-app lg:flex"
+          className="admin-sidebar-collapse hidden size-9 items-center justify-center border border-app bg-surface text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app lg:flex"
         >
           {compact ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
         </button>
@@ -250,11 +252,25 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
             onClick={onCloseMobile}
             aria-label={t("common.close")}
             data-action-id="admin.sidebar.close-mobile-navigation"
-            className="flex size-10 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-app lg:hidden"
+            className="flex size-11 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)] lg:hidden"
           >
             <X size={19} />
           </button>
         )}
+      </div>
+      <div className="admin-drawer-search px-4 pt-4 lg:hidden">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => openDrawerSearch(onCloseMobile)}
+          aria-label={t("common.search")}
+          data-action-id="admin.sidebar.open-search"
+          className="h-11 w-full justify-start gap-3 rounded-lg border-app bg-surface px-3 text-sm font-medium text-muted shadow-none hover:bg-[var(--color-surface-soft)] hover:text-app"
+        >
+          <Search size={17} aria-hidden="true" />
+          <span className="min-w-0 flex-1 truncate text-left">{t("common.search")}</span>
+          <kbd className="whitespace-nowrap rounded border border-app bg-app px-1.5 py-0.5 text-[9px] font-medium text-muted">Ctrl/⌘ K</kbd>
+        </Button>
       </div>
       <nav ref={navRef} className="admin-sidebar-nav min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-3 py-5" aria-label={t("header.mobileNavigation")}>
         {sections.map(({ titleKey, items }) => (
@@ -293,7 +309,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
           className="min-w-0 flex-1"
           contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
           trigger={(
-            <span className="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)]">
+            <span className="flex h-11 w-full items-center justify-between gap-3 rounded-none border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)]">
               <span className="flex min-w-0 items-center gap-2.5">
                 <LanguageFlag locale={i18n.language.startsWith("uz") ? "uz" : i18n.language.startsWith("en") ? "en" : "ru"} />
                 <span className="truncate">{languages.find(({ code }) => i18n.language.startsWith(code))?.name ?? languages[0].name}</span>

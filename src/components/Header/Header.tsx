@@ -161,7 +161,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
             aria-expanded={isMobileMenuOpen}
             aria-controls="admin-mobile-navigation"
             data-action-id="admin.sidebar.toggle-mobile-navigation"
-            className="inline-flex h-10 w-10 items-center justify-center rounded border border-app bg-surface text-app transition-colors hover:bg-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded border border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 lg:hidden"
           >
             {isMobileMenuOpen ? (
               <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="m18 6-12 12M6 6l12 12" /></svg>
@@ -181,14 +181,14 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           onClick={() => window.dispatchEvent(new CustomEvent('open-command-palette'))}
           id="header-search-btn"
           className="
-            hidden sm:flex items-center gap-2 pl-9 pr-3 h-10 text-sm rounded w-52 md:w-64
+            hidden sm:flex items-center gap-2 pl-9 pr-3 h-11 text-sm rounded-none w-52 md:w-64
             bg-gray-50 dark:bg-white/5
-            border border-app hover:border-primary-500/50 dark:hover:border-primary-500/50
+            border border-app hover:border-[var(--color-text-secondary)]
             text-muted hover:text-app
             transition-all duration-150 relative cursor-pointer group
           "
         >
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-hover:text-primary-500 transition-colors">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-hover:text-app transition-colors">
             <SearchIcon />
           </span>
           <span className="truncate text-xs md:text-sm">{t('common.search', 'Поиск по панели...')}</span>
@@ -201,7 +201,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
         <Dropdown
           align="right"
           trigger={
-            <div data-action-id="admin.header.language-indicator" className="flex items-center justify-between gap-1.5 h-10 px-3 rounded text-xs font-semibold bg-surface border border-app text-app hover:border-primary-500 transition-colors cursor-pointer select-none">
+            <div data-action-id="admin.header.language-indicator" className="flex items-center justify-between gap-1.5 h-11 px-3 rounded-none text-xs font-semibold bg-surface border border-app text-app hover:border-[var(--color-text-secondary)] transition-colors cursor-pointer select-none">
               <LanguageFlag
                 locale={i18n.language?.startsWith('uz') ? 'uz' : i18n.language?.startsWith('en') ? 'en' : 'ru'}
               />
@@ -228,8 +228,8 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                   i18n.changeLanguage(lang.code);
                   localStorage.setItem('i18nextLng', lang.code);
                 }}
-                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-sm text-xs font-medium text-left transition-colors cursor-pointer ${
-                  active ? 'bg-primary-500 text-white font-semibold' : 'text-app hover:bg-gray-100 dark:hover:bg-white/5'
+                className={`w-full flex min-h-11 items-center justify-between px-3 py-1.5 rounded-none text-xs font-medium text-left transition-colors cursor-pointer ${
+                  active ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] font-semibold' : 'text-app hover:bg-[var(--color-surface-soft)]'
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -252,12 +252,12 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
             type="button"
             onClick={() => setIsNotifOpen(!isNotifOpen)}
             className={`
-              relative w-10 h-10 rounded-lg flex items-center justify-center
+              relative w-11 h-11 rounded-none flex items-center justify-center
               transition-all duration-150 cursor-pointer
               ${
                 isNotifOpen
                   ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10'
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-[var(--color-surface-soft)]'
               }
             `}
             aria-label={t('header.notifications')}
@@ -309,7 +309,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                       type="button"
                       onClick={() => handleNotificationClick(n)}
                       className={`
-                        w-full p-3.5 text-left hover:bg-gray-50 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 transition-colors cursor-pointer flex gap-3
+                        w-full p-3.5 text-left hover:bg-[var(--color-surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 transition-colors cursor-pointer flex gap-3
                         ${!n.isRead ? 'bg-primary-50/30 dark:bg-primary-950/10' : ''}
                       `}
                     >
@@ -349,8 +349,8 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           className="
             hidden sm:flex items-center gap-1.5 px-4 py-2 text-sm font-medium
             text-primary-600 dark:text-primary-400
-            border border-primary-500 rounded-lg
-            hover:bg-primary-50 dark:hover:bg-primary-900/20
+            border border-app rounded-none
+            hover:bg-[var(--color-surface-soft)]
             transition-all duration-150 cursor-pointer
           "
         >

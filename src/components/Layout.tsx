@@ -122,7 +122,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
           type="button"
           aria-label={t('header.closeMenu')}
           onClick={() => setIsMobileMenuOpen(false)}
-          className="fixed inset-0 z-40 cursor-default bg-black/55 backdrop-blur-sm transition-opacity duration-200 ease-out lg:hidden"
+          className="fixed inset-0 z-40 cursor-default bg-black/45 backdrop-blur-[2px] transition-opacity duration-200 ease-out lg:hidden"
         />
       )}
 

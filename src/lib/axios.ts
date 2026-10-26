@@ -5,10 +5,14 @@
 
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
+import { resolveAdminApiOrigin, resolveAdminBrowserApiUrl } from './apiOrigin';
 
-const API_URL = import.meta.env.DEV || import.meta.env.VITE_AVERON_RUNTIME_TARGET === 'local'
-  ? '/api/backend'
-  : import.meta.env.VITE_API_URL || 'https://averon-backend-production.up.railway.app';
+const isLocalRuntime = import.meta.env.DEV || import.meta.env.VITE_AVERON_RUNTIME_TARGET === 'local';
+const localApiUrl = resolveAdminApiOrigin(import.meta.env.VITE_AVERON_LOCAL_API_URL || '', true, 'http://127.0.0.1:8080');
+const productionApiUrl = resolveAdminApiOrigin(import.meta.env.VITE_API_URL || '', !isLocalRuntime, 'https://averon-backend-production.up.railway.app');
+const localBrowserTarget = isLocalRuntime ? '/api/backend' : localApiUrl;
+const browserHostname = typeof window === 'undefined' ? '' : window.location.hostname;
+const API_URL = resolveAdminBrowserApiUrl(browserHostname, localBrowserTarget, productionApiUrl);
 export { API_URL };
 const PROACTIVE_REFRESH_BEFORE_MS = 5 * 60 * 1000; // 5 минут
 

@@ -4,6 +4,7 @@ import { BadgeCheck, Check, ExternalLink, RefreshCw, Search, X } from 'lucide-re
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
+import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { api } from '../../lib/axios';
 
@@ -109,12 +110,19 @@ export default function ReviewsPage() {
             onChange={(value) => { setVerified(value); setPage(1); }}
             containerClassName="text-sm font-semibold"
           />
-          <form onSubmit={(event) => { event.preventDefault(); setDebouncedSearch(search.trim()); setPage(1); }} className="text-sm font-semibold">
-            <label htmlFor="review-search">{t('commerceReviews.search')}</label>
-            <span className="mt-1 flex min-h-10 overflow-hidden rounded-lg border border-app">
-              <input id="review-search" value={search} onChange={(event) => setSearch(event.target.value)} maxLength={120} className="min-w-0 flex-1 bg-app px-3 font-normal" />
-              <button type="submit" className="px-3 text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" aria-label={t('commerceReviews.search')}><Search size={17} /></button>
-            </span>
+          <form onSubmit={(event) => { event.preventDefault(); setDebouncedSearch(search.trim()); setPage(1); }} className="flex items-end text-sm font-semibold">
+            <Input
+              id="review-search"
+              label={t('commerceReviews.search')}
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              onClear={() => { setSearch(''); setDebouncedSearch(''); setPage(1); }}
+              clearable
+              maxLength={120}
+              containerClassName="min-w-0 flex-1"
+              className="font-normal"
+            />
+            <button type="submit" className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-l-0 border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" aria-label={t('commerceReviews.search')}><Search size={17} /></button>
           </form>
         </section>
 

@@ -88,7 +88,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           disabled={currentPage <= 1}
           onClick={() => onPageChange(1)}
-          className="p-1.5 rounded-lg border border-app bg-surface hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-1.5 rounded-none border border-app bg-surface hover:bg-[var(--color-surface-soft)] hover:text-app disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-11 min-w-11"
           title="В начало"
         >
           <ChevronsLeft size={14} />
@@ -97,7 +97,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           disabled={currentPage <= 1}
           onClick={() => onPageChange(currentPage - 1)}
-          className="p-1.5 rounded-lg border border-app bg-surface hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-1.5 rounded-none border border-app bg-surface hover:bg-[var(--color-surface-soft)] hover:text-app disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-11 min-w-11"
           title="Назад"
         >
           <ChevronLeft size={14} />
@@ -118,10 +118,10 @@ export const Pagination: React.FC<PaginationProps> = ({
               type="button"
               onClick={() => onPageChange(p)}
               className={clsx(
-                'min-w-8 h-8 px-2 rounded-lg font-medium transition-all text-xs flex items-center justify-center cursor-pointer',
+                'min-w-11 min-h-11 px-3 rounded-none font-medium transition-all text-xs flex items-center justify-center cursor-pointer',
                 isActive
-                  ? 'bg-primary-500 text-white font-bold shadow-xs'
-                  : 'bg-surface border border-app text-app hover:bg-gray-100 dark:hover:bg-white/5',
+                  ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] font-bold shadow-xs'
+                  : 'bg-surface border border-app text-app hover:bg-[var(--color-surface-soft)]',
               )}
             >
               {p}
@@ -133,7 +133,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           disabled={currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
-          className="p-1.5 rounded-lg border border-app bg-surface hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-1.5 rounded-none border border-app bg-surface hover:bg-[var(--color-surface-soft)] hover:text-app disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-11 min-w-11"
           title="Вперёд"
         >
           <ChevronRight size={14} />
@@ -142,7 +142,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           disabled={currentPage >= totalPages}
           onClick={() => onPageChange(totalPages)}
-          className="p-1.5 rounded-lg border border-app bg-surface hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="p-1.5 rounded-none border border-app bg-surface hover:bg-[var(--color-surface-soft)] hover:text-app disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-11 min-w-11"
           title="В конец"
         >
           <ChevronsRight size={14} />

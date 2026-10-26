@@ -1,4 +1,49 @@
 {
+  "commandPalette": {
+    "title": "Boshqaruv panelidan qidirish",
+    "noResults": "“{{query}}” so'rovi bo'yicha natija topilmadi",
+    "routes": "Panel bo'limlari",
+    "products": "Mahsulotlar",
+    "users": "Foydalanuvchilar"
+  },
+  "categories": {
+    "all": "Barcha toifalar",
+    "page": "Toifalar",
+    "title": "Toifalarni boshqarish",
+    "add": "Toifa qo'shish",
+    "edit": "Toifani tahrirlash",
+    "slug": "Toifa manzili",
+    "nameRu": "Nomi (RU)",
+    "nameUz": "Nomi (UZ)",
+    "nameEn": "Nomi (EN)",
+    "imageUrl": "Toifa rasmi (URL)",
+    "uploadImage": "Yoki rasm yuklang",
+    "imageUploaded": "Toifa rasmi yuklandi",
+    "imageUploadError": "Rasmni yuklab bo'lmadi",
+    "imagePreview": "Toifa ko'rinishi",
+    "parent": "Yuqori toifa",
+    "root": "Yuqori toifasiz",
+    "sortOrder": "Saralash tartibi",
+    "productsCount": "Mahsulotlar",
+    "viewProducts": "Mahsulotlarni ko'rish",
+    "active": "Faol",
+    "inactive": "Arxivlangan",
+    "archive": "Arxivlash",
+    "restore": "Tiklash",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "empty": "Hozircha toifalar yo'q.",
+    "loadError": "Toifalarni yuklab bo'lmadi.",
+    "saveError": "Toifani saqlab bo'lmadi.",
+    "saved": "Toifa saqlandi.",
+    "archived": "Toifa arxivlandi."
+  },
+  "select": {
+    "choose": "Tanlang...",
+    "searchPlaceholder": "Qidirish...",
+    "noOptions": "Hech narsa topilmadi",
+    "clear": "Tanlangan qiymatni tozalash"
+  },
   "security": {
     "title": "Hisob xavfsizligi",
     "description": "Administrator paneliga kirishning qo'shimcha himoyasini boshqaring.",
@@ -81,6 +126,9 @@
     "system": "Infratuzilma"
   },
   "common": {
+    "clearField": "Maydonni tozalash",
+    "showPassword": "Parolni ko'rsatish",
+    "hidePassword": "Parolni yashirish",
     "search": "Panel bo'ylab qidirish...",
     "searchPlaceholder": "Bo'limlar, e'lonlar, foydalanuvchilarni qidirish... (⌘K)",
     "save": "Saqlash",

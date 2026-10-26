@@ -14,8 +14,8 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] active:brightness-90 shadow-xs',
-  ghost: 'bg-transparent text-app hover:bg-[var(--color-surface-soft)]',
+  primary: 'bg-[var(--color-primary)] text-[var(--color-on-primary)] hover:bg-[var(--color-primary-hover)] active:brightness-90 shadow-xs',
+  ghost: 'bg-transparent text-app hover:bg-[var(--color-surface-soft)] hover:text-app',
   danger: 'bg-red-600 text-white hover:bg-red-700 shadow-xs',
   outline: 'bg-surface border border-app text-app hover:bg-[var(--color-surface-soft)]',
 };
@@ -52,7 +52,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={[
-          'inline-flex items-center justify-center rounded-theme font-theme font-semibold whitespace-nowrap transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer outline-none select-none',
+          'inline-flex items-center justify-center rounded-none font-theme font-semibold whitespace-nowrap transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-150 [transition-timing-function:var(--ease-out-ui)] active:scale-[.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer outline-none select-none',
           variantClasses[variant],
           sizeClasses[size],
           className,
