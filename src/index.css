@@ -393,17 +393,14 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-primary) 3%, var(--c
 /* Analytics surfaces use the storefront's semantic dark tones while retaining light mode tokens. */
 .analytics-page .analytics-surface,
 .analytics-page .card.analytics-surface {
-  background-color: var(--color-surface);
+  background-color: var(--analytics-surface, var(--color-surface));
 }
 .analytics-page .analytics-surface-muted {
-  background-color: var(--color-surface-soft);
+  background-color: var(--analytics-surface-muted, var(--color-surface-soft));
 }
-.dark .analytics-page .analytics-surface,
-.dark .analytics-page .card.analytics-surface {
-  background-color: #181b1f;
-}
-.dark .analytics-page .analytics-surface-muted {
-  background-color: #20242a;
+.dark .analytics-page {
+  --analytics-surface: #181b1f;
+  --analytics-surface-muted: #20242a;
 }
 
 input[type="number"] {

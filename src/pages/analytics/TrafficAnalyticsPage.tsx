@@ -48,6 +48,7 @@ const TrafficAnalyticsPage: React.FC = () => {
 
   const daily = stats?.daily ?? [];
   const total = stats?.totalVisitors ?? 0;
+  const totalDailyVisits = daily.reduce((sum, item) => sum + item.visitors, 0);
   const isEmpty = !isLoading && !isError && daily.length === 0;
   const periods = [7, 14, 30, 60, 90];
 
@@ -137,10 +138,10 @@ const TrafficAnalyticsPage: React.FC = () => {
                   <YAxis tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} />
                   <Tooltip
                     labelFormatter={(value) => formatDate(String(value), { day: 'numeric', month: 'long', year: 'numeric' })}
-                    formatter={(value) => [formatMetric(Number(value)), t('trafficPage.uniqueVisitors')]}
+                    formatter={(value) => [formatMetric(Number(value)), t('trafficPage.dailyVisits')]}
                     contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 0, fontSize: '12px', color: 'var(--color-text)' }}
                   />
-                  <Area type="monotone" dataKey="visitors" name={t('trafficPage.uniqueVisitors')} stroke="var(--color-info)" strokeWidth={2.5} fillOpacity={1} fill="url(#visitorGradient)" />
+                  <Area type="monotone" dataKey="visitors" name={t('trafficPage.dailyVisits')} stroke="var(--color-info)" strokeWidth={2.5} fillOpacity={1} fill="url(#visitorGradient)" />
                 </AreaChart>
               </ResponsiveContainer>
             )}
@@ -165,7 +166,7 @@ const TrafficAnalyticsPage: React.FC = () => {
                   <tr><td colSpan={3} className="px-4 py-8 text-center text-muted sm:px-6">{rangeError ? getRangeErrorText() : isEmpty ? t('trafficPage.noData') : t('trafficPage.loadError')}</td></tr>
                 ) : (
                   [...daily].reverse().map((item) => {
-                    const share = total > 0 ? (item.visitors / total) * 100 : 0;
+                    const share = totalDailyVisits > 0 ? (item.visitors / totalDailyVisits) * 100 : 0;
                     return (
                       <tr key={item.date}>
                         <td className="px-4 py-3 font-medium text-app sm:px-6">{formatDate(item.date, { day: 'numeric', month: 'long', year: 'numeric', weekday: 'short' })}</td>
