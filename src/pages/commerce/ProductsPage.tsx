@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Layout from "../../components/Layout";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
-import { Pagination, Select } from "../../components/ui";
+import { Input, Pagination, Select } from "../../components/ui";
 import {
   createManualProduct,
   archiveProduct,
@@ -401,10 +401,18 @@ export default function ProductsPage() {
             updateCatalogQuery("q", searchDraft.trim());
           }}
         >
-          <label className="min-w-0 flex-1 text-xs font-semibold text-muted">
-            {t("products.searchProducts")}
-            <input id="admin-product-search" name="searchProducts" type="search" className="input mt-1.5 w-full" value={searchDraft} onChange={(event) => setSearchDraft(event.target.value)} />
-          </label>
+          <Input
+            id="admin-product-search"
+            name="searchProducts"
+            type="search"
+            label={t("products.searchProducts")}
+            containerClassName="min-w-0 flex-1 text-xs font-semibold text-muted"
+            className="mt-1.5"
+            value={searchDraft}
+            clearable
+            onClear={() => { setSearchDraft(""); updateCatalogQuery("q", ""); }}
+            onChange={(event) => setSearchDraft(event.target.value)}
+          />
           <button type="submit" className="btn-primary h-10">{t("products.searchAction")}</button>
         </form>
         <Select

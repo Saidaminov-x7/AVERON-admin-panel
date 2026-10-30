@@ -1,6 +1,3 @@
-// src/pages/commerce/CommerceDashboardPage.tsx
-// Главный дашборд коммерческой части AVERON
-
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,6 +13,7 @@ import {
 import Layout from '../../components/Layout';
 import { Button } from '../../components/ui';
 import { getCommerceDashboard } from '../../lib/commerceApi';
+import { formatCommerceNumber } from './commerceDashboardFormat';
 
 export default function CommerceDashboardPage() {
   const { t, i18n } = useTranslation();
@@ -24,6 +22,7 @@ export default function CommerceDashboardPage() {
     queryFn: getCommerceDashboard,
     refetchInterval: 30_000,
   });
+  const hasData = data !== undefined;
 
   const numberLocale = i18n.language?.startsWith('en')
     ? 'en-US'
@@ -44,14 +43,17 @@ export default function CommerceDashboardPage() {
 
   return (
     <Layout title={t('commerce.commandCenter', 'AVERON Command Center')}>
-      {/* Hero-баннер */}
-      <section className="overflow-hidden rounded-3xl bg-surface border border-app p-7 text-app shadow-sm">
-        <p className="text-xs font-bold tracking-[.2em] text-amber-500">{t('commerce.route', 'КИТАЙ → УЗБЕКИСТАН')}</p>
-        <h1 className="mt-3 text-3xl font-black text-app">{t('commerce.heroTitle', 'Товары, доставка и реальная прибыль')}</h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted">
+      <Card padding="lg" className="overflow-hidden">
+        <p className="text-xs font-bold tracking-[.18em] text-muted">
+          {t('commerce.route', 'КИТАЙ → УЗБЕКИСТАН')}
+        </p>
+        <h2 className="mt-3 max-w-4xl text-2xl font-bold leading-tight tracking-tight text-app sm:text-[28px]">
+          {t('commerce.heroTitle', 'Товары, доставка и реальная прибыль')}
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
           {t('commerce.heroSubtitle', 'AI готовит карточки. Решение о публикации всегда принимает администратор.')}
         </p>
-      </section>
+      </Card>
 
       {/* First load, failure without data, and real metrics have distinct states. */}
       {isLoading && !data ? (
@@ -113,21 +115,20 @@ export default function CommerceDashboardPage() {
         </>
       )}
 
-      {/* Информационные карточки */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="card">
-          <h2 className="font-bold text-app">{t('commerce.publicationControl', 'Контроль публикации')}</h2>
-          <p className="mt-2 text-sm text-muted">
+      <section aria-label={t('commerce.publicationControl', 'Контроль публикации')} className="grid grid-cols-1 gap-4 min-[768px]:grid-cols-2">
+        <Card padding="md">
+          <h2 className="text-base font-semibold leading-6 text-app">{t('commerce.publicationControl', 'Контроль публикации')}</h2>
+          <p className="mt-2 text-sm leading-6 text-muted">
             {t('commerce.publicationControlDesc', 'Ни один импортированный товар не появляется на сайте без Approve.')}
           </p>
-        </div>
-        <div className="card">
-          <h2 className="font-bold text-app">{t('commerce.actualEconomics', 'Фактическая экономика')}</h2>
-          <p className="mt-2 text-sm text-muted">
+        </Card>
+        <Card padding="md">
+          <h2 className="text-base font-semibold leading-6 text-app">{t('commerce.actualEconomics', 'Фактическая экономика')}</h2>
+          <p className="mt-2 text-sm leading-6 text-muted">
             {t('commerce.actualEconomicsDesc', 'Прибыль учитывает закупку, cargo, комиссии, доставку и возвраты.')}
           </p>
-        </div>
-      </div>
+        </Card>
+      </section>
     </Layout>
   );
 }

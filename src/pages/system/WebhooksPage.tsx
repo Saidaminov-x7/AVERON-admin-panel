@@ -138,7 +138,7 @@ const WebhooksPage: React.FC = () => {
                             type="button"
                             onClick={() => handleTestWebhook(w.id)}
                             disabled={testingId === w.id}
-                            className="px-2.5 py-1 rounded-lg text-xs font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/40 transition-colors cursor-pointer disabled:opacity-50"
+                            className="px-2.5 py-1 rounded-none text-xs font-medium text-app hover:bg-[var(--color-surface-soft)] hover:text-app transition-colors cursor-pointer disabled:opacity-60"
                             title="Тестовая отправка пинга"
                           >
                             {testingId === w.id ? 'Отправка...' : 'Тест'}

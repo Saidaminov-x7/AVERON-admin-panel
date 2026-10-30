@@ -1,10 +1,11 @@
 // src/components/CommandPalette/CommandPalette.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Command } from 'cmdk';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { searchProductsApi, searchUsersApi } from '../../lib/searchApi';
+import { getTabBoundaryTarget, restoreOpenerFocus } from './commandPaletteFocus';
 import {
   Home,
   List,
@@ -27,6 +28,7 @@ import {
   AlertCircle,
   Bell,
   Eye,
+  X,
 } from 'lucide-react';
 
 interface StaticRoute {
@@ -63,23 +65,42 @@ const STATIC_ROUTES: StaticRoute[] = [
 export const CommandPalette: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   // Глобальный хоткей: ⌘K / Ctrl+K и кастомный event 'open-command-palette'
   useEffect(() => {
+    const captureOpener = () => {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && active !== document.body && !dialogRef.current?.contains(active)) {
+        openerRef.current = active;
+      } else {
+        // Mobile drawer search closes its drawer before dispatching the open event.
+        // In that case focus may already be on body, so return to the surviving menu trigger.
+        openerRef.current = document.querySelector<HTMLElement>(
+          '[data-action-id="admin.sidebar.toggle-mobile-navigation"]',
+        ) ?? document.getElementById('header-search-btn');
+      }
+    };
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'л' || e.key === 'Л')) {
         e.preventDefault();
-        setOpen((v) => !v);
-      }
-      if (e.key === 'Escape') {
-        setOpen(false);
+        if (open) setOpen(false);
+        else {
+          captureOpener();
+          setOpen(true);
+        }
       }
     };
 
     const handleCustomOpen = () => {
-      setOpen(true);
+      if (!open) {
+        captureOpener();
+        setOpen(true);
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -89,7 +110,37 @@ export const CommandPalette: React.FC = () => {
       document.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('open-command-palette', handleCustomOpen);
     };
-  }, []);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    searchInputRef.current?.focus();
+    const opener = openerRef.current;
+    return () => {
+      requestAnimationFrame(() => {
+        restoreOpenerFocus(opener);
+      });
+    };
+  }, [open]);
+
+  const handleDialogKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(false);
+      return;
+    }
+    if (event.key !== 'Tab' || !dialogRef.current) return;
+
+    const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(
+      'input:not([disabled]), button:not([disabled]), a[href], select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    )).filter((element) => element.getAttribute('aria-hidden') !== 'true');
+    const boundaryTarget = getTabBoundaryTarget(focusable, document.activeElement, event.shiftKey);
+    if (boundaryTarget) {
+      event.preventDefault();
+      boundaryTarget.focus();
+    }
+  };
 
   const deferredQuery = query.trim();
 
@@ -132,14 +183,20 @@ export const CommandPalette: React.FC = () => {
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+      onKeyDown={handleDialogKeyDown}
       onClick={() => setOpen(false)}
     >
       <div
-        className="bg-surface border border-app rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[80vh]"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('commandPalette.title')}
+        tabIndex={-1}
+        className="bg-surface border border-app rounded-none shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <Command
-          label="Глобальный поиск"
+          label={t('commandPalette.title')}
           className="flex flex-col h-full overflow-hidden"
           shouldFilter={false}
         >
@@ -147,6 +204,7 @@ export const CommandPalette: React.FC = () => {
           <div className="flex items-center gap-3 px-4 py-3.5 border-b border-app">
             <Search size={20} className="text-muted shrink-0" />
             <Command.Input
+              ref={searchInputRef}
               value={query}
               onValueChange={setQuery}
               placeholder={t('common.searchPlaceholder', 'Поиск разделов, объявлений, пользователей... (нажмите Esc для закрытия)')}
@@ -156,10 +214,15 @@ export const CommandPalette: React.FC = () => {
             {query && (
               <button
                 type="button"
-                onClick={() => setQuery('')}
-                className="text-xs text-muted hover:text-app px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/10"
+                aria-label={t('select.clear')}
+                title={t('select.clear')}
+                onClick={() => {
+                  setQuery('');
+                  requestAnimationFrame(() => searchInputRef.current?.focus());
+                }}
+                className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-none text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
-                Очистить
+                <X size={16} aria-hidden="true" />
               </button>
             )}
             <kbd className="hidden sm:inline-block px-2 py-0.5 text-[11px] font-mono rounded bg-gray-100 dark:bg-white/10 text-muted border border-app">
@@ -176,14 +239,14 @@ export const CommandPalette: React.FC = () => {
               !isListingsLoading &&
               !isUsersLoading && (
                 <Command.Empty className="text-muted text-sm py-12 text-center">
-                  Ничего не найдено по запросу &laquo;{query}&raquo;
+                  {t('commandPalette.noResults', { query })}
                 </Command.Empty>
               )}
 
             {/* Группа: Разделы платформы */}
             {filteredRoutes.length > 0 && (
               <Command.Group
-                heading="Разделы платформы"
+                heading={t('commandPalette.routes')}
                 className="text-xs font-semibold text-muted px-2 py-1 select-none"
               >
                 <div className="space-y-1 mt-1">
@@ -191,7 +254,7 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={r.path}
                       onSelect={() => go(r.path)}
-                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
+                      className="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5 rounded-none text-app hover:bg-[var(--color-surface-soft)] hover:text-app data-[selected=true]:bg-[var(--color-surface-soft)] cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
                     >
                       <div className="flex items-center gap-3">
                         <span className="p-1.5 rounded-lg bg-gray-100 dark:bg-white/5 text-muted">
@@ -213,7 +276,7 @@ export const CommandPalette: React.FC = () => {
             {/* Группа: Товары */}
             {listingResults.length > 0 && (
               <Command.Group
-                heading="Товары"
+                heading={t('commandPalette.products')}
                 className="text-xs font-semibold text-muted px-2 py-1 select-none border-t border-app pt-3"
               >
                 <div className="space-y-1 mt-1">
@@ -221,7 +284,7 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={l.id}
                       onSelect={() => go(`/products?highlight=${l.id}`)}
-                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
+                      className="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5 rounded-none text-app hover:bg-[var(--color-surface-soft)] hover:text-app data-[selected=true]:bg-[var(--color-surface-soft)] cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <span className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 shrink-0">
@@ -246,7 +309,7 @@ export const CommandPalette: React.FC = () => {
             {/* Группа: Пользователи */}
             {userResults.length > 0 && (
               <Command.Group
-                heading="Пользователи"
+                heading={t('commandPalette.users')}
                 className="text-xs font-semibold text-muted px-2 py-1 select-none border-t border-app pt-3"
               >
                 <div className="space-y-1 mt-1">
@@ -254,7 +317,7 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={u.id}
                       onSelect={() => go(`/users/${u.id}`)}
-                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
+                      className="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5 rounded-none text-app hover:bg-[var(--color-surface-soft)] hover:text-app data-[selected=true]:bg-[var(--color-surface-soft)] cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <span className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 shrink-0">

@@ -159,6 +159,9 @@
     "system": "Infrastructure"
   },
   "common": {
+    "clearField": "Clear field",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "search": "Search panel...",
     "searchPlaceholder": "Search sections, products, and users... (⌘K)",
     "save": "Save",
@@ -1006,6 +1009,11 @@
       "nameRu": "Name (RU)",
       "nameUz": "Name (UZ)",
       "nameEn": "Name (EN)",
+      "imageUrl": "Category image (URL)",
+      "uploadImage": "Or upload an image",
+      "imageUploaded": "Category image uploaded",
+      "imageUploadError": "Could not upload image",
+      "imagePreview": "Category preview",
       "parent": "Parent category",
       "root": "No parent",
       "sortOrder": "Sort order",

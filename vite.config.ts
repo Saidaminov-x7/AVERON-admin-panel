@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { resolveAdminApiOrigin } from './src/lib/apiOrigin.ts';
 
 function releaseManifest(): Plugin {
   const getManifest = () => ({
@@ -28,7 +29,10 @@ function releaseManifest(): Plugin {
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
-  const apiTarget = env.VITE_API_URL || 'https://averon-backend-production.up.railway.app';
+  const isLocalRuntime = env.VITE_AVERON_RUNTIME_TARGET === 'local' || mode === 'development';
+  const apiTarget = isLocalRuntime
+    ? resolveAdminApiOrigin(env.VITE_AVERON_LOCAL_API_URL || '', true, 'http://127.0.0.1:8080')
+    : resolveAdminApiOrigin(env.VITE_API_URL || '', false, 'https://averon-backend-production.up.railway.app');
 
   return {
     plugins: [react(), releaseManifest()],

@@ -305,7 +305,7 @@ const SettingsPage: React.FC = () => {
                 onClick={() => {
                   setNavLinks([...navLinks, { label: '', href: '', position: 'header' }]);
                 }}
-                className="w-full p-2 text-sm text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg border border-dashed border-app"
+                className="w-full min-h-11 p-2 text-sm text-app hover:bg-[var(--color-surface-soft)] hover:text-app rounded-none border border-dashed border-app transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
                 + Добавить ссылку
               </button>

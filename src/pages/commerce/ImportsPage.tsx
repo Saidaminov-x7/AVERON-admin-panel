@@ -264,6 +264,8 @@ export default function ImportsPage() {
           <Input
             label={t('common.search', 'Поиск')}
             value={query}
+            clearable
+            onClear={() => { setQuery(''); resetFilters(); }}
             onChange={(event) => { setQuery(event.target.value); resetFilters(); }}
             placeholder={t('imports.searchPlaceholder', 'Название или ID источника')}
           />

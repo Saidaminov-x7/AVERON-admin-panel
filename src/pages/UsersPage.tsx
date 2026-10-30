@@ -332,6 +332,11 @@ export const UsersPage: React.FC = () => {
           <Input
             placeholder={t('users.searchPlaceholder', 'Поиск по имени, email, телефону или ID...')}
             value={searchInput}
+            clearable
+            onClear={() => {
+              setSearchInput('');
+              updateParam('page', 1);
+            }}
             onChange={(e) => {
               setSearchInput(e.target.value);
               updateParam('page', 1);

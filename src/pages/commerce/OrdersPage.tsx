@@ -7,6 +7,7 @@ import Layout from '../../components/Layout';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Modal } from '../../components/ui/Modal';
+import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { getOrder, getOrders, updateOrderShipping, updateOrderStatus } from '../../lib/commerceApi';
 import type { CommerceDeliveryStatus, CommerceOrderTransition } from '../../lib/commerceApi';
@@ -186,11 +187,17 @@ export default function OrdersPage() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <label className="relative min-w-64 flex-1">
-            <span className="sr-only">{copy.search}</span>
-            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={copy.search} className="input w-full pl-9" />
-          </label>
+          <Input
+            type="search"
+            aria-label={copy.search}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            onClear={() => setSearch('')}
+            clearable
+            placeholder={copy.search}
+            leftIcon={<Search size={16} />}
+            containerClassName="min-w-64 flex-1"
+          />
           <Select
             value={statusFilter}
             options={[{ value: '', label: copy.all }, ...Object.entries(statusLabels).map(([value, labels]) => ({ value, label: labels[locale] }))]}

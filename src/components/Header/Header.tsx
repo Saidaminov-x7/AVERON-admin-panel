@@ -82,12 +82,12 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           className="
             hidden sm:flex items-center gap-2 pl-9 pr-3 h-11 text-sm rounded w-52 md:w-64
             bg-gray-50 dark:bg-white/5
-            border border-app hover:border-primary-500/50 dark:hover:border-primary-500/50
+            border border-app hover:border-[var(--color-text-secondary)]
             text-muted hover:text-app
             transition-all duration-150 relative cursor-pointer group
           "
         >
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-hover:text-primary-500 transition-colors">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-hover:text-app transition-colors">
             <SearchIcon />
           </span>
           <span className="truncate text-xs md:text-sm">{t('common.search', 'Поиск по панели...')}</span>

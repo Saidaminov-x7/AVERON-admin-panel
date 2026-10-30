@@ -159,6 +159,9 @@
     "system": "Infratuzilma"
   },
   "common": {
+    "clearField": "Maydonni tozalash",
+    "showPassword": "Parolni ko'rsatish",
+    "hidePassword": "Parolni yashirish",
     "search": "Panel bo'ylab qidirish...",
     "searchPlaceholder": "Bo'limlar, e'lonlar, foydalanuvchilarni qidirish... (⌘K)",
     "save": "Saqlash",

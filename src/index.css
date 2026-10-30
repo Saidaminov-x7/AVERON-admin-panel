@@ -222,7 +222,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-primary) 3%, var(--c
 .averon-admin-shell :where(input:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select) {
   min-height: 44px;
   border-color: var(--color-border);
-  border-radius: var(--radius);
+  border-radius: 0;
   background-color: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-family);
@@ -245,12 +245,55 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-primary) 3%, var(--c
   border-radius: 0 !important;
   font-family: var(--font-family);
 }
+.averon-admin-shell :where(button, [role="button"], a[class*="btn-"], [role="combobox"], [role="option"], input:not([type="hidden"]):not([type="file"]):not([type="range"]), textarea, select) {
+  border-radius: 0 !important;
+}
+.averon-admin-shell button[class*="h-8"] { min-height: 36px; }
+.averon-admin-shell button[class*="h-8"][class*="w-8"] { min-width: 36px; }
+.averon-admin-shell a[class*="btn-"] { min-height: 44px; font-family: var(--font-family); }
+.averon-admin-shell :where(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--color-primary);
+}
+.averon-admin-shell input[type="search"]::-webkit-search-cancel-button,
+.averon-admin-shell input[type="search"]::-webkit-search-decoration,
+.averon-admin-shell input[type="search"]::-webkit-search-results-button,
+.averon-admin-shell input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+.averon-admin-shell :where(button, [role="button"]).bg-primary-500,
+.averon-admin-shell :where(button, [role="button"]).btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.averon-admin-shell :where(button, [role="button"]).bg-primary-500:hover:not(:disabled),
+.averon-admin-shell :where(button, [role="button"]).btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  color: var(--color-on-primary);
+}
+.averon-admin-shell a.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.averon-admin-shell a.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  color: var(--color-on-primary);
+}
 .averon-admin-shell button:not([class*="h-7"]):not([class*="h-8"]):not([class*="size-"]):not([class*="absolute"]) {
   min-height: 44px;
 }
 .averon-admin-shell :where(button, [role="button"], a):focus-visible {
   outline: 2px solid color-mix(in srgb, var(--color-primary) 55%, transparent);
   outline-offset: 2px;
+}
+@media (hover: none) and (pointer: coarse) {
+  .averon-admin-shell button[class*="h-7"],
+  .averon-admin-shell button[class*="h-8"],
+  .averon-admin-shell button[class*="size-"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 .averon-admin-shell :where(button, [role="button"]):disabled {
   cursor: not-allowed;
@@ -274,6 +317,13 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-primary) 3%, var(--c
   background: var(--color-surface);
   color: var(--color-text);
   box-shadow: 0 12px 32px rgb(20 20 20 / .12);
+}
+.averon-admin-menu {
+  border-radius: 0 !important;
+}
+.averon-admin-menu :where(button, [role="menuitem"], [role="menuitemradio"], [role="option"]) {
+  border-radius: 0 !important;
+  min-height: 44px;
 }
 .averon-admin-shell :where([class~="bg-white"], [class~="bg-gray-50"]) {
   border-color: var(--color-border);
@@ -896,6 +946,7 @@ html body a[class*="button"],
   }
 
   .averon-admin-shell .admin-mobile-navigation .admin-sidebar-brand,
+  .averon-admin-shell .admin-mobile-navigation .admin-drawer-search,
   .averon-admin-shell .admin-mobile-navigation .admin-sidebar-nav,
   .averon-admin-shell .admin-mobile-navigation [data-admin-mobile-utilities],
   .averon-admin-shell .admin-mobile-navigation [data-admin-drawer-footer] {
