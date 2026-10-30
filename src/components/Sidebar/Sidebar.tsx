@@ -5,9 +5,10 @@ import {
   Activity,
   AlertCircle,
   BarChart2,
+  BadgePercent,
   Bell,
   Check,
-  ChevronDown,
+  ChevronRight,
   ClipboardCheck,
   ExternalLink,
   Gauge,
@@ -25,7 +26,6 @@ import {
   ShoppingBag,
   Tags,
   Users,
-  UserRound,
   X,
 } from "lucide-react";
 import { getSidebarWidthPreference } from "./sidebarPreferences";
@@ -34,10 +34,7 @@ import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import { useAuth } from "../../hooks/useAuth";
 import { logoutApi } from "../../lib/authApi";
 import { useAuthStore } from "../../store/authStore";
-import { LanguageFlag } from "../ui/LanguageFlag";
 import { Dropdown } from "../Dropdown";
-import { Button } from "../ui";
-import { openDrawerSearch } from "./drawerSearch";
 
 type NavIcon = ComponentType<{ size?: number; strokeWidth?: number }>;
 type NavItem = { to: string; labelKey: string; icon: NavIcon };
@@ -62,7 +59,7 @@ const sections: NavSection[] = [
     items: [
       { to: "/orders", labelKey: "sidebar.orders", icon: PackageCheck },
       { to: "/finance", labelKey: "sidebar.finance", icon: ReceiptText },
-      { to: "/commerce/promo-codes", labelKey: "sidebar.commercePromos", icon: Tags },
+      { to: "/commerce/promo-codes", labelKey: "sidebar.commercePromos", icon: BadgePercent },
     ],
   },
   {
@@ -70,9 +67,14 @@ const sections: NavSection[] = [
     items: [
       { to: "/users", labelKey: "sidebar.users", icon: Users },
       { to: "/analytics", labelKey: "sidebar.analytics", icon: BarChart2 },
+    ],
+  },
+  {
+    titleKey: "sidebar.section.service",
+    items: [
+      { to: "/notifications", labelKey: "sidebar.notifications", icon: Bell },
       { to: "/audit-log", labelKey: "sidebar.audit", icon: ShieldCheck },
       { to: "/visual-search/audit", labelKey: "sidebar.visualSearchAudit", icon: Search },
-      { to: "/notifications", labelKey: "sidebar.notifications", icon: Bell },
       { to: "/error-logs", labelKey: "sidebar.errorLogs", icon: AlertCircle },
       { to: "/settings/general", labelKey: "sidebar.settings", icon: Settings },
       { to: "/system/health", labelKey: "sidebar.health", icon: HeartHandshake },
@@ -86,6 +88,8 @@ const languages = [
   { code: "uz", name: "Oʻzbekcha" },
   { code: "en", name: "English" },
 ] as const;
+
+const languageLabels = { ru: "Русский", uz: "Oʻzbekcha", en: "English" } as const;
 
 function readCollapsedPreference() {
   try {
@@ -221,17 +225,33 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
 
   return (
     <aside
-      style={{ "--admin-sidebar-width": `${compact ? 76 : width}px` } as CSSProperties}
+      style={{ "--admin-sidebar-width": `${compact ? 64 : width}px` } as CSSProperties}
       className={`sidebar-bg safe-top safe-bottom admin-sidebar relative flex h-dvh w-screen max-w-full shrink-0 flex-col overflow-hidden text-app transition-[width] duration-200 lg:w-[var(--admin-sidebar-width)] lg:border-r lg:sidebar-border ${compact ? "is-collapsed" : ""}`}
       aria-label={t("header.mobileNavigation")}
     >
-      <div className="admin-sidebar-brand sticky top-0 z-20 flex h-[72px] shrink-0 items-center justify-between border-b border-app bg-surface px-5">
-        <button type="button" onClick={() => { navigate("/"); onCloseMobile?.(); }} className="text-left" aria-label={t("sidebar.dashboard")}>
-          <span className="flex items-center gap-2 text-base font-black tracking-[.2em]">
-            <span className={compact ? "hidden lg:inline" : ""}>AVERON</span>
-            <span className={compact ? "lg:hidden" : "hidden"}>A</span>
+      <div className="admin-sidebar-brand sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-app bg-surface px-5">
+        <button
+          type="button"
+          onClick={() => {
+            if (compact) {
+              toggleCollapsed();
+              return;
+            }
+            navigate("/");
+            onCloseMobile?.();
+          }}
+          className={`flex items-center text-left ${compact ? "admin-sidebar-compact-toggle group relative lg:flex lg:size-11 lg:items-center lg:justify-center" : ""}`}
+          aria-label={t(compact ? "common.expand" : "sidebar.dashboard")}
+          title={compact ? t("common.expand") : undefined}
+          aria-pressed={compact ? collapsed : undefined}
+          data-action-id={compact ? "admin.sidebar.toggle-collapse" : undefined}
+        >
+          <span className="admin-mobile-brand flex items-center gap-2 text-base font-black tracking-[.2em]">
+            <span className={compact ? "hidden" : ""}>AVERON</span>
+            <span className={compact ? "admin-sidebar-compact-mark hidden lg:inline" : "hidden"}>A</span>
           </span>
-          {!compact && <span className="mt-1 block text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</span>}
+          {compact && <PanelLeftOpen className="admin-sidebar-compact-expand absolute inset-0 m-auto opacity-0 transition-opacity" size={17} aria-hidden="true" />}
+          {!compact && <span className="admin-mobile-brand-label ml-1 block text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</span>}
         </button>
 
         <button
@@ -241,7 +261,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
           aria-pressed={collapsed}
           title={t(compact ? "common.expand" : "common.collapse")}
           aria-label={t(compact ? "common.expand" : "common.collapse")}
-          className="admin-sidebar-collapse hidden size-9 items-center justify-center border border-app bg-surface text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app lg:flex"
+          className={`admin-sidebar-collapse hidden size-11 items-center justify-center border border-app bg-surface text-muted transition-colors hover:bg-app hover:text-app ${compact ? "lg:hidden" : "lg:flex"}`}
         >
           {compact ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
         </button>
@@ -252,34 +272,32 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
             onClick={onCloseMobile}
             aria-label={t("common.close")}
             data-action-id="admin.sidebar.close-mobile-navigation"
-            className="flex size-11 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)] lg:hidden"
+            className="flex size-11 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-app lg:hidden"
           >
             <X size={19} />
           </button>
         )}
       </div>
-      <div className="admin-drawer-search px-4 pt-4 lg:hidden">
-        <Button
+      <nav ref={navRef} className="admin-sidebar-nav min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-5" aria-label={t("header.mobileNavigation")}>
+        <button
           type="button"
-          variant="outline"
-          onClick={() => openDrawerSearch(onCloseMobile)}
-          aria-label={t("common.search")}
-          data-action-id="admin.sidebar.open-search"
-          className="h-11 w-full justify-start gap-3 rounded-lg border-app bg-surface px-3 text-sm font-medium text-muted shadow-none hover:bg-[var(--color-surface-soft)] hover:text-app"
+          data-action-id="admin.sidebar.mobile-search"
+          onClick={() => {
+            onCloseMobile?.();
+            window.dispatchEvent(new CustomEvent("open-command-palette"));
+          }}
+          className="admin-mobile-search flex min-h-12 w-full items-center gap-3 border-b border-app px-1 text-left text-sm text-muted transition-colors hover:text-app lg:hidden"
         >
           <Search size={17} aria-hidden="true" />
-          <span className="min-w-0 flex-1 truncate text-left">{t("common.search")}</span>
-          <kbd className="whitespace-nowrap rounded border border-app bg-app px-1.5 py-0.5 text-[9px] font-medium text-muted">Ctrl/⌘ K</kbd>
-        </Button>
-      </div>
-      <nav ref={navRef} className="admin-sidebar-nav min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain px-3 py-5" aria-label={t("header.mobileNavigation")}>
+          <span>{t("common.search")}</span>
+        </button>
         {sections.map(({ titleKey, items }) => (
           <section key={titleKey} aria-label={t(titleKey)}>
-            <h2 className={`admin-sidebar-section-title mb-2 px-3 text-[10px] font-bold tracking-[.12em] text-muted ${compact ? "lg:sr-only" : ""}`}>
+            <h2 className="admin-sidebar-section-title sr-only">
               {t(titleKey)}
             </h2>
-            <div className="space-y-1">
-              {items.map(({ to, labelKey, icon: Icon }) => (
+            <div className="admin-sidebar-items space-y-1">
+              {items.map(({ to, labelKey, icon: Icon }, index) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -289,8 +307,10 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
                   aria-label={t(labelKey)}
                   className={({ isActive }) => `admin-drawer-link flex min-h-11 items-center gap-3 px-3 py-2 text-sm transition-colors ${isActive ? "is-active" : ""}`}
                 >
+                  <span className="admin-mobile-link-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                   <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
-                  {!compact && <span className="admin-sidebar-label truncate">{t(labelKey)}</span>}
+                  <span className="admin-sidebar-label truncate">{t(labelKey)}</span>
+                  <ChevronRight className="admin-mobile-link-chevron" size={15} aria-hidden="true" />
                 </NavLink>
               ))}
             </div>
@@ -301,63 +321,59 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
       <div data-admin-mobile-utilities="" className="admin-sidebar-mobile-tools space-y-3 border-t border-app bg-surface px-4 py-4 lg:hidden">
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs font-semibold text-muted">{t("common.language")}</span>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <Dropdown
+              key={isMobileOpen ? "mobile-open" : "mobile-closed"}
+              portal
+              scrollable={false}
+              ariaLabel={t("common.language")}
+              className="w-11 shrink-0"
+              contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
+              trigger={(
+                <span className="flex h-11 w-11 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)]">
+                  <span>{(i18n.language.slice(0, 2) || "ru").toUpperCase()}</span>
+                </span>
+              )}
+            >
+              {languages.map(({ code }) => {
+                const active = i18n.language.slice(0, 2) === code;
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={active}
+                    data-action-id={`admin.sidebar.language.${code}`}
+                    onClick={() => changeLanguage(code)}
+                    className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${active ? "bg-[var(--color-surface-soft)] font-semibold text-app" : "text-app hover:bg-[var(--color-surface-soft)]"}`}
+                  >
+                    <span className="flex items-center gap-3"><span className="w-7 text-[11px] font-semibold tracking-wide text-muted">{code.toUpperCase()}</span>{languageLabels[code]}</span>
+                    {active && <Check size={16} className="text-primary-500" />}
+                  </button>
+                );
+              })}
+            </Dropdown>
+            <ThemeToggle />
+          </div>
         </div>
-        <Dropdown
-          key={isMobileOpen ? "mobile-open" : "mobile-closed"}
-          portal
-          className="min-w-0 flex-1"
-          contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
-          trigger={(
-            <span className="flex h-11 w-full items-center justify-between gap-3 rounded-none border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)]">
-              <span className="flex min-w-0 items-center gap-2.5">
-                <LanguageFlag locale={i18n.language.startsWith("uz") ? "uz" : i18n.language.startsWith("en") ? "en" : "ru"} />
-                <span className="truncate">{languages.find(({ code }) => i18n.language.startsWith(code))?.name ?? languages[0].name}</span>
-              </span>
-              <ChevronDown size={16} className="shrink-0 text-muted" />
-            </span>
-          )}
-        >
-          {languages.map(({ code, name }) => {
-            const active = i18n.language.slice(0, 2) === code;
-            return (
-              <button
-                key={code}
-                type="button"
-                role="menuitemradio"
-                aria-checked={active}
-                data-action-id={`admin.sidebar.language.${code}`}
-                onClick={() => changeLanguage(code)}
-                className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${active ? "bg-[var(--color-surface-soft)] font-semibold text-app" : "text-app hover:bg-[var(--color-surface-soft)]"}`}
-              >
-                <span className="flex items-center gap-3"><LanguageFlag locale={code} />{name}</span>
-                {active && <Check size={16} className="text-primary-500" />}
-              </button>
-            );
-          })}
-        </Dropdown>
-        <div className="grid grid-cols-2 gap-2">
-          <NavLink to="/notifications" onClick={onCloseMobile} className="flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
-            <Bell size={17} />{t("header.notifications")}
-          </NavLink>
-          <NavLink to="/profile" onClick={onCloseMobile} className="flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
-            <UserRound size={17} />{t("header.account")}
-          </NavLink>
-          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="col-span-2 flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
+        <div>
+          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
             <ExternalLink size={17} />{t("header.goToSite")}
           </a>
         </div>
       </div>
 
-      <div data-admin-drawer-footer="" className="admin-sidebar-account flex shrink-0 items-center gap-3 border-t border-app px-4 py-3">
-        <div className="admin-account-avatar flex size-9 shrink-0 items-center justify-center bg-app text-xs font-bold text-app" aria-hidden="true">
-          {(user?.name || "A").slice(0, 1).toUpperCase()}
-        </div>
-        <div className={`admin-sidebar-account-details min-w-0 flex-1 ${compact ? "lg:hidden" : ""}`}>
-            <p className="truncate text-sm font-semibold">{user?.name || t("sidebar.admin")}</p>
-            <p className="truncate text-xs text-muted">{user?.adminRole || "ADMIN"}</p>
-        </div>
-        <button type="button" onClick={logout} className="admin-logout flex size-9 shrink-0 items-center justify-center text-muted transition-colors hover:bg-red-500/10 hover:text-red-600" aria-label={t("sidebar.logout")} title={t("sidebar.logout")}>
+      <div data-admin-drawer-footer="" className={`admin-sidebar-account flex shrink-0 items-center gap-3 border-t border-app px-4 py-3 ${compact ? "lg:flex-col lg:gap-1 lg:px-0 lg:py-2" : ""}`}>
+        <NavLink to="/profile" onClick={onCloseMobile} aria-label={`${t("header.account")}: ${user?.name || t("sidebar.admin")}`} className={`admin-account-profile flex min-w-0 flex-1 items-center gap-3 text-left transition-colors hover:text-primary-600 ${compact ? "lg:flex-col lg:gap-1" : ""}`}>
+          <span className="admin-account-avatar flex size-11 shrink-0 items-center justify-center bg-app text-xs font-bold text-app" aria-hidden="true">
+            {(user?.name || "A").slice(0, 1).toUpperCase()}
+          </span>
+          <span className={`admin-sidebar-account-details min-w-0 flex-1 ${compact ? "lg:hidden" : ""}`}>
+              <span className="block truncate text-sm font-semibold">{user?.name || t("sidebar.admin")}</span>
+              <span className="block truncate text-xs text-muted">{user?.adminRole || "ADMIN"}</span>
+          </span>
+        </NavLink>
+        <button type="button" onClick={logout} className="admin-logout flex size-11 shrink-0 items-center justify-center text-muted transition-colors hover:bg-red-500/10 hover:text-red-600" aria-label={t("sidebar.logout")} title={t("sidebar.logout")}>
           <LogOut size={17} />
         </button>
       </div>

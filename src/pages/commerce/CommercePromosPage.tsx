@@ -98,7 +98,7 @@ export default function CommercePromosPage() {
 
   return (
     <Layout title={text.title}>
-      <main className="mx-auto max-w-7xl space-y-6 pb-12">
+      <main className="admin-page-full-width space-y-6 pb-12">
         <header className="flex flex-wrap items-start justify-between gap-4">
           <p className="max-w-3xl text-sm text-muted">{text.intro}</p>
           <Button type="button" onClick={() => setCreateOpen((open) => !open)}><Plus size={16} />{text.create}</Button>

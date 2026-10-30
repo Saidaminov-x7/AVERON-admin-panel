@@ -1,41 +1,43 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
+  AlertTriangle,
   CircleDollarSign,
   ClipboardCheck,
   PackageCheck,
+  RefreshCw,
   ShoppingBag,
   TrendingUp,
   Users,
 } from 'lucide-react';
 import Layout from '../../components/Layout';
-import { Card } from '../../components/ui/Card';
-import { Skeleton } from '../../components/ui/Skeleton';
+import { Button, Card } from '../../components/ui';
 import { getCommerceDashboard } from '../../lib/commerceApi';
-import { formatCommerceNumber } from './commerceDashboardFormat';
 
 export default function CommerceDashboardPage() {
   const { t, i18n } = useTranslation();
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ['commerce-dashboard'],
     queryFn: getCommerceDashboard,
     refetchInterval: 30_000,
   });
-  const hasData = data !== undefined;
 
-  const money = (value: string | number | undefined) => {
-    if (value === undefined) return '—';
-    return `${formatCommerceNumber(value, i18n.language)} ${t('commerce.currencySuffix', 'сум')}`;
-  };
+  const numberLocale = i18n.language?.startsWith('en')
+    ? 'en-US'
+    : i18n.language?.startsWith('uz')
+      ? 'uz-UZ'
+      : 'ru-RU';
+  const money = (value: string | number | undefined) =>
+    `${Number(value).toLocaleString(numberLocale)} ${t('commerce.currencySuffix', 'сум')}`;
 
-  const cards = [
-    { label: t('commerce.revenue', 'Выручка'), value: money(data?.finance.revenue), Icon: CircleDollarSign, color: 'text-emerald-600 dark:text-emerald-400' },
-    { label: t('commerce.netProfit', 'Чистая прибыль'), value: money(data?.finance.netProfit), Icon: TrendingUp, color: 'text-amber-600 dark:text-amber-400' },
-    { label: t('commerce.orders', 'Заказы'), value: data ? formatCommerceNumber(data.orders.total, i18n.language) : '—', Icon: PackageCheck, color: 'text-muted' },
-    { label: t('commerce.pendingReview', 'Ожидают проверки'), value: data ? formatCommerceNumber(data.products.pendingReview, i18n.language) : '—', Icon: ClipboardCheck, color: 'text-muted' },
-    { label: t('commerce.published', 'Опубликовано'), value: data ? formatCommerceNumber(data.products.published, i18n.language) : '—', Icon: ShoppingBag, color: 'text-muted' },
-    { label: t('commerce.users', 'Пользователи'), value: data ? formatCommerceNumber(data.users.total, i18n.language) : '—', Icon: Users, color: 'text-muted' },
-  ];
+  const cards = data ? [
+    { label: t('commerce.revenue', 'Выручка'),                 value: money(data.finance.revenue),       Icon: CircleDollarSign, color: 'text-emerald-500' },
+    { label: t('commerce.netProfit', 'Чистая прибыль'),         value: money(data.finance.netProfit),     Icon: TrendingUp,       color: 'text-amber-500' },
+    { label: t('commerce.orders', 'Заказы'),                   value: data.orders.total,                 Icon: PackageCheck,     color: 'text-blue-500' },
+    { label: t('commerce.pendingReview', 'Ожидают проверки'), value: data.products.pendingReview,      Icon: ClipboardCheck,  color: 'text-orange-500' },
+    { label: t('commerce.published', 'Опубликовано'),         value: data.products.published,           Icon: ShoppingBag,      color: 'text-primary-500' },
+    { label: t('commerce.users', 'Пользователи'),             value: data.users.total,                  Icon: Users,            color: 'text-cyan-500' },
+  ] : [];
 
   return (
     <Layout title={t('commerce.commandCenter', 'AVERON Command Center')}>
@@ -51,29 +53,65 @@ export default function CommerceDashboardPage() {
         </p>
       </Card>
 
-      {isError && (
-        <div role="alert" className="rounded-theme border border-red-300 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
-          {t('commerce.backendError', 'Backend AVERON недоступен. Проверьте соединение.')}
-        </div>
-      )}
-
-      <section aria-label={t('commerce.commandCenter', 'AVERON Command Center')} aria-busy={isLoading && !hasData}>
-        <div className="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1280px]:grid-cols-3">
-          {cards.map(({ label, value, Icon, color }) => (
-            <Card key={label} padding="md" className="min-w-0">
-              <div className="flex min-h-10 items-start justify-between gap-3">
-                <p className="max-w-[calc(100%-2.5rem)] text-sm font-medium leading-5 text-muted">{label}</p>
-                <Icon aria-hidden="true" focusable="false" className={`mt-0.5 shrink-0 ${color}`} size={20} />
+      {/* First load, failure without data, and real metrics have distinct states. */}
+      {isLoading && !data ? (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" role="status" aria-live="polite">
+          <span className="sr-only">{t('commerce.dashboardLoading', 'Загрузка показателей дашборда')}</span>
+          {Array.from({ length: 6 }, (_, index) => (
+            <div className="card space-y-4" key={index} aria-hidden="true">
+              <div className="flex items-center justify-between">
+                <div className="h-4 w-28 animate-pulse motion-reduce:animate-none bg-surface-soft" />
+                <div className="h-5 w-5 animate-pulse motion-reduce:animate-none bg-surface-soft" />
               </div>
-              <div className="mt-4 min-h-9 text-[26px] font-bold leading-9 tracking-tight tabular-nums text-app [overflow-wrap:anywhere] sm:text-[28px]">
-                {isLoading && !hasData
-                  ? <Skeleton className="mt-2 h-6 w-2/3" />
-                  : value}
-              </div>
-            </Card>
+              <div className="h-8 w-32 animate-pulse motion-reduce:animate-none bg-surface-soft" />
+            </div>
           ))}
         </div>
-      </section>
+      ) : isError && !data ? (
+        <section className="card flex flex-col gap-3 border-red-200 bg-red-50 p-4 text-app dark:border-red-900/50 dark:bg-red-950/20 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6" role="alert">
+          <div className="flex min-w-0 items-start gap-3">
+            <AlertTriangle className="mt-0.5 shrink-0 text-red-700 dark:text-red-300" size={20} aria-hidden="true" />
+            <div className="min-w-0">
+              <h2 className="font-semibold text-app">{t('commerce.dashboardUnavailableTitle', 'Не удалось загрузить показатели')}</h2>
+              <p className="mt-1 text-sm text-muted">{t('commerce.dashboardUnavailableDescription', 'Показатели скрыты, пока сервер не вернёт актуальные данные.')}</p>
+            </div>
+          </div>
+          <Button
+            variant="primary"
+            size="md"
+            leftIcon={<RefreshCw size={16} aria-hidden="true" />}
+            className="w-full shrink-0 rounded-none sm:w-auto"
+            onClick={() => { void refetch(); }}
+            disabled={isFetching}
+            loading={isFetching}
+            aria-busy={isFetching}
+          >
+            {t('commerce.retry', 'Повторить')}
+          </Button>
+        </section>
+      ) : (
+        <>
+          {isError && data && (
+            <div className="card flex items-start gap-3 border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200" role="status" aria-live="polite">
+              <AlertTriangle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+              <p className="text-sm">{t('commerce.dashboardStaleWarning', 'Не удалось обновить данные. Ниже показаны последние успешно загруженные значения.')}</p>
+            </div>
+          )}
+          {data && (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {cards.map(({ label, value, Icon, color }) => (
+                <div className="card" key={label}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-muted">{label}</span>
+                    <Icon className={color} size={22} />
+                  </div>
+                  <div className="mt-4 text-2xl font-black text-app">{value}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
       <section aria-label={t('commerce.publicationControl', 'Контроль публикации')} className="grid grid-cols-1 gap-4 min-[768px]:grid-cols-2">
         <Card padding="md">

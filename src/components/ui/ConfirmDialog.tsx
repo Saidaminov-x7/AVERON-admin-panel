@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AlertTriangle, Info } from 'lucide-react';
 import { Modal } from './Modal';
 import { Button } from './Button';
@@ -26,6 +26,16 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   variant = 'danger',
   loading = false,
 }) => {
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  const restoreFocusRef = useRef(false);
+  useEffect(() => {
+    if (!isOpen) {
+      restoreFocusRef.current = false;
+    } else if (!loading && restoreFocusRef.current) {
+      restoreFocusRef.current = false;
+      if (document.activeElement === document.body) confirmRef.current?.focus();
+    }
+  }, [isOpen, loading]);
   const iconConfig = {
     danger: {
       icon: <AlertTriangle size={24} className="text-red-500" />,
@@ -56,9 +66,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             {cancelLabel}
           </Button>
           <Button
+            ref={confirmRef}
             variant={iconConfig.btnVariant}
             size="sm"
             onClick={() => {
+              restoreFocusRef.current = document.activeElement === confirmRef.current;
               onConfirm();
             }}
             loading={loading}

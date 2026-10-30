@@ -92,7 +92,7 @@ export function Modal({
   };
 
   const panelClass = presentation === 'page'
-    ? 'admin-page-presentation mx-auto w-full max-w-5xl overflow-hidden rounded-theme border border-app shadow-sm'
+    ? 'admin-page-presentation -mx-4 max-w-none overflow-hidden rounded-none border-x-0 border-y border-app shadow-sm sm:mx-auto sm:w-full sm:max-w-5xl sm:rounded-theme sm:border-x'
     : `relative z-10 shadow-2xl border border-app ${
       fullscreenOnMobile
         ? `h-[100dvh] max-h-[100dvh] rounded-none border-x-0 border-y-0 sm:h-auto sm:max-h-[90vh] sm:rounded-theme sm:border ${sizeClasses[size]}`
@@ -122,7 +122,7 @@ export function Modal({
             aria-describedby={subtitle ? `${dialogId}-description` : undefined}
             tabIndex={-1}
             onKeyDown={presentation === 'page' ? undefined : handleDialogKeyDown}
-            className={`flex w-full min-h-0 flex-col font-theme bg-surface outline-none overflow-hidden ${panelClass}`}
+            className={`flex ${presentation === 'page' ? '' : 'w-full'} min-h-0 flex-col font-theme bg-surface outline-none overflow-hidden ${panelClass}`}
             initial={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}
             animate={{ opacity: 1, transform: 'scale(1)' }}
             exit={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}
@@ -145,7 +145,7 @@ export function Modal({
               <button
                 type="button"
                 onClick={onClose}
-                className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-none text-muted hover:bg-[var(--color-surface-soft)] hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 cursor-pointer transition-colors ${
+                className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-gray-100 hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/5 cursor-pointer transition-colors ${
                   headerContent ? 'col-start-2 row-start-1 sm:col-start-3 sm:justify-self-end' : 'col-start-2 row-start-1'
                 }`}
                 aria-label={closeLabel}
@@ -153,9 +153,9 @@ export function Modal({
                 <X size={18} />
               </button>
             </div>
-            <div className={presentation === 'page' ? 'p-4 sm:p-6' : 'min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6'}>{children}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">{children}</div>
             {footer && (
-              <div className="sticky bottom-0 z-20 flex shrink-0 items-center justify-end gap-3 border-t border-app bg-surface/95 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur sm:p-5">
+              <div className={`${presentation === 'page' ? 'admin-page-footer' : ''} sticky bottom-0 z-20 flex flex-wrap shrink-0 items-center justify-end gap-3 border-t border-app bg-surface/95 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur sm:flex-nowrap sm:p-5`}>
                 {footer}
               </div>
             )}

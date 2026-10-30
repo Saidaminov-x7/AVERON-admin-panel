@@ -15,19 +15,20 @@ import {
 } from '../lib/profileApi';
 import { logoutApi } from '../lib/authApi';
 import { AdminSecuritySection } from '../components/security/AdminSecuritySection';
-
-const roleTitles: Record<string, string> = {
-  SUPER_ADMIN: 'Супер Администратор',
-  ADMIN: 'Администратор',
-  MODERATOR: 'Модератор',
-  SUPPORT: 'Специалист поддержки',
-};
+import { Button } from '../components/ui/Button';
 
 const ProfilePage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { updateUser, logout } = useAuthStore();
+  const dateLocale = i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'uz' ? 'uz-UZ' : 'en-US';
+  const roleKeys: Record<string, string> = {
+    SUPER_ADMIN: 'profile.roleSuperAdmin',
+    ADMIN: 'profile.roleAdmin',
+    MODERATOR: 'profile.roleModerator',
+    SUPPORT: 'profile.roleSupport',
+  };
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['admin', 'profile'],
@@ -67,13 +68,13 @@ const ProfilePage: React.FC = () => {
     onSuccess: (updated) => {
       updateUser(updated);
       queryClient.invalidateQueries({ queryKey: ['admin', 'profile'] });
-      setProfileSuccess('Профиль успешно обновлён');
+      setProfileSuccess(t('profile.saved'));
       setProfileError('');
       setTimeout(() => setProfileSuccess(''), 3000);
     },
     onError: (err: unknown) => {
       const error = err as { response?: { data?: { message?: string } } };
-      setProfileError(error.response?.data?.message || 'Ошибка при обновлении профиля');
+      setProfileError(error.response?.data?.message || t('profile.saveFailed'));
     },
   });
 
@@ -81,7 +82,7 @@ const ProfilePage: React.FC = () => {
   const changePasswordMutation = useMutation({
     mutationFn: changePasswordApi,
     onSuccess: () => {
-      setPasswordSuccess('Пароль успешно изменён');
+      setPasswordSuccess(t('profile.passwordUpdated'));
       setPasswordError('');
       setCurrentPassword('');
       setNewPassword('');
@@ -90,7 +91,7 @@ const ProfilePage: React.FC = () => {
     },
     onError: (err: unknown) => {
       const error = err as { response?: { data?: { message?: string } } };
-      setPasswordError(error.response?.data?.message || 'Ошибка при смене пароля');
+      setPasswordError(error.response?.data?.message || t('profile.passwordUpdateFailed'));
     },
   });
 
@@ -106,7 +107,7 @@ const ProfilePage: React.FC = () => {
       setAvatar(result.url);
       updateProfileMutation.mutate({ name, avatar: result.url });
     } catch {
-      setProfileError('Ошибка при загрузке аватара');
+      setProfileError(t('profile.avatarUploadFailed'));
     } finally {
       setIsUploading(false);
     }
@@ -125,12 +126,12 @@ const ProfilePage: React.FC = () => {
     setPasswordError('');
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('Новые пароли не совпадают');
+      setPasswordError(t('profile.passwordMismatch'));
       return;
     }
 
     if (newPassword.length < 8 || !/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/\d/.test(newPassword)) {
-      setPasswordError('Пароль должен содержать минимум 8 символов, заглавную и строчную буквы и цифру');
+      setPasswordError(t('profile.passwordRequirements'));
       return;
     }
 
@@ -150,7 +151,7 @@ const ProfilePage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Layout title="Профиль">
+      <Layout title={t('profile.title')}>
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="card h-48 animate-pulse bg-gray-100 dark:bg-white/5" />
           <div className="card h-64 animate-pulse bg-gray-100 dark:bg-white/5" />
@@ -160,7 +161,7 @@ const ProfilePage: React.FC = () => {
   }
 
   return (
-    <Layout title="Профиль администратора">
+      <Layout title={t('profile.title')}>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Карточка информации о роли и статусе */}
         <div className="card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
@@ -180,7 +181,8 @@ const ProfilePage: React.FC = () => {
               <label
                 htmlFor="avatar-upload"
                 className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-surface border border-app shadow-md cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 text-muted hover:text-app transition-all"
-                title="Загрузить новое фото"
+                title={t('profile.uploadAvatar')}
+                aria-label={t('profile.uploadAvatar')}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
@@ -201,43 +203,45 @@ const ProfilePage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold text-app">{profile?.name}</h2>
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400">
-                  {roleTitles[profile?.adminRole || 'SUPER_ADMIN'] || 'Администратор'}
+                  {t(roleKeys[profile?.adminRole || 'SUPER_ADMIN'] || 'profile.roleAdmin')}
                 </span>
               </div>
               <p className="text-sm text-muted mt-0.5">{profile?.email}</p>
               <div className="flex items-center gap-4 text-xs text-muted mt-2">
                 <span>
-                  Вход:{' '}
+                  {t('profile.lastLogin')}:{' '}
                   {profile?.lastLoginAt
-                    ? new Date(profile.lastLoginAt).toLocaleString('ru-RU', {
+                    ? new Date(profile.lastLoginAt).toLocaleString(dateLocale, {
                         day: 'numeric',
                         month: 'short',
                         hour: '2-digit',
                         minute: '2-digit',
                       })
-                    : 'Не зафиксирован'}
+                    : t('profile.notRecorded')}
                 </span>
                 <span>
-                  Регистрация:{' '}
+                  {t('profile.createdAt')}:{' '}
                   {profile?.createdAt
-                    ? new Date(profile.createdAt).toLocaleDateString('ru-RU')
+                    ? new Date(profile.createdAt).toLocaleDateString(dateLocale)
                     : '—'}
                 </span>
               </div>
             </div>
           </div>
 
-          <button
+          <Button
+            variant="danger"
+            size="md"
             onClick={handleLogout}
-            className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer self-stretch sm:self-center"
+            className="self-stretch sm:self-center"
           >
-            Выйти из аккаунта
-          </button>
+            {t('profile.logout')}
+          </Button>
         </div>
 
         {/* Секция изменения имени и данных */}
         <div className="card">
-          <h3 className="text-base font-semibold text-app mb-4">Основные данные</h3>
+          <h3 className="text-base font-semibold text-app mb-4">{t('profile.personalData')}</h3>
           {profileSuccess && (
             <div className="p-3 mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-sm border border-green-200 dark:border-green-800">
               {profileSuccess}
@@ -251,8 +255,9 @@ const ProfilePage: React.FC = () => {
 
           <form onSubmit={handleProfileSubmit} className="space-y-4 max-w-md">
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Имя</label>
+              <label htmlFor="profile-name" className="block text-sm font-medium text-app mb-1.5">{t('profile.name')}</label>
               <input
+                id="profile-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -262,8 +267,9 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Email (только чтение)</label>
+              <label htmlFor="profile-email" className="block text-sm font-medium text-app mb-1.5">{t('profile.emailReadOnly')}</label>
               <input
+                id="profile-email"
                 type="email"
                 value={profile?.email || ''}
                 disabled
@@ -272,8 +278,9 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Телефон</label>
+              <label htmlFor="profile-phone" className="block text-sm font-medium text-app mb-1.5">{t('profile.phone')}</label>
               <input
+                id="profile-phone"
                 type="text"
                 value={profile?.phone || ''}
                 disabled
@@ -298,13 +305,13 @@ const ProfilePage: React.FC = () => {
               <p className="mt-1 text-xs text-muted">{t('profile.telegramIdHint')}</p>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={updateProfileMutation.isPending || isUploading}
-              className="btn-primary"
+              loading={updateProfileMutation.isPending || isUploading}
             >
-              {updateProfileMutation.isPending ? 'Сохранение...' : 'Сохранить изменения'}
-            </button>
+              {updateProfileMutation.isPending || isUploading ? t('profile.saving') : t('profile.saveChanges')}
+            </Button>
           </form>
         </div>
 
@@ -312,7 +319,7 @@ const ProfilePage: React.FC = () => {
 
         {/* Секция смены пароля */}
         <div className="card">
-          <h3 className="text-base font-semibold text-app mb-4">Смена пароля</h3>
+          <h3 className="text-base font-semibold text-app mb-4">{t('profile.changePassword')}</h3>
           {passwordSuccess && (
             <div className="p-3 mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-sm border border-green-200 dark:border-green-800">
               {passwordSuccess}
@@ -326,8 +333,9 @@ const ProfilePage: React.FC = () => {
 
           <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-md">
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Текущий пароль</label>
+              <label htmlFor="profile-current-password" className="block text-sm font-medium text-app mb-1.5">{t('profile.currentPassword')}</label>
               <input
+                id="profile-current-password"
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
@@ -337,8 +345,9 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Новый пароль</label>
+              <label htmlFor="profile-new-password" className="block text-sm font-medium text-app mb-1.5">{t('profile.newPassword')}</label>
               <input
+                id="profile-new-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -347,12 +356,13 @@ const ProfilePage: React.FC = () => {
                 autoComplete="new-password"
                 className="input"
               />
-              <p className="mt-1 text-xs text-muted">Не менее 8 символов, включая заглавную, строчную букву и цифру.</p>
+              <p className="mt-1 text-xs text-muted">{t('profile.passwordRequirements')}</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-app mb-1.5">Подтверждение нового пароля</label>
+              <label htmlFor="profile-confirm-password" className="block text-sm font-medium text-app mb-1.5">{t('profile.confirmPassword')}</label>
               <input
+                id="profile-confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -362,13 +372,13 @@ const ProfilePage: React.FC = () => {
               />
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={changePasswordMutation.isPending}
-              className="btn-primary"
+              loading={changePasswordMutation.isPending}
             >
-              {changePasswordMutation.isPending ? 'Обновление...' : 'Обновить пароль'}
-            </button>
+              {changePasswordMutation.isPending ? t('profile.passwordUpdating') : t('profile.updatePassword')}
+            </Button>
           </form>
         </div>
       </div>

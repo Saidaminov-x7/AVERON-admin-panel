@@ -86,7 +86,7 @@ export function ProductRichTextField({
       aria-label={labelText}
       title={labelText}
       onClick={() => handleFormat(format)}
-      className="inline-flex size-8 items-center justify-center rounded-md border border-app bg-surface text-muted transition-colors hover:bg-surface-secondary hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      className="inline-flex size-11 items-center justify-center rounded-md border border-app bg-surface text-muted transition-colors hover:bg-surface-secondary hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:size-9"
     >
       {icon}
     </button>
@@ -114,7 +114,7 @@ export function ProductRichTextField({
           error={error}
         />
       )}
-      <div className="mt-2 flex flex-wrap items-center gap-1.5" aria-label={copy.hint}>
+      <div role="group" className="mt-2 flex flex-wrap items-center gap-1.5" aria-label={copy.hint}>
         {toolbarButton("bold", copy.bold, <Bold size={15} />)}
         {toolbarButton("italic", copy.italic, <Italic size={15} />)}
         {toolbarButton("strikethrough", copy.strikethrough, <Strikethrough size={15} />)}

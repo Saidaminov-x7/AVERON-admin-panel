@@ -15,32 +15,32 @@ import {
 import { useAuthStore } from '../../store/authStore';
 import type { AdminRoleType } from '../../store/authStore';
 
-const roleLabels: Record<AdminRoleType, { label: string; color: string; desc: string }> = {
+const roleLabels: Record<AdminRoleType, { labelKey: string; color: string; descKey: string }> = {
   SUPER_ADMIN: {
-    label: 'Супер Администратор',
+    labelKey: 'superAdmin',
     color: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400',
-    desc: 'Полный доступ ко всей системе, сотрудникам и настройкам',
+    descKey: 'superAdminDescription',
   },
   ADMIN: {
-    label: 'Администратор',
+    labelKey: 'admin',
     color: 'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400',
-    desc: 'Модерация, пользователи, аналитика, конструктор страниц',
+    descKey: 'adminDescription',
   },
   MODERATOR: {
-    label: 'Модератор',
+    labelKey: 'moderator',
     color: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400',
-    desc: 'Одобрение/отклонение объявлений, просмотр пользователей',
+    descKey: 'moderatorDescription',
   },
   SUPPORT: {
-    label: 'Поддержка',
+    labelKey: 'support',
     color: 'bg-gray-100 text-gray-800 dark:bg-white/10 dark:text-gray-200',
-    desc: 'Только чтение (read-only) объявлений и пользователей',
+    descKey: 'supportDescription',
   },
 };
 
 const StaffPage: React.FC = () => {
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const currentUser = useAuthStore((state) => state.user);
 
   const { data: staffList = [], isLoading } = useQuery({
@@ -55,6 +55,7 @@ const StaffPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [modalError, setModalError] = useState('');
   const [feedbackMsg, setFeedbackMsg] = useState('');
+  const dateLocale = i18n.language?.startsWith('uz') ? 'uz-UZ' : i18n.language?.startsWith('en') ? 'en-US' : 'ru-RU';
 
   // Мутация: добавление сотрудника
   const addMutation = useMutation({
@@ -65,12 +66,12 @@ const StaffPage: React.FC = () => {
       setEmail('');
       setName('');
       setPassword('');
-      setFeedbackMsg(t('common.saved', 'Сотрудник успешно добавлен'));
+      setFeedbackMsg(t('staffPage.addSuccess'));
       setTimeout(() => setFeedbackMsg(''), 3000);
     },
     onError: (err: unknown) => {
       const error = err as { response?: { data?: { message?: string } } };
-      setModalError(error.response?.data?.message || 'Ошибка добавления сотрудника');
+      setModalError(error.response?.data?.message || t('staffPage.addError'));
     },
   });
 
@@ -80,7 +81,7 @@ const StaffPage: React.FC = () => {
       updateStaffRoleApi(id, { adminRole: role }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'staff'] });
-      setFeedbackMsg(t('common.saved', 'Роль сотрудника обновлена'));
+      setFeedbackMsg(t('staffPage.roleUpdated'));
       setTimeout(() => setFeedbackMsg(''), 3000);
     },
   });
@@ -90,7 +91,7 @@ const StaffPage: React.FC = () => {
     mutationFn: revokeStaffApi,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'staff'] });
-      setFeedbackMsg(t('common.saved', 'Доступ сотрудника отозван'));
+      setFeedbackMsg(t('staffPage.accessRevoked'));
       setTimeout(() => setFeedbackMsg(''), 3000);
     },
   });
@@ -107,14 +108,14 @@ const StaffPage: React.FC = () => {
   };
 
   const handleRevoke = (id: string, staffName: string) => {
-    if (confirm(`Вы действительно хотите отозвать доступ в панель у сотрудника "${staffName}"?`)) {
+    if (confirm(t('staffPage.revokeConfirmation', { name: staffName }))) {
       revokeMutation.mutate(id);
     }
   };
 
   return (
     <Layout title={t('nav.staff', 'Сотрудники и роли')}>
-      <div className="max-w-6xl mx-auto space-y-6 pb-12">
+      <div className="admin-page-full-width space-y-6 pb-12">
         {feedbackMsg && (
           <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-sm border border-emerald-200 dark:border-emerald-800/40 flex items-center gap-2">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -127,9 +128,9 @@ const StaffPage: React.FC = () => {
         {/* Информационная плашка и кнопка добавления */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-app">{t('nav.staff', 'Администраторы и персонал')}</h2>
+            <h2 className="text-lg font-bold text-app">{t('staffPage.title')}</h2>
             <p className="text-xs text-muted mt-0.5">
-              Управление правами доступа к модулям админ-панели. Доступно исключительно Супер-Администратору.
+              {t('staffPage.description')}
             </p>
           </div>
           <button
@@ -140,7 +141,7 @@ const StaffPage: React.FC = () => {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            {t('common.add', 'Добавить сотрудника')}
+            {t('staffPage.addStaff')}
           </button>
         </div>
 
@@ -150,10 +151,10 @@ const StaffPage: React.FC = () => {
             <table className="w-full text-left text-sm">
               <thead className="bg-gray-50 dark:bg-white/5 border-b border-app text-xs uppercase text-muted font-semibold">
                 <tr>
-                  <th className="px-6 py-3.5">{t('users.name', 'Сотрудник')}</th>
-                  <th className="px-6 py-3.5">{t('users.role', 'Роль в панели')}</th>
-                  <th className="px-6 py-3.5">{t('users.lastActive', 'Последний вход')}</th>
-                  <th className="px-6 py-3.5">{t('users.registeredAt', 'Дата добавления')}</th>
+                  <th className="px-6 py-3.5">{t('staffPage.employee')}</th>
+                  <th className="px-6 py-3.5">{t('staffPage.role')}</th>
+                  <th className="px-6 py-3.5">{t('staffPage.lastLogin')}</th>
+                  <th className="px-6 py-3.5">{t('staffPage.dateAdded')}</th>
                   <th className="px-6 py-3.5 text-right">{t('common.actions', 'Действия')}</th>
                 </tr>
               </thead>
@@ -161,13 +162,13 @@ const StaffPage: React.FC = () => {
                 {isLoading ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center text-muted">
-                      {t('common.loading', 'Загрузка списка сотрудников...')}
+                      {t('staffPage.loading')}
                     </td>
                   </tr>
                 ) : staffList.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center text-muted">
-                      {t('users.userNotFound', 'Сотрудники не найдены')}
+                      {t('staffPage.empty')}
                     </td>
                   </tr>
                 ) : (
@@ -197,7 +198,7 @@ const StaffPage: React.FC = () => {
                                 {staff.name}
                                 {isSelf && (
                                   <span className="text-[10px] bg-gray-100 dark:bg-white/10 px-1.5 py-0.2 rounded text-muted">
-                                    Вы
+                                    {t('staffPage.you')}
                                   </span>
                                 )}
                               </div>
@@ -209,11 +210,12 @@ const StaffPage: React.FC = () => {
                         <td className="px-6 py-4">
                           {isPrimarySuperAdmin ? (
                             <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${roleMeta.color}`}>
-                              {roleMeta.label}
+                              {t(`staffPage.roles.${roleMeta.labelKey}`)}
                             </span>
                           ) : (
                             <Select
                               value={role}
+                              ariaLabel={t('staffPage.staffRole', { name: staff.name })}
                               onChange={(value) => {
                                 if (!['ADMIN', 'MODERATOR', 'SUPPORT', 'SUPER_ADMIN'].includes(value)) return;
                                 updateRoleMutation.mutate({
@@ -223,10 +225,10 @@ const StaffPage: React.FC = () => {
                               }}
                               disabled={updateRoleMutation.isPending}
                               options={[
-                                { value: 'ADMIN', label: 'Администратор' },
-                                { value: 'MODERATOR', label: 'Модератор' },
-                                { value: 'SUPPORT', label: 'Поддержка' },
-                                { value: 'SUPER_ADMIN', label: 'Супер-Админ' },
+                                { value: 'ADMIN', label: t('staffPage.roles.admin') },
+                                { value: 'MODERATOR', label: t('staffPage.roles.moderator') },
+                                { value: 'SUPPORT', label: t('staffPage.roles.support') },
+                                { value: 'SUPER_ADMIN', label: t('staffPage.roles.superAdminShort') },
                               ]}
                               className="text-xs font-semibold"
                             />
@@ -234,11 +236,11 @@ const StaffPage: React.FC = () => {
                         </td>
 
                         <td className="px-6 py-4 text-xs text-muted font-mono">
-                          {staff.lastLoginAt ? new Date(staff.lastLoginAt).toLocaleString('ru-RU') : 'Никогда'}
+                          {staff.lastLoginAt ? new Date(staff.lastLoginAt).toLocaleString(dateLocale) : t('staffPage.never')}
                         </td>
 
                         <td className="px-6 py-4 text-xs text-muted font-mono">
-                          {staff.createdAt ? new Date(staff.createdAt).toLocaleDateString('ru-RU') : '—'}
+                          {staff.createdAt ? new Date(staff.createdAt).toLocaleDateString(dateLocale) : '—'}
                         </td>
 
                         <td className="px-6 py-4 text-right">
@@ -250,7 +252,7 @@ const StaffPage: React.FC = () => {
                               disabled={revokeMutation.isPending}
                               className="text-xs text-red-600 dark:text-red-400 hover:underline font-medium cursor-pointer"
                             >
-                              {t('users.block', 'Отозвать доступ')}
+                              {t('staffPage.revokeAccess')}
                             </button>
                           )}
                         </td>
@@ -265,15 +267,15 @@ const StaffPage: React.FC = () => {
 
         {/* Описание уровней доступа */}
         <div className="card">
-          <h3 className="text-sm font-bold text-app mb-3">Иерархия уровней доступа</h3>
+          <h3 className="text-sm font-bold text-app mb-3">{t('staffPage.roleHierarchy')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {(Object.entries(roleLabels) as [AdminRoleType, (typeof roleLabels)[AdminRoleType]][]).map(
               ([key, meta]) => (
                 <div key={key} className="p-3.5 rounded-xl border border-app bg-gray-50/50 dark:bg-white/5 space-y-1.5">
                   <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${meta.color}`}>
-                    {meta.label}
+                  {t(`staffPage.roles.${meta.labelKey}`)}
                   </span>
-                  <p className="text-xs text-muted leading-relaxed">{meta.desc}</p>
+                  <p className="text-xs text-muted leading-relaxed">{t(`staffPage.roles.${meta.descKey}`)}</p>
                 </div>
               ),
             )}
@@ -284,7 +286,7 @@ const StaffPage: React.FC = () => {
         <Modal
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
-          title={t('common.add', 'Добавить сотрудника')}
+          title={t('staffPage.addStaff')}
           size="md"
           fullscreenOnMobile
           closeLabel={t('common.close', 'Закрыть')}
@@ -294,7 +296,7 @@ const StaffPage: React.FC = () => {
                 {t('common.cancel', 'Отмена')}
               </Button>
               <Button type="submit" form="staff-add-form" loading={addMutation.isPending}>
-                {t('common.save', 'Назначить права')}
+                {t('staffPage.assignRole')}
               </Button>
             </>
           }
@@ -308,10 +310,11 @@ const StaffPage: React.FC = () => {
 
               <form id="staff-add-form" onSubmit={handleAddSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-app mb-1">
-                    Email пользователя *
+                  <label htmlFor="staff-add-email" className="block text-xs font-semibold text-app mb-1">
+                    {t('staffPage.email')} *
                   </label>
                   <input
+                    id="staff-add-email"
                     type="email"
                     placeholder="colleague@averon.uz"
                     value={email}
@@ -319,39 +322,39 @@ const StaffPage: React.FC = () => {
                     required
                     className="input"
                   />
-                  <p className="text-[11px] text-muted mt-1">
-                    Если аккаунт уже зарегистрирован на сайте — ему будет назначена выбранная роль. Если нет — аккаунт будет создан.
-                  </p>
+                  <p className="text-[11px] text-muted mt-1">{t('staffPage.emailHint')}</p>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-app mb-1">
-                    Назначаемая роль *
+                    {t('staffPage.assignedRole')} *
                   </label>
                   <Select
                     value={selectedRole}
+                    ariaLabel={t('staffPage.assignedRole')}
                     onChange={(value) => {
                       if (['ADMIN', 'MODERATOR', 'SUPPORT', 'SUPER_ADMIN'].includes(value)) {
                         setSelectedRole(value as AdminRoleType);
                       }
                     }}
                     options={[
-                      { value: 'ADMIN', label: 'Администратор (Модерация, пользователи, CMS)' },
-                      { value: 'MODERATOR', label: 'Модератор (Проверка объявлений)' },
-                      { value: 'SUPPORT', label: 'Поддержка (Read-only просмотр)' },
-                      { value: 'SUPER_ADMIN', label: 'Супер Администратор (Полный доступ)' },
+                      { value: 'ADMIN', label: t('staffPage.roleOptions.admin') },
+                      { value: 'MODERATOR', label: t('staffPage.roleOptions.moderator') },
+                      { value: 'SUPPORT', label: t('staffPage.roleOptions.support') },
+                      { value: 'SUPER_ADMIN', label: t('staffPage.roleOptions.superAdmin') },
                     ]}
                     className="input"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-app mb-1">
-                    Имя (для нового пользователя)
+                  <label htmlFor="staff-add-name" className="block text-xs font-semibold text-app mb-1">
+                    {t('staffPage.nameForNewUser')}
                   </label>
                   <input
+                    id="staff-add-name"
                     type="text"
-                    placeholder="Алишер К."
+                    placeholder={t('staffPage.namePlaceholder')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="input"
@@ -359,12 +362,13 @@ const StaffPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-app mb-1">
-                    Пароль (для нового пользователя)
+                  <label htmlFor="staff-add-password" className="block text-xs font-semibold text-app mb-1">
+                    {t('staffPage.passwordForNewUser')}
                   </label>
                   <input
+                    id="staff-add-password"
                     type="password"
-                    placeholder="Password123!"
+                    placeholder={t('staffPage.passwordPlaceholder')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="input"

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, RotateCcw, Archive } from "lucide-react";
+import { Pencil, Plus, RotateCcw, Archive, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -43,6 +43,7 @@ export default function CategoriesPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [values, setValues] = useState<CategoryValues>(emptyValues);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const categoriesQuery = useQuery({
     queryKey: ["admin", "commerce-categories"],
     queryFn: getProductCategories,
@@ -214,12 +215,15 @@ export default function CategoriesPage() {
           <Input label={t("categories.sortOrder")} type="number" min={0} max={10000} step={1} value={values.sortOrder} onChange={(event) => setValues((current) => ({ ...current, sortOrder: event.target.value }))} />
           <Input label={t("categories.imageUrl")} type="url" value={values.imageUrl} onChange={(event) => setValues((current) => ({ ...current, imageUrl: event.target.value }))} placeholder="https://..." />
           <div className="space-y-2">
-            <label className="text-xs font-medium text-muted">{t("categories.uploadImage")}</label>
+            <p className="text-xs font-medium text-muted">{t("categories.uploadImage")}</p>
             <input
+              ref={imageInputRef}
+              id="category-image-file"
               type="file"
               accept="image/*"
               disabled={uploadingImage}
-              className="block w-full text-sm"
+              className="hidden"
+              aria-hidden="true"
               onChange={async (event) => {
                 const file = event.target.files?.[0];
                 if (!file) return;
@@ -236,6 +240,17 @@ export default function CategoriesPage() {
                 }
               }}
             />
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              leftIcon={<UploadCloud size={16} />}
+              loading={uploadingImage}
+              disabled={uploadingImage}
+              onClick={() => imageInputRef.current?.click()}
+            >
+              {t(uploadingImage ? "categories.uploadingImage" : "categories.chooseImage")}
+            </Button>
             {values.imageUrl ? <img src={values.imageUrl} alt={t("categories.imagePreview")} className="h-24 w-24 object-cover" /> : null}
           </div>
         </form>

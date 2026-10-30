@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import Layout from '../components/Layout';
+import { Input } from '../components/ui/Input';
 import { downloadAnalyticsReportApi, getRangeAnalyticsApi, getFunnelAnalyticsApi, getCustomerJourneyAnalyticsApi } from '../lib/analyticsApi';
 
 const AnalyticsPage: React.FC = () => {
@@ -89,7 +90,7 @@ const AnalyticsPage: React.FC = () => {
 
   return (
     <Layout title={t('analytics.title')}>
-      <div className="space-y-6 max-w-7xl mx-auto">
+      <div className="admin-page-full-width space-y-6">
         {/* Фильтры периода и экспорт */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
@@ -107,19 +108,22 @@ const AnalyticsPage: React.FC = () => {
             ))}
 
             {isCustom && (
-              <div className="flex items-center gap-2 ml-2">
-                <input
+              <div className="grid w-full min-w-0 basis-full grid-cols-1 gap-3 sm:grid-cols-2 md:w-auto md:basis-auto md:grid-cols-2">
+                <Input
                   type="date"
+                  label={t('analyticsPage.fromDate')}
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="input py-1 px-2.5 text-xs w-36"
+                  containerClassName="min-w-0"
+                  className="w-full min-w-0 py-1 px-2.5 text-xs"
                 />
-                <span className="text-xs text-muted">—</span>
-                <input
+                <Input
                   type="date"
+                  label={t('analyticsPage.toDate')}
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="input py-1 px-2.5 text-xs w-36"
+                  containerClassName="min-w-0"
+                  className="w-full min-w-0 py-1 px-2.5 text-xs"
                 />
               </div>
             )}

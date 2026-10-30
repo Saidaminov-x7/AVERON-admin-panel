@@ -23,7 +23,7 @@ const SystemHealthPage: React.FC = () => {
 
   return (
     <Layout title={t('system.healthTitle', 'Мониторинг здоровья инфраструктуры')}>
-      <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      <div className="admin-page-full-width space-y-6 pb-12">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <p className="text-xs sm:text-sm text-muted">
             {t('system.healthSubtitle', 'Статус критических сервисов бэкенда, latency базы данных PostgreSQL, Redis и потребление оперативной памяти.')}

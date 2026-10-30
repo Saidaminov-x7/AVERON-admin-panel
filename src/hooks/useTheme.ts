@@ -7,16 +7,11 @@ type Theme = 'light' | 'dark';
 
 const STORAGE_KEY = 'averon-admin-theme';
 
-// Определяем начальную тему: из localStorage или системных настроек
+// Тёмная тема AVERON используется по умолчанию; явный выбор пользователя сохраняется.
 const getInitialTheme = (): Theme => {
   const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
   if (stored === 'light' || stored === 'dark') return stored;
-
-  // Системные настройки браузера
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    return 'dark';
-  }
-  return 'light';
+  return 'dark';
 };
 
 export const useTheme = () => {

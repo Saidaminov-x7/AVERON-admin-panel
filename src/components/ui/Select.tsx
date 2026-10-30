@@ -19,6 +19,7 @@ export interface SelectProps {
   onChange: (value: string) => void;
   placeholder?: string;
   label?: string;
+  ariaLabel?: string;
   error?: string;
   helperText?: string;
   searchable?: boolean;
@@ -43,6 +44,7 @@ export const Select: React.FC<SelectProps> = ({
   onChange,
   placeholder,
   label,
+  ariaLabel,
   error,
   helperText,
   searchable = false,
@@ -199,6 +201,7 @@ export const Select: React.FC<SelectProps> = ({
         ref={triggerRef}
         type="button"
         id={selectId}
+        aria-label={ariaLabel}
         disabled={disabled}
         onClick={() => !disabled && setIsOpen(!isOpen)}
         onKeyDown={(event) => {

@@ -1,8 +1,10 @@
-import React from 'react';
-import { clsx } from 'clsx';
+import React, { useEffect, useRef, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Button } from './Button';
 import { Select } from './Select';
+import { getVisiblePageNumbers } from './paginationUtils';
 
 export interface PaginationProps {
   currentPage: number;
@@ -25,129 +27,130 @@ export const Pagination: React.FC<PaginationProps> = ({
   pageSizeOptions = [10, 20, 50, 100],
   className,
 }) => {
-  if (totalPages <= 1 && !totalItems) return null;
+  const { t, i18n } = useTranslation();
+  const currentPageButtonRef = useRef<HTMLButtonElement>(null);
+  const focusCurrentPageAfterChange = useRef(false);
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window === 'undefined' ? 1024 : window.innerWidth,
+  );
 
-  // Generate visible page numbers
-  const getPages = () => {
-    const pages: (number | 'ellipsis')[] = [];
-    const maxVisible = 5;
+  useEffect(() => {
+    const updateViewportWidth = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', updateViewportWidth);
+    return () => window.removeEventListener('resize', updateViewportWidth);
+  }, []);
 
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      if (currentPage > 3) pages.push('ellipsis');
+  useEffect(() => {
+    if (!focusCurrentPageAfterChange.current) return;
+    focusCurrentPageAfterChange.current = false;
+    currentPageButtonRef.current?.focus();
+  }, [currentPage]);
 
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-
-      if (currentPage < totalPages - 2) pages.push('ellipsis');
-      pages.push(totalPages);
-    }
-    return pages;
+  const changePage = (page: number) => {
+    if (page === currentPage) return;
+    focusCurrentPageAfterChange.current = true;
+    onPageChange(page);
   };
 
-  const pages = getPages();
+  if (totalPages <= 1 && !totalItems) return null;
+
+  const pageNumbers = getVisiblePageNumbers(currentPage, totalPages, viewportWidth);
+  const formattedTotal = totalItems === undefined
+    ? null
+    : new Intl.NumberFormat(i18n.language).format(totalItems);
 
   return (
     <div
       className={twMerge(
-        'flex flex-col sm:flex-row items-center justify-between gap-4 py-3 px-1 text-xs text-muted select-none',
+        'flex flex-col md:flex-row items-center justify-between gap-4 py-3 px-1 text-xs text-muted select-none',
         className,
       )}
     >
-      {/* Total items info & page size */}
-      <div className="flex items-center gap-3">
-        {totalItems !== undefined && (
+      <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center md:w-auto">
+        {formattedTotal !== null && (
           <span>
-            Всего: <strong className="text-app font-semibold">{totalItems}</strong> записей
+            {t('common.total', { count: formattedTotal })}
           </span>
         )}
         {onPageSizeChange && (
-          <div className="flex items-center gap-1.5 ml-2">
-            <span>Показывать:</span>
-            <div className="w-20">
+          <div className="flex items-center gap-2 sm:ml-2">
+            <span aria-hidden="true">{t('common.itemsPerPage')}</span>
+            <div className="w-24">
               <Select
+                ariaLabel={t('common.itemsPerPage')}
                 value={String(pageSize)}
-                onChange={(val) => onPageSizeChange(Number(val))}
-                options={pageSizeOptions.map((opt) => ({ value: String(opt), label: String(opt) }))}
-                className="h-8 text-xs py-1"
+                onChange={(value) => onPageSizeChange(Number(value))}
+                options={pageSizeOptions.map((option) => ({ value: String(option), label: String(option) }))}
+                className="h-11 text-xs py-1"
               />
             </div>
           </div>
         )}
       </div>
 
-      {/* Page controls */}
-      <div className="flex items-center gap-1">
-        <button
+      <nav aria-label={t('common.pagination')} className="flex items-center justify-center gap-2">
+        <Button
           type="button"
+          variant="outline"
+          size="icon"
           disabled={currentPage <= 1}
-          onClick={() => onPageChange(1)}
-          className="p-1.5 rounded-none border border-app bg-surface hover:bg-[var(--color-surface-soft)] hover:text-app disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-11 min-w-11"
-          title="В начало"
+          onClick={() => changePage(1)}
+          aria-label={t('common.firstPage')}
+          title={t('common.firstPage')}
         >
-          <ChevronsLeft size={14} />
-        </button>
-        <button
+          <ChevronsLeft size={16} aria-hidden="true" />
+        </Button>
+        <Button
           type="button"
+          variant="outline"
+          size="icon"
           disabled={currentPage <= 1}
-          onClick={() => onPageChange(currentPage - 1)}
-          className="p-1.5 rounded-none border border-app bg-surface hover:bg-[var(--color-surface-soft)] hover:text-app disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-11 min-w-11"
-          title="Назад"
+          onClick={() => changePage(currentPage - 1)}
+          aria-label={t('common.previousPage')}
+          title={t('common.previousPage')}
         >
-          <ChevronLeft size={14} />
-        </button>
+          <ChevronLeft size={16} aria-hidden="true" />
+        </Button>
 
-        {pages.map((p, idx) => {
-          if (p === 'ellipsis') {
-            return (
-              <span key={`el-${idx}`} className="px-2 py-1 text-muted">
-                ...
-              </span>
-            );
-          }
-          const isActive = p === currentPage;
-          return (
-            <button
-              key={p}
-              type="button"
-              onClick={() => onPageChange(p)}
-              className={clsx(
-                'min-w-11 min-h-11 px-3 rounded-none font-medium transition-all text-xs flex items-center justify-center cursor-pointer',
-                isActive
-                  ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] font-bold shadow-xs'
-                  : 'bg-surface border border-app text-app hover:bg-[var(--color-surface-soft)]',
-              )}
-            >
-              {p}
-            </button>
-          );
-        })}
+        {pageNumbers.map((page) => (
+          <Button
+            key={page}
+            ref={page === currentPage ? currentPageButtonRef : undefined}
+            type="button"
+            variant={page === currentPage ? 'primary' : 'outline'}
+            size="icon"
+            onClick={() => changePage(page)}
+            aria-label={t('common.pageNumber', { page })}
+            aria-current={page === currentPage ? 'page' : undefined}
+            className="tabular-nums text-xs"
+          >
+            {page}
+          </Button>
+        ))}
 
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="icon"
           disabled={currentPage >= totalPages}
-          onClick={() => onPageChange(currentPage + 1)}
-          className="p-1.5 rounded-none border border-app bg-surface hover:bg-[var(--color-surface-soft)] hover:text-app disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-11 min-w-11"
-          title="Вперёд"
+          onClick={() => changePage(currentPage + 1)}
+          aria-label={t('common.nextPage')}
+          title={t('common.nextPage')}
         >
-          <ChevronRight size={14} />
-        </button>
-        <button
+          <ChevronRight size={16} aria-hidden="true" />
+        </Button>
+        <Button
           type="button"
+          variant="outline"
+          size="icon"
           disabled={currentPage >= totalPages}
-          onClick={() => onPageChange(totalPages)}
-          className="p-1.5 rounded-none border border-app bg-surface hover:bg-[var(--color-surface-soft)] hover:text-app disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-11 min-w-11"
-          title="В конец"
+          onClick={() => changePage(totalPages)}
+          aria-label={t('common.lastPage')}
+          title={t('common.lastPage')}
         >
-          <ChevronsRight size={14} />
-        </button>
-      </div>
+          <ChevronsRight size={16} aria-hidden="true" />
+        </Button>
+      </nav>
     </div>
   );
 };

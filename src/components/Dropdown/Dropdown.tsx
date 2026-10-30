@@ -8,6 +8,8 @@ interface DropdownProps {
   align?: 'left' | 'right';
   className?: string;
   contentClassName?: string;
+  ariaLabel?: string;
+  scrollable?: boolean;
   portal?: boolean;
 }
 
@@ -17,6 +19,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
   align = 'left',
   className = '',
   contentClassName = '',
+  ariaLabel,
+  scrollable = true,
   portal = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +43,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
     setPosition(getDropdownPosition({
       anchor: { top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left },
       panelWidth: panelRect.width,
-      panelHeight: panelElement.scrollHeight,
+      panelHeight: panelElement.scrollHeight + panelElement.offsetHeight - panelElement.clientHeight,
       viewportWidth: window.innerWidth,
       viewportHeight: typeof drawerFooterTop === 'number' && drawerFooterTop > 0
         ? Math.min(window.innerHeight, drawerFooterTop)
@@ -67,6 +71,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
     };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
         setIsOpen(false);
         triggerRef.current?.focus();
         return;
@@ -116,6 +122,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
       <button
         ref={triggerRef}
         type="button"
+        aria-label={ariaLabel}
         aria-expanded={isOpen}
         aria-controls={panelId}
         aria-haspopup="menu"
@@ -138,7 +145,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           id={panelId}
           role="menu"
           data-admin-drawer-portal={portal ? '' : undefined}
-          className={`averon-admin-menu fixed z-50 w-48 overflow-y-auto overscroll-contain rounded-none border border-app bg-surface shadow-xl animate-fade-in ${contentClassName}`}
+          className={`fixed z-50 w-48 ${scrollable ? 'overflow-y-auto overscroll-contain' : 'overflow-y-hidden'} rounded-xl border border-app bg-surface shadow-xl animate-fade-in ${contentClassName}`}
           style={{
             top: position?.top ?? 0,
             left: position?.left ?? 0,
@@ -151,7 +158,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
             triggerRef.current?.focus();
           }}
           onBlur={(event) => {
-            if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsOpen(false);
+            const nextTarget = event.relatedTarget as Node | null;
+            if (nextTarget && (event.currentTarget.contains(nextTarget) || triggerRef.current?.contains(nextTarget))) return;
+            setIsOpen(false);
           }}
         >
           {children}

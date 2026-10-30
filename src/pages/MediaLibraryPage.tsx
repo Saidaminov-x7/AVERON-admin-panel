@@ -126,7 +126,7 @@ export const MediaLibraryPage: React.FC = () => {
 
   return (
     <Layout title={t('media.title', 'Медиа-библиотека')}>
-      <div className="space-y-6 animate-fade-in max-w-7xl mx-auto pb-12">
+      <div className="admin-page-full-width space-y-6 animate-fade-in pb-12">
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -251,6 +251,8 @@ export const MediaLibraryPage: React.FC = () => {
                   {/* Select Checkbox */}
                   <button
                     type="button"
+                    aria-label={t('media.selectFile', { id: item.id })}
+                    aria-pressed={isSelected}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleToggleSelect(item.id);
@@ -320,6 +322,8 @@ export const MediaLibraryPage: React.FC = () => {
                 <div className="flex items-center gap-3 min-w-0">
                   <button
                     type="button"
+                    aria-label={t('media.selectFile', { id: item.id })}
+                    aria-pressed={selectedIds.includes(item.id)}
                     onClick={() => handleToggleSelect(item.id)}
                     className="text-muted hover:text-primary-500"
                   >

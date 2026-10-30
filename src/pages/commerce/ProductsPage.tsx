@@ -28,20 +28,18 @@ import {
 import { deleteUnattachedMediaApi, uploadProductPhotoApi } from "../../lib/mediaApi";
 import { getSiteSettingsApi } from "../../lib/siteSettingsApi";
 import { ProductFormModal, type ProductFormSubmission } from "./ProductFormModal";
+import {
+  formatCatalogPublishedAt,
+  getCatalogCategoryName,
+  getCatalogProductTitle,
+  toCatalogLocale,
+} from "./productCatalogPresentation";
 
 const ALL_COUNTRIES = "ALL" as const;
 
-function formatPublishedAt(value: string | null | undefined): string | null {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  const days = Math.max(0, Math.floor((new Date().getTime() - date.getTime()) / 86_400_000));
-  const time = date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
-  return `${days} дн. назад · ${time}`;
-}
-
 export default function ProductsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const catalogLocale = toCatalogLocale(i18n.language);
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -243,28 +241,28 @@ export default function ProductsPage() {
   const archiveMutation = useMutation({
     mutationFn: archiveProduct,
     onSuccess: () => {
-      toast.success("Товар перемещён в архив");
+      toast.success(t("products.archiveSuccess"));
       void qc.invalidateQueries({ queryKey: ["commerce-products"] });
     },
-    onError: () => toast.error("Не удалось архивировать товар"),
+    onError: () => toast.error(t("products.archiveError")),
   });
   const restoreMutation = useMutation({
     mutationFn: restoreProduct,
     onSuccess: () => {
-      toast.success("Товар восстановлен как черновик");
+      toast.success(t("products.restoreSuccess"));
       void qc.invalidateQueries({ queryKey: ["commerce-products"] });
     },
-    onError: () => toast.error("Не удалось восстановить товар"),
+    onError: () => toast.error(t("products.restoreError")),
   });
   const permanentDeleteMutation = useMutation({
     mutationFn: deleteProductPermanently,
     onSuccess: () => {
-      toast.success("Товар удалён навсегда");
+      toast.success(t("products.deleteProductSuccess"));
       void qc.invalidateQueries({ queryKey: ["commerce-products"] });
     },
     onError: (error: unknown) => {
       const message = (error as { response?: { data?: { message?: string } } }).response?.data?.message;
-      toast.error(message || "Не удалось удалить товар навсегда");
+      toast.error(message || t("products.deleteProductError"));
     },
   });
 
@@ -479,10 +477,14 @@ export default function ProductsPage() {
       ) : products.length ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {products.map((product) => {
-            const russianTranslation = product.translations?.ru;
-            const title = typeof russianTranslation === "string"
-              ? russianTranslation
-              : russianTranslation?.title || product.slug;
+            const title = getCatalogProductTitle(product.translations, product.slug, catalogLocale);
+            const publishedAt = formatCatalogPublishedAt(
+              product.publishedAt,
+              catalogLocale,
+              (days) => days === 0
+                ? t("products.today")
+                : t("products.daysAgo", { count: days }),
+            );
             return (
               <article className="group overflow-hidden rounded-xl border border-app bg-surface transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-primary-500/40 hover:shadow-lg" key={product.id}>
                 <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-surface-muted">
@@ -517,9 +519,9 @@ export default function ProductsPage() {
                   ) : null}
                   <p className="text-[10px] font-semibold uppercase tracking-[.12em] text-muted">{getCountryLabel(product.country)}</p>
                   <h2 className="mt-1 line-clamp-2 min-h-10 text-sm font-semibold leading-5">{title}</h2>
-                  <p className="mt-1 text-xs text-muted">{product.category
-                    ? (typeof product.category.name === "string" ? product.category.name : product.category.name.ru || product.category.name.en || product.category.slug)
-                    : t("products.uncategorized")}</p>
+                  <p className="mt-1 text-xs text-muted">
+                    {getCatalogCategoryName(product.category, catalogLocale, t("products.uncategorized"))}
+                  </p>
                   <div className="mt-3 flex flex-wrap items-baseline gap-2">
                     <strong className="text-base tabular-nums">{Number(product.salePriceUzs).toLocaleString()} UZS</strong>
                     {product.compareAtPriceUzs && Number(product.compareAtPriceUzs) > Number(product.salePriceUzs) ? <span className="text-xs tabular-nums text-muted line-through">{Number(product.compareAtPriceUzs).toLocaleString()} UZS</span> : null}
@@ -530,13 +532,15 @@ export default function ProductsPage() {
                       ? t("products.inStock")
                       : t("products.outOfStock")}</span>
                   </div>
-                  <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted" aria-label="Метрики товара">
-                    <span>Просмотры: {product._count?.recentlyViewedRecords ?? 0}</span>
-                    <span>Лайки: {product._count?.favoriteLinks ?? 0}</span>
-                    <span>Отзывы: {product._count?.reviews ?? 0}</span>
+                  <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted" aria-label={t("products.metricsLabel")}>
+                    <span>{t("products.viewsCount", { count: product._count?.recentlyViewedRecords ?? 0 })}</span>
+                    <span>{t("products.likesCount", { count: product._count?.favoriteLinks ?? 0 })}</span>
+                    <span>{t("products.reviewsCount", { count: product._count?.reviews ?? 0 })}</span>
                   </div>
-                  {product.status === "PUBLISHED" && formatPublishedAt(product.publishedAt) ? (
-                    <p className="mt-1 text-xs text-muted">Опубликован: {formatPublishedAt(product.publishedAt)}</p>
+                  {product.status === "PUBLISHED" && publishedAt ? (
+                    <p className="mt-1 text-xs text-muted">
+                      {t("products.publishedAtPrefix")}: {publishedAt}
+                    </p>
                   ) : null}
                   <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-app pt-3">
                     <button
@@ -548,13 +552,13 @@ export default function ProductsPage() {
                       {t("products.editProduct")}
                     </button>
                     {product.status === "ARCHIVED" ? (
-                      <button type="button" disabled={restoreMutation.isPending} onClick={() => restoreMutation.mutate(product.id)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-app px-3 text-xs font-semibold hover:bg-app disabled:opacity-50"><RotateCcw size={14} />Восстановить</button>
+                      <button type="button" disabled={restoreMutation.isPending} onClick={() => restoreMutation.mutate(product.id)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-app px-3 text-xs font-semibold hover:bg-app disabled:opacity-50"><RotateCcw size={14} />{t("products.restoreProduct")}</button>
                     ) : (
-                      <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate(product.id)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-app px-3 text-xs font-semibold hover:bg-app disabled:opacity-50"><Archive size={14} />В архив</button>
+                      <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate(product.id)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-app px-3 text-xs font-semibold hover:bg-app disabled:opacity-50"><Archive size={14} />{t("products.archiveProduct")}</button>
                     )}
                     <button type="button" disabled={permanentDeleteMutation.isPending} onClick={() => {
-                      if (window.confirm(`Удалить «${title}» навсегда? Это действие нельзя отменить.`)) permanentDeleteMutation.mutate(product.id);
-                    }} className="inline-flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50" aria-label={`Удалить ${title} навсегда`}><Trash2 size={15} /></button>
+                      if (window.confirm(t("products.deleteProductConfirm", { title }))) permanentDeleteMutation.mutate(product.id);
+                    }} className="inline-flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50" aria-label={t("products.deleteProductLabel", { title })}><Trash2 size={15} /></button>
                   </div>
                 </div>
               </article>

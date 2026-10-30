@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   fileIdentity,
   formatPhotoSize,
+  getFirstProductValidationStep,
   normalizeProductSizes,
   reorderItem,
   validateProductDraft,
@@ -21,6 +22,14 @@ const validDraft: ProductDraftValidationInput = {
 const isProductCountry = (value: unknown) => ["CN", "US", "TR", "IT", "GB"].includes(String(value));
 
 describe("product form validation", () => {
+  it("routes validation errors to the earliest step in the product workflow", () => {
+    expect(getFirstProductValidationStep({ titleRu: "title", salePriceUzs: "salePriceUzs", photos: "photos" })).toBe(0);
+    expect(getFirstProductValidationStep({ salePriceUzs: "salePriceUzs", photos: "photos" })).toBe(1);
+    expect(getFirstProductValidationStep({ colors: "color", photos: "photos" })).toBe(2);
+    expect(getFirstProductValidationStep({ photos: "photos" })).toBe(3);
+    expect(getFirstProductValidationStep({})).toBeNull();
+  });
+
   it("reports all required field errors in one validation pass", () => {
     const errors = validateProductDraft({
       ...validDraft,

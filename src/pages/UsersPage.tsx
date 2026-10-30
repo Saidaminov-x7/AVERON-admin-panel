@@ -23,6 +23,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import Layout from '../components/Layout';
+import { updateUserQueryParams } from './userQueryParams';
 import {
   getAdminUsersApi,
   blockUserApi,
@@ -85,17 +86,7 @@ export const UsersPage: React.FC = () => {
   }, [debouncedSearch, setSearchParams]);
 
   const updateParams = (updates: Record<string, string | number | undefined | null>) => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      Object.entries(updates).forEach(([key, value]) => {
-        if (value !== undefined && value !== '' && value !== null) {
-          next.set(key, String(value));
-        } else {
-          next.delete(key);
-        }
-      });
-      return next;
-    });
+    setSearchParams((prev) => updateUserQueryParams(prev, updates));
   };
 
   const updateParam = (key: string, value: string | number) => {
@@ -300,7 +291,7 @@ export const UsersPage: React.FC = () => {
 
   return (
     <Layout title={t('users.title', 'Управление пользователями')}>
-      <div className="space-y-6 animate-fade-in max-w-7xl mx-auto pb-12">
+      <div className="admin-page-full-width space-y-6 animate-fade-in pb-12">
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -357,8 +348,7 @@ export const UsersPage: React.FC = () => {
             options={ROLE_OPTIONS}
             value={roleFilter}
             onChange={(val) => {
-              updateParam('role', val);
-              updateParam('page', 1);
+              updateParams({ role: val, page: 1 });
             }}
           />
 
@@ -366,8 +356,7 @@ export const UsersPage: React.FC = () => {
             options={SORT_OPTIONS}
             value={sortOption}
             onChange={(val) => {
-              updateParam('sort', val);
-              updateParam('page', 1);
+              updateParams({ sort: val, page: 1 });
             }}
           />
         </div>
@@ -414,13 +403,20 @@ export const UsersPage: React.FC = () => {
           />
         ) : (
           <div className="rounded-2xl border border-app bg-surface overflow-hidden shadow-xs">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+            <div
+              className="max-w-full min-w-0 overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+              role="region"
+              aria-label={t('users.tableRegion')}
+              tabIndex={0}
+            >
+              <table className="w-full min-w-[720px] text-left text-xs">
                 <thead className="bg-gray-50 dark:bg-white/5 border-b border-app text-muted font-bold">
                   <tr>
                     <th className="p-3.5 w-10">
                       <button
                         type="button"
+                        aria-label={t('users.selectAllVisible')}
+                        aria-pressed={selectedIds.length === users.length && users.length > 0}
                         onClick={handleSelectAll}
                         className="text-muted hover:text-app"
                       >
@@ -460,6 +456,8 @@ export const UsersPage: React.FC = () => {
                           <td className="p-3.5">
                             <button
                               type="button"
+                              aria-label={t('users.selectUser', { name: user.name || user.id })}
+                              aria-pressed={isSelected}
                               onClick={() => handleToggleSelect(user.id)}
                               className="text-muted hover:text-primary-500"
                             >
