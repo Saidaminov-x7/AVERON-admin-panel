@@ -6,6 +6,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '../lib/apiError';
 import { useDebounce } from '../hooks/useDebounce';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -31,6 +32,7 @@ import {
   deleteUserApi,
   type UserRole,
   type AdminUser,
+  type PaginatedResponse,
 } from '../lib/usersApi';
 import {
   Button,
@@ -143,28 +145,25 @@ export const UsersPage: React.FC = () => {
       blockUserApi(id, reason),
     onMutate: async ({ id, reason }) => {
       await queryClient.cancelQueries({ queryKey: ['admin', 'users'] });
-      const previousData = queryClient.getQueriesData({ queryKey: ['admin', 'users'] });
-      queryClient.setQueriesData({ queryKey: ['admin', 'users'] }, (old: any) => {
+      const previousData = queryClient.getQueriesData<PaginatedResponse<AdminUser>>({ queryKey: ['admin', 'users'] });
+      queryClient.setQueriesData<PaginatedResponse<AdminUser>>({ queryKey: ['admin', 'users'] }, (old) => {
         if (!old) return old;
-        if (old.items && Array.isArray(old.items)) {
-          return {
-            ...old,
-            items: old.items.map((u: any) =>
-              u.id === id ? { ...u, isBlocked: true, blockedReason: reason } : u
-            ),
-          };
-        }
-        return old;
+        return {
+          ...old,
+          items: old.items.map((user) =>
+            user.id === id ? { ...user, isBlocked: true, blockedReason: reason } : user,
+          ),
+        };
       });
       return { previousData };
     },
-    onError: (err: any, _vars, context) => {
+    onError: (err: unknown, _vars, context) => {
       if (context?.previousData) {
         for (const [key, val] of context.previousData) {
           queryClient.setQueryData(key, val);
         }
       }
-      toast.error(err.response?.data?.message || t('users.errorBlock', 'Ошибка блокировки пользователя'));
+      toast.error(getApiErrorMessage(err) || t('users.errorBlock', 'Ошибка блокировки пользователя'));
     },
     onSuccess: () => {
       setBlockUser(null);
@@ -181,28 +180,25 @@ export const UsersPage: React.FC = () => {
     mutationFn: unblockUserApi,
     onMutate: async (id: string) => {
       await queryClient.cancelQueries({ queryKey: ['admin', 'users'] });
-      const previousData = queryClient.getQueriesData({ queryKey: ['admin', 'users'] });
-      queryClient.setQueriesData({ queryKey: ['admin', 'users'] }, (old: any) => {
+      const previousData = queryClient.getQueriesData<PaginatedResponse<AdminUser>>({ queryKey: ['admin', 'users'] });
+      queryClient.setQueriesData<PaginatedResponse<AdminUser>>({ queryKey: ['admin', 'users'] }, (old) => {
         if (!old) return old;
-        if (old.items && Array.isArray(old.items)) {
-          return {
-            ...old,
-            items: old.items.map((u: any) =>
-              u.id === id ? { ...u, isBlocked: false, blockedReason: null } : u
-            ),
-          };
-        }
-        return old;
+        return {
+          ...old,
+          items: old.items.map((user) =>
+            user.id === id ? { ...user, isBlocked: false, blockedReason: null } : user,
+          ),
+        };
       });
       return { previousData };
     },
-    onError: (err: any, _vars, context) => {
+    onError: (err: unknown, _vars, context) => {
       if (context?.previousData) {
         for (const [key, val] of context.previousData) {
           queryClient.setQueryData(key, val);
         }
       }
-      toast.error(err.response?.data?.message || t('users.errorUnblock', 'Ошибка разблокировки пользователя'));
+      toast.error(getApiErrorMessage(err) || t('users.errorUnblock', 'Ошибка разблокировки пользователя'));
     },
     onSuccess: () => {
       toast.success(t('users.unblockedSuccess', 'Пользователь разблокирован'));
@@ -259,8 +255,8 @@ export const UsersPage: React.FC = () => {
       await deleteUserApi(id);
       invalidateUsers();
       toast.success(t('users.deletedSuccess', 'Пользователь удален'));
-    } catch (e: any) {
-      toast.error(e?.response?.data?.message || t('users.errorDelete', 'Не удалось удалить пользователя'));
+    } catch (error: unknown) {
+      toast.error(getApiErrorMessage(error) || t('users.errorDelete', 'Не удалось удалить пользователя'));
     }
   };
 

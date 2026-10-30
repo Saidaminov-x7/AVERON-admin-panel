@@ -19,6 +19,7 @@ import {
   History,
 } from 'lucide-react';
 import Layout from '../components/Layout';
+import { getApiErrorMessage } from '../lib/apiError';
 import { useAuthStore, type AdminRoleType, type AdminUser } from '../store/authStore';
 import {
   getStaffListApi,
@@ -83,8 +84,8 @@ export const StaffPage: React.FC = () => {
       resetForm();
       toast.success('Сотрудник успешно добавлен');
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || 'Ошибка добавления сотрудника');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error) || 'Ошибка добавления сотрудника');
     },
   });
 
@@ -96,8 +97,8 @@ export const StaffPage: React.FC = () => {
       setEditingStaff(null);
       toast.success('Роль сотрудника обновлена');
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || 'Ошибка изменения роли');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error) || 'Ошибка изменения роли');
     },
   });
 
@@ -108,8 +109,8 @@ export const StaffPage: React.FC = () => {
       setRevokeConfirmId(null);
       toast.success('Доступ сотрудника отозван');
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || 'Ошибка отзыва доступа');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error) || 'Ошибка отзыва доступа');
     },
   });
 

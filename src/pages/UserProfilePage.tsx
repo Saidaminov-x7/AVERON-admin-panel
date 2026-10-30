@@ -14,6 +14,10 @@ import { ArrowLeft, Shield, Lock, Unlock, Mail, Phone, Calendar, Clock, Activity
 import { format } from 'date-fns';
 import { ru, enUS } from 'date-fns/locale';
 
+function isMetadataRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 const UserProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -246,14 +250,14 @@ const UserProfilePage: React.FC = () => {
           <div className="card min-w-0 overflow-hidden p-0">
             {userAiSessionsData?.aiSessions?.length ? (
               <div className="divide-y divide-app">
-                {userAiSessionsData.aiSessions.map((session: any) => (
+                {userAiSessionsData.aiSessions.map((session) => (
                   <div key={session.id} className="p-4">
                     <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                       <strong className="text-sm text-app">{session.title || 'Диалог с AI'}</strong>
                       <span className="text-xs text-muted">{format(new Date(session.updatedAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</span>
                     </div>
                     <div className="space-y-2">
-                      {session.messages.map((message: any) => (
+                      {session.messages.map((message) => (
                         <div key={message.id} className={`max-w-full break-words rounded-lg px-3 py-2 text-xs ${message.role === 'user' ? 'ml-auto bg-primary-500 text-white' : 'bg-surface-soft text-app dark:bg-white/5'}`}>
                           <span className="mb-1 block font-semibold">{message.role === 'user' ? 'Пользователь' : 'AVERON AI'}</span>
                           {message.content}
@@ -303,7 +307,7 @@ const UserProfilePage: React.FC = () => {
                             {format(new Date(act.createdAt), 'd MMM yyyy, HH:mm:ss', { locale: currentLocale })}
                           </span>
                         </div>
-                        {act.meta && Object.keys(act.meta).length > 0 && (
+                        {isMetadataRecord(act.meta) && Object.keys(act.meta).length > 0 && (
                           <pre className="text-xs text-success bg-page dark:bg-black/90 p-2 rounded-xl mt-1 font-mono overflow-x-auto max-w-full border border-app">
                             {JSON.stringify(act.meta, null, 2)}
                           </pre>

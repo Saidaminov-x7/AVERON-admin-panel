@@ -97,7 +97,7 @@ export interface UserActivityItem {
   id: string;
   userId: string;
   action: string;
-  meta: any;
+  meta: unknown;
   ip: string | null;
   userAgent: string | null;
   createdAt: string;
