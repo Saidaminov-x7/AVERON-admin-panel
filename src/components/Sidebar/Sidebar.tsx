@@ -35,8 +35,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { logoutApi } from "../../lib/authApi";
 import { useAuthStore } from "../../store/authStore";
 import { Dropdown } from "../Dropdown";
-import { Button } from "../ui";
-import { openDrawerSearch } from "./drawerSearch";
 
 type NavIcon = ComponentType<{ size?: number; strokeWidth?: number }>;
 type NavItem = { to: string; labelKey: string; icon: NavIcon };

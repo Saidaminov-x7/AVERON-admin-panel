@@ -8,7 +8,6 @@ import { useAuthStore } from '../store/authStore';
 import { loginApi, verify2faApi, resend2faApi, verifyAdminTotpLoginApi } from '../lib/authApi';
 import Dropdown from '../components/Dropdown/Dropdown';
 import ThemeToggle from '../components/ThemeToggle/ThemeToggle';
-import { Checkbox } from '../components/ui/Checkbox';
 
 const REMEMBER_EMAIL_KEY = 'admin_remembered_email';
 const LOGIN_LANGUAGES = [

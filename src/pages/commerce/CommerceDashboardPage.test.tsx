@@ -34,6 +34,7 @@ vi.mock('../../components/Layout', () => ({
   default: ({ children }: { children: ReactNode }) => createElement('main', null, children),
 }));
 vi.mock('../../components/ui', () => ({
+  Card: ({ children, className }: { children: ReactNode; className?: string }) => createElement('section', { className }, children),
   Button: (props: ComponentProps<'button'> & {
     loading?: boolean;
     leftIcon?: ReactNode;

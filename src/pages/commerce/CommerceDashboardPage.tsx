@@ -11,9 +11,8 @@ import {
   Users,
 } from 'lucide-react';
 import Layout from '../../components/Layout';
-import { Button } from '../../components/ui';
+import { Button, Card } from '../../components/ui';
 import { getCommerceDashboard } from '../../lib/commerceApi';
-import { formatCommerceNumber } from './commerceDashboardFormat';
 
 export default function CommerceDashboardPage() {
   const { t, i18n } = useTranslation();
@@ -22,7 +21,6 @@ export default function CommerceDashboardPage() {
     queryFn: getCommerceDashboard,
     refetchInterval: 30_000,
   });
-  const hasData = data !== undefined;
 
   const numberLocale = i18n.language?.startsWith('en')
     ? 'en-US'
