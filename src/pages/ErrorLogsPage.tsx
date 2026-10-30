@@ -44,7 +44,7 @@ const ErrorLogsPage: React.FC = () => {
 
   return (
     <Layout title={t('system.errorLogsTitle', 'Ошибки фронтенда')}>
-      <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      <div className="admin-page-full-width space-y-6 pb-12">
         {/* Фильтры */}
         <div className="card p-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">

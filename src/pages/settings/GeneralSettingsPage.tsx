@@ -1,7 +1,7 @@
 // src/pages/settings/GeneralSettingsPage.tsx
 // Основные настройки: maintenance mode, название сайта, контакты для футера, логотип
 
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -48,6 +48,7 @@ const GeneralSettingsPage: React.FC = () => {
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
   const [navLinks, setNavLinks] = useState<
     Array<{ label: string; href: string; position: 'header' | 'footer' }>
   >([
@@ -147,6 +148,7 @@ const GeneralSettingsPage: React.FC = () => {
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    e.target.value = '';
 
     if (!file.type.startsWith('image/') && !file.type.includes('svg')) {
       toast.error(t('settings.logoTypeError', 'Можно загружать только изображения (PNG, JPG, SVG, WebP)'));
@@ -197,19 +199,19 @@ const GeneralSettingsPage: React.FC = () => {
           </Card>
           {/* Масштабирование двумя пальцами (Pinch-to-zoom) */}
           <Card
-            title="Масштабирование на смартфонах (Pinch-to-zoom)"
-            description="Управление возможностью увеличивать и уменьшать масштаб сайта жестом двумя пальцами на мобильных устройствах"
+            title={t('settings.pinchZoomTitle')}
+            description={t('settings.pinchZoomDesc')}
           >
             <div className="flex items-center justify-between pt-2">
               <div className="space-y-1">
-                <p className="font-semibold text-app">Увеличение двумя пальцами (Zoom)</p>
-                <p className="text-xs text-muted">
+                <p className="font-semibold text-app">{t('settings.pinchZoomLabel')}</p>
+                <p id="admin-pinch-zoom-description" className="text-xs text-muted">
                   {mobilePinchZoomEnabled
-                    ? 'Включено: пользователи могут свободно приближать текст и фотографии щипком двумя пальцами'
-                    : 'Отключено: масштаб зафиксирован 1:1 без возможности ручного приближения'}
+                    ? t('settings.pinchZoomEnabled')
+                    : t('settings.pinchZoomDisabled')}
                 </p>
               </div>
-              <Switch checked={mobilePinchZoomEnabled} onChange={setMobilePinchZoomEnabled} />
+              <Switch checked={mobilePinchZoomEnabled} onChange={setMobilePinchZoomEnabled} ariaLabel={t('settings.pinchZoomLabel')} ariaDescribedBy="admin-pinch-zoom-description" />
             </div>
           </Card>
           {/* Maintenance Mode */}
@@ -226,14 +228,14 @@ const GeneralSettingsPage: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-app">{t('settings.maintenanceStatus', 'Статус техобслуживания')}</p>
-                    <p className="text-xs text-muted">
+                    <p id="admin-maintenance-status-description" className="text-xs text-muted">
                       {maintenanceMode
                         ? t('settings.maintenanceOn', 'Сайт переведен в режим обслуживания')
                         : t('settings.maintenanceOff', 'Сайт работает в обычном режиме')}
                     </p>
                   </div>
                 </div>
-                <Switch checked={maintenanceMode} onChange={setMaintenanceMode} />
+                <Switch checked={maintenanceMode} onChange={setMaintenanceMode} ariaLabel={t('settings.maintenanceStatus')} ariaDescribedBy="admin-maintenance-status-description" />
               </div>
 
               {maintenanceMode && (
@@ -247,7 +249,7 @@ const GeneralSettingsPage: React.FC = () => {
                   />
                   <div className="pt-3 border-t border-app mt-4 flex items-center justify-between">
                     <span className="text-sm text-muted">{t('settings.requirePasswordMaintenance', 'Требовать пароль при техобслуживании')}</span>
-                    <Switch checked={maintenancePasswordEnabled} onChange={setMaintenancePasswordEnabled} />
+                    <Switch checked={maintenancePasswordEnabled} onChange={setMaintenancePasswordEnabled} ariaLabel={t('settings.requirePasswordMaintenance')} />
                   </div>
                   {maintenancePasswordEnabled && (
                     <div className="pt-3 border-t border-app mt-4">
@@ -286,14 +288,17 @@ const GeneralSettingsPage: React.FC = () => {
                       }}
                     />
                   </div>
-                  <button
+                  <Button
                     type="button"
+                    variant="danger"
+                    size="icon"
                     onClick={handleLogoDelete}
-                    className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute right-1 top-1 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100"
                     title={t('settings.deleteLogo', 'Удалить логотип')}
+                    aria-label={t('settings.deleteLogo', 'Удалить логотип')}
                   >
-                    <Trash2 size={14} />
-                  </button>
+                    <Trash2 size={16} aria-hidden="true" />
+                  </Button>
                 </div>
               ) : (
                 <div className="h-20 w-44 rounded-xl border-2 border-dashed border-app flex flex-col items-center justify-center text-muted gap-1 bg-surface">
@@ -302,16 +307,25 @@ const GeneralSettingsPage: React.FC = () => {
                 </div>
               )}
 
-              <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-app bg-surface hover:bg-gray-50 dark:hover:bg-white/5 text-app text-sm font-medium cursor-pointer transition-colors">
-                <Upload size={16} />
-                <span>{t('settings.uploadNewLogo', 'Загрузить новый логотип')}</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoUpload}
-                  className="hidden"
-                />
-              </label>
+              <Button
+                type="button"
+                variant="outline"
+                size="md"
+                leftIcon={<Upload size={16} />}
+                loading={uploadLogoMutation.isPending}
+                onClick={() => logoInputRef.current?.click()}
+              >
+                {t('settings.uploadNewLogo', 'Загрузить новый логотип')}
+              </Button>
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                onChange={handleLogoUpload}
+                className="sr-only"
+                tabIndex={-1}
+                aria-hidden="true"
+              />
             </div>
           </Card>
 
@@ -356,7 +370,7 @@ const GeneralSettingsPage: React.FC = () => {
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                size="md"
                 leftIcon={<Plus size={14} />}
                 onClick={() =>
                   setNavLinks((prev) => [
@@ -416,14 +430,16 @@ const GeneralSettingsPage: React.FC = () => {
                     />
                   </div>
                   <div className="w-full sm:w-auto flex sm:flex-col justify-end items-end sm:items-center pt-2 sm:pt-6">
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setNavLinks((prev) => prev.filter((_, i) => i !== idx))}
-                      className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
                       title={t('settings.removeMenuItem', 'Удалить пункт меню')}
+                      aria-label={t('settings.removeMenuItem', 'Удалить пункт меню')}
                     >
-                      <Trash2 size={16} />
-                    </button>
+                      <Trash2 size={16} aria-hidden="true" />
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -434,7 +450,7 @@ const GeneralSettingsPage: React.FC = () => {
             <Button
               type="submit"
               variant="primary"
-              size="lg"
+              size="md"
               leftIcon={<Save size={18} />}
               loading={isLoading || mutation.isPending}
             >

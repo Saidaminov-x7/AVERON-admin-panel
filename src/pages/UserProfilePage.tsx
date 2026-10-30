@@ -12,7 +12,7 @@ import { getUserAiSessionsApi } from '../lib/extendedAdminApi';
 import Badge from '../components/Badge/Badge';
 import { ArrowLeft, Shield, Lock, Unlock, Mail, Phone, Calendar, Clock, Activity, MessageSquare, MonitorSmartphone, X } from 'lucide-react';
 import { format } from 'date-fns';
-import { ru, enUS } from 'date-fns/locale';
+import { ru, enUS, uz } from 'date-fns/locale';
 
 const UserProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,7 +57,7 @@ const UserProfilePage: React.FC = () => {
     },
   });
 
-  const currentLocale = i18n.language === 'en' ? enUS : ru;
+  const currentLocale = i18n.language.startsWith('uz') ? uz : i18n.language === 'en' ? enUS : ru;
 
   if (isUserLoading) {
     return (
@@ -71,9 +71,9 @@ const UserProfilePage: React.FC = () => {
 
   if (!user) {
     return (
-      <Layout title={t('users.userNotFound', 'Пользователь не найден')}>
+      <Layout title={t('users.userMissing')}>
         <div className="card p-8 text-center max-w-md mx-auto">
-          <h2 className="text-xl font-semibold text-app mb-4">{t('users.userNotFound', 'Пользователь не найден')}</h2>
+          <h2 className="text-xl font-semibold text-app mb-4">{t('users.userMissing')}</h2>
           <button className="btn-primary" onClick={() => navigate('/users')}>
             {t('common.back', 'Вернуться к списку')}
           </button>
@@ -84,8 +84,8 @@ const UserProfilePage: React.FC = () => {
 
   const getRoleBadge = (role: string) => {
     switch (role) {
-      case 'ADMIN': return { label: 'Администратор', variant: 'teal' as const };
-      default: return { label: 'Пользователь', variant: 'info' as const };
+      case 'ADMIN': return { label: t('users.roleAdmin'), variant: 'teal' as const };
+      default: return { label: t('users.roleUser'), variant: 'info' as const };
     }
   };
 
@@ -175,49 +175,106 @@ const UserProfilePage: React.FC = () => {
 
         {/* Вкладки */}
         <div className="border-b border-app">
-          <nav className="flex gap-5 overflow-x-auto pb-1">
+          <nav
+            className="grid grid-cols-1 min-[360px]:grid-cols-2 min-[480px]:flex min-[480px]:flex-wrap gap-2 pb-1"
+            role="tablist"
+            aria-label={t('users.profileSections')}
+            aria-orientation="horizontal"
+            onKeyDown={(event) => {
+              const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+              const currentIndex = tabs.indexOf(event.target as HTMLButtonElement);
+              if (currentIndex < 0) return;
+              let nextIndex = currentIndex;
+              if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % tabs.length;
+              else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+              else if (event.key === 'Home') nextIndex = 0;
+              else if (event.key === 'End') nextIndex = tabs.length - 1;
+              else return;
+              event.preventDefault();
+              tabs[nextIndex].focus();
+              tabs[nextIndex].click();
+            }}
+          >
             <button
+              type="button"
+              role="tab"
+              id="user-profile-tab-info"
+              aria-controls="user-profile-panel-info"
+              aria-selected={activeTab === 'info'}
+              tabIndex={activeTab === 'info' ? 0 : -1}
               onClick={() => setActiveTab('info')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                 activeTab === 'info' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
               }`}
             >
-              {t('users.profile', 'Информация')}
+              {t('users.userInfo')}
             </button>
             <button
+              type="button"
+              role="tab"
+              id="user-profile-tab-ai"
+              aria-controls="user-profile-panel-ai"
+              aria-selected={activeTab === 'ai'}
+              tabIndex={activeTab === 'ai' ? 0 : -1}
               onClick={() => setActiveTab('ai')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-1.5 ${
+              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                 activeTab === 'ai' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
               }`}
             >
-              <MessageSquare size={14} /> История AVERON AI ({userAiSessionsData?.aiSessions?.length || 0})
+              <MessageSquare size={14} /> {t('users.aiHistory')} ({userAiSessionsData?.aiSessions?.length || 0})
             </button>
             <button
+              type="button"
+              role="tab"
+              id="user-profile-tab-activity"
+              aria-controls="user-profile-panel-activity"
+              aria-selected={activeTab === 'activity'}
+              tabIndex={activeTab === 'activity' ? 0 : -1}
               onClick={() => setActiveTab('activity')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                 activeTab === 'activity' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
               }`}
             >
               {t('dashboard.recentActivity', 'Активность')} ({userActivity?.items?.length || 0})
             </button>
             <button
+              type="button"
+              role="tab"
+              id="user-profile-tab-history"
+              aria-controls="user-profile-panel-history"
+              aria-selected={activeTab === 'history'}
+              tabIndex={activeTab === 'history' ? 0 : -1}
               onClick={() => setActiveTab('history')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
+              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                 activeTab === 'history' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
               }`}
             >
               {t('auditLog.title', 'Админ-аудит')} ({auditLogs?.length || 0})
             </button>
-            <button onClick={() => setActiveTab('sessions')} className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-1.5 ${activeTab === 'sessions' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'}`}>
-              <MonitorSmartphone size={14}/> Сессии ({sessions.length})
+            <button
+              type="button"
+              role="tab"
+              id="user-profile-tab-sessions"
+              aria-controls="user-profile-panel-sessions"
+              aria-selected={activeTab === 'sessions'}
+              tabIndex={activeTab === 'sessions' ? 0 : -1}
+              onClick={() => setActiveTab('sessions')}
+              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${activeTab === 'sessions' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'}`}
+            >
+              <MonitorSmartphone size={14}/> {t('users.sessions')} ({sessions.length})
             </button>
           </nav>
         </div>
 
         {/* Контент вкладок */}
+        {(['info', 'ai', 'activity', 'history', 'sessions'] as const)
+          .filter((tab) => tab !== activeTab)
+          .map((tab) => (
+            <div key={tab} id={`user-profile-panel-${tab}`} role="tabpanel" aria-labelledby={`user-profile-tab-${tab}`} hidden />
+          ))}
         {activeTab === 'info' && (
-          <div className="card p-6">
-            <h2 className="text-lg font-semibold text-app mb-4">Дополнительная информация</h2>
+          <div id="user-profile-panel-info" role="tabpanel" aria-labelledby="user-profile-tab-info" tabIndex={0} className="card p-6">
+            <h2 className="text-lg font-semibold text-app mb-4">{t('users.additionalInfo')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 border border-app rounded-xl bg-surface">
                 <div className="text-sm text-muted mb-1">{t('users.role', 'Роль в системе')}</div>
@@ -243,19 +300,19 @@ const UserProfilePage: React.FC = () => {
 
         {/* AVERON AI history */}
         {activeTab === 'ai' && (
-          <div className="card min-w-0 overflow-hidden p-0">
+          <div id="user-profile-panel-ai" role="tabpanel" aria-labelledby="user-profile-tab-ai" tabIndex={0} className="card min-w-0 overflow-hidden p-0">
             {userAiSessionsData?.aiSessions?.length ? (
               <div className="divide-y divide-app">
                 {userAiSessionsData.aiSessions.map((session: any) => (
                   <div key={session.id} className="p-4">
                     <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                      <strong className="text-sm text-app">{session.title || 'Диалог с AI'}</strong>
+                      <strong className="text-sm text-app">{session.title || t('users.aiConversation')}</strong>
                       <span className="text-xs text-muted">{format(new Date(session.updatedAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</span>
                     </div>
                     <div className="space-y-2">
                       {session.messages.map((message: any) => (
                         <div key={message.id} className={`max-w-full break-words rounded-lg px-3 py-2 text-xs ${message.role === 'user' ? 'ml-auto bg-primary-500 text-white' : 'bg-gray-100 text-app dark:bg-white/5'}`}>
-                          <span className="mb-1 block font-semibold">{message.role === 'user' ? 'Пользователь' : 'AVERON AI'}</span>
+                          <span className="mb-1 block font-semibold">{message.role === 'user' ? t('users.messageFromUser') : 'AVERON AI'}</span>
                           {message.content}
                         </div>
                       ))}
@@ -264,17 +321,17 @@ const UserProfilePage: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center text-muted">У пользователя нет истории AVERON AI</div>
+              <div className="p-8 text-center text-muted">{t('users.noAiHistory')}</div>
             )}
           </div>
         )}
 
         {activeTab === 'activity' && (
-          <div className="card p-0 overflow-hidden">
+          <div id="user-profile-panel-activity" role="tabpanel" aria-labelledby="user-profile-tab-activity" tabIndex={0} className="card p-0 overflow-hidden">
             {isActivityLoading ? (
               <div className="p-6 text-center text-muted">{t('common.loading', 'Загрузка логов активности...')}</div>
             ) : !userActivity?.items || userActivity.items.length === 0 ? (
-              <div className="p-6 text-center text-muted">{t('common.noData', 'Активности пользователя не найдено')}</div>
+              <div className="p-6 text-center text-muted">{t('users.noActivity')}</div>
             ) : (
               <div className="divide-y divide-app">
                 {userActivity.items.map((act) => (
@@ -287,10 +344,10 @@ const UserProfilePage: React.FC = () => {
                         <div className="flex items-center justify-between gap-2 mb-1">
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-app text-sm">
-                              {act.action === 'LOGIN' ? 'Вход в аккаунт'
-                                : act.action === 'REGISTER' ? 'Регистрация аккаунта'
-                                : act.action === 'LISTING_CREATED' ? 'Создано объявление'
-                                : act.action === 'MESSAGE_SENT' ? 'Отправлено сообщение'
+                              {act.action === 'LOGIN' ? t('users.activityLogin')
+                                : act.action === 'REGISTER' ? t('users.activityRegister')
+                                : act.action === 'LISTING_CREATED' ? t('users.activityListingCreated')
+                                : act.action === 'MESSAGE_SENT' ? t('users.activityMessageSent')
                                 : act.action}
                             </span>
                             {act.ip && (
@@ -323,7 +380,7 @@ const UserProfilePage: React.FC = () => {
         )}
 
         {activeTab === 'history' && (
-          <div className="card p-0 overflow-hidden">
+          <div id="user-profile-panel-history" role="tabpanel" aria-labelledby="user-profile-tab-history" tabIndex={0} className="card p-0 overflow-hidden">
             {isAuditLoading ? (
               <div className="p-6 text-center text-muted">{t('common.loading', 'Загрузка...')}</div>
             ) : auditLogs?.length === 0 ? (
@@ -349,8 +406,8 @@ const UserProfilePage: React.FC = () => {
                           <span className="font-medium text-app">
                             {log.action === 'USER_BLOCKED' ? t('users.block', 'Заблокирован')
                               : log.action === 'USER_UNBLOCKED' ? t('users.unblock', 'Разблокирован')
-                              : log.action === 'USER_ROLE_CHANGED' ? 'Изменена роль'
-                              : log.action === 'USER_CREATED' ? 'Зарегистрирован'
+                              : log.action === 'USER_ROLE_CHANGED' ? t('users.eventRoleChanged')
+                              : log.action === 'USER_CREATED' ? t('users.eventUserRegistered')
                               : log.action}
                           </span>
                           <span className="text-xs text-muted">
@@ -358,10 +415,10 @@ const UserProfilePage: React.FC = () => {
                           </span>
                         </div>
                         <div className="text-sm text-muted">
-                          {typeof log.meta?.reason === 'string' && <div className="mb-1">Причина: {log.meta.reason}</div>}
+                          {typeof log.meta?.reason === 'string' && <div className="mb-1">{t('users.reasonLabel')}: {log.meta.reason}</div>}
                           {typeof log.meta?.oldRole === 'string' && typeof log.meta?.newRole === 'string' && (
                             <div>
-                              Роль изменена с <strong>{log.meta.oldRole}</strong> на <strong>{log.meta.newRole}</strong>
+                              {t('users.roleChangedFromTo', { oldRole: log.meta.oldRole, newRole: log.meta.newRole })}
                             </div>
                           )}
                         </div>
@@ -373,7 +430,27 @@ const UserProfilePage: React.FC = () => {
             )}
           </div>
         )}
-        {activeTab === 'sessions' && <div className="card p-5"><h2 className="text-lg font-semibold text-app">Активные сессии</h2><p className="mt-1 text-sm text-muted">Устройства, на которых пользователь сейчас авторизован.</p><div className="mt-4 divide-y divide-app">{isSessionsLoading ? <div className="py-8 text-center text-muted">Загрузка…</div> : sessions.map((session) => <div key={session.id} className="flex items-center gap-3 py-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500"><MonitorSmartphone size={18}/></div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-app">{session.userAgent || 'Неизвестное устройство'}</p><p className="mt-1 text-xs text-muted">{session.ipAddress || 'IP скрыт'} · {format(new Date(session.lastSeenAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</p></div><button onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app text-muted hover:text-red-500" title="Завершить сессию"><X size={16}/></button></div>)}{!isSessionsLoading && !sessions.length ? <div className="py-8 text-center text-muted">Активных сессий нет.</div> : null}</div></div>}
+        {activeTab === 'sessions' && (
+          <div id="user-profile-panel-sessions" role="tabpanel" aria-labelledby="user-profile-tab-sessions" tabIndex={0} className="card p-5">
+            <h2 className="text-lg font-semibold text-app">{t('users.activeSessions')}</h2>
+            <p className="mt-1 text-sm text-muted">{t('users.activeSessionsDescription')}</p>
+            <div className="mt-4 divide-y divide-app">
+              {isSessionsLoading ? <div className="py-8 text-center text-muted">{t('common.loading')}</div> : sessions.map((session) => (
+                <div key={session.id} className="flex items-center gap-3 py-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500"><MonitorSmartphone size={18} /></div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-app">{session.userAgent || t('users.unknownDevice')}</p>
+                    <p className="mt-1 text-xs text-muted">{session.ipAddress || t('users.hiddenIp')} · {format(new Date(session.lastSeenAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</p>
+                  </div>
+                  <button type="button" onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app text-muted hover:text-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" title={t('users.endSession')} aria-label={t('users.endSession')}>
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+              {!isSessionsLoading && !sessions.length ? <div className="py-8 text-center text-muted">{t('users.noActiveSessions')}</div> : null}
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

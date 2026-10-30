@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Search, ShoppingCart, RefreshCw, Eye, Check, Ban } from 'lucide-react';
 import { toast } from 'sonner';
@@ -94,6 +94,10 @@ export default function OrdersPage() {
   const [deliveryStatus, setDeliveryStatus] = useState<CommerceDeliveryStatus>('PENDING');
   const [cancelPending, setCancelPending] = useState(false);
   const [statusNote, setStatusNote] = useState('');
+  const shippingSubmitRef = useRef<HTMLButtonElement>(null);
+  const restoreShippingFocusRef = useRef(false);
+  const statusSubmitRef = useRef<HTMLButtonElement>(null);
+  const restoreStatusFocusRef = useRef(false);
 
   const ordersQuery = useQuery({ queryKey: ['commerce-orders'], queryFn: getOrders });
   const selectedOrderQuery = useQuery({
@@ -118,6 +122,12 @@ export default function OrdersPage() {
     },
     onError: () => toast.error(copy.updateError),
   });
+  useEffect(() => {
+    if (!statusMutation.isPending && restoreStatusFocusRef.current) {
+      restoreStatusFocusRef.current = false;
+      if (document.activeElement === document.body) statusSubmitRef.current?.focus();
+    }
+  }, [statusMutation.isPending]);
   const shippingMutation = useMutation({
     mutationFn: ({ orderNumber, payload }: { orderNumber: string; payload: {
       status: CommerceDeliveryStatus;
@@ -135,6 +145,12 @@ export default function OrdersPage() {
     },
     onError: () => toast.error(fulfillmentCopy[locale].shippingError),
   });
+  useEffect(() => {
+    if (!shippingMutation.isPending && restoreShippingFocusRef.current) {
+      restoreShippingFocusRef.current = false;
+      if (document.activeElement === document.body) shippingSubmitRef.current?.focus();
+    }
+  }, [shippingMutation.isPending]);
 
   const orders = useMemo(
     () => filterCommerceOrders(ordersQuery.data ?? [], search, statusFilter),
@@ -197,7 +213,7 @@ export default function OrdersPage() {
           <div className="card overflow-x-auto p-0">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-app text-left text-xs text-muted font-semibold tracking-wide uppercase">
-                <th className="px-4 py-3">{copy.number}</th><th className="px-4 py-3">{copy.customer}</th><th className="px-4 py-3">{copy.status}</th><th className="px-4 py-3 text-right">{copy.total}</th><th className="px-4 py-3">{copy.date}</th><th className="px-4 py-3"><span className="sr-only">{copy.details}</span></th>
+                <th className="px-4 py-3">{copy.number}</th><th className="px-4 py-3">{copy.customer}</th><th className="px-4 py-3">{copy.status}</th><th className="px-4 py-3 text-right">{copy.total}</th><th className="px-4 py-3">{copy.date}</th><th className="relative px-4 py-3"><span className="sr-only">{copy.details}</span></th>
               </tr></thead>
               <tbody>{orders.map((item) => (
                 <tr key={item.orderNumber} className="border-t border-app hover:bg-gray-50 dark:hover:bg-white/[0.03]">
@@ -271,6 +287,8 @@ export default function OrdersPage() {
                     const trackingNumber = String(formData.get('trackingNumber') ?? '').trim();
                     const provider = String(formData.get('provider') ?? '').trim();
                     const note = String(formData.get('note') ?? '').trim();
+                    // The pending disabled state can drop focus out of the dialog.
+                    restoreShippingFocusRef.current = document.activeElement === shippingSubmitRef.current;
                     shippingMutation.mutate({
                       orderNumber: order.orderNumber,
                       payload: {
@@ -315,7 +333,7 @@ export default function OrdersPage() {
                     <input name="note" maxLength={500} className="input w-full" />
                   </label>
                   <div className="sm:col-span-2 flex justify-end">
-                    <button type="submit" disabled={shippingMutation.isPending} className="btn-primary disabled:opacity-50">
+                    <button ref={shippingSubmitRef} type="submit" disabled={shippingMutation.isPending} className="btn-primary disabled:opacity-50">
                       {shippingMutation.isPending ? fulfillment.updateShipping : fulfillment.saveShipping}
                     </button>
                   </div>
@@ -346,12 +364,16 @@ export default function OrdersPage() {
                   )}
                   <button
                     type="button"
+                    ref={statusSubmitRef}
                     disabled={statusMutation.isPending || statusNote.length > 500}
-                    onClick={() => statusMutation.mutate({
-                      orderNumber: order.orderNumber,
-                      status: nextStatus,
-                      ...(statusNote.trim() ? { note: statusNote.trim() } : {}),
-                    })}
+                    onClick={() => {
+                      restoreStatusFocusRef.current = document.activeElement === statusSubmitRef.current;
+                      statusMutation.mutate({
+                        orderNumber: order.orderNumber,
+                        status: nextStatus,
+                        ...(statusNote.trim() ? { note: statusNote.trim() } : {}),
+                      });
+                    }}
                     className="btn-primary disabled:opacity-50"
                   >
                     <Check size={16} className="mr-2 inline" />{statusLabels[nextStatus][locale]}

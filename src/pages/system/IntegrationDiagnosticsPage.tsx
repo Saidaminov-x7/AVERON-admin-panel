@@ -41,7 +41,7 @@ export default function IntegrationDiagnosticsPage() {
   const query = useQuery({ queryKey: ['admin', 'integration-diagnostics'], queryFn: getIntegrationDiagnostics, refetchInterval: 60_000 });
   return (
     <Layout title={text.title}>
-      <main className="mx-auto max-w-7xl space-y-4 pb-12">
+      <main className="admin-page-full-width space-y-4 pb-12">
         <p className="text-sm text-muted">{text.warning}</p>
         {query.isPending ? <p role="status" className="card p-5">{text.loading}</p> : query.isError ? <p role="alert" className="card p-5 text-rose-600">{text.error}</p> : query.data?.length === 0 ? <p role="status" className="card p-5 text-muted">{text.empty}</p> : (
           <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

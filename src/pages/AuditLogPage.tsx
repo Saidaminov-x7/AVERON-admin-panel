@@ -106,7 +106,7 @@ export const AuditLogPage: React.FC = () => {
 
   return (
     <Layout title={t('auditLog.title', 'Журнал действий')}>
-      <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      <div className="admin-page-full-width space-y-6 pb-12">
         {/* Заголовок страницы */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>

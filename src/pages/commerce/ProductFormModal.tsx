@@ -2,11 +2,12 @@ import { Suspense, lazy, useCallback, useEffect, useId, useRef, useState } from 
 import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import { ImageOff, MoveDown, MoveUp, RefreshCw, Sparkles, Star, Trash2, Upload } from "lucide-react";
+import { ChevronDown, ImageOff, MoveDown, MoveUp, RefreshCw, Sparkles, Star, Trash2, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button, Input, Modal, Select } from "../../components/ui";
+import { Button, Input, Modal, Select, Switch } from "../../components/ui";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { LanguageFlag } from "../../components/ui/LanguageFlag";
+import { Dropdown } from "../../components/Dropdown";
 import { useAdminCapabilities } from "../../hooks/useAdminCapabilities";
 import {
   applyProductAiSuggestions,
@@ -33,10 +34,12 @@ import {
 import {
   fileIdentity,
   formatPhotoSize,
+  getFirstProductValidationStep,
   normalizeProductSizes,
   PRODUCT_VALIDATION_FIELDS,
   reorderItem,
   validateProductDraft,
+  type ProductValidationCode,
   type ProductValidationField,
 } from "./productFormValidation";
 import {
@@ -63,6 +66,13 @@ type PhotoDraft = {
   file?: File;
   crop: ProductPhotoCrop;
 };
+type PhotoInputError =
+  | { code: "invalidType"; name: string }
+  | { code: "tooLarge"; name: string; size: number }
+  | { code: "duplicate" }
+  | { code: "limit"; max: number }
+  | { code: "sizeChartInvalid" }
+  | { code: "cropError" };
 
 function getPhotoPreviewStyle(photo: PhotoDraft) {
   if (productPhotoCropSignature(photo.crop) === productPhotoCropSignature(DEFAULT_PRODUCT_PHOTO_CROP)) {
@@ -100,7 +110,7 @@ type ProductFormValues = {
   publish: boolean;
   publishTelegram: boolean;
 };
-type FormErrors = Partial<Record<ProductValidationField, string>>;
+type FormErrors = Partial<Record<ProductValidationField, ProductValidationCode>>;
 
 export type ProductFormSubmission = {
   title: string;
@@ -249,7 +259,9 @@ export function ProductFormModal({
     crop: { ...DEFAULT_PRODUCT_PHOTO_CROP },
   })));
   const [errors, setErrors] = useState<FormErrors>({});
-  const [photoInputErrors, setPhotoInputErrors] = useState<string[]>([]);
+  const errorSummaryRef = useRef<HTMLDivElement>(null);
+  const shouldFocusErrorSummaryRef = useRef(false);
+  const [photoInputErrors, setPhotoInputErrors] = useState<PhotoInputError[]>([]);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isPreparingImages, setIsPreparingImages] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<ProductAiSuggestionsResponse | null>(null);
@@ -260,6 +272,13 @@ export function ProductFormModal({
   const [imageEmbeddingSuccess, setImageEmbeddingSuccess] = useState("");
   const aiRequestRef = useRef<AbortController | null>(null);
   const submitInFlightRef = useRef(false);
+
+  useEffect(() => {
+    if (!shouldFocusErrorSummaryRef.current) return;
+    shouldFocusErrorSummaryRef.current = false;
+    errorSummaryRef.current?.focus();
+    errorSummaryRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [currentStep, errors]);
 
   const capabilitiesQuery = useAdminCapabilities(isOpen);
   const telegramDefaultAppliedRef = useRef(false);
@@ -375,7 +394,7 @@ export function ProductFormModal({
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files ?? []);
-    const issues: string[] = [];
+    const issues: PhotoInputError[] = [];
     const maxSize = Math.min(25, Math.max(1, maxProductPhotoSizeMb)) * 1024 * 1024;
     const maxCount = Math.min(15, Math.max(1, maxProductPhotos));
     const knownFiles = new Set(photos.flatMap((photo) => photo.file ? [fileIdentity(photo.file)] : []));
@@ -383,20 +402,20 @@ export function ProductFormModal({
 
     for (const file of selectedFiles) {
       if (!["image/jpeg", "image/png", "image/webp", "image/gif"].includes(file.type)) {
-        issues.push(t("products.photoInvalidType", { name: file.name }));
+        issues.push({ code: "invalidType", name: file.name });
         continue;
       }
       if (file.size > maxSize) {
-        issues.push(t("products.photoTooLarge", { name: file.name, size: maxProductPhotoSizeMb }));
+        issues.push({ code: "tooLarge", name: file.name, size: maxProductPhotoSizeMb });
         continue;
       }
       const identity = fileIdentity(file);
       if (knownFiles.has(identity)) {
-        issues.push(t("products.duplicatePhoto"));
+        issues.push({ code: "duplicate" });
         continue;
       }
       if (photos.length + additions.length >= maxCount) {
-        issues.push(t("products.photoLimitReached", { max: maxCount }));
+        issues.push({ code: "limit", max: maxCount });
         break;
       }
       knownFiles.add(identity);
@@ -617,24 +636,18 @@ export function ProductFormModal({
       maxPhotoSizeMb: maxProductPhotoSizeMb,
       colorsText: values.colorsText,
     }, isProductCountry);
-    const validationMessages = {
-      title: t("products.validationTitleLocale"),
-      country: t("products.countryRequired"),
-      salePriceUzs: t("products.validationSalePrice"),
-      photos: t("products.validationPhotos"),
-      photoCount: t("products.photoLimitReached", { max: Math.min(15, maxProductPhotos) }),
-      photoSize: t("products.photoSizeLimit", { size: maxProductPhotoSizeMb }),
-      color: t("products.colorNameRequired"),
-    };
     for (const field of PRODUCT_VALIDATION_FIELDS) {
       const code = validationCodes[field];
-      if (code) nextErrors[field] = validationMessages[code];
+      if (code) nextErrors[field] = code;
     }
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) {
       const firstMissingLocale = locales.find((locale) => nextErrors[localeErrorKeys[locale]]);
       if (firstMissingLocale) setActiveLocale(firstMissingLocale);
+      const firstInvalidStep = getFirstProductValidationStep(validationCodes);
+      if (firstInvalidStep !== null) setCurrentStep(firstInvalidStep);
+      shouldFocusErrorSummaryRef.current = true;
       return;
     }
 
@@ -644,7 +657,7 @@ export function ProductFormModal({
       if (!Array.isArray(parsed) || parsed.some((row) => !row || typeof row !== "object" || typeof row.size !== "string")) throw new Error("invalid chart");
       sizeChart = parsed as Array<Record<string, string | number>>;
     } catch {
-      setPhotoInputErrors([t("products.sizeChartInvalid")]);
+      setPhotoInputErrors([{ code: "sizeChartInvalid" }]);
       setCurrentStep(2);
       return;
     }
@@ -708,7 +721,7 @@ export function ProductFormModal({
         colors: values.colorsText.split("\n").map((row, index) => {
           const [name, hex] = row.split("|").map((part) => part.trim());
           const normalizedHex = name && !hex && /^#[0-9a-fA-F]{6}$/.test(name) ? name : hex;
-          return { name: hex ? name : `Цвет ${index + 1}`, hex: normalizedHex };
+          return { name: hex ? name : t("products.colorFallback", { number: index + 1 }), hex: normalizedHex };
         }).filter((item) => item.name && /^#[0-9a-fA-F]{6}$/.test(item.hex)),
         country: isProductCountry(values.country) ? values.country : undefined,
         categoryId: values.categoryId || null,
@@ -722,7 +735,7 @@ export function ProductFormModal({
         images,
       });
     } catch {
-      setPhotoInputErrors([t("products.photoCropError")]);
+      setPhotoInputErrors([{ code: "cropError" }]);
     } finally {
       submitInFlightRef.current = false;
       setIsPreparingImages(false);
@@ -767,6 +780,28 @@ export function ProductFormModal({
     photos: t("products.photoSection"),
     colors: t("products.productColors"),
   };
+  const getValidationMessage = (code?: ProductValidationCode): string | undefined => {
+    if (!code) return undefined;
+    switch (code) {
+      case "title": return t("products.validationTitleLocale");
+      case "country": return t("products.countryRequired");
+      case "salePriceUzs": return t("products.validationSalePrice");
+      case "photos": return t("products.validationPhotos");
+      case "photoCount": return t("products.photoLimitReached", { max: Math.min(15, maxProductPhotos) });
+      case "photoSize": return t("products.photoSizeLimit", { size: maxProductPhotoSizeMb });
+      case "color": return t("products.colorNameRequired");
+    }
+  };
+  const getPhotoInputErrorMessage = (issue: PhotoInputError): string => {
+    switch (issue.code) {
+      case "invalidType": return t("products.photoInvalidType", { name: issue.name });
+      case "tooLarge": return t("products.photoTooLarge", { name: issue.name, size: issue.size });
+      case "duplicate": return t("products.duplicatePhoto");
+      case "limit": return t("products.photoLimitReached", { max: issue.max });
+      case "sizeChartInvalid": return t("products.sizeChartInvalid");
+      case "cropError": return t("products.photoCropError");
+    }
+  };
   const photoOrientations: Array<{
     value: ProductPhotoOrientation;
     label: string;
@@ -777,7 +812,30 @@ export function ProductFormModal({
     { value: "square", label: t("products.photoSquare"), aspectClass: "aspect-square" },
   ];
   const headerContent = (
-    <div role="tablist" aria-label={t("products.contentLanguage")} className="inline-flex w-full rounded-xl border border-app bg-gray-50 p-1 dark:bg-white/5 sm:w-auto">
+    <div className="flex w-full flex-col items-start gap-1 sm:w-auto">
+    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">{t("products.contentLanguage")}</span>
+    <Dropdown
+      align="right"
+      className="w-full sm:w-auto"
+      contentClassName="w-56 p-1"
+      ariaLabel={`${t("products.contentLanguage")}: ${localeName(activeLocale)}`}
+      trigger={(
+        <span className="flex h-11 w-full min-w-44 items-center justify-between gap-3 rounded-theme border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)] sm:w-auto">
+          <span className="flex min-w-0 items-center gap-2"><LanguageFlag locale={activeLocale} className="h-4 w-6" /><span className="truncate">{localeName(activeLocale)}</span></span>
+          <ChevronDown size={16} className="shrink-0 text-muted" aria-hidden="true" />
+        </span>
+      )}
+    >
+      {locales.map((locale) => {
+        const error = errors[localeErrorKeys[locale]];
+        const complete = values.translations[locale].title.trim().length >= 2;
+        return <button key={locale} type="button" role="menuitemradio" aria-checked={activeLocale === locale} aria-label={t("products.contentTabLabel", { language: localeName(locale), status: error ? t("products.translationError") : complete ? t("products.translationComplete") : t("products.translationIncomplete") })} onClick={() => setActiveLocale(locale)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${activeLocale === locale ? "bg-[var(--color-surface-soft)] font-semibold text-app" : "text-app hover:bg-[var(--color-surface-soft)]"}`}>
+          <span className="flex items-center gap-3"><LanguageFlag locale={locale} className="h-4 w-6" />{localeName(locale)}</span>
+          {error ? <span aria-hidden="true" className="text-red-500">!</span> : complete ? <span aria-hidden="true" className="text-emerald-600">✓</span> : null}
+        </button>;
+      })}
+    </Dropdown>
+    <div role="tablist" aria-label={t("products.contentLanguage")} className="hidden">
       {locales.map((locale) => {
         const error = errors[localeErrorKeys[locale]];
         const complete = values.translations[locale].title.trim().length >= 2;
@@ -806,6 +864,7 @@ export function ProductFormModal({
         );
       })}
     </div>
+    </div>
   );
 
   return (
@@ -822,8 +881,8 @@ export function ProductFormModal({
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={isSaving || isPreparingImages}>{t("common.cancel")}</Button>
-          {currentStep > 0 && <Button type="button" variant="outline" onClick={() => setCurrentStep((step) => step - 1)} disabled={isSaving || isPreparingImages}>Назад</Button>}
-          {currentStep < steps.length - 1 ? <Button type="button" onClick={() => setCurrentStep((step) => step + 1)}>Далее</Button> : <Button type="submit" form={formId} loading={isSaving || isPreparingImages} disabled={settingsLoading || isPreparingImages}>
+          {currentStep > 0 && <Button type="button" variant="outline" onClick={() => setCurrentStep((step) => step - 1)} disabled={isSaving || isPreparingImages}>{t("products.previousStep")}</Button>}
+          {currentStep < steps.length - 1 ? <Button type="button" onClick={() => setCurrentStep((step) => step + 1)}>{t("products.nextStep")}</Button> : <Button type="submit" form={formId} loading={isSaving || isPreparingImages} disabled={settingsLoading || isPreparingImages}>
             {isPreparingImages
               ? t("products.preparingPhotos")
               : isSaving
@@ -835,11 +894,11 @@ export function ProductFormModal({
     >
       <form id={formId} noValidate onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-3">
-          <div className="flex gap-1" aria-label="Шаги создания товара">{steps.map((step, index) => <button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={t(step)} aria-current={index === currentStep ? "step" : undefined} className="group flex min-h-0 flex-1 items-center rounded-full bg-transparent p-0"><span className={`h-1 w-full rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-neutral-200 dark:bg-neutral-700 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-600"}`} /></button>)}</div>
-          <div className="flex items-center justify-between text-xs text-muted"><span>Шаг {currentStep + 1} из {steps.length}</span><span className="font-medium text-app">{t(steps[currentStep])}</span></div>
+          <div role="group" className="-mx-3 flex gap-0.5 sm:mx-0" aria-label={t("products.stepNavigation")}>{steps.map((step, index) => <button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={t("products.stepButtonLabel", { number: index + 1, name: t(step) })} aria-current={index === currentStep ? "step" : undefined} className="group flex min-h-11 min-w-11 flex-1 items-center justify-center rounded-full bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500"><span className={`h-1 w-full rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-neutral-200 dark:bg-neutral-700 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-600"}`} /></button>)}</div>
+          <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs text-muted"><span>{t("products.stepProgress", { current: currentStep + 1, total: steps.length })}</span><span className="font-medium text-app">{t(steps[currentStep])}</span></div>
         </div>
-        <div className="rounded-xl border border-primary-500/20 bg-primary-500/5 p-4">
-          <p className="text-sm font-bold text-app">{product ? "Редактирование карточки товара" : "Новый товар — заполните по шагам"}</p>
+        <div className="rounded-xl border border-app bg-surface-secondary p-4">
+          <p className="text-sm font-bold text-app">{product ? t("products.wizardEditTitle") : t("products.wizardCreateTitle")}</p>
           <p className="mt-1 text-xs leading-5 text-muted">{t("products.workflowHint")}</p>
         </div>
         {submissionError && (
@@ -848,11 +907,11 @@ export function ProductFormModal({
           </div>
         )}
         {submitAttempted && Object.keys(errors).length > 0 && (
-          <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600">
+          <div ref={errorSummaryRef} role="alert" tabIndex={-1} className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
             <p className="font-semibold">{t("products.formHasErrors")}</p>
             <ul className="mt-2 list-inside list-disc space-y-1">
               {Object.entries(errors).map(([field, message]) => message && (
-                <li key={field}><strong>{errorLabels[field as keyof FormErrors]}:</strong> {message}</li>
+                <li key={field}><strong>{errorLabels[field as keyof FormErrors]}:</strong> {getValidationMessage(message)}</li>
               ))}
             </ul>
           </div>
@@ -866,7 +925,7 @@ export function ProductFormModal({
               value={values.country}
               options={countryOptions}
               onChange={(value) => updateValue("country", value)}
-              error={errors.country}
+              error={getValidationMessage(errors.country)}
             />
             <div className="md:col-span-2">
               <Select
@@ -960,7 +1019,7 @@ export function ProductFormModal({
               maxLength={500}
               value={values.translations[activeLocale].title}
               onChange={(value) => updateLocalizedValue("title", value)}
-              error={errors[localeErrorKeys[activeLocale]]}
+              error={getValidationMessage(errors[localeErrorKeys[activeLocale]])}
               containerClassName="md:col-span-2"
               copy={{
                 bold: t("products.richText.bold"),
@@ -1031,7 +1090,7 @@ export function ProductFormModal({
             <h4 className="text-sm font-bold text-app">{t("products.priceSection")}</h4>
             <p className="mt-1 text-xs text-muted">{t("products.priceSectionHint")}</p>
           </div>
-          <p className="text-sm text-muted">Остатки для каждого размера и цвета указываются отдельно на шаге «Варианты товара».</p>
+          <p className="text-sm text-muted">{t("products.sizeStockHint")}</p>
           <Input
             label={t("products.salePriceLabel")}
             type="number"
@@ -1040,11 +1099,11 @@ export function ProductFormModal({
             inputMode="decimal"
             value={values.salePriceUzs}
             onChange={(event) => updateValue("salePriceUzs", event.target.value)}
-            error={errors.salePriceUzs}
+            error={getValidationMessage(errors.salePriceUzs)}
             className="max-w-md"
           />
           <Input
-            label="Старая цена до скидки (необязательно)"
+            label={t("products.oldPriceLabel")}
             type="number"
             min="0.01"
             step="0.01"
@@ -1053,18 +1112,18 @@ export function ProductFormModal({
             onChange={(event) => updateValue("compareAtPriceUzs", event.target.value)}
             className="max-w-md"
           />
-          <p className="text-xs text-muted">Если цена выше текущей, на витрине автоматически появится скидка.</p>
+          <p className="text-xs text-muted">{t("products.oldPriceHint")}</p>
         </section>
 
         <section className={`${currentStep === 2 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <div>
-            <h4 className="text-sm font-bold text-app">Цвета товара</h4>
-            <p className="mt-1 text-xs text-muted">Задайте название и выберите оттенок в палитре или введите HEX-код.</p>
+            <h4 className="text-sm font-bold text-app">{t("products.colorsTitle")}</h4>
+            <p className="mt-1 text-xs text-muted">{t("products.colorsHint")}</p>
           </div>
           <div className="space-y-2">
             {values.colorsText.split("\n").map((row, rowIndex) => ({ row, rowIndex })).filter(({ row }) => row.trim()).map(({ row, rowIndex }) => {
               const [rawName, rawHex] = row.split("|").map((part) => part.trim());
-              const name = rawHex ? rawName : `Цвет ${rowIndex + 1}`;
+              const name = rawName || t("products.colorFallback", { number: rowIndex + 1 });
               const hex = /^#[0-9a-fA-F]{6}$/.test(rawHex ?? "") ? rawHex.toUpperCase() : /^#[0-9a-fA-F]{6}$/.test(rawName ?? "") ? rawName.toUpperCase() : "#808080";
               const rows = values.colorsText.split("\n");
               const displayHex = rawHex ?? rawName;
@@ -1074,18 +1133,18 @@ export function ProductFormModal({
                 updateValue("colorsText", rows.join("\n"));
               };
               return <div key={`${rowIndex}-${name}`} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-app bg-app p-2.5 sm:grid-cols-[auto_minmax(0,1fr)_8.5rem_auto]">
-                <label className="relative row-span-2 size-10 cursor-pointer overflow-hidden rounded-full border border-app shadow-sm sm:row-span-1" title={`Выбрать цвет ${name}`}>
+                <label className="relative row-span-2 size-10 cursor-pointer overflow-hidden rounded-full border border-app shadow-sm sm:row-span-1" title={t("products.chooseColor", { name })}>
                   <span className="absolute inset-0" style={{ backgroundColor: hex }} />
-                  <input aria-label={`Выбрать цвет ${name}`} type="color" value={hex} onChange={(event) => updateRow(name, event.target.value)} className="absolute inset-0 size-full cursor-pointer opacity-0" />
+                  <input aria-label={t("products.chooseColor", { name })} type="color" value={hex} onChange={(event) => updateRow(rawName, event.target.value)} className="absolute inset-0 size-full cursor-pointer opacity-0" />
                 </label>
-                <input aria-label={`Название цвета ${rowIndex + 1}`} value={name} onChange={(event) => updateRow(event.target.value, hex)} placeholder="Например, Графитовый" className="h-10 min-w-0 rounded-md border border-app bg-surface px-3 text-sm text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" />
+                <input aria-label={t("products.colorName", { number: rowIndex + 1 })} value={rawName} onChange={(event) => updateRow(event.target.value, hex)} placeholder={t("products.colorExample")} className="h-10 min-w-0 rounded-md border border-app bg-surface px-3 text-sm text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" />
                 <div className="relative col-start-2 sm:col-start-auto">
-                  <input aria-label={`HEX цвет ${name}`} value={hexInput} maxLength={7} onChange={(event) => { const next = event.target.value.startsWith("#") ? event.target.value : `#${event.target.value}`; if (/^#[0-9a-fA-F]{0,6}$/.test(next)) updateRow(name, next); }} onBlur={() => { if (!/^#[0-9a-fA-F]{6}$/.test(hexInput)) updateRow(name, "#808080"); }} className="h-10 w-full rounded-md border border-app bg-surface px-2 font-mono text-sm uppercase text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" />
+                  <input aria-label={t("products.hexColor", { name })} value={hexInput} maxLength={7} onChange={(event) => { const next = event.target.value.startsWith("#") ? event.target.value : `#${event.target.value}`; if (/^#[0-9a-fA-F]{0,6}$/.test(next)) updateRow(rawName, next); }} onBlur={() => { if (!/^#[0-9a-fA-F]{6}$/.test(hexInput)) updateRow(rawName, "#808080"); }} className="h-10 w-full rounded-md border border-app bg-surface px-2 font-mono text-sm uppercase text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" />
                 </div>
-                <button type="button" aria-label={`Удалить цвет ${name}`} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-red-500/10 hover:text-red-600 sm:row-span-1"><Trash2 size={16} /></button>
+                <button type="button" aria-label={t("products.removeColor", { name })} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-red-500/10 hover:text-red-600 sm:row-span-1"><Trash2 size={16} /></button>
               </div>;
             })}
-            <button type="button" onClick={() => updateValue("colorsText", [values.colorsText, " | #808080"].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold text-app transition-colors hover:bg-app"><span aria-hidden="true">+</span> Добавить цвет</button>
+            <button type="button" onClick={() => updateValue("colorsText", [values.colorsText, " | #808080"].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold text-app transition-colors hover:bg-app"><span aria-hidden="true">+</span> {t("products.addColor")}</button>
           </div>
         </section>
 
@@ -1097,8 +1156,8 @@ export function ProductFormModal({
             </p>
             <p className="mt-1 text-xs text-muted">{t("products.photoEditingHint")}</p>
           </div>
-          {errors.photos && <p role="alert" className="text-sm text-red-500">{errors.photos}</p>}
-          {photoInputErrors.map((issue, index) => <p key={`${issue}-${index}`} role="alert" className="text-sm text-red-500">{issue}</p>)}
+          {errors.photos && <p role="alert" className="text-sm text-red-500">{getValidationMessage(errors.photos)}</p>}
+          {photoInputErrors.map((issue, index) => <p key={`${issue.code}-${index}`} role="alert" className="text-sm text-red-500">{getPhotoInputErrorMessage(issue)}</p>)}
           {photos.length > 0 && (
             <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {photos.map((photo, index) => (
@@ -1311,16 +1370,16 @@ export function ProductFormModal({
             <div className="grid gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-app">
-                  Размеры товара
+                  {t("products.sizesTitle")}
                   <textarea
                     value={values.sizesText}
                     onChange={(event) => updateValue("sizesText", event.target.value)}
                     rows={3}
-                    placeholder={'Для одежды: S, M, L, XL, XXL\nДля обуви: 35, 36, 37, 38, 39, 40\nДля детской: 86, 92, 98, 104'}
+                    placeholder={t("products.sizesPlaceholder")}
                     className="mt-2 w-full rounded-xl border border-app bg-app px-3 py-3 text-sm text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
                   />
                 </label>
-                <div className="mt-3 flex flex-wrap gap-2" aria-label="Предпросмотр размеров">
+                <div className="mt-3 flex flex-wrap gap-2" aria-label={t("products.sizesPreview")}>
                   {normalizeProductSizes(values.sizesText).map((size, index) => (
                     <span key={`${size}-${index}`} className="inline-flex h-10 min-w-[44px] select-none items-center justify-center rounded-md border border-app bg-surface px-3 text-sm font-medium text-app">{size}</span>
                   ))}
@@ -1357,8 +1416,8 @@ export function ProductFormModal({
         {(product?.source === "MANUAL" || !product) && (
           <section className={`${currentStep === 2 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
             <div>
-              <h4 className="text-sm font-bold text-app">Остатки по вариантам</h4>
-              <p className="mt-1 text-xs text-muted">Количество задаётся отдельно для каждой пары цвета и размера. Для товара без вариантов используется одно общее поле.</p>
+              <h4 className="text-sm font-bold text-app">{t("products.stockByVariantTitle")}</h4>
+              <p className="mt-1 text-xs text-muted">{t("products.stockByVariantHint")}</p>
             </div>
             {(() => {
               const colors = values.colorsText.split("\n").map((row) => {
@@ -1370,7 +1429,7 @@ export function ProductFormModal({
               const colorOptions = colors.length ? colors : [null];
               const sizeOptions = sizes.length ? sizes : [null];
               if (!colors.length && !sizes.length) {
-                return <Input label="Наличие товара (шт.)" type="number" min="0" max="2147483647" step="1" inputMode="numeric" value={values.stock} onChange={(event) => updateValue("stock", event.target.value)} className="max-w-md" />;
+                return <Input label={t("products.stockLabel")} type="number" min="0" max="2147483647" step="1" inputMode="numeric" value={values.stock} onChange={(event) => updateValue("stock", event.target.value)} className="max-w-md" />;
               }
               const parsedStock = (raw: string | undefined) => {
                 const number = Number(raw ?? values.stock ?? 0);
@@ -1380,8 +1439,8 @@ export function ProductFormModal({
                 {colorOptions.flatMap((color) => sizeOptions.map((size) => {
                   const key = `${color ?? ""}::${size ?? ""}`;
                   const stock = values.variantStockOverrides[key] ?? values.stock;
-                  const label = [color?.split("::")[0], size].filter(Boolean).join(" · ") || "Стандартный вариант";
-                  return <Input key={key} label={`${label} — наличие (шт.)`} type="number" min="0" max="2147483647" step="1" inputMode="numeric" value={stock} onChange={(event) => {
+                  const label = [color?.split("::")[0], size].filter(Boolean).join(" · ") || t("products.standardVariant");
+                  return <Input key={key} label={`${label} — ${t("products.stockUnits")}`} type="number" min="0" max="2147483647" step="1" inputMode="numeric" value={stock} onChange={(event) => {
                     const value = event.target.value;
                     if (value !== "" && !/^\d{1,10}$/.test(value)) return;
                     updateValue("variantStockOverrides", { ...values.variantStockOverrides, [key]: value });
@@ -1430,16 +1489,14 @@ export function ProductFormModal({
         <section className={`${currentStep === 5 ? "" : "hidden "}space-y-3 rounded-xl border border-app p-4`}>
           <h4 className="text-sm font-bold text-app">{t("products.publicationSection")}</h4>
           <div className="flex items-center justify-between gap-4 py-2">
-            <div><p className="text-sm font-medium text-app">{t("products.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Товар появится в каталоге после сохранения.</p></div>
-            <button type="button" role="switch" aria-checked={values.publish} onClick={() => updateValue("publish", !values.publish)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${values.publish ? "bg-primary-600" : "bg-neutral-300 dark:bg-neutral-600"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publish ? "translate-x-5" : "translate-x-0"}`} /></button>
+            <Switch checked={values.publish} onChange={(checked) => updateValue("publish", checked)} label={t("products.publishLabel")} description={t("products.publishDescription")} containerClassName="w-full" />
           </div>
           <div>
             <div className="flex items-center justify-between gap-4 py-2">
-              <div><p className="text-sm font-medium text-app">{t("products.telegram.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Публикация выполняется после успешного сохранения товара.</p></div>
-              <button type="button" role="switch" aria-checked={values.publishTelegram} disabled={!values.publish || !capabilitiesQuery.data?.telegramProductPublish} onClick={() => updateValue("publishTelegram", !values.publishTelegram)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-40 ${values.publishTelegram ? "bg-primary-600" : "bg-neutral-300 dark:bg-neutral-600"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publishTelegram ? "translate-x-5" : "translate-x-0"}`} /></button>
+              <Switch checked={values.publishTelegram} onChange={(checked) => updateValue("publishTelegram", checked)} label={t("products.telegram.publishLabel")} description={t("products.telegram.publishDescription")} disabled={!values.publish || !capabilitiesQuery.data?.telegramProductPublish} ariaDescribedBy={`${formId}-telegram-status`} containerClassName="w-full" />
             </div>
             {!capabilitiesQuery.isLoading && !capabilitiesQuery.isError && (
-              <p className="ml-6 mt-1 text-xs text-muted">
+              <p id={`${formId}-telegram-status`} className="ml-6 mt-1 text-xs text-muted">
                 {!capabilitiesQuery.data?.telegramProductPublishFeatureEnabled
                   ? t("products.telegram.featureDisabled")
                   : !capabilitiesQuery.data.telegramProductPublishConfigured
@@ -1450,10 +1507,10 @@ export function ProductFormModal({
               </p>
             )}
             {capabilitiesQuery.isLoading && (
-              <p className="ml-6 mt-1 text-xs text-muted">{t("products.telegram.loading")}</p>
+              <p id={`${formId}-telegram-status`} className="ml-6 mt-1 text-xs text-muted">{t("products.telegram.loading")}</p>
             )}
             {capabilitiesQuery.isError && (
-              <p role="alert" className="ml-6 mt-1 text-xs text-red-600">{t("products.telegram.statusError")}</p>
+              <p id={`${formId}-telegram-status`} role="alert" className="ml-6 mt-1 text-xs text-red-600">{t("products.telegram.statusError")}</p>
             )}
           </div>
           {telegramPublishError && (

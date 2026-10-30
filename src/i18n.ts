@@ -26,4 +26,13 @@ i18n
     },
   });
 
+const syncDocumentLanguage = (language: string) => {
+  if (typeof document === 'undefined') return;
+  const baseLanguage = language.toLowerCase().split('-')[0];
+  document.documentElement.lang = ['ru', 'uz', 'en'].includes(baseLanguage) ? baseLanguage : 'ru';
+};
+
+i18n.on('languageChanged', syncDocumentLanguage);
+syncDocumentLanguage(i18n.resolvedLanguage || i18n.language || 'ru');
+
 export default i18n;

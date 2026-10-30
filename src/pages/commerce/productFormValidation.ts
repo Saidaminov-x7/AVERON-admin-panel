@@ -19,6 +19,18 @@ export type ProductValidationCode =
   | "color";
 export type ProductValidationErrors = Partial<Record<ProductValidationField, ProductValidationCode>>;
 
+const PRODUCT_VALIDATION_STEP_FIELDS: ReadonlyArray<readonly ProductValidationField[]> = [
+  ["titleRu", "titleUz", "titleEn", "country"],
+  ["salePriceUzs"],
+  ["colors"],
+  ["photos"],
+];
+
+export function getFirstProductValidationStep(errors: ProductValidationErrors): number | null {
+  const step = PRODUCT_VALIDATION_STEP_FIELDS.findIndex((fields) => fields.some((field) => errors[field]));
+  return step === -1 ? null : step;
+}
+
 export interface ProductDraftValidationInput {
   titles: Record<"ru" | "uz" | "en", string>;
   country: string;
