@@ -82,7 +82,7 @@ const ErrorLogsPage: React.FC = () => {
               <Select
                 value={severity || ''}
                 onChange={(val) => {
-                  setSeverity((val as any) || undefined);
+                  setSeverity(val === 'error' || val === 'warning' || val === 'info' ? val : undefined);
                   setPage(1);
                 }}
                 options={[

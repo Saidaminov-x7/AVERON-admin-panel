@@ -2,6 +2,7 @@
 // Медиа-библиотека платформы: просмотр, поиск, загрузка, удаление и копирование ссылок на изображения
 
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -65,8 +66,11 @@ export const MediaLibraryPage: React.FC = () => {
       setIsUploadModalOpen(false);
       toast.success(t('media.uploadSuccess', 'Изображения успешно загружены'));
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || t('media.uploadError', 'Ошибка загрузки файлов'));
+    onError: (err: unknown) => {
+      const message = axios.isAxiosError<{ message?: unknown }>(err) && typeof err.response?.data?.message === 'string'
+        ? err.response.data.message
+        : t('media.uploadError', 'Ошибка загрузки файлов');
+      toast.error(message);
     },
   });
 
@@ -78,8 +82,11 @@ export const MediaLibraryPage: React.FC = () => {
       if (selectedImage?.id === deleteConfirmId) setSelectedImage(null);
       setDeleteConfirmId(null);
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || t('media.deleteError', 'Ошибка удаления файла'));
+    onError: (err: unknown) => {
+      const message = axios.isAxiosError<{ message?: unknown }>(err) && typeof err.response?.data?.message === 'string'
+        ? err.response.data.message
+        : t('media.deleteError', 'Ошибка удаления файла');
+      toast.error(message);
     },
   });
 

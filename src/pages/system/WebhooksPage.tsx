@@ -9,6 +9,7 @@ import { Webhook, Plus, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru, enUS } from 'date-fns/locale';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 const WebhooksPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -53,8 +54,11 @@ const WebhooksPage: React.FC = () => {
       } else {
         toast.error(`Ошибка доставки тестового вебхука: ${res.error || 'Статус ' + res.statusCode}`);
       }
-    } catch (err: any) {
-      toast.error('Сбой отправки тестового вебхука: ' + (err.message || 'Ошибка сети'));
+    } catch (err: unknown) {
+      const detail = axios.isAxiosError<{ message?: unknown }>(err)
+        ? (typeof err.response?.data?.message === 'string' ? err.response.data.message : err.message)
+        : err instanceof Error ? err.message : 'Ошибка сети';
+      toast.error('Сбой отправки тестового вебхука: ' + detail);
     } finally {
       setTestingId(null);
     }

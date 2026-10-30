@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, RotateCcw, Archive } from "lucide-react";
 import { toast } from "sonner";
@@ -228,8 +229,11 @@ export default function CategoriesPage() {
                   const uploaded = await uploadMediaApi(file);
                   setValues((current) => ({ ...current, imageUrl: uploaded.url }));
                   toast.success("Изображение категории загружено");
-                } catch (error: any) {
-                  toast.error(error?.response?.data?.message || "Не удалось загрузить изображение");
+                } catch (error: unknown) {
+                  const message = axios.isAxiosError<{ message?: unknown }>(error) && typeof error.response?.data?.message === 'string'
+                    ? error.response.data.message
+                    : "Не удалось загрузить изображение";
+                  toast.error(message);
                 } finally {
                   setUploadingImage(false);
                   event.target.value = "";

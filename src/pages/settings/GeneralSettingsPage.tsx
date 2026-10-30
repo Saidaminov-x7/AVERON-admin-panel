@@ -65,8 +65,8 @@ const GeneralSettingsPage: React.FC = () => {
       setContactPhone(settings.contactPhone === '+998 71 200-00-00' ? '' : settings.contactPhone || '');
       setMaintenanceMode(settings.maintenanceMode ?? false);
       setMaintenanceMessage(settings.maintenanceMessage || '');
-      setMaintenancePasswordEnabled((settings as any).maintenancePasswordEnabled ?? false);
-      setMobilePinchZoomEnabled((settings as any).mobilePinchZoomEnabled ?? true);
+      setMaintenancePasswordEnabled(settings.maintenancePasswordEnabled ?? false);
+      setMobilePinchZoomEnabled(settings.mobilePinchZoomEnabled ?? true);
       setMaxProductPhotos(settings.maxProductPhotos ?? 15);
       setMaxProductPhotoSizeMb(settings.maxProductPhotoSizeMb ?? 10);
       setLogoPreview(settings.logoUrl || null);
@@ -255,7 +255,7 @@ const GeneralSettingsPage: React.FC = () => {
                         type="password"
                         value={maintenanceBypassPassword}
                         onChange={(e) => setMaintenanceBypassPassword(e.target.value)}
-                        placeholder={(settings as any).maintenanceBypassPasswordConfigured
+                        placeholder={settings?.maintenanceBypassPasswordConfigured
                           ? t('settings.leaveBlankToKeepPassword', 'Оставьте пустым, чтобы сохранить текущий пароль')
                           : t('common.enterPassword', 'Введите пароль')}
                         className="input max-w-xs"
