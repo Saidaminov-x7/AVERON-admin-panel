@@ -30,9 +30,11 @@ function releaseManifest(): Plugin {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
   const isLocalRuntime = env.VITE_AVERON_RUNTIME_TARGET === 'local';
-  const apiTarget = isLocalRuntime
-    ? env.VITE_AVERON_LOCAL_API_URL || 'http://127.0.0.1:8080'
-    : env.VITE_API_URL || 'https://averon-backend-production.up.railway.app';
+  const apiTarget = resolveAdminApiOrigin(
+    isLocalRuntime ? (env.VITE_AVERON_LOCAL_API_URL || '') : (env.VITE_API_URL || ''),
+    isLocalRuntime,
+    isLocalRuntime ? 'http://127.0.0.1:8080' : 'https://averon-backend-production.up.railway.app',
+  );
 
   return {
     plugins: [react(), releaseManifest()],
