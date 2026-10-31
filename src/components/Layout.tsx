@@ -153,7 +153,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
 
         {/* Контент страницы */}
         <main className="admin-scroll safe-bottom flex-1 overflow-x-hidden overflow-y-auto p-3 min-[390px]:p-4 sm:p-6 lg:p-8 animate-fade-in">
-          <div className="admin-page-frame mx-auto w-full max-w-[1320px] space-y-4 sm:space-y-6">
+          <div className="admin-page-frame mx-auto w-full max-w-[1440px] space-y-4 sm:space-y-6">
             {children}
           </div>
         </main>

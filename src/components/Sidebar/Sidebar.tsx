@@ -5,9 +5,9 @@ import {
   Activity,
   AlertCircle,
   BarChart2,
+  BadgePercent,
   Bell,
   Check,
-  ChevronDown,
   ClipboardCheck,
   ExternalLink,
   Gauge,
@@ -60,7 +60,7 @@ const sections: NavSection[] = [
     items: [
       { to: "/orders", labelKey: "sidebar.orders", icon: PackageCheck },
       { to: "/finance", labelKey: "sidebar.finance", icon: ReceiptText },
-      { to: "/commerce/promo-codes", labelKey: "sidebar.commercePromos", icon: Tags },
+      { to: "/commerce/promo-codes", labelKey: "sidebar.commercePromos", icon: BadgePercent },
     ],
   },
   {
@@ -274,7 +274,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
                   className={({ isActive }) => `admin-drawer-link flex min-h-11 items-center gap-3 px-3 py-2 text-sm transition-colors ${isActive ? "is-active" : ""}`}
                 >
                   <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
-                  {!compact && <span className="admin-sidebar-label truncate">{t(labelKey)}</span>}
+                  <span className="admin-sidebar-label truncate">{t(labelKey)}</span>
                 </NavLink>
               ))}
             </div>
@@ -282,23 +282,19 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
         ))}
       </nav>
 
-      <div data-admin-mobile-utilities="" className="admin-sidebar-mobile-tools space-y-3 border-t border-app bg-surface px-4 py-4 lg:hidden">
+      <div data-admin-mobile-utilities="" className="admin-sidebar-mobile-tools space-y-3 border-t border-app bg-[var(--color-surface-soft)] px-4 pb-5 pt-4 lg:hidden">
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold text-muted">{t("common.language")}</span>
-          <ThemeToggle />
-        </div>
+          <span className="text-xs font-semibold text-muted">{t("common.languageAndTheme")}</span>
+          <div className="flex min-w-0 items-center gap-2">
         <Dropdown
           key={isMobileOpen ? "mobile-open" : "mobile-closed"}
           portal
-          className="min-w-0 flex-1"
+          className="w-11 shrink-0"
           contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-2"
           trigger={(
-            <span className="flex h-11 w-full items-center justify-between gap-3 rounded-lg border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)]">
-              <span className="flex min-w-0 items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)]">
                 <LanguageFlag locale={i18n.language.startsWith("uz") ? "uz" : i18n.language.startsWith("en") ? "en" : "ru"} />
-                <span className="truncate">{languages.find(({ code }) => i18n.language.startsWith(code))?.name ?? languages[0].name}</span>
-              </span>
-              <ChevronDown size={16} className="shrink-0 text-muted" />
+                <span className="sr-only">{t("common.language")}</span>
             </span>
           )}
         >
@@ -320,6 +316,9 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
             );
           })}
         </Dropdown>
+            <ThemeToggle />
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-2">
           <NavLink to="/notifications" onClick={onCloseMobile} className="flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
             <Bell size={17} />{t("header.notifications")}

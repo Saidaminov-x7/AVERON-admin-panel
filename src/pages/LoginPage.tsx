@@ -254,7 +254,7 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* Форма */}
-        <div className="card">
+        <div className={step === 'credentials' ? 'card' : 'card border-2 border-app bg-surface'}>
           {step === 'credentials' ? (
             <form onSubmit={handleCredentialsSubmit} className="space-y-4">
               {/* Email */}

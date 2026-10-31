@@ -316,7 +316,7 @@ export const Select: React.FC<SelectProps> = ({
                         <span
                           className={clsx(
                             'text-[length:var(--font-size-caption)] truncate',
-                            isSelected ? 'text-white/80' : 'text-muted',
+                            'text-muted',
                           )}
                         >
                           ({option.description})

@@ -1,5 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useId, useRef, useState } from "react";
-import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { ImageOff, MoveDown, MoveUp, RefreshCw, Sparkles, Star, Trash2, Upload } from "lucide-react";
@@ -337,19 +337,6 @@ export function ProductFormModal({
       ...(key === "publish" && value === false ? { publishTelegram: false } : {}),
     }));
     setErrors((current) => ({ ...current, [key]: undefined }));
-  };
-
-  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const currentIndex = locales.indexOf(activeLocale);
-    let nextIndex = currentIndex;
-    if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % locales.length;
-    else if (event.key === "ArrowLeft") nextIndex = (currentIndex + locales.length - 1) % locales.length;
-    else if (event.key === "Home") nextIndex = 0;
-    else if (event.key === "End") nextIndex = locales.length - 1;
-    else return;
-    event.preventDefault();
-    setActiveLocale(locales[nextIndex]);
-    event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[nextIndex]?.focus();
   };
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
@@ -756,35 +743,18 @@ export function ProductFormModal({
     { value: "square", label: t("products.photoSquare"), aspectClass: "aspect-square" },
   ];
   const headerContent = (
-    <div role="tablist" aria-label={t("products.contentLanguage")} className="inline-flex w-full rounded-xl border border-app bg-surface-soft p-1 dark:bg-white/5 sm:w-auto">
-      {locales.map((locale) => {
-        const error = errors[localeErrorKeys[locale]];
-        const complete = values.translations[locale].title.trim().length >= 2;
-        return (
-          <button
-            key={locale}
-            type="button"
-            role="tab"
-            id={`${formId}-tab-${locale}`}
-            aria-controls={`${formId}-panel`}
-            aria-selected={activeLocale === locale}
-            aria-label={t("products.contentTabLabel", {
-              language: localeName(locale),
-              status: error ? t("products.translationError") : complete ? t("products.translationComplete") : t("products.translationIncomplete"),
-            })}
-            tabIndex={activeLocale === locale ? 0 : -1}
-            onClick={() => setActiveLocale(locale)}
-            onKeyDown={handleTabKeyDown}
-            className={`inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:flex-none ${
-              activeLocale === locale ? "bg-surface text-primary-600 shadow-sm dark:text-primary-400" : "text-muted hover:text-app"
-            }`}
-          >
-            <LanguageFlag locale={locale} className="h-4 w-6" />
-            {error ? <span aria-hidden="true" className="text-error">!</span> : complete ? <span aria-hidden="true" className="text-success">✓</span> : null}
-          </button>
-        );
-      })}
-    </div>
+    <Select
+      label={t("products.contentLanguage")}
+      value={activeLocale}
+      onChange={(value) => { if (locales.includes(value as ProductLocale)) setActiveLocale(value as ProductLocale); }}
+      options={locales.map((locale) => ({
+        value: locale,
+        label: localeName(locale),
+        description: errors[localeErrorKeys[locale]] ? t("products.translationError") : values.translations[locale].title.trim().length >= 2 ? t("products.translationComplete") : t("products.translationIncomplete"),
+        icon: <LanguageFlag locale={locale} className="h-4 w-6" />,
+      }))}
+      containerClassName="w-full sm:w-56"
+    />
   );
 
   return (
@@ -933,7 +903,7 @@ export function ProductFormModal({
               </div>
             </div>
           )}
-          <div id={`${formId}-panel`} role="tabpanel" aria-labelledby={`${formId}-tab-${activeLocale}`} className="grid gap-4 md:grid-cols-2">
+          <div id={`${formId}-panel`} role="region" aria-label={`${t("products.contentLanguage")}: ${localeName(activeLocale)}`} className="grid gap-4 md:grid-cols-2">
             <ProductRichTextField
               label={t("products.titleLabel")}
               maxLength={500}

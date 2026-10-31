@@ -408,7 +408,7 @@ button, [role="button"], a, summary, select {
   touch-action: manipulation;
 }
 
-button, [role="button"], summary { user-select: none; }
+button, [role="button"], summary, .admin-sidebar a { user-select: none; }
 
 :where(button, [role="button"], a, input, select, textarea, summary):focus-visible {
   outline: 2px solid var(--color-primary);
@@ -488,22 +488,22 @@ button, [role="button"], summary { user-select: none; }
 
 /* AVERON retail language: clean white canvas, ink typography, fine borders. */
 :root {
-  --color-bg: #f7f7f7;
+  --color-bg: #ffffff;
   --color-surface: #fff;
-  --color-surface-soft: #f2f2f2;
-  --color-border: #e4e4e4;
+  --color-surface-soft: #f5f5f5;
+  --color-border: #dddddd;
   --color-text: #111;
-  --color-text-muted: #737373;
+  --color-text-muted: #767676;
   --color-text-secondary: #4a4a4a;
   --color-muted: var(--color-text-muted);
-  --color-image-surface: var(--color-surface-soft);
-  --color-border-hover: color-mix(in srgb, var(--color-border) 65%, var(--color-text));
-  --color-sale: var(--color-error);
+  --color-image-surface: #f3f3f3;
+  --color-border-hover: #999999;
+  --color-sale: #d6001c;
   --color-sidebar-bg: #fff;
   --color-sidebar-border: #e4e4e4;
   --color-primary: #1a1a1a;
   --color-primary-hover: #000;
-  --color-secondary: var(--color-primary-hover);
+  --color-secondary: #404040;
   --color-on-primary: #fff;
   --radius: 0.25rem;
   --radius-control: 0.25rem;
@@ -524,18 +524,18 @@ button, [role="button"], summary { user-select: none; }
   --color-surface: #1e1e1e;
   --color-surface-soft: #252525;
   --color-border: #3a3a3a;
-  --color-text: #f2f2f2;
+  --color-text: #f2f3f3;
   --color-text-muted: #a3a3a3;
-  --color-text-secondary: #c3c3c3;
+  --color-text-secondary: #c3c7cb;
   --color-muted: var(--color-text-muted);
-  --color-image-surface: var(--color-surface-soft);
-  --color-border-hover: color-mix(in srgb, var(--color-border) 65%, var(--color-text));
-  --color-sale: var(--color-error);
+  --color-image-surface: #ededed;
+  --color-border-hover: #737373;
+  --color-sale: #ff6577;
   --color-sidebar-bg: #1e1e1e;
   --color-sidebar-border: #3a3a3a;
   --color-primary: #f1f1f1;
   --color-primary-hover: #fff;
-  --color-secondary: var(--color-primary-hover);
+  --color-secondary: #cfcfcf;
   --color-on-primary: #181818;
   --shadow-elevated: 0 18px 48px rgb(0 0 0 / .18);
   --shadow-menu: 0 12px 32px rgb(20 20 20 / .12);
@@ -622,7 +622,12 @@ button, [role="button"], summary { user-select: none; }
   color: currentColor;
 }
 
-.averon-admin-shell .admin-sidebar.is-collapsed .admin-sidebar-label { display: none; }
+.averon-admin-shell .admin-sidebar-label {
+  max-width: 16rem;
+  opacity: 1;
+  transition: max-width var(--duration-ui) var(--ease-out-ui), opacity var(--duration-ui) var(--ease-out-ui);
+}
+.averon-admin-shell .admin-sidebar.is-collapsed .admin-sidebar-label { max-width: 0; opacity: 0; }
 .averon-admin-shell .admin-sidebar.is-collapsed .admin-drawer-link { justify-content: center; padding-inline: var(--space-2); }
 .averon-admin-shell .admin-sidebar.is-collapsed nav { padding-inline: var(--space-2); }
 
@@ -631,6 +636,7 @@ button, [role="button"], summary { user-select: none; }
 }
 
 .averon-admin-topbar {
+  padding-inline: clamp(var(--space-4), 3vw, var(--space-10));
   z-index: 30;
   min-height: 64px;
   height: 64px;
@@ -640,8 +646,9 @@ button, [role="button"], summary { user-select: none; }
 }
 
 .averon-admin-topbar > div {
+  width: 100%;
   max-width: 1440px;
-  padding-inline: clamp(var(--space-4), 3vw, var(--space-10));
+  padding-inline: 0;
 }
 
 .averon-admin-topbar h1 {
@@ -665,7 +672,7 @@ button, [role="button"], summary { user-select: none; }
 
 .averon-admin-shell .admin-page-frame {
   width: 100%;
-  max-width: 1320px;
+  max-width: 1440px;
   margin-inline: auto;
   min-width: 0;
 }
@@ -734,7 +741,7 @@ button, [role="button"], summary { user-select: none; }
 
   .averon-admin-shell .admin-sidebar.is-collapsed { width: 100% !important; }
 
-  .averon-admin-shell .admin-sidebar-label { display: inline; }
+  .averon-admin-shell .admin-sidebar.is-collapsed .admin-sidebar-label { max-width: 16rem; opacity: 1; }
 
   .averon-admin-shell .admin-sidebar-section-title { clip: auto; clip-path: none; height: auto; overflow: visible; position: static; white-space: normal; width: auto; }
 
@@ -773,7 +780,7 @@ button, [role="button"], summary { user-select: none; }
 
   .averon-admin-shell .admin-mobile-navigation .admin-drawer-link {
     position: relative;
-    min-height: 3.25rem;
+    min-height: 2.75rem;
     gap: var(--space-4);
     border: 0;
     border-bottom: 1px solid var(--color-border);
@@ -805,7 +812,7 @@ button, [role="button"], summary { user-select: none; }
   }
 
   .averon-admin-shell .admin-mobile-navigation [data-admin-mobile-utilities] {
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-4);
     border-top-color: var(--color-border);
     background: var(--color-surface-soft);
   }
@@ -837,13 +844,14 @@ button, [role="button"], summary { user-select: none; }
 }
 
 @media (max-width: 639px) {
+  .averon-admin-topbar { padding-inline: var(--space-3); }
   .averon-admin-shell main.admin-scroll {
     padding: var(--space-4) var(--space-3) calc(var(--space-6) + env(safe-area-inset-bottom));
   }
 
   .averon-admin-topbar > div {
     gap: var(--space-2);
-    padding-inline: var(--space-3);
+    padding-inline: 0;
   }
 
   .averon-admin-topbar h1 {

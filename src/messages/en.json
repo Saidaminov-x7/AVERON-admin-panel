@@ -107,6 +107,7 @@
     "collapse": "Collapse sidebar",
     "expand": "Expand sidebar",
     "language": "Language",
+    "languageAndTheme": "Language and theme",
     "error": "Error",
     "success": "Success",
     "noData": "No data available",
@@ -654,6 +655,9 @@
       "providerNotConfigured": "No image embedding provider is configured."
     },
     "contentLanguage": "Product content language",
+    "pricing": "Pricing",
+    "variants": "Variants",
+    "photos": "Photos",
     "contentLocale": {
       "ru": "Русский",
       "uz": "O'zbek",

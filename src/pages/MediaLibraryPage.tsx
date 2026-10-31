@@ -322,7 +322,7 @@ export const MediaLibraryPage: React.FC = () => {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between p-3 hover:bg-surface-soft dark:hover:bg-white/5 transition-colors gap-4"
+                className="flex flex-col items-stretch justify-between p-3 hover:bg-surface-soft dark:hover:bg-white/5 transition-colors gap-4 sm:flex-row sm:items-center"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <button
@@ -355,7 +355,7 @@ export const MediaLibraryPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="grid w-full min-w-0 grid-cols-2 gap-2 sm:w-auto sm:shrink-0 [&>a]:flex [&>a]:min-h-11 [&>a]:items-center [&>a]:justify-center [&>button]:min-h-11 [&>button]:min-w-0 [&>button]:w-full [&>button]:whitespace-normal">
                   <Button
                     variant="ghost"
                     size="sm"

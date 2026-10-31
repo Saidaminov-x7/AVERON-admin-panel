@@ -530,7 +530,7 @@ export default function ProductsPage() {
                   {product.status === "PUBLISHED" && formatPublishedAt(product.publishedAt) ? (
                     <p className="mt-1 text-xs text-muted">Опубликован: {formatPublishedAt(product.publishedAt)}</p>
                   ) : null}
-                  <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-app pt-3">
+                  <div className="mt-4 grid grid-cols-2 gap-2 border-t border-app pt-3 [&>button]:min-h-11 [&>button]:min-w-0 [&>button]:w-full [&>button]:justify-center">
                     <button
                       type="button"
                       onClick={() => navigate(`/products/edit/${encodeURIComponent(product.slug)}`)}

@@ -107,6 +107,7 @@
     "collapse": "Свернуть меню",
     "expand": "Развернуть меню",
     "language": "Язык",
+    "languageAndTheme": "Язык и тема",
     "error": "Ошибка",
     "success": "Успешно",
     "noData": "Данные отсутствуют",
@@ -612,6 +613,9 @@
       "providerNotConfigured": "Провайдер эмбеддингов изображений не настроен."
     },
     "contentLanguage": "Язык контента товара",
+    "pricing": "Цены",
+    "variants": "Варианты",
+    "photos": "Фотографии",
     "contentLocale": {
       "ru": "Русский",
       "uz": "O'zbek",

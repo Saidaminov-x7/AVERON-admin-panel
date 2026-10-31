@@ -332,7 +332,7 @@ export default function ImportsPage() {
                       <p className="mt-1 text-xs text-muted">{new Date(item.createdAt).toLocaleString(currencyLocale)}</p>
                       {item.status === 'REJECTED' && item.rejectionReason && <p className="mt-1 text-sm text-error">{item.rejectionReason}</p>}
                     </div>
-                    <div className="flex flex-wrap gap-2 md:shrink-0">
+                    <div className="grid grid-cols-2 gap-2 md:shrink-0 [&>button]:min-h-11 [&>button]:min-w-0">
                       <Button variant="outline" size="sm" leftIcon={<Eye size={15} />} onClick={() => setDetailsItem(item)}>
                         {t('imports.details', 'Детали')}
                       </Button>

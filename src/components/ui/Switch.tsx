@@ -7,6 +7,7 @@ export interface SwitchProps {
   onChange: (checked: boolean) => void;
   label?: React.ReactNode;
   description?: string;
+  ariaLabel?: string;
   disabled?: boolean;
   size?: 'sm' | 'md';
   className?: string;
@@ -18,6 +19,7 @@ export const Switch: React.FC<SwitchProps> = ({
   onChange,
   label,
   description,
+  ariaLabel,
   disabled = false,
   size = 'md',
   className,
@@ -44,26 +46,20 @@ export const Switch: React.FC<SwitchProps> = ({
       <button
         type="button"
         role="switch"
+        aria-label={ariaLabel}
         aria-checked={checked}
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         className={twMerge(
           clsx(
-            'relative inline-flex shrink-0 transition-colors duration-200 ease-in-out rounded-full border-2 border-transparent cursor-pointer outline-none focus:ring-2 focus:ring-primary-500/20',
-            isSm ? 'h-5 w-9' : 'h-6 w-11',
-            checked ? 'bg-primary-500' : 'bg-surface-soft dark:bg-surface-soft',
+            'relative inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
           ),
           className,
         )}
       >
-        <span
-          className={clsx(
-            'pointer-events-none inline-block transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out',
-            isSm
-              ? clsx('h-4 w-4', checked ? 'translate-x-4' : 'translate-x-0')
-              : clsx('h-5 w-5', checked ? 'translate-x-5' : 'translate-x-0'),
-          )}
-        />
+        <span aria-hidden="true" className={clsx('relative block rounded-full border transition-colors duration-200 motion-reduce:transition-none', isSm ? 'h-5 w-9' : 'h-6 w-11', checked ? 'border-primary-500 bg-primary-500' : 'border-app bg-surface-soft')}>
+          <span className={clsx('absolute left-0.5 top-0.5 rounded-full bg-white shadow-sm transition-transform duration-200 motion-reduce:transition-none', isSm ? 'size-3.5' : 'size-[18px]', checked && (isSm ? 'translate-x-4' : 'translate-x-5'))} />
+        </span>
       </button>
     </label>
   );

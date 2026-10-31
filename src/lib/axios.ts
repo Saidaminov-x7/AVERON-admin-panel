@@ -6,7 +6,7 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
-const API_URL = import.meta.env.DEV
+const API_URL = import.meta.env.DEV || import.meta.env.VITE_AVERON_RUNTIME_TARGET === 'local'
   ? '/api/backend'
   : import.meta.env.VITE_API_URL || 'https://averon-backend-production.up.railway.app';
 export { API_URL };
