@@ -5,6 +5,7 @@ import { Button } from './Button';
 import { Checkbox } from './Checkbox';
 import { Input } from './Input';
 import { Select } from './Select';
+import { Switch } from './Switch';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -31,6 +32,30 @@ describe('shared admin control visual and semantic contract', () => {
     expect(checkbox).toContain('h-[18px] w-[18px]');
     expect(checkbox).toContain('peer-checked:bg-[var(--color-primary)]');
     expect(checkbox).not.toContain('peer-checked:bg-primary-500');
+    expect(checkbox).toContain('items-center');
+    expect(checkbox).toContain('data-admin-checkbox-indicator=""');
+  });
+
+  it('renders a branded, named switch with stable checked and unchecked states', () => {
+    const unchecked = renderToStaticMarkup(createElement(Switch, {
+      checked: false,
+      ariaLabel: 'Publish to Telegram',
+      onChange: () => undefined,
+    }));
+    const checked = renderToStaticMarkup(createElement(Switch, {
+      checked: true,
+      label: 'Publish to storefront',
+      onChange: () => undefined,
+    }));
+
+    expect(unchecked).toContain('role="switch"');
+    expect(unchecked).toContain('aria-checked="false"');
+    expect(unchecked).toContain('aria-label="Publish to Telegram"');
+    expect(unchecked).toContain('bg-[var(--color-border)]');
+    expect(unchecked).toContain('min-h-11 min-w-11');
+    expect(checked).toContain('aria-checked="true"');
+    expect(checked).toContain('aria-labelledby=');
+    expect(checked).toContain('bg-[var(--color-primary)]');
   });
 
   it('renders the Select clear action as a separate named button', () => {

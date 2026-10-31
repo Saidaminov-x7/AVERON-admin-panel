@@ -112,7 +112,10 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
   const [isDesktop, setIsDesktop] = useState(() => window.matchMedia("(min-width: 1024px)").matches);
   const compact = collapsed && isDesktop;
   const navRef = useRef<HTMLElement>(null);
+  const resizeCleanupRef = useRef<(() => void) | null>(null);
   const siteUrl = import.meta.env.VITE_SITE_URL || "https://averon.uz";
+
+  useEffect(() => () => resizeCleanupRef.current?.(), []);
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 1024px)");
@@ -157,31 +160,50 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
     });
   };
 
-  const startResize = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!isDesktop || compact) return;
+  const startResize = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!window.matchMedia("(min-width: 1024px)").matches || compact || event.button > 0 || resizeCleanupRef.current) return;
     event.preventDefault();
+    const startWidth = width;
+    const pointerId = event.pointerId;
     document.documentElement.classList.add("admin-sidebar-resizing");
-    let nextWidth = width;
+    let nextWidth = startWidth;
+    let active = true;
+    const cleanup = () => {
+      if (!active) return;
+      active = false;
+      document.documentElement.classList.remove("admin-sidebar-resizing");
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", cancel);
+      window.removeEventListener("blur", cancel);
+      resizeCleanupRef.current = null;
+    };
     const move = (pointerEvent: PointerEvent) => {
-        const pageRect = document.querySelector(".averon-admin-shell")?.getBoundingClientRect();
-        nextWidth = Math.min(320, Math.max(232, pointerEvent.clientX - (pageRect?.left ?? 0)));
+      if (!active || pointerEvent.pointerId !== pointerId) return;
+      const pageRect = document.querySelector(".averon-admin-shell")?.getBoundingClientRect();
+      nextWidth = Math.min(320, Math.max(232, pointerEvent.clientX - (pageRect?.left ?? 0)));
       setWidth(nextWidth);
     };
-    const finish = () => {
+    const finish = (pointerEvent: PointerEvent) => {
+      if (!active || pointerEvent.pointerId !== pointerId) return;
       setWidth(nextWidth);
       try {
         localStorage.setItem("averon-admin-sidebar-width", String(nextWidth));
       } catch {
         // Width remains adjustable for the current session.
       }
-      document.documentElement.classList.remove("admin-sidebar-resizing");
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", finish);
-      window.removeEventListener("pointercancel", finish);
+      cleanup();
     };
+    const cancel = (pointerEvent: Event) => {
+      if ("pointerId" in pointerEvent && pointerEvent.pointerId !== pointerId) return;
+      setWidth(startWidth);
+      cleanup();
+    };
+    resizeCleanupRef.current = cleanup;
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", finish);
-    window.addEventListener("pointercancel", finish);
+    window.addEventListener("pointercancel", cancel);
+    window.addEventListener("blur", cancel);
   };
 
   const resizeWithKeyboard = (event: ReactKeyboardEvent<HTMLDivElement>) => {
@@ -224,6 +246,9 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
       style={{ "--admin-sidebar-width": `${compact ? 76 : width}px` } as CSSProperties}
       className={`sidebar-bg safe-top safe-bottom admin-sidebar relative flex h-dvh w-screen max-w-full shrink-0 flex-col overflow-hidden text-app transition-[width] duration-200 lg:w-[var(--admin-sidebar-width)] lg:border-r lg:sidebar-border ${compact ? "is-collapsed" : ""}`}
       aria-label={t("header.mobileNavigation")}
+      onPointerDownCapture={(event) => {
+        if ((event.target as HTMLElement).closest(".admin-sidebar-resizer")) startResize(event);
+      }}
     >
       <div className="admin-sidebar-brand sticky top-0 z-20 flex h-[72px] shrink-0 items-center justify-between border-b border-app bg-surface px-5">
         <button type="button" onClick={() => { navigate("/"); onCloseMobile?.(); }} className="text-left" aria-label={t("sidebar.dashboard")}>
@@ -307,7 +332,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
           key={isMobileOpen ? "mobile-open" : "mobile-closed"}
           portal
           className="min-w-0 flex-1"
-          contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
+          contentClassName="admin-language-options w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
           trigger={(
             <span className="flex h-11 w-full items-center justify-between gap-3 rounded-none border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)]">
               <span className="flex min-w-0 items-center gap-2.5">
@@ -364,16 +389,16 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
       {!compact && (
         <div
           role="separator"
+          style={{ zIndex: 60, pointerEvents: "auto" }}
           aria-orientation="vertical"
           aria-label={t("sidebar.resize", "Изменить ширину меню")}
           aria-valuemin={232}
           aria-valuemax={320}
           aria-valuenow={width}
           tabIndex={0}
-          onPointerDown={startResize}
           onKeyDown={resizeWithKeyboard}
           data-action-id="admin.sidebar.resize"
-          className="admin-sidebar-resizer absolute inset-y-0 right-0 z-10 hidden w-3 cursor-col-resize border-r border-transparent hover:border-primary-500/30 focus-visible:border-primary-500/40 lg:block"
+          className="admin-sidebar-resizer pointer-events-auto absolute inset-y-0 right-[-8px] z-20 hidden w-6 cursor-col-resize border-r border-transparent hover:border-primary-500/30 focus-visible:border-primary-500/40 lg:block"
         />
       )}
     </aside>

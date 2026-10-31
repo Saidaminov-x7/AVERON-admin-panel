@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Header/Header';
 import { CommandPalette } from './CommandPalette/CommandPalette';
@@ -18,6 +18,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
   const [pageTitle, setPageTitle] = useState(title);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const focusReturnRef = useRef<HTMLElement | null>(null);
   const focusRestoreFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -34,19 +35,30 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
     return () => desktopViewport.removeEventListener('change', closeDrawerOnDesktop);
   }, [persistent, updatePersistentTitle]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (updatePersistentTitle && !persistent) return;
+    if (!isMobileMenuOpen) return;
     if (focusRestoreFrameRef.current !== null) {
       cancelAnimationFrame(focusRestoreFrameRef.current);
       focusRestoreFrameRef.current = null;
     }
-    if (!isMobileMenuOpen) return;
     const previousOverflow = document.body.style.overflow;
-    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      const previouslyFocused = focusReturnRef.current
+        ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
     document.body.style.overflow = 'hidden';
-    const frame = requestAnimationFrame(() => {
-      drawerRef.current?.querySelector<HTMLElement>('a[href], button:not(:disabled)')?.focus();
-    });
+    let focusDrawer = true;
+    let focusFrame = 0;
+    const focusInsideDrawer = (attempt = 0) => {
+      if (!focusDrawer || !drawerRef.current) return;
+      const initialFocusTarget = drawerRef.current.querySelector<HTMLElement>(
+        '[data-action-id="admin.sidebar.close-mobile-navigation"], a[href], button:not(:disabled)',
+      );
+      (initialFocusTarget ?? drawerRef.current).focus({ preventScroll: true });
+      if (!drawerRef.current.contains(document.activeElement) && attempt < 5) {
+        focusFrame = requestAnimationFrame(() => focusInsideDrawer(attempt + 1));
+      }
+    };
+    focusFrame = requestAnimationFrame(() => focusInsideDrawer());
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -98,7 +110,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => {
-      cancelAnimationFrame(frame);
+      focusDrawer = false;
+      cancelAnimationFrame(focusFrame);
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = previousOverflow;
       if (previouslyFocused) {
@@ -113,7 +126,16 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
   if (updatePersistentTitle && !persistent) return <>{children}</>;
 
   const shell = (
-    <div className="averon-admin-shell flex h-dvh overflow-hidden bg-app">
+    <div
+      className="averon-admin-shell flex h-dvh overflow-hidden bg-app"
+      onClickCapture={(event) => {
+        const target = event.target instanceof Element
+          ? event.target.closest<HTMLElement>('[data-action-id="admin.sidebar.toggle-mobile-navigation"]')
+          : null;
+        if (target && !isMobileMenuOpen) focusReturnRef.current = target;
+        if (target && isMobileMenuOpen) focusReturnRef.current = null;
+      }}
+    >
       <CommandPalette />
       {/* Глобальная командная строка / Поиск */}
       {/* Затемнение фона для мобильного меню (Backdrop) */}
@@ -121,8 +143,11 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
         <button
           type="button"
           aria-label={t('header.closeMenu')}
+          aria-hidden="true"
+          tabIndex={-1}
+          data-action-id="admin.sidebar.close-mobile-navigation-backdrop"
           onClick={() => setIsMobileMenuOpen(false)}
-          className="fixed inset-0 z-40 cursor-default bg-black/45 backdrop-blur-[2px] transition-opacity duration-200 ease-out lg:hidden"
+          className="fixed inset-0 z-40 cursor-default bg-black/45 transition-opacity duration-200 ease-out lg:hidden"
         />
       )}
 
@@ -135,7 +160,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
         aria-modal={isMobileMenuOpen ? true : undefined}
         aria-label={isMobileMenuOpen ? t('header.mobileNavigation') : undefined}
         tabIndex={-1}
-        className={`admin-mobile-navigation fixed inset-0 z-50 h-dvh w-screen max-w-full transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:inset-y-0 lg:right-auto lg:h-auto lg:w-[var(--admin-sidebar-width)] lg:max-w-none ${
+          className={`admin-mobile-navigation fixed inset-0 z-50 h-dvh w-[min(92vw,400px)] max-w-full transition-[transform,visibility] duration-[280ms] [transition-timing-function:var(--ease-drawer)] lg:visible lg:relative lg:inset-y-0 lg:right-auto lg:h-auto lg:w-[var(--admin-sidebar-width)] lg:max-w-none ${
           isMobileMenuOpen ? 'is-open' : 'is-closed'
         }`}
       >
@@ -147,13 +172,25 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
         {/* Верхняя панель */}
         <Header
           title={persistent ? pageTitle : title}
-          onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          onToggleMobileMenu={() => {
+            if (!isMobileMenuOpen) {
+              focusReturnRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+              setIsMobileMenuOpen(true);
+              requestAnimationFrame(() => requestAnimationFrame(() => {
+                drawerRef.current?.querySelector<HTMLElement>(
+                  '[data-action-id="admin.sidebar.close-mobile-navigation"], a[href], button:not(:disabled)',
+                )?.focus();
+              }));
+            } else {
+              setIsMobileMenuOpen(false);
+            }
+          }}
           isMobileMenuOpen={isMobileMenuOpen}
         />
 
         {/* Контент страницы */}
         <main className="admin-scroll safe-bottom flex-1 overflow-x-hidden overflow-y-auto p-3 min-[390px]:p-4 sm:p-6 lg:p-8 animate-fade-in">
-          <div className="admin-page-frame mx-auto w-full max-w-[1320px] space-y-4 sm:space-y-6">
+          <div className="admin-page-frame mx-auto w-full max-w-[1440px] space-y-4 sm:space-y-6">
             {children}
           </div>
         </main>

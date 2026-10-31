@@ -209,7 +209,7 @@ const GeneralSettingsPage: React.FC = () => {
                     : 'Отключено: масштаб зафиксирован 1:1 без возможности ручного приближения'}
                 </p>
               </div>
-              <Switch checked={mobilePinchZoomEnabled} onChange={setMobilePinchZoomEnabled} />
+              <Switch ariaLabel={t('settings.mobilePinchZoom', 'Масштабирование двумя пальцами')} checked={mobilePinchZoomEnabled} onChange={setMobilePinchZoomEnabled} />
             </div>
           </Card>
           {/* Maintenance Mode */}
@@ -233,7 +233,7 @@ const GeneralSettingsPage: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <Switch checked={maintenanceMode} onChange={setMaintenanceMode} />
+                <Switch ariaLabel={t('settings.maintenanceMode', 'Режим технического обслуживания')} checked={maintenanceMode} onChange={setMaintenanceMode} />
               </div>
 
               {maintenanceMode && (
@@ -247,7 +247,7 @@ const GeneralSettingsPage: React.FC = () => {
                   />
                   <div className="pt-3 border-t border-app mt-4 flex items-center justify-between">
                     <span className="text-sm text-muted">{t('settings.requirePasswordMaintenance', 'Требовать пароль при техобслуживании')}</span>
-                    <Switch checked={maintenancePasswordEnabled} onChange={setMaintenancePasswordEnabled} />
+                    <Switch ariaLabel={t('settings.requirePasswordMaintenance', 'Требовать пароль при техобслуживании')} checked={maintenancePasswordEnabled} onChange={setMaintenancePasswordEnabled} />
                   </div>
                   {maintenancePasswordEnabled && (
                     <div className="pt-3 border-t border-app mt-4">

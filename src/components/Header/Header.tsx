@@ -211,7 +211,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
               </svg>
             </div>
           }
-          contentClassName="w-32 p-1 border border-app rounded bg-surface shadow-xl"
+          contentClassName="admin-language-options w-36 p-1 border border-app rounded bg-surface shadow-xl"
         >
           {([
             { code: 'ru', label: 'Русский' },
@@ -224,9 +224,11 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                 key={lang.code}
                 type="button"
                 data-action-id={`admin.header.select-language.${lang.code}`}
+                role="menuitemradio"
+                aria-checked={active}
                 onClick={() => {
                   i18n.changeLanguage(lang.code);
-                  localStorage.setItem('i18nextLng', lang.code);
+                  try { localStorage.setItem('i18nextLng', lang.code); } catch { /* Language remains active for this session. */ }
                 }}
                 className={`w-full flex min-h-11 items-center justify-between px-3 py-1.5 rounded-none text-xs font-medium text-left transition-colors cursor-pointer ${
                   active ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] font-semibold' : 'text-app hover:bg-[var(--color-surface-soft)]'

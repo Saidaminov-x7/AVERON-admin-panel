@@ -19,7 +19,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         <label
           htmlFor={checkboxId}
           className={clsx(
-            'inline-flex items-start gap-2.5 cursor-pointer select-none group',
+            'inline-flex items-center gap-2.5 cursor-pointer select-none group',
             disabled && 'opacity-50 cursor-not-allowed',
           )}
         >
@@ -34,6 +34,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               {...props}
             />
             <div
+              data-admin-checkbox-indicator=""
               className={twMerge(
                 clsx(
                   'h-[18px] w-[18px] rounded-none border transition-all duration-150 flex items-center justify-center',

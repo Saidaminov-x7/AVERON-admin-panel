@@ -1,12 +1,13 @@
 import { Suspense, lazy, useCallback, useEffect, useId, useRef, useState } from "react";
-import type { ChangeEvent, FormEvent, KeyboardEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { ImageOff, MoveDown, MoveUp, RefreshCw, Sparkles, Star, Trash2, Upload } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button, Input, Modal, Select } from "../../components/ui";
+import { Button, Input, Modal, Select, Switch } from "../../components/ui";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { LanguageFlag } from "../../components/ui/LanguageFlag";
+import { Dropdown } from "../../components/Dropdown";
 import { useAdminCapabilities } from "../../hooks/useAdminCapabilities";
 import {
   applyProductAiSuggestions,
@@ -358,19 +359,6 @@ export function ProductFormModal({
       ...(key === "publish" && value === false ? { publishTelegram: false } : {}),
     }));
     setErrors((current) => ({ ...current, [key]: undefined }));
-  };
-
-  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const currentIndex = locales.indexOf(activeLocale);
-    let nextIndex = currentIndex;
-    if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % locales.length;
-    else if (event.key === "ArrowLeft") nextIndex = (currentIndex + locales.length - 1) % locales.length;
-    else if (event.key === "Home") nextIndex = 0;
-    else if (event.key === "End") nextIndex = locales.length - 1;
-    else return;
-    event.preventDefault();
-    setActiveLocale(locales[nextIndex]);
-    event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[nextIndex]?.focus();
   };
 
   const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
@@ -777,7 +765,12 @@ export function ProductFormModal({
     { value: "square", label: t("products.photoSquare"), aspectClass: "aspect-square" },
   ];
   const headerContent = (
-    <div role="tablist" aria-label={t("products.contentLanguage")} className="inline-flex w-full rounded-xl border border-app bg-gray-50 p-1 dark:bg-white/5 sm:w-auto">
+    <Dropdown align="right" className="w-full sm:w-auto" contentClassName="admin-language-options w-[min(16rem,calc(100vw-2rem))] p-1" trigger={(
+      <span className="flex min-h-11 w-full items-center justify-between gap-3 rounded-theme border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-surface-soft sm:min-w-52">
+        <span className="flex min-w-0 items-center gap-2.5"><LanguageFlag locale={activeLocale} className="h-4 w-6" /><span className="truncate">{localeName(activeLocale)}</span></span>
+        <span className="sr-only shrink-0 text-xs font-medium text-muted sm:not-sr-only">{t("products.contentLanguage")}</span>
+      </span>
+    )}>
       {locales.map((locale) => {
         const error = errors[localeErrorKeys[locale]];
         const complete = values.translations[locale].title.trim().length >= 2;
@@ -785,27 +778,23 @@ export function ProductFormModal({
           <button
             key={locale}
             type="button"
-            role="tab"
-            id={`${formId}-tab-${locale}`}
-            aria-controls={`${formId}-panel`}
-            aria-selected={activeLocale === locale}
+            role="menuitemradio"
+            aria-checked={activeLocale === locale}
             aria-label={t("products.contentTabLabel", {
               language: localeName(locale),
               status: error ? t("products.translationError") : complete ? t("products.translationComplete") : t("products.translationIncomplete"),
             })}
-            tabIndex={activeLocale === locale ? 0 : -1}
             onClick={() => setActiveLocale(locale)}
-            onKeyDown={handleTabKeyDown}
-            className={`inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:flex-none ${
-              activeLocale === locale ? "bg-surface text-primary-600 shadow-sm dark:text-primary-400" : "text-muted hover:text-app"
+            className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-theme px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+              activeLocale === locale ? "bg-surface-soft font-semibold text-app" : "text-secondary hover:bg-surface-soft hover:text-app"
             }`}
           >
-            <LanguageFlag locale={locale} className="h-4 w-6" />
+            <span className="flex min-w-0 items-center gap-2.5"><LanguageFlag locale={locale} className="h-4 w-6" />{localeName(locale)}</span>
             {error ? <span aria-hidden="true" className="text-red-500">!</span> : complete ? <span aria-hidden="true" className="text-emerald-600">✓</span> : null}
           </button>
         );
       })}
-    </div>
+    </Dropdown>
   );
 
   return (
@@ -954,7 +943,7 @@ export function ProductFormModal({
               </div>
             </div>
           )}
-          <div id={`${formId}-panel`} role="tabpanel" aria-labelledby={`${formId}-tab-${activeLocale}`} className="grid gap-4 md:grid-cols-2">
+          <div id={`${formId}-panel`} role="group" aria-label={`${t("products.contentLanguage")}: ${localeName(activeLocale)}`} className="grid gap-4 md:grid-cols-2">
             <ProductRichTextField
               label={t("products.titleLabel")}
               maxLength={500}
@@ -1431,12 +1420,12 @@ export function ProductFormModal({
           <h4 className="text-sm font-bold text-app">{t("products.publicationSection")}</h4>
           <div className="flex items-center justify-between gap-4 py-2">
             <div><p className="text-sm font-medium text-app">{t("products.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Товар появится в каталоге после сохранения.</p></div>
-            <button type="button" role="switch" aria-checked={values.publish} onClick={() => updateValue("publish", !values.publish)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${values.publish ? "bg-primary-600" : "bg-neutral-300 dark:bg-neutral-600"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publish ? "translate-x-5" : "translate-x-0"}`} /></button>
+            <Switch ariaLabel={t("products.publishLabel")} checked={values.publish} onChange={(checked) => updateValue("publish", checked)} />
           </div>
           <div>
             <div className="flex items-center justify-between gap-4 py-2">
               <div><p className="text-sm font-medium text-app">{t("products.telegram.publishLabel")}</p><p className="mt-0.5 text-xs text-muted">Публикация выполняется после успешного сохранения товара.</p></div>
-              <button type="button" role="switch" aria-checked={values.publishTelegram} disabled={!values.publish || !capabilitiesQuery.data?.telegramProductPublish} onClick={() => updateValue("publishTelegram", !values.publishTelegram)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:cursor-not-allowed disabled:opacity-40 ${values.publishTelegram ? "bg-primary-600" : "bg-neutral-300 dark:bg-neutral-600"}`}><span className={`pointer-events-none inline-block size-5 rounded-full bg-white shadow transition duration-200 ${values.publishTelegram ? "translate-x-5" : "translate-x-0"}`} /></button>
+              <Switch ariaLabel={t("products.telegram.publishLabel")} checked={values.publishTelegram} disabled={!values.publish || !capabilitiesQuery.data?.telegramProductPublish} onChange={(checked) => updateValue("publishTelegram", checked)} />
             </div>
             {!capabilitiesQuery.isLoading && !capabilitiesQuery.isError && (
               <p className="ml-6 mt-1 text-xs text-muted">

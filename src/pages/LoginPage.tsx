@@ -362,13 +362,13 @@ const LoginPage: React.FC = () => {
           ) : step === 'telegram' ? (
             <form onSubmit={handle2faSubmit} className="space-y-4">
               {/* Уведомление о Telegram */}
-              <div className="flex items-center gap-3 p-3 bg-primary-50 dark:bg-primary-950/40 border border-primary-200 dark:border-primary-800/60 rounded-xl text-xs text-primary-900 dark:text-primary-200">
-                <div className="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center shrink-0">
+              <div data-admin-2fa-notice="" role="status" className="admin-2fa-notice flex items-center gap-3 rounded-theme border p-3 text-xs leading-relaxed">
+                <div aria-hidden="true" className="admin-2fa-notice-icon flex size-9 shrink-0 items-center justify-center rounded-full border">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-17.5 7.5a2.25 2.25 0 0 0 .126 4.15l4.898 1.633 1.83 5.488a1.5 1.5 0 0 0 2.502.504l2.842-2.842 4.962 3.722a2.25 2.25 0 0 0 3.518-1.517l3.5-17a2.25 2.25 0 0 0-2.656-2.853z" />
                   </svg>
                 </div>
-                <div className="leading-tight">
+                <div className="min-w-0 leading-tight">
                   <p className="font-semibold text-sm mb-0.5">Telegram 2FA</p>
                   <p className="opacity-90">{infoMessage || 'Проверьте сообщения в Telegram-боте'}</p>
                 </div>
