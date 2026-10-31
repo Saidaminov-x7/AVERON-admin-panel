@@ -19,11 +19,11 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         <label
           htmlFor={checkboxId}
           className={clsx(
-            'inline-flex items-start gap-2.5 cursor-pointer select-none group',
+            'inline-flex items-start gap-3 cursor-pointer select-none group',
             disabled && 'opacity-50 cursor-not-allowed',
           )}
         >
-          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center">
+          <div className="relative flex items-center justify-center mt-1">
             <input
               ref={ref}
               id={checkboxId}
@@ -38,10 +38,10 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                 clsx(
                   'h-[18px] w-[18px] rounded-none border transition-all duration-150 flex items-center justify-center',
                   'bg-surface border-app',
-                  'peer-checked:bg-[var(--color-primary)] peer-checked:border-[var(--color-primary)] text-[var(--color-on-primary)]',
-                  'peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-500',
-                  'group-hover:border-[var(--color-text-secondary)]',
-                  error && 'border-red-500',
+                  'peer-checked:bg-primary-500 peer-checked:border-primary-500 text-white',
+                  'peer-focus:ring-2 peer-focus:ring-primary-500/20',
+                  'group-hover:border-primary-400',
+                  error && 'border-line',
                 ),
                 className,
               )}
@@ -52,11 +52,11 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           {(label || description) && (
             <div className="text-xs">
               {label && <span className="font-medium text-app block">{label}</span>}
-              {description && <span className="text-muted block mt-0.5">{description}</span>}
+              {description && <span className="text-muted block mt-1">{description}</span>}
             </div>
           )}
         </label>
-        {error && <p className="text-xs text-red-500 font-medium animate-fade-in pl-6">{error}</p>}
+        {error && <p className="text-xs text-error font-medium animate-fade-in pl-6">{error}</p>}
       </div>
     );
   },

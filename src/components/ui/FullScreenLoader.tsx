@@ -13,7 +13,7 @@ export const FullScreenLoader: React.FC<FullScreenLoaderProps> = ({
         <div className="mt-4 text-xl font-semibold tracking-[0.18em] text-app">
           AVERON
         </div>
-        <div className="mt-4 h-7 w-7 animate-spin rounded-full border-2 border-[var(--color-border)] border-t-[#244FC7] motion-reduce:animate-none dark:border-t-[#8EA5FF]" />
+        <div className="mt-4 h-7 w-7 animate-spin rounded-full border-2 border-line border-t-primary motion-reduce:animate-none" />
         {label && (
           <p className="mt-3 text-xs font-medium text-muted tracking-wide">
             {label}

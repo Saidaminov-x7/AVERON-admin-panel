@@ -29,10 +29,10 @@ function releaseManifest(): Plugin {
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());
-  const isLocalRuntime = env.VITE_AVERON_RUNTIME_TARGET === 'local' || mode === 'development';
+  const isLocalRuntime = env.VITE_AVERON_RUNTIME_TARGET === 'local';
   const apiTarget = isLocalRuntime
-    ? resolveAdminApiOrigin(env.VITE_AVERON_LOCAL_API_URL || '', true, 'http://127.0.0.1:8080')
-    : resolveAdminApiOrigin(env.VITE_API_URL || '', false, 'https://averon-backend-production.up.railway.app');
+    ? env.VITE_AVERON_LOCAL_API_URL || 'http://127.0.0.1:8080'
+    : env.VITE_API_URL || 'https://averon-backend-production.up.railway.app';
 
   return {
     plugins: [react(), releaseManifest()],

@@ -187,17 +187,11 @@ export default function OrdersPage() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Input
-            type="search"
-            aria-label={copy.search}
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            onClear={() => setSearch('')}
-            clearable
-            placeholder={copy.search}
-            leftIcon={<Search size={16} />}
-            containerClassName="min-w-64 flex-1"
-          />
+          <label className="relative min-w-64 flex-1">
+            <span className="sr-only">{copy.search}</span>
+            <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={copy.search} className="input w-full pl-10" />
+          </label>
           <Select
             value={statusFilter}
             options={[{ value: '', label: copy.all }, ...Object.entries(statusLabels).map(([value, labels]) => ({ value, label: labels[locale] }))]}
@@ -210,7 +204,7 @@ export default function OrdersPage() {
         {ordersQuery.isLoading ? (
           <div role="status" className="card animate-pulse h-48">{copy.loading}</div>
         ) : ordersQuery.isError ? (
-          <div role="alert" className="card flex flex-wrap items-center justify-between gap-3 text-red-500">
+          <div role="alert" className="card flex flex-wrap items-center justify-between gap-3 text-error">
             <p>{copy.error}</p>
             <button type="button" onClick={() => void ordersQuery.refetch()} className="btn-ghost inline-flex items-center gap-2"><RefreshCw size={16} />{copy.retry}</button>
           </div>
@@ -223,7 +217,7 @@ export default function OrdersPage() {
                 <th className="px-4 py-3">{copy.number}</th><th className="px-4 py-3">{copy.customer}</th><th className="px-4 py-3">{copy.status}</th><th className="px-4 py-3 text-right">{copy.total}</th><th className="px-4 py-3">{copy.date}</th><th className="relative px-4 py-3"><span className="sr-only">{copy.details}</span></th>
               </tr></thead>
               <tbody>{orders.map((item) => (
-                <tr key={item.orderNumber} className="border-t border-app hover:bg-gray-50 dark:hover:bg-white/[0.03]">
+                <tr key={item.orderNumber} className="border-t border-app hover:bg-surface-soft dark:hover:bg-white/[0.03]">
                   <td className="px-4 py-3 font-bold text-app">#{item.orderNumber}</td>
                   <td className="px-4 py-3 text-app">{readField(item.contact, 'name') || copy.noName}</td>
                   <td className="px-4 py-3"><span className={statusStyles[item.status] ?? 'badge-neutral'}>{statusLabels[item.status]?.[locale] ?? item.status}</span></td>
@@ -239,14 +233,14 @@ export default function OrdersPage() {
 
       <Modal isOpen={Boolean(selectedOrderNumber)} onClose={() => { setSelectedOrderNumber(null); setStatusNote(''); }} title={`${copy.detailsTitle} ${selectedOrderNumber ? `#${selectedOrderNumber}` : ''}`} size="xl">
         {selectedOrderQuery.isLoading ? <div role="status" className="py-8 text-center text-muted">{copy.loading}</div> : selectedOrderQuery.isError || !order ? (
-          <div role="alert" className="py-8 text-center text-red-500">{copy.error}<button type="button" onClick={() => void selectedOrderQuery.refetch()} className="ml-3 underline">{copy.retry}</button></div>
+          <div role="alert" className="py-8 text-center text-error">{copy.error}<button type="button" onClick={() => void selectedOrderQuery.refetch()} className="ml-3 underline">{copy.retry}</button></div>
         ) : (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span className={statusStyles[order.status] ?? 'badge-neutral'}>{statusLabels[order.status]?.[locale] ?? order.status}</span>
               <span className="text-sm text-muted">{new Date(order.createdAt).toLocaleString(locale === 'en' ? 'en-US' : locale === 'uz' ? 'uz-UZ' : 'ru-RU')}</span>
             </div>
-            <section className="grid gap-4 rounded-xl bg-gray-50 p-4 dark:bg-white/[0.03] sm:grid-cols-2">
+            <section className="grid gap-4 rounded-xl bg-surface-soft p-4 dark:bg-white/[0.03] sm:grid-cols-2">
               <div><h3 className="text-sm font-bold">{copy.delivery}</h3><p className="mt-2 text-sm">{name || copy.noName}</p><p className="text-sm text-muted">{phone || '—'}</p></div>
               <div><h3 className="text-sm font-bold">{copy.address}</h3><p className="mt-2 text-sm">{[city, street, extraAddress].filter(Boolean).join(', ') || '—'}</p></div>
             </section>
@@ -254,7 +248,7 @@ export default function OrdersPage() {
               <h3 className="font-bold">{copy.items}</h3>
               <ul className="mt-2 divide-y divide-app">{order.items.map((item) => (
                 <li key={item.id} className="flex flex-wrap justify-between gap-3 py-3 text-sm">
-                  <span>{item.title}{item.variantSnapshot ? ` · ${[item.variantSnapshot.color, item.variantSnapshot.size].filter(Boolean).join(' · ')}` : ''} × {item.quantity}{item.isPreorder && <span className="ml-2 rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">{fulfillment.preorder}</span>}</span>
+                  <span>{item.title}{item.variantSnapshot ? ` · ${[item.variantSnapshot.color, item.variantSnapshot.size].filter(Boolean).join(' · ')}` : ''} × {item.quantity}{item.isPreorder && <span className="ml-2 rounded bg-surface-soft px-2 py-1 text-xs font-semibold text-info dark:bg-surface-soft dark:text-info">{fulfillment.preorder}</span>}</span>
                   <span className="font-semibold">{formatUzs(item.totalPrice, locale)}</span>
                 </li>
               ))}</ul>
@@ -275,7 +269,7 @@ export default function OrdersPage() {
             {order && (
               <section className="space-y-4 border-t border-app pt-4">
                 <h3 className="font-bold">{fulfillment.internalDelivery}</h3>
-                <dl className="grid gap-3 rounded-xl bg-gray-50 p-4 text-sm dark:bg-white/[0.03] sm:grid-cols-2">
+                <dl className="grid gap-3 rounded-xl bg-surface-soft p-4 text-sm dark:bg-white/[0.03] sm:grid-cols-2">
                   <div><dt className="text-xs text-muted">{fulfillment.method}</dt><dd>{order.delivery?.method ?? 'COURIER'}</dd></div>
                   <div><dt className="text-xs text-muted">{fulfillment.recipient}</dt><dd>{order.delivery?.recipient ?? name} · {order.delivery?.phone ?? phone}</dd></div>
                   <div className="sm:col-span-2"><dt className="text-xs text-muted">{fulfillment.destination}</dt><dd>{[readField(order.delivery?.destination ?? order.deliveryAddress, 'city'), readField(order.delivery?.destination ?? order.deliveryAddress, 'address')].filter(Boolean).join(', ') || '—'}</dd></div>
@@ -367,7 +361,7 @@ export default function OrdersPage() {
                 </label>
                 <div className="flex flex-wrap justify-end gap-3">
                   {order.status === 'CREATED' && (
-                    <button type="button" disabled={statusMutation.isPending} onClick={() => setCancelPending(true)} className="btn-ghost text-red-600 disabled:opacity-50"><Ban size={16} className="mr-2 inline" />{copy.cancel}</button>
+                    <button type="button" disabled={statusMutation.isPending} onClick={() => setCancelPending(true)} className="btn-ghost text-error disabled:opacity-50"><Ban size={16} className="mr-2 inline" />{copy.cancel}</button>
                   )}
                   <button
                     type="button"

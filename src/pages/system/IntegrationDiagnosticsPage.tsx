@@ -43,10 +43,10 @@ export default function IntegrationDiagnosticsPage() {
     <Layout title={text.title}>
       <main className="admin-page-full-width space-y-4 pb-12">
         <p className="text-sm text-muted">{text.warning}</p>
-        {query.isPending ? <p role="status" className="card p-5">{text.loading}</p> : query.isError ? <p role="alert" className="card p-5 text-rose-600">{text.error}</p> : query.data?.length === 0 ? <p role="status" className="card p-5 text-muted">{text.empty}</p> : (
+        {query.isPending ? <p role="status" className="card p-5">{text.loading}</p> : query.isError ? <p role="alert" className="card p-5 text-error">{text.error}</p> : query.data?.length === 0 ? <p role="status" className="card p-5 text-muted">{text.empty}</p> : (
           <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {query.data?.map((item) => <li key={item.name} className="card space-y-3 p-5">
-              <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-bold">{item.name}</h2>{item.degraded && <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-900">{text.degraded}</span>}</div>
+              <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-bold">{item.name}</h2>{item.degraded && <span className="rounded-full bg-surface-soft px-2 py-1 text-xs font-bold text-warning">{text.degraded}</span>}</div>
               <dl className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-2 text-sm">
                 <dt>{text.enabled}</dt><dd>{item.featureEnabled ? text.yes : text.no}</dd>
                 <dt>{text.configured}</dt><dd>{item.configured ? text.yes : text.no}</dd>

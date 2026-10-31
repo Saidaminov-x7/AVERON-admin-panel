@@ -66,9 +66,8 @@ const GeneralSettingsPage: React.FC = () => {
       setContactPhone(settings.contactPhone === '+998 71 200-00-00' ? '' : settings.contactPhone || '');
       setMaintenanceMode(settings.maintenanceMode ?? false);
       setMaintenanceMessage(settings.maintenanceMessage || '');
-      setMaintenanceBypassPassword((settings as any).maintenanceBypassPassword || '');
-      setMaintenancePasswordEnabled((settings as any).maintenancePasswordEnabled ?? false);
-      setMobilePinchZoomEnabled((settings as any).mobilePinchZoomEnabled ?? true);
+      setMaintenancePasswordEnabled(settings.maintenancePasswordEnabled ?? false);
+      setMobilePinchZoomEnabled(settings.mobilePinchZoomEnabled ?? true);
       setMaxProductPhotos(settings.maxProductPhotos ?? 15);
       setMaxProductPhotoSizeMb(settings.maxProductPhotoSizeMb ?? 10);
       setLogoPreview(settings.logoUrl || null);
@@ -132,7 +131,7 @@ const GeneralSettingsPage: React.FC = () => {
       maintenanceMode,
       maintenanceMessage: maintenanceMessage.trim() || null,
       maintenancePasswordEnabled,
-      maintenanceBypassPassword: maintenanceBypassPassword.trim() || null,
+      ...(maintenanceBypassPassword.trim() ? { maintenanceBypassPassword: maintenanceBypassPassword.trim() } : {}),
       mobilePinchZoomEnabled,
       maxProductPhotos,
       maxProductPhotoSizeMb,
@@ -211,19 +210,19 @@ const GeneralSettingsPage: React.FC = () => {
                     : t('settings.pinchZoomDisabled')}
                 </p>
               </div>
-              <Switch checked={mobilePinchZoomEnabled} onChange={setMobilePinchZoomEnabled} ariaLabel={t('settings.pinchZoomLabel')} ariaDescribedBy="admin-pinch-zoom-description" />
+              <Switch ariaLabel="Увеличение двумя пальцами (Zoom)" checked={mobilePinchZoomEnabled} onChange={setMobilePinchZoomEnabled} />
             </div>
           </Card>
           {/* Maintenance Mode */}
           <Card
             title={t('settings.maintenanceMode', 'Режим технического обслуживания')}
             description={t('settings.maintenanceModeDesc', 'Если включено, публичная часть сайта будет недоступна для посетителей')}
-            className="border-amber-500/20 bg-amber-500/5"
+            className="border-line bg-surface-soft"
           >
             <div className="space-y-4 pt-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-soft text-warning dark:bg-surface-soft dark:text-warning">
                     <AlertTriangle size={20} />
                   </div>
                   <div>
@@ -235,7 +234,7 @@ const GeneralSettingsPage: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <Switch checked={maintenanceMode} onChange={setMaintenanceMode} ariaLabel={t('settings.maintenanceStatus')} ariaDescribedBy="admin-maintenance-status-description" />
+                <Switch ariaLabel={t('settings.maintenanceMode', 'Режим технического обслуживания')} checked={maintenanceMode} onChange={setMaintenanceMode} />
               </div>
 
               {maintenanceMode && (
@@ -249,7 +248,7 @@ const GeneralSettingsPage: React.FC = () => {
                   />
                   <div className="pt-3 border-t border-app mt-4 flex items-center justify-between">
                     <span className="text-sm text-muted">{t('settings.requirePasswordMaintenance', 'Требовать пароль при техобслуживании')}</span>
-                    <Switch checked={maintenancePasswordEnabled} onChange={setMaintenancePasswordEnabled} ariaLabel={t('settings.requirePasswordMaintenance')} />
+                    <Switch ariaLabel={t('settings.requirePasswordMaintenance', 'Требовать пароль при техобслуживании')} checked={maintenancePasswordEnabled} onChange={setMaintenancePasswordEnabled} />
                   </div>
                   {maintenancePasswordEnabled && (
                     <div className="pt-3 border-t border-app mt-4">
@@ -258,7 +257,9 @@ const GeneralSettingsPage: React.FC = () => {
                         type="password"
                         value={maintenanceBypassPassword}
                         onChange={(e) => setMaintenanceBypassPassword(e.target.value)}
-                        placeholder={t('common.enterPassword', 'Введите пароль')}
+                        placeholder={settings?.maintenanceBypassPasswordConfigured
+                          ? t('settings.leaveBlankToKeepPassword', 'Оставьте пустым, чтобы сохранить текущий пароль')
+                          : t('common.enterPassword', 'Введите пароль')}
                         className="input max-w-xs"
                       />
                       <p className="text-xs text-muted mt-1">{t('settings.bypassPasswordHint', 'Пароль позволит входить в сайт, когда включён режим обслуживания.')}</p>
@@ -293,7 +294,7 @@ const GeneralSettingsPage: React.FC = () => {
                     variant="danger"
                     size="icon"
                     onClick={handleLogoDelete}
-                    className="absolute right-1 top-1 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100"
+                    className="absolute -top-2 -right-2 bg-surface-soft hover:bg-surface-soft text-error rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                     title={t('settings.deleteLogo', 'Удалить логотип')}
                     aria-label={t('settings.deleteLogo', 'Удалить логотип')}
                   >
@@ -307,25 +308,16 @@ const GeneralSettingsPage: React.FC = () => {
                 </div>
               )}
 
-              <Button
-                type="button"
-                variant="outline"
-                size="md"
-                leftIcon={<Upload size={16} />}
-                loading={uploadLogoMutation.isPending}
-                onClick={() => logoInputRef.current?.click()}
-              >
-                {t('settings.uploadNewLogo', 'Загрузить новый логотип')}
-              </Button>
-              <input
-                ref={logoInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/svg+xml,image/webp"
-                onChange={handleLogoUpload}
-                className="sr-only"
-                tabIndex={-1}
-                aria-hidden="true"
-              />
+              <label className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-app bg-surface hover:bg-surface-soft dark:hover:bg-white/5 text-app text-sm font-medium cursor-pointer transition-colors">
+                <Upload size={16} />
+                <span>{t('settings.uploadNewLogo', 'Загрузить новый логотип')}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+              </label>
             </div>
           </Card>
 
@@ -387,7 +379,7 @@ const GeneralSettingsPage: React.FC = () => {
               {navLinks.map((link, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-col sm:flex-row items-center gap-3 p-3.5 rounded-xl border border-app bg-surface"
+                  className="flex flex-col sm:flex-row items-center gap-3 p-4 rounded-xl border border-app bg-surface"
                 >
                   <div className="flex-1 w-full sm:w-auto">
                     <Input
@@ -435,6 +427,7 @@ const GeneralSettingsPage: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => setNavLinks((prev) => prev.filter((_, i) => i !== idx))}
+                      className="p-2 text-error hover:bg-surface-soft dark:hover:bg-surface-soft rounded-xl transition-colors"
                       title={t('settings.removeMenuItem', 'Удалить пункт меню')}
                       aria-label={t('settings.removeMenuItem', 'Удалить пункт меню')}
                     >

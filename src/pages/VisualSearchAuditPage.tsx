@@ -49,7 +49,7 @@ export default function VisualSearchAuditPage() {
           </div>
         ) : isError ? (
           <Card className="p-6">
-            <p className="text-sm text-red-600 dark:text-red-300" role="alert">
+            <p className="text-sm text-error dark:text-error" role="alert">
               {t('visualSearchAudit.error', 'Could not load Visual Search activity.')}
             </p>
             <Button className="mt-4" variant="outline" onClick={() => void refetch()}>
@@ -69,7 +69,7 @@ export default function VisualSearchAuditPage() {
           <Card className="overflow-hidden p-0">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1050px] text-left text-xs">
-                <thead className="bg-gray-50/60 text-muted dark:bg-white/[0.02]">
+                <thead className="bg-surface-soft text-muted dark:bg-white/[0.02]">
                   <tr>
                     <th className="px-4 py-3">{t('visualSearchAudit.operation', 'Operation')}</th>
                     <th className="px-4 py-3">{t('visualSearchAudit.timestamp', 'Timestamp')}</th>

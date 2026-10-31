@@ -153,8 +153,8 @@ const ProfilePage: React.FC = () => {
     return (
       <Layout title={t('profile.title')}>
         <div className="max-w-4xl mx-auto space-y-6">
-          <div className="card h-48 animate-pulse bg-gray-100 dark:bg-white/5" />
-          <div className="card h-64 animate-pulse bg-gray-100 dark:bg-white/5" />
+          <div className="card h-48 animate-pulse bg-surface-soft dark:bg-white/5" />
+          <div className="card h-64 animate-pulse bg-surface-soft dark:bg-white/5" />
         </div>
       </Layout>
     );
@@ -180,9 +180,8 @@ const ProfilePage: React.FC = () => {
               )}
               <label
                 htmlFor="avatar-upload"
-                className="absolute -bottom-1 -right-1 p-1.5 rounded-lg bg-surface border border-app shadow-md cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 text-muted hover:text-app transition-all"
-                title={t('profile.uploadAvatar')}
-                aria-label={t('profile.uploadAvatar')}
+                className="absolute -bottom-1 -right-1 p-2 rounded-lg bg-surface border border-app shadow-md cursor-pointer hover:bg-surface-soft dark:hover:bg-white/10 text-muted hover:text-app transition-all"
+                title="Загрузить новое фото"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
@@ -202,11 +201,11 @@ const ProfilePage: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold text-app">{profile?.name}</h2>
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400">
-                  {t(roleKeys[profile?.adminRole || 'SUPER_ADMIN'] || 'profile.roleAdmin')}
+                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400">
+                  {roleTitles[profile?.adminRole || 'SUPER_ADMIN'] || 'Администратор'}
                 </span>
               </div>
-              <p className="text-sm text-muted mt-0.5">{profile?.email}</p>
+              <p className="text-sm text-muted mt-1">{profile?.email}</p>
               <div className="flex items-center gap-4 text-xs text-muted mt-2">
                 <span>
                   {t('profile.lastLogin')}:{' '}
@@ -233,7 +232,7 @@ const ProfilePage: React.FC = () => {
             variant="danger"
             size="md"
             onClick={handleLogout}
-            className="self-stretch sm:self-center"
+            className="px-4 py-2 text-sm font-medium text-error dark:text-error border border-line dark:border-line hover:bg-surface-soft dark:hover:bg-surface-soft rounded-lg transition-colors cursor-pointer self-stretch sm:self-center"
           >
             {t('profile.logout')}
           </Button>
@@ -243,19 +242,19 @@ const ProfilePage: React.FC = () => {
         <div className="card">
           <h3 className="text-base font-semibold text-app mb-4">{t('profile.personalData')}</h3>
           {profileSuccess && (
-            <div className="p-3 mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-sm border border-green-200 dark:border-green-800">
+            <div className="p-3 mb-4 rounded-lg bg-surface-soft dark:bg-surface-soft text-success dark:text-success text-sm border border-line dark:border-line">
               {profileSuccess}
             </div>
           )}
           {profileError && (
-            <div className="p-3 mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm border border-red-200 dark:border-red-800">
+            <div className="p-3 mb-4 rounded-lg bg-surface-soft dark:bg-surface-soft text-error dark:text-error text-sm border border-line dark:border-line">
               {profileError}
             </div>
           )}
 
           <form onSubmit={handleProfileSubmit} className="space-y-4 max-w-md">
             <div>
-              <label htmlFor="profile-name" className="block text-sm font-medium text-app mb-1.5">{t('profile.name')}</label>
+              <label className="block text-sm font-medium text-app mb-2">Имя</label>
               <input
                 id="profile-name"
                 type="text"
@@ -267,29 +266,29 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="profile-email" className="block text-sm font-medium text-app mb-1.5">{t('profile.emailReadOnly')}</label>
+              <label className="block text-sm font-medium text-app mb-2">Email (только чтение)</label>
               <input
                 id="profile-email"
                 type="email"
                 value={profile?.email || ''}
                 disabled
-                className="input bg-gray-100 dark:bg-white/5 opacity-70 cursor-not-allowed"
+                className="input bg-surface-soft dark:bg-white/5 opacity-70 cursor-not-allowed"
               />
             </div>
 
             <div>
-              <label htmlFor="profile-phone" className="block text-sm font-medium text-app mb-1.5">{t('profile.phone')}</label>
+              <label className="block text-sm font-medium text-app mb-2">Телефон</label>
               <input
                 id="profile-phone"
                 type="text"
                 value={profile?.phone || ''}
                 disabled
-                className="input bg-gray-100 dark:bg-white/5 opacity-70 cursor-not-allowed"
+                className="input bg-surface-soft dark:bg-white/5 opacity-70 cursor-not-allowed"
               />
             </div>
 
             <div>
-              <label htmlFor="profile-telegram-id" className="block text-sm font-medium text-app mb-1.5">{t('profile.telegramId')}</label>
+              <label htmlFor="profile-telegram-id" className="block text-sm font-medium text-app mb-2">{t('profile.telegramId')}</label>
               <input
                 id="profile-telegram-id"
                 type="text"
@@ -321,19 +320,19 @@ const ProfilePage: React.FC = () => {
         <div className="card">
           <h3 className="text-base font-semibold text-app mb-4">{t('profile.changePassword')}</h3>
           {passwordSuccess && (
-            <div className="p-3 mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-sm border border-green-200 dark:border-green-800">
+            <div className="p-3 mb-4 rounded-lg bg-surface-soft dark:bg-surface-soft text-success dark:text-success text-sm border border-line dark:border-line">
               {passwordSuccess}
             </div>
           )}
           {passwordError && (
-            <div className="p-3 mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm border border-red-200 dark:border-red-800">
+            <div className="p-3 mb-4 rounded-lg bg-surface-soft dark:bg-surface-soft text-error dark:text-error text-sm border border-line dark:border-line">
               {passwordError}
             </div>
           )}
 
           <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-md">
             <div>
-              <label htmlFor="profile-current-password" className="block text-sm font-medium text-app mb-1.5">{t('profile.currentPassword')}</label>
+              <label className="block text-sm font-medium text-app mb-2">Текущий пароль</label>
               <input
                 id="profile-current-password"
                 type="password"
@@ -345,7 +344,7 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="profile-new-password" className="block text-sm font-medium text-app mb-1.5">{t('profile.newPassword')}</label>
+              <label className="block text-sm font-medium text-app mb-2">Новый пароль</label>
               <input
                 id="profile-new-password"
                 type="password"
@@ -360,7 +359,7 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="profile-confirm-password" className="block text-sm font-medium text-app mb-1.5">{t('profile.confirmPassword')}</label>
+              <label className="block text-sm font-medium text-app mb-2">Подтверждение нового пароля</label>
               <input
                 id="profile-confirm-password"
                 type="password"

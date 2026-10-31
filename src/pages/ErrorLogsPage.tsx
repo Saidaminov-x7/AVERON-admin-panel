@@ -52,7 +52,7 @@ const ErrorLogsPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => { setResolvedFilter('unresolved'); setPage(1); }}
-                className={`px-3 py-1.5 transition-colors cursor-pointer ${
+                className={`px-3 py-2 transition-colors cursor-pointer ${
                   resolvedFilter === 'unresolved' ? 'bg-primary-500 text-white' : 'text-muted hover:text-app'
                 }`}
               >
@@ -61,7 +61,7 @@ const ErrorLogsPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => { setResolvedFilter('resolved'); setPage(1); }}
-                className={`px-3 py-1.5 transition-colors cursor-pointer ${
+                className={`px-3 py-2 transition-colors cursor-pointer ${
                   resolvedFilter === 'resolved' ? 'bg-primary-500 text-white' : 'text-muted hover:text-app'
                 }`}
               >
@@ -70,7 +70,7 @@ const ErrorLogsPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => { setResolvedFilter('all'); setPage(1); }}
-                className={`px-3 py-1.5 transition-colors cursor-pointer ${
+                className={`px-3 py-2 transition-colors cursor-pointer ${
                   resolvedFilter === 'all' ? 'bg-primary-500 text-white' : 'text-muted hover:text-app'
                 }`}
               >
@@ -82,7 +82,7 @@ const ErrorLogsPage: React.FC = () => {
               <Select
                 value={severity || ''}
                 onChange={(val) => {
-                  setSeverity((val as any) || undefined);
+                  setSeverity(val === 'error' || val === 'warning' || val === 'info' ? val : undefined);
                   setPage(1);
                 }}
                 options={[
@@ -107,7 +107,7 @@ const ErrorLogsPage: React.FC = () => {
             <div className="p-8 text-center text-muted">{t('common.loading', 'Загрузка ошибок...')}</div>
           ) : !data?.items || data.items.length === 0 ? (
             <div className="p-8 text-center text-muted">
-              <CheckCircle size={32} className="mx-auto text-emerald-500 mb-2" />
+              <CheckCircle size={32} className="mx-auto text-success mb-2" />
               {t('common.noData', 'Ошибок не обнаружено')}
             </div>
           ) : (
@@ -116,21 +116,21 @@ const ErrorLogsPage: React.FC = () => {
                 <div
                   key={err.id}
                   onClick={() => setSelectedError(err)}
-                  className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${
+                  className={`p-4 cursor-pointer hover:bg-surface-soft dark:hover:bg-white/5 transition-colors ${
                     err.resolved ? 'opacity-60' : ''
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className="flex-shrink-0 mt-0.5">
+                      <div className="flex-shrink-0 mt-1">
                         <AlertTriangle
                           size={18}
                           className={
                             err.severity === 'error'
-                              ? 'text-rose-500'
+                              ? 'text-error'
                               : err.severity === 'warning'
-                              ? 'text-amber-500'
-                              : 'text-blue-500'
+                              ? 'text-warning'
+                              : 'text-info'
                           }
                         />
                       </div>
@@ -182,7 +182,7 @@ const ErrorLogsPage: React.FC = () => {
                           resolveMutation.mutate(err.id);
                         }}
                         disabled={resolveMutation.isPending}
-                        className="btn-ghost text-xs py-1 px-2.5 flex-shrink-0 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 cursor-pointer"
+                        className="btn-ghost text-xs py-1 px-3 flex-shrink-0 text-success dark:text-success hover:bg-surface-soft dark:hover:bg-surface-soft cursor-pointer"
                       >
                         {t('reports.resolved', 'Решено')}
                       </button>
@@ -257,7 +257,7 @@ const ErrorLogsPage: React.FC = () => {
                     {t('system.markAsResolved', 'Пометить как решённую')}
                   </button>
                 ) : (
-                  <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
+                  <span className="text-xs text-success font-medium flex items-center gap-1">
                     <CheckCircle size={14} /> {t('system.errorResolved', 'Ошибка помечена как решённая')}
                   </span>
                 )}
@@ -274,7 +274,7 @@ const ErrorLogsPage: React.FC = () => {
               <div className="space-y-4 text-sm">
                 <div>
                   <div className="text-xs text-muted mb-1 font-medium">{t('system.errorMessage', 'Сообщение')}:</div>
-                  <div className="font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/20 p-3 rounded-xl border border-rose-200 dark:border-rose-900/30 break-words">
+                  <div className="font-semibold text-error dark:text-error bg-surface-soft dark:bg-surface-soft p-3 rounded-xl border border-line dark:border-line break-words">
                     {selectedError.message}
                   </div>
                 </div>
@@ -310,7 +310,7 @@ const ErrorLogsPage: React.FC = () => {
                     <div className="text-xs text-muted mb-1 font-medium flex items-center gap-1">
                       <Terminal size={13} /> Stack Trace:
                     </div>
-                    <pre className="p-3 bg-stone-950 text-rose-300 rounded-xl text-xs font-mono overflow-x-auto whitespace-pre-wrap border border-app">
+                    <pre className="p-3 bg-page text-error rounded-xl text-xs font-mono overflow-x-auto whitespace-pre-wrap border border-app">
                       {selectedError.stack}
                     </pre>
                   </div>

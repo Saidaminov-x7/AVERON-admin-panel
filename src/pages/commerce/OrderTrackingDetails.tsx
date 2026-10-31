@@ -48,7 +48,7 @@ export default function OrderTrackingDetails({ history, shipments, locale, statu
         {shipments.length ? (
           <ul className="grid gap-3 sm:grid-cols-2">
             {shipments.map((shipment) => (
-              <li key={shipment.trackingNumber} className="min-w-0 rounded-xl bg-gray-50 p-4 text-sm dark:bg-white/[0.03]">
+              <li key={shipment.trackingNumber} className="min-w-0 rounded-xl bg-surface-soft p-4 text-sm dark:bg-white/[0.03]">
                 <dl className="space-y-2">
                   <div><dt className="text-xs text-muted">{copy.provider}</dt><dd className="font-medium">{shipment.provider}</dd></div>
                   <div><dt className="text-xs text-muted">{copy.tracking}</dt><dd className="break-all font-mono">{shipment.trackingNumber}</dd></div>

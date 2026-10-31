@@ -59,7 +59,26 @@ export const testWebhookApi = async (id: string): Promise<{ success: boolean; st
   return data;
 };
 
-export const getUserAiSessionsApi = async (userId: string): Promise<{ aiSessions: any[] }> => {
-  const { data } = await api.get<{ aiSessions: any[] }>(`/admin/users/${userId}/ai-sessions`);
+export interface AdminAiMessage {
+  id: string;
+  role: string;
+  content: string;
+  model: string;
+  timestamp: string;
+}
+
+export interface AdminAiSession {
+  id: string;
+  title: string;
+  updatedAt: string;
+  messages: AdminAiMessage[];
+}
+
+export interface AdminAiSessionsResponse {
+  aiSessions: AdminAiSession[];
+}
+
+export const getUserAiSessionsApi = async (userId: string): Promise<AdminAiSessionsResponse> => {
+  const { data } = await api.get<AdminAiSessionsResponse>(`/admin/users/${userId}/ai-sessions`);
   return data;
 };

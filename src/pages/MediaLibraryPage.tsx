@@ -2,6 +2,7 @@
 // Медиа-библиотека платформы: просмотр, поиск, загрузка, удаление и копирование ссылок на изображения
 
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -65,8 +66,11 @@ export const MediaLibraryPage: React.FC = () => {
       setIsUploadModalOpen(false);
       toast.success(t('media.uploadSuccess', 'Изображения успешно загружены'));
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || t('media.uploadError', 'Ошибка загрузки файлов'));
+    onError: (err: unknown) => {
+      const message = axios.isAxiosError<{ message?: unknown }>(err) && typeof err.response?.data?.message === 'string'
+        ? err.response.data.message
+        : t('media.uploadError', 'Ошибка загрузки файлов');
+      toast.error(message);
     },
   });
 
@@ -78,8 +82,11 @@ export const MediaLibraryPage: React.FC = () => {
       if (selectedImage?.id === deleteConfirmId) setSelectedImage(null);
       setDeleteConfirmId(null);
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || t('media.deleteError', 'Ошибка удаления файла'));
+    onError: (err: unknown) => {
+      const message = axios.isAxiosError<{ message?: unknown }>(err) && typeof err.response?.data?.message === 'string'
+        ? err.response.data.message
+        : t('media.deleteError', 'Ошибка удаления файла');
+      toast.error(message);
     },
   });
 
@@ -130,7 +137,7 @@ export const MediaLibraryPage: React.FC = () => {
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-app tracking-tight flex items-center gap-2.5">
+            <h1 className="text-xl sm:text-2xl font-black text-app tracking-tight flex items-center gap-3">
               <span>{t('media.title', 'Медиа-библиотека')}</span>
               <Badge variant="primary" size="sm">
                 {t('media.filesCount', { count: total, defaultValue: `${total} файлов` })}
@@ -139,12 +146,12 @@ export const MediaLibraryPage: React.FC = () => {
                 {formatFileSize(data?.meta?.totalBytes || 0)} {t('media.used', 'занято')}
               </Badge>
             </h1>
-            <p className="text-xs text-muted mt-0.5">
+            <p className="text-xs text-muted mt-1">
               {t('media.subtitle', 'Хранилище загруженных изображений и медиаресурсов платформы')}
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -192,7 +199,7 @@ export const MediaLibraryPage: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 self-end sm:self-auto">
+          <div className="flex items-center gap-2 self-end sm:self-auto">
             <button
               type="button"
               onClick={() => setViewMode('grid')}
@@ -269,7 +276,7 @@ export const MediaLibraryPage: React.FC = () => {
                   {/* Thumbnail Image */}
                   <div
                     onClick={() => setSelectedImage(item)}
-                    className="aspect-square cursor-pointer overflow-hidden bg-gray-100 dark:bg-white/5 flex items-center justify-center"
+                    className="aspect-square cursor-pointer overflow-hidden bg-surface-soft dark:bg-white/5 flex items-center justify-center"
                   >
                     <img
                       src={item.url}
@@ -280,7 +287,7 @@ export const MediaLibraryPage: React.FC = () => {
                   </div>
 
                   {/* Footer overlay */}
-                  <div className="p-2 flex items-center justify-between text-[11px] text-muted border-t border-app">
+                  <div className="p-2 flex items-center justify-between text-[length:var(--font-size-caption)] text-muted border-t border-app">
                     <span className="truncate">{formatFileSize(item.size)}</span>
                     <div className="flex items-center gap-1">
                       <button
@@ -289,10 +296,10 @@ export const MediaLibraryPage: React.FC = () => {
                           e.stopPropagation();
                           handleCopyUrl(item.url, item.id);
                         }}
-                        className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-white/10 text-muted hover:text-app transition-colors"
+                        className="p-1 rounded-md hover:bg-surface-soft dark:hover:bg-white/10 text-muted hover:text-app transition-colors"
                         title={t('media.copyLink', 'Скопировать ссылку')}
                       >
-                        {isCopied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                        {isCopied ? <Check size={12} className="text-success" /> : <Copy size={12} />}
                       </button>
                       <button
                         type="button"
@@ -300,7 +307,7 @@ export const MediaLibraryPage: React.FC = () => {
                           e.stopPropagation();
                           setDeleteConfirmId(item.id);
                         }}
-                        className="p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500 transition-colors"
+                        className="p-1 rounded-md hover:bg-surface-soft dark:hover:bg-surface-soft text-error transition-colors"
                         title={t('common.delete', 'Удалить')}
                       >
                         <Trash2 size={12} />
@@ -317,7 +324,7 @@ export const MediaLibraryPage: React.FC = () => {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors gap-4"
+                className="flex flex-col items-stretch justify-between p-3 hover:bg-surface-soft dark:hover:bg-white/5 transition-colors gap-4 sm:flex-row sm:items-center"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <button
@@ -346,18 +353,18 @@ export const MediaLibraryPage: React.FC = () => {
                     >
                       {item.url.split('/').pop()}
                     </p>
-                    <p className="text-[11px] text-muted font-mono mt-0.5">
+                    <p className="text-[length:var(--font-size-caption)] text-muted font-mono mt-1">
                       {formatFileSize(item.size)} • {item.mimeType} • {new Date(item.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="grid w-full min-w-0 grid-cols-2 gap-2 sm:w-auto sm:shrink-0 [&>a]:flex [&>a]:min-h-11 [&>a]:items-center [&>a]:justify-center [&>button]:min-h-11 [&>button]:min-w-0 [&>button]:w-full [&>button]:whitespace-normal">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleCopyUrl(item.url, item.id)}
-                    icon={copiedId === item.id ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+                    icon={copiedId === item.id ? <Check size={14} className="text-success" /> : <Copy size={14} />}
                   >
                     {copiedId === item.id ? t('media.copied', 'Скопировано') : t('media.copyLink', 'Ссылка')}
                   </Button>
@@ -365,7 +372,7 @@ export const MediaLibraryPage: React.FC = () => {
                     href={item.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="p-2 rounded-xl border border-app text-muted hover:text-app hover:bg-gray-100 dark:hover:bg-white/10"
+                    className="p-2 rounded-xl border border-app text-muted hover:text-app hover:bg-surface-soft dark:hover:bg-white/10"
                     title={t('media.openNewTab', 'Открыть в новой вкладке')}
                   >
                     <ExternalLink size={14} />
@@ -374,7 +381,7 @@ export const MediaLibraryPage: React.FC = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => setDeleteConfirmId(item.id)}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+                    className="text-error hover:text-error hover:bg-surface-soft dark:hover:bg-surface-soft"
                   >
                     <Trash2 size={16} />
                   </Button>
@@ -444,7 +451,7 @@ export const MediaLibraryPage: React.FC = () => {
                     href={selectedImage.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="btn-primary text-xs flex items-center gap-1.5"
+                    className="btn-primary text-xs flex items-center gap-2"
                   >
                     {t('media.openNewTab', 'Открыть в новой вкладке')} <ExternalLink size={14} />
                   </a>
@@ -463,25 +470,25 @@ export const MediaLibraryPage: React.FC = () => {
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">{t('media.fileSize', 'Размер файла')}:</span>
+                  <span className="text-muted block text-[length:var(--font-size-caption)]">{t('media.fileSize', 'Размер файла')}:</span>
                   <strong className="text-app">{formatFileSize(selectedImage.size)}</strong>
                 </Card>
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">MIME-{t('media.type', 'тип')}:</span>
+                  <span className="text-muted block text-[length:var(--font-size-caption)]">MIME-{t('media.type', 'тип')}:</span>
                   <strong className="text-app font-mono">{selectedImage.mimeType}</strong>
                 </Card>
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">{t('media.createdAt', 'Дата создания')}:</span>
+                  <span className="text-muted block text-[length:var(--font-size-caption)]">{t('media.createdAt', 'Дата создания')}:</span>
                   <strong className="text-app">{new Date(selectedImage.createdAt).toLocaleDateString()}</strong>
                 </Card>
                 <Card padding="sm">
-                  <span className="text-muted block text-[10px]">{t('media.fileId', 'ID файла')}:</span>
-                  <strong className="text-app font-mono text-[10px] truncate block">{selectedImage.id}</strong>
+                  <span className="text-muted block text-[length:var(--font-size-caption)]">{t('media.fileId', 'ID файла')}:</span>
+                  <strong className="text-app font-mono text-[length:var(--font-size-caption)] truncate block">{selectedImage.id}</strong>
                 </Card>
               </div>
 
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-app text-xs flex items-center justify-between gap-3">
-                <span className="font-mono text-muted truncate text-[11px]">{selectedImage.url}</span>
+              <div className="p-3 rounded-xl bg-surface-soft dark:bg-white/5 border border-app text-xs flex items-center justify-between gap-3">
+                <span className="font-mono text-muted truncate text-[length:var(--font-size-caption)]">{selectedImage.url}</span>
                 <Button
                   variant="ghost"
                   size="sm"

@@ -93,7 +93,7 @@ const SettingsPage: React.FC = () => {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h2 className="text-base font-semibold text-app">Режим обслуживания сайта</h2>
-              <p className="text-sm text-muted mt-0.5">
+              <p className="text-sm text-muted mt-1">
                 При включении пользователи будут перенаправлены на страницу технических работ.
                 Вы всегда сможете зайти в админку и отключить режим.
               </p>
@@ -105,7 +105,7 @@ const SettingsPage: React.FC = () => {
                 onClick={() => setMaintenanceMode((v) => !v)}
                 className={`
                   relative inline-flex items-center w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-4
-                  ${maintenanceMode ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'}
+                  ${maintenanceMode ? 'bg-primary-500' : 'bg-surface-soft dark:bg-surface-soft'}
                 `}
                 role="switch"
                 aria-checked={maintenanceMode}
@@ -121,16 +121,16 @@ const SettingsPage: React.FC = () => {
           {/* Статус */}
           <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm mb-4 ${
             maintenanceMode
-              ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
-              : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
+              ? 'bg-warning text-ink'
+              : 'bg-success text-on-primary'
           }`}>
-            <div className={`w-2 h-2 rounded-full ${maintenanceMode ? 'bg-amber-500' : 'bg-emerald-500'}`}/>
+            <div className={`w-2 h-2 rounded-full ${maintenanceMode ? 'bg-warning' : 'bg-success'}`}/>
             {maintenanceMode ? '⚠️ Сайт переведён в режим обслуживания' : '✅ Сайт работает в штатном режиме'}
           </div>
 
           {/* Сообщение */}
           <div>
-            <label htmlFor="maintenance-message" className="block text-sm font-medium text-app mb-1.5">
+            <label htmlFor="maintenance-message" className="block text-sm font-medium text-app mb-2">
               Сообщение для пользователей
             </label>
             <textarea
@@ -165,12 +165,12 @@ const SettingsPage: React.FC = () => {
               ) : 'Сохранить настройки'}
             </button>
             {saved && (
-              <span className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+              <span className="text-sm text-success dark:text-success flex items-center gap-1">
                 ✓ Сохранено!
               </span>
             )}
             {mutation.isError && (
-              <span className="text-sm text-red-500">Ошибка при сохранении</span>
+              <span className="text-sm text-error">Ошибка при сохранении</span>
             )}
           </div>
         </div>
@@ -201,7 +201,7 @@ const SettingsPage: React.FC = () => {
                 <button
                   onClick={handleDeleteLogo}
                   disabled={deleteLogoMutation.isPending}
-                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center text-xs hover:bg-red-600 disabled:opacity-50"
+                  className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-surface-soft text-error flex items-center justify-center text-xs hover:bg-surface-soft disabled:opacity-50"
                 >
                   ×
                 </button>
@@ -234,7 +234,7 @@ const SettingsPage: React.FC = () => {
             )}
           </div>
           {uploadLogoMutation.isError && (
-            <p className="text-sm text-red-500 mt-2">Ошибка при загрузке логотипа</p>
+            <p className="text-sm text-error mt-2">Ошибка при загрузке логотипа</p>
           )}
         </div>
 
@@ -287,7 +287,7 @@ const SettingsPage: React.FC = () => {
                     newLinks.splice(index, 1);
                     setNavLinks(newLinks);
                   }}
-                  className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                  className="p-2 text-error hover:bg-surface-soft dark:hover:bg-surface-soft rounded-lg"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <polyline points="3 6 5 6 21 6" />
@@ -323,7 +323,7 @@ const SettingsPage: React.FC = () => {
               { label: 'Admin Panel', value: 'Vite + React + TanStack Query' },
               { label: 'API URL', value: import.meta.env.VITE_API_URL || 'localhost:3000' },
             ].map(({ label, value }) => (
-              <div key={label} className="flex items-center justify-between py-1.5 border-b border-app last:border-0">
+              <div key={label} className="flex items-center justify-between py-2 border-b border-app last:border-0">
                 <dt className="text-muted">{label}</dt>
                 <dd className="font-medium text-app font-mono text-xs">{value}</dd>
               </div>

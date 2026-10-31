@@ -201,7 +201,7 @@ export const CommandPalette: React.FC = () => {
           shouldFilter={false}
         >
           {/* Инпут поиска */}
-          <div className="flex items-center gap-3 px-4 py-3.5 border-b border-app">
+          <div className="flex items-center gap-3 px-4 py-4 border-b border-app">
             <Search size={20} className="text-muted shrink-0" />
             <Command.Input
               ref={searchInputRef}
@@ -214,18 +214,13 @@ export const CommandPalette: React.FC = () => {
             {query && (
               <button
                 type="button"
-                aria-label={t('select.clear')}
-                title={t('select.clear')}
-                onClick={() => {
-                  setQuery('');
-                  requestAnimationFrame(() => searchInputRef.current?.focus());
-                }}
-                className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-none text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                onClick={() => setQuery('')}
+                className="text-xs text-muted hover:text-app px-2 py-1 rounded bg-surface-soft dark:bg-white/10"
               >
                 <X size={16} aria-hidden="true" />
               </button>
             )}
-            <kbd className="hidden sm:inline-block px-2 py-0.5 text-[11px] font-mono rounded bg-gray-100 dark:bg-white/10 text-muted border border-app">
+            <kbd className="hidden sm:inline-block px-2 py-1 text-[length:var(--font-size-caption)] font-mono rounded bg-surface-soft dark:bg-white/10 text-muted border border-app">
               ESC
             </kbd>
           </div>
@@ -254,10 +249,10 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={r.path}
                       onSelect={() => go(r.path)}
-                      className="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5 rounded-none text-app hover:bg-[var(--color-surface-soft)] hover:text-app data-[selected=true]:bg-[var(--color-surface-soft)] cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
+                      className="flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="p-1.5 rounded-lg bg-gray-100 dark:bg-white/5 text-muted">
+                        <span className="p-2 rounded-lg bg-surface-soft dark:bg-white/5 text-muted">
                           {r.icon}
                         </span>
                         <span className="text-sm font-medium">
@@ -284,10 +279,10 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={l.id}
                       onSelect={() => go(`/products?highlight=${l.id}`)}
-                      className="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5 rounded-none text-app hover:bg-[var(--color-surface-soft)] hover:text-app data-[selected=true]:bg-[var(--color-surface-soft)] cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
+                      className="flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 shrink-0">
+                        <span className="p-2 rounded-lg bg-surface-soft dark:bg-surface-soft text-info dark:text-info shrink-0">
                           <List size={16} />
                         </span>
                         <div className="min-w-0">
@@ -297,7 +292,7 @@ export const CommandPalette: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs px-2 py-0.5 rounded-md bg-gray-100 dark:bg-white/10 text-muted shrink-0">
+                      <span className="text-xs px-2 py-1 rounded-md bg-surface-soft dark:bg-white/10 text-muted shrink-0">
                         {l.status || 'ACTIVE'}
                       </span>
                     </Command.Item>
@@ -317,10 +312,10 @@ export const CommandPalette: React.FC = () => {
                     <Command.Item
                       key={u.id}
                       onSelect={() => go(`/users/${u.id}`)}
-                      className="flex min-h-11 items-center justify-between gap-3 px-3 py-2.5 rounded-none text-app hover:bg-[var(--color-surface-soft)] hover:text-app data-[selected=true]:bg-[var(--color-surface-soft)] cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
+                      className="flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-app hover:bg-primary-50 dark:hover:bg-primary-950/40 hover:text-primary-600 dark:hover:text-primary-400 cursor-pointer transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <span className="p-2 rounded-lg bg-surface-soft dark:bg-surface-soft text-success dark:text-success shrink-0">
                           <User size={16} />
                         </span>
                         <div className="min-w-0">
@@ -328,7 +323,7 @@ export const CommandPalette: React.FC = () => {
                           <p className="text-xs text-muted truncate">{u.email}</p>
                         </div>
                       </div>
-                      <span className="text-xs px-2 py-0.5 rounded-md bg-gray-100 dark:bg-white/10 text-muted shrink-0">
+                      <span className="text-xs px-2 py-1 rounded-md bg-surface-soft dark:bg-white/10 text-muted shrink-0">
                         {u.role || 'USER'}
                       </span>
                     </Command.Item>
@@ -339,14 +334,14 @@ export const CommandPalette: React.FC = () => {
           </Command.List>
 
           {/* Футер палитры */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-t border-app text-xs text-muted bg-gray-50/50 dark:bg-white/5 select-none">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-app text-xs text-muted bg-surface-soft dark:bg-white/5 select-none">
             <div className="flex items-center gap-3">
               <span>
-                <kbd className="font-mono bg-surface px-1.5 py-0.5 rounded border border-app">↑</kbd>{' '}
-                <kbd className="font-mono bg-surface px-1.5 py-0.5 rounded border border-app">↓</kbd> Навигация
+                <kbd className="font-mono bg-surface px-2 py-1 rounded border border-app">↑</kbd>{' '}
+                <kbd className="font-mono bg-surface px-2 py-1 rounded border border-app">↓</kbd> Навигация
               </span>
               <span>
-                <kbd className="font-mono bg-surface px-1.5 py-0.5 rounded border border-app">↵</kbd> Выбрать
+                <kbd className="font-mono bg-surface px-2 py-1 rounded border border-app">↵</kbd> Выбрать
               </span>
             </div>
             <span>AVERON Command Center</span>

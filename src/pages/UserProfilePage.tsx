@@ -14,6 +14,10 @@ import { ArrowLeft, Shield, Lock, Unlock, Mail, Phone, Calendar, Clock, Activity
 import { format } from 'date-fns';
 import { ru, enUS, uz } from 'date-fns/locale';
 
+function isMetadataRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 const UserProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -153,7 +157,7 @@ const UserProfilePage: React.FC = () => {
               <div className="flex gap-2 mt-6">
                 {user.isBlocked ? (
                   <button
-                    className="btn-ghost gap-1 cursor-pointer text-emerald-600"
+                    className="btn-ghost gap-1 cursor-pointer text-success"
                     onClick={() => unblockMutation.mutate()}
                     disabled={unblockMutation.isPending}
                   >
@@ -217,7 +221,7 @@ const UserProfilePage: React.FC = () => {
               aria-selected={activeTab === 'ai'}
               tabIndex={activeTab === 'ai' ? 0 : -1}
               onClick={() => setActiveTab('ai')}
-              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-2 ${
                 activeTab === 'ai' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'
               }`}
             >
@@ -251,17 +255,8 @@ const UserProfilePage: React.FC = () => {
             >
               {t('auditLog.title', 'Админ-аудит')} ({auditLogs?.length || 0})
             </button>
-            <button
-              type="button"
-              role="tab"
-              id="user-profile-tab-sessions"
-              aria-controls="user-profile-panel-sessions"
-              aria-selected={activeTab === 'sessions'}
-              tabIndex={activeTab === 'sessions' ? 0 : -1}
-              onClick={() => setActiveTab('sessions')}
-              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${activeTab === 'sessions' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'}`}
-            >
-              <MonitorSmartphone size={14}/> {t('users.sessions')} ({sessions.length})
+            <button onClick={() => setActiveTab('sessions')} className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center gap-2 ${activeTab === 'sessions' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'}`}>
+              <MonitorSmartphone size={14}/> Сессии ({sessions.length})
             </button>
           </nav>
         </div>
@@ -303,16 +298,16 @@ const UserProfilePage: React.FC = () => {
           <div id="user-profile-panel-ai" role="tabpanel" aria-labelledby="user-profile-tab-ai" tabIndex={0} className="card min-w-0 overflow-hidden p-0">
             {userAiSessionsData?.aiSessions?.length ? (
               <div className="divide-y divide-app">
-                {userAiSessionsData.aiSessions.map((session: any) => (
+                {userAiSessionsData.aiSessions.map((session) => (
                   <div key={session.id} className="p-4">
                     <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                       <strong className="text-sm text-app">{session.title || t('users.aiConversation')}</strong>
                       <span className="text-xs text-muted">{format(new Date(session.updatedAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</span>
                     </div>
                     <div className="space-y-2">
-                      {session.messages.map((message: any) => (
-                        <div key={message.id} className={`max-w-full break-words rounded-lg px-3 py-2 text-xs ${message.role === 'user' ? 'ml-auto bg-primary-500 text-white' : 'bg-gray-100 text-app dark:bg-white/5'}`}>
-                          <span className="mb-1 block font-semibold">{message.role === 'user' ? t('users.messageFromUser') : 'AVERON AI'}</span>
+                      {session.messages.map((message) => (
+                        <div key={message.id} className={`max-w-full break-words rounded-lg px-3 py-2 text-xs ${message.role === 'user' ? 'ml-auto bg-primary-500 text-white' : 'bg-surface-soft text-app dark:bg-white/5'}`}>
+                          <span className="mb-1 block font-semibold">{message.role === 'user' ? 'Пользователь' : 'AVERON AI'}</span>
                           {message.content}
                         </div>
                       ))}
@@ -335,9 +330,9 @@ const UserProfilePage: React.FC = () => {
             ) : (
               <div className="divide-y divide-app">
                 {userActivity.items.map((act) => (
-                  <div key={act.id} className="p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                  <div key={act.id} className="p-4 hover:bg-surface-soft dark:hover:bg-white/5 transition-colors">
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-0.5">
+                      <div className="flex-shrink-0 mt-1">
                         <Activity size={18} className="text-primary-500" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -351,7 +346,7 @@ const UserProfilePage: React.FC = () => {
                                 : act.action}
                             </span>
                             {act.ip && (
-                              <span className="text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-white/10 text-muted font-mono">
+                              <span className="text-xs px-2 py-1 rounded bg-surface-soft dark:bg-white/10 text-muted font-mono">
                                 {act.ip}
                               </span>
                             )}
@@ -360,13 +355,13 @@ const UserProfilePage: React.FC = () => {
                             {format(new Date(act.createdAt), 'd MMM yyyy, HH:mm:ss', { locale: currentLocale })}
                           </span>
                         </div>
-                        {act.meta && Object.keys(act.meta).length > 0 && (
-                          <pre className="text-xs text-emerald-400 bg-gray-900 dark:bg-black/90 p-2 rounded-xl mt-1 font-mono overflow-x-auto max-w-full border border-app">
+                        {isMetadataRecord(act.meta) && Object.keys(act.meta).length > 0 && (
+                          <pre className="text-xs text-success bg-page dark:bg-black/90 p-2 rounded-xl mt-1 font-mono overflow-x-auto max-w-full border border-app">
                             {JSON.stringify(act.meta, null, 2)}
                           </pre>
                         )}
                         {act.userAgent && (
-                          <div className="text-[11px] text-muted truncate mt-1">
+                          <div className="text-[length:var(--font-size-caption)] text-muted truncate mt-1">
                             {act.userAgent}
                           </div>
                         )}
@@ -388,15 +383,15 @@ const UserProfilePage: React.FC = () => {
             ) : (
               <div className="divide-y divide-app">
                 {auditLogs?.map((log) => (
-                  <div key={log.id} className="p-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                  <div key={log.id} className="p-4 hover:bg-surface-soft dark:hover:bg-white/5 transition-colors">
                     <div className="flex items-start gap-3">
                       <div className="flex-shrink-0">
                         {log.action === 'USER_BLOCKED' ? (
-                          <Lock size={18} className="text-red-500" />
+                          <Lock size={18} className="text-error" />
                         ) : log.action === 'USER_UNBLOCKED' ? (
-                          <Unlock size={18} className="text-emerald-500" />
+                          <Unlock size={18} className="text-success" />
                         ) : log.action === 'USER_ROLE_CHANGED' ? (
-                          <Shield size={18} className="text-blue-500" />
+                          <Shield size={18} className="text-info" />
                         ) : (
                           <Clock size={18} className="text-muted" />
                         )}
@@ -430,27 +425,7 @@ const UserProfilePage: React.FC = () => {
             )}
           </div>
         )}
-        {activeTab === 'sessions' && (
-          <div id="user-profile-panel-sessions" role="tabpanel" aria-labelledby="user-profile-tab-sessions" tabIndex={0} className="card p-5">
-            <h2 className="text-lg font-semibold text-app">{t('users.activeSessions')}</h2>
-            <p className="mt-1 text-sm text-muted">{t('users.activeSessionsDescription')}</p>
-            <div className="mt-4 divide-y divide-app">
-              {isSessionsLoading ? <div className="py-8 text-center text-muted">{t('common.loading')}</div> : sessions.map((session) => (
-                <div key={session.id} className="flex items-center gap-3 py-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500"><MonitorSmartphone size={18} /></div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-app">{session.userAgent || t('users.unknownDevice')}</p>
-                    <p className="mt-1 text-xs text-muted">{session.ipAddress || t('users.hiddenIp')} · {format(new Date(session.lastSeenAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</p>
-                  </div>
-                  <button type="button" onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app text-muted hover:text-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" title={t('users.endSession')} aria-label={t('users.endSession')}>
-                    <X size={16} />
-                  </button>
-                </div>
-              ))}
-              {!isSessionsLoading && !sessions.length ? <div className="py-8 text-center text-muted">{t('users.noActiveSessions')}</div> : null}
-            </div>
-          </div>
-        )}
+        {activeTab === 'sessions' && <div className="card p-5"><h2 className="text-lg font-semibold text-app">Активные сессии</h2><p className="mt-1 text-sm text-muted">Устройства, на которых пользователь сейчас авторизован.</p><div className="mt-4 divide-y divide-app">{isSessionsLoading ? <div className="py-8 text-center text-muted">Загрузка…</div> : sessions.map((session) => <div key={session.id} className="flex items-center gap-3 py-4"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500"><MonitorSmartphone size={18}/></div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-app">{session.userAgent || 'Неизвестное устройство'}</p><p className="mt-1 text-xs text-muted">{session.ipAddress || 'IP скрыт'} · {format(new Date(session.lastSeenAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</p></div><button onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app text-muted hover:text-error" title="Завершить сессию"><X size={16}/></button></div>)}{!isSessionsLoading && !sessions.length ? <div className="py-8 text-center text-muted">Активных сессий нет.</div> : null}</div></div>}
       </div>
     </Layout>
   );

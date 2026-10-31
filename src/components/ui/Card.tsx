@@ -51,7 +51,7 @@ export const Card: React.FC<CardProps> = ({
               title
             )}
             {description && (
-              <p className="text-xs text-muted mt-0.5">{description}</p>
+              <p className="text-xs text-muted mt-1">{description}</p>
             )}
           </div>
           {headerAction && <div className="shrink-0">{headerAction}</div>}
@@ -96,7 +96,7 @@ export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement
   children,
   ...props
 }) => (
-  <p className={twMerge('text-xs text-muted mt-0.5', className)} {...props}>
+  <p className={twMerge('text-xs text-muted mt-1', className)} {...props}>
     {children}
   </p>
 );

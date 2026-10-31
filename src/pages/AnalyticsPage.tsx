@@ -100,7 +100,7 @@ const AnalyticsPage: React.FC = () => {
                 onClick={() => setPeriodDays(p.value)}
                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${periodDays === p.value
                     ? 'bg-primary-500 text-white shadow-sm'
-                    : 'border border-app text-muted hover:text-app hover:bg-gray-100 dark:hover:bg-white/5'
+                    : 'border border-app text-muted hover:text-app hover:bg-surface-soft dark:hover:bg-white/5'
                   }`}
               >
                 {p.label}
@@ -114,16 +114,14 @@ const AnalyticsPage: React.FC = () => {
                   label={t('analyticsPage.fromDate')}
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  containerClassName="min-w-0"
-                  className="w-full min-w-0 py-1 px-2.5 text-xs"
+                  className="input py-1 px-3 text-xs w-36"
                 />
                 <Input
                   type="date"
                   label={t('analyticsPage.toDate')}
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  containerClassName="min-w-0"
-                  className="w-full min-w-0 py-1 px-2.5 text-xs"
+                  className="input py-1 px-3 text-xs w-36"
                 />
               </div>
             )}
@@ -133,7 +131,7 @@ const AnalyticsPage: React.FC = () => {
             type="button"
             onClick={() => void exportReport()}
             disabled={isExporting}
-            className="px-4 py-2 text-xs font-semibold rounded-lg border border-app text-app hover:bg-gray-100 dark:hover:bg-white/5 flex items-center gap-2 transition-colors cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold rounded-lg border border-app text-app hover:bg-surface-soft dark:hover:bg-white/5 flex items-center gap-2 transition-colors cursor-pointer"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
@@ -143,15 +141,15 @@ const AnalyticsPage: React.FC = () => {
             {isExporting ? t('analyticsPage.exporting') : t('analyticsPage.exportCsv')}
           </button>
         </div>
-        {exportError && <p role="alert" className="text-sm text-red-600">{t('analyticsPage.exportError')}</p>}
+        {exportError && <p role="alert" className="text-sm text-error">{t('analyticsPage.exportError')}</p>}
         {isError && (
-          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface-soft p-4 text-sm text-error dark:text-error">
             <span>{t('analyticsPage.loadError')}</span>
             <button type="button" className="underline" onClick={() => void refetch()}>{t('analyticsPage.retry')}</button>
           </div>
         )}
         {isJourneyError && (
-          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-700">
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 border border-line bg-surface-soft p-4 text-sm text-error">
             <span>{t('analyticsPage.journeyLoadError')}</span>
             <button type="button" className="underline" onClick={() => void refetchJourney()}>{t('analyticsPage.retry')}</button>
           </div>
@@ -166,7 +164,7 @@ const AnalyticsPage: React.FC = () => {
             <div className="text-2xl font-extrabold text-app">
               {formatMetric(summary?.totalVisitors)}
             </div>
-            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.dedupeNote')}</p>
+            <p className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.dedupeNote')}</p>
           </div>
 
           <div className="card p-5">
@@ -176,7 +174,7 @@ const AnalyticsPage: React.FC = () => {
             <div className="text-2xl font-extrabold text-app">
               {formatMetric(summary?.totalPaidOrders)}
             </div>
-            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.paidOrdersNote')}</p>
+            <p className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.paidOrdersNote')}</p>
           </div>
 
           <div className="card p-5">
@@ -188,7 +186,7 @@ const AnalyticsPage: React.FC = () => {
                 ? t('analyticsPage.noData')
                 : `${formatMetric(summary?.revenueUzs)} UZS`}
             </div>
-            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.netRevenueNote')}</p>
+            <p className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.netRevenueNote')}</p>
           </div>
 
           <div className="card p-5">
@@ -198,7 +196,7 @@ const AnalyticsPage: React.FC = () => {
             <div className="text-2xl font-extrabold text-app">
               {formatMetric(summary?.totalProducts)}
             </div>
-            <p className="text-[11px] text-muted mt-1">{t('analyticsPage.addedNote')}</p>
+            <p className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.addedNote')}</p>
           </div>
         </div>
 
@@ -216,7 +214,7 @@ const AnalyticsPage: React.FC = () => {
               [t('analyticsPage.journeyAvgProducts'), journey?.avgProductsInFirstOrder.toFixed(1)],
             ].map(([label, value]) => (
               <div key={String(label)} className="card min-w-0 p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</p>
+                <p className="text-[length:var(--font-size-caption)] font-semibold uppercase tracking-wide text-muted">{label}</p>
                 <p className="mt-2 text-xl font-semibold text-app">{value === undefined ? (isLoading ? '...' : t('analyticsPage.noData')) : value}</p>
               </div>
             ))}
@@ -236,12 +234,12 @@ const AnalyticsPage: React.FC = () => {
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={journey.daily} margin={{ top: 5, right: 8, left: -22, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} interval={2} />
-                  <YAxis tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} />
-                  <Tooltip contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', fontSize: '12px', color: 'var(--color-text)' }} />
-                  <Legend wrapperStyle={{ fontSize: '12px' }} />
-                  <Line type="monotone" dataKey="purchases" name={t('analyticsPage.journeyPurchases')} stroke="#161616" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="units" name={t('analyticsPage.journeyUnits')} stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 'var(--font-size-caption)', fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} interval={2} />
+                  <YAxis tick={{ fontSize: 'var(--font-size-caption)', fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', fontSize: 'var(--font-size-label)', color: 'var(--color-text)' }} />
+                  <Legend wrapperStyle={{ fontSize: 'var(--font-size-label)' }} />
+                  <Line type="monotone" dataKey="purchases" name={t('analyticsPage.journeyPurchases')} stroke="var(--color-primary)" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="units" name={t('analyticsPage.journeyUnits')} stroke="var(--color-info)" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             )}
@@ -252,7 +250,7 @@ const AnalyticsPage: React.FC = () => {
         <div className="card">
           <h3 className="text-base font-semibold text-app mb-4">{t('analyticsPage.chartTitle')}</h3>
           {isLoading ? (
-            <div className="h-72 bg-gray-100 dark:bg-white/5 rounded-lg animate-pulse" />
+            <div className="h-72 bg-surface-soft dark:bg-white/5 rounded-lg animate-pulse" />
           ) : chartData.length === 0 ? (
             <div className="h-72 flex items-center justify-center text-muted text-sm">
               {t('analyticsPage.noData')}
@@ -263,7 +261,7 @@ const AnalyticsPage: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+                  tick={{ fontSize: 'var(--font-size-caption)', fill: 'var(--color-text-muted)' }}
                   tickFormatter={(v) =>
                     new Date(v).toLocaleDateString(dateLocale, { day: 'numeric', month: 'short' })
                   }
@@ -272,7 +270,7 @@ const AnalyticsPage: React.FC = () => {
                   interval={Math.max(0, Math.floor(chartData.length / 6))}
                 />
                 <YAxis
-                  tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }}
+                  tick={{ fontSize: 'var(--font-size-caption)', fill: 'var(--color-text-muted)' }}
                   axisLine={false}
                   tickLine={false}
                   allowDecimals={false}
@@ -282,7 +280,7 @@ const AnalyticsPage: React.FC = () => {
                     backgroundColor: 'var(--color-surface)',
                     border: '1px solid var(--color-border)',
                     borderRadius: '0.75rem',
-                    fontSize: '12px',
+                    fontSize: 'var(--font-size-label)',
                     color: 'var(--color-text)',
                   }}
                   labelFormatter={(v) =>
@@ -293,12 +291,12 @@ const AnalyticsPage: React.FC = () => {
                     })
                   }
                 />
-                <Legend wrapperStyle={{ fontSize: '12px' }} />
+                <Legend wrapperStyle={{ fontSize: 'var(--font-size-label)' }} />
                 <Line
                   type="monotone"
                   dataKey="visitors"
                   name={t('analyticsPage.lineVisitors')}
-                  stroke="#14b8a6"
+                  stroke="var(--color-info)"
                   strokeWidth={2.5}
                   dot={false}
                 />
@@ -306,7 +304,7 @@ const AnalyticsPage: React.FC = () => {
                   type="monotone"
                   dataKey="registrations"
                   name={t('analyticsPage.lineRegistrations')}
-                  stroke="#8b5cf6"
+                  stroke="var(--color-secondary)"
                   strokeWidth={2}
                   dot={false}
                 />
@@ -314,7 +312,7 @@ const AnalyticsPage: React.FC = () => {
                   type="monotone"
                   dataKey="products"
                   name={t('analyticsPage.lineProducts')}
-                  stroke="#f59e0b"
+                  stroke="var(--color-warning)"
                   strokeWidth={2}
                   dot={false}
                 />
@@ -322,7 +320,7 @@ const AnalyticsPage: React.FC = () => {
                   type="monotone"
                   dataKey="paidOrders"
                   name={t('analyticsPage.linePaidOrders')}
-                  stroke="#0f766e"
+                  stroke="var(--color-success)"
                   strokeWidth={2}
                   dot={false}
                 />
@@ -333,7 +331,7 @@ const AnalyticsPage: React.FC = () => {
 
         {/* Воронка конверсии */}
         {isFunnelError ? (
-          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface-soft p-4 text-sm text-error dark:text-error">
             <span>{t('analyticsPage.funnelError')}</span>
             <button type="button" className="underline" onClick={() => void refetchFunnel()}>{t('analyticsPage.retry')}</button>
           </div>
@@ -344,17 +342,17 @@ const AnalyticsPage: React.FC = () => {
               <div className="p-4 rounded-xl bg-primary-500/10 border border-primary-500/20">
                 <div className="text-xs font-semibold text-primary-600 dark:text-primary-400">{t('analyticsPage.funnelViews')}</div>
                 <div className="text-2xl font-bold text-app mt-1">{formatMetric(funnel.visits)}</div>
-                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelVisits')}</div>
+                <div className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.funnelVisits')}</div>
               </div>
-              <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                <div className="text-xs font-semibold text-purple-600 dark:text-purple-400">{t('analyticsPage.funnelFavorites')}</div>
+              <div className="p-4 rounded-xl bg-surface-soft border border-line">
+                <div className="text-xs font-semibold text-info dark:text-info">{t('analyticsPage.funnelFavorites')}</div>
                 <div className="text-2xl font-bold text-app mt-1">{formatMetric(funnel.favorites)}</div>
-                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: formatRate(funnel.favoriteRate) })}</div>
+                <div className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: formatRate(funnel.favoriteRate) })}</div>
               </div>
-              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{t('analyticsPage.funnelOrders')}</div>
+              <div className="p-4 rounded-xl bg-surface-soft border border-line">
+                <div className="text-xs font-semibold text-success dark:text-success">{t('analyticsPage.funnelOrders')}</div>
                 <div className="text-2xl font-bold text-app mt-1">{formatMetric(funnel.paidOrders)}</div>
-                <div className="text-[11px] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: formatRate(funnel.orderRate) })}</div>
+                <div className="text-[length:var(--font-size-caption)] text-muted mt-1">{t('analyticsPage.funnelConversion', { rate: formatRate(funnel.orderRate) })}</div>
               </div>
             </div>
           </div>

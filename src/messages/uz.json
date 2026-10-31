@@ -188,6 +188,7 @@
     "collapse": "Menyuni yig'ish",
     "expand": "Menyuni ochish",
     "language": "Til",
+    "languageAndTheme": "Til va mavzu",
     "error": "Xatolik",
     "success": "Muvaffaqiyatli",
     "noData": "Ma'lumotlar mavjud emas",
@@ -905,6 +906,9 @@
       "providerNotConfigured": "Rasm embedding provayderi sozlanmagan."
     },
     "contentLanguage": "Mahsulot kontenti tili",
+    "pricing": "Narxlar",
+    "variants": "Variantlar",
+    "photos": "Rasmlar",
     "contentLocale": {
       "ru": "Русский",
       "uz": "O'zbek",

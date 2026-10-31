@@ -96,14 +96,14 @@ export function TelegramPublicationPanel({
   const statusKey = publication?.status ?? "NOT_PUBLISHED";
 
   return (
-    <section className="mt-4 rounded-xl border border-sky-200 bg-sky-50/60 p-3 dark:border-sky-900 dark:bg-sky-950/20" aria-label={t("products.telegram.title")}>
+    <section className="mt-4 rounded-xl border border-line bg-surface-soft p-3 dark:border-line dark:bg-surface-soft" aria-label={t("products.telegram.title")}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
           <h3 className="text-sm font-bold">{t("products.telegram.title")}</h3>
           {statusQuery.isLoading ? (
             <p role="status" className="mt-1 text-xs text-muted">{t("products.telegram.loading")}</p>
           ) : statusQuery.isError ? (
-            <p role="alert" className="mt-1 text-xs text-red-600">{t("products.telegram.statusError")}</p>
+            <p role="alert" className="mt-1 text-xs text-error">{t("products.telegram.statusError")}</p>
           ) : (
             <p className="mt-1 text-xs text-muted">{t(`products.telegram.status.${statusKey}`)}</p>
           )}
@@ -134,7 +134,7 @@ export function TelegramPublicationPanel({
         </p>
       )}
       {publication?.status === "FAILED" && (
-        <p role="alert" className="mt-2 text-xs text-red-700 dark:text-red-300">
+        <p role="alert" className="mt-2 text-xs text-error dark:text-error">
           {t(publication.errorCode === "TELEGRAM_DELIVERY_UNCONFIRMED"
             ? "products.telegram.deliveryUnconfirmed"
             : "products.telegram.publishError")}
@@ -148,7 +148,7 @@ export function TelegramPublicationPanel({
       )}
 
       {isExpanded && (
-        <div className="mt-3 space-y-3 border-t border-sky-200 pt-3 dark:border-sky-900">
+        <div className="mt-3 space-y-3 border-t border-line pt-3 dark:border-line">
           <label className="block text-xs font-semibold" htmlFor={`telegram-caption-${productId}`}>
             {t("products.telegram.captionLabel")}
             <textarea
@@ -161,7 +161,7 @@ export function TelegramPublicationPanel({
                 setPreview(null);
               }}
               placeholder={t("products.telegram.captionPlaceholder")}
-              className="mt-1 block w-full resize-y rounded-lg border border-stone-300 bg-white p-2 text-sm font-normal text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 dark:border-white/20 dark:bg-stone-900 dark:text-white"
+              className="mt-1 block w-full resize-y rounded-lg border border-line bg-white p-2 text-sm font-normal text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:border-white/20 dark:bg-page dark:text-white"
             />
           </label>
           <p className="text-xs text-muted">{t("products.telegram.canonicalDataHint")}</p>
@@ -174,15 +174,15 @@ export function TelegramPublicationPanel({
             <Eye size={15} />{previewMutation.isPending ? t("products.telegram.previewLoading") : t("products.telegram.preview")}
           </button>
           {previewMutation.isError && (
-            <p role="alert" className="text-sm text-red-700 dark:text-red-300">{t("products.telegram.previewError")}</p>
+            <p role="alert" className="text-sm text-error dark:text-error">{t("products.telegram.previewError")}</p>
           )}
           {preview && (
-            <article className="max-w-md overflow-hidden rounded-xl border border-stone-200 bg-white text-stone-900 dark:border-white/10">
+            <article className="max-w-md overflow-hidden rounded-xl border border-line bg-white text-ink dark:border-white/10">
               {preview.imageUrl && <img src={preview.imageUrl} alt={preview.title} className="max-h-72 w-full object-cover" />}
               <div className="space-y-2 p-3">
                 <h4 className="font-bold">{preview.title}</h4>
                 <p className="whitespace-pre-wrap break-words text-sm">{preview.captionText}</p>
-                <a href={preview.productUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center rounded-lg bg-sky-600 px-4 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500">
+                <a href={preview.productUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center rounded-lg bg-primary px-4 text-sm font-bold text-[var(--color-on-primary)] hover:bg-[var(--color-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                   {preview.buttonText}
                 </a>
               </div>
@@ -212,7 +212,7 @@ export function TelegramPublicationPanel({
                 : t("products.telegram.publish")}
           </button>
           {publishMutation.isError && (
-            <p role="alert" className="text-sm text-red-700 dark:text-red-300">
+            <p role="alert" className="text-sm text-error dark:text-error">
               {t("products.telegram.publishError")}
               {telegramFailureReason(publishMutation.error) ? ` (${telegramFailureReason(publishMutation.error)})` : ""}
             </p>

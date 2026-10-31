@@ -7,6 +7,7 @@ export interface SwitchProps {
   onChange: (checked: boolean) => void;
   label?: React.ReactNode;
   description?: string;
+  ariaLabel?: string;
   disabled?: boolean;
   size?: 'sm' | 'md';
   ariaLabel?: string;
@@ -20,6 +21,7 @@ export const Switch: React.FC<SwitchProps> = ({
   onChange,
   label,
   description,
+  ariaLabel,
   disabled = false,
   size = 'md',
   ariaLabel,
@@ -45,45 +47,26 @@ export const Switch: React.FC<SwitchProps> = ({
     >
       {(label || description) && (
         <div className="text-xs mr-2">
-          {label && <span id={labelId} className="font-medium text-app block">{label}</span>}
-          {description && <span id={descriptionId} className="text-muted block mt-0.5">{description}</span>}
+          {label && <span className="font-medium text-app block">{label}</span>}
+          {description && <span className="text-muted block mt-1">{description}</span>}
         </div>
       )}
       <button
         type="button"
         role="switch"
         aria-label={ariaLabel}
-        aria-labelledby={!ariaLabel && label ? labelId : undefined}
-        aria-describedby={describedBy}
         aria-checked={checked}
         disabled={disabled}
         onClick={() => !disabled && onChange(!checked)}
         className={twMerge(
           clsx(
-            'relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-transparent p-0 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)] disabled:cursor-not-allowed disabled:opacity-60',
+            'relative inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
           ),
           className,
         )}
       >
-        <span
-          aria-hidden="true"
-          className={clsx(
-            'pointer-events-none relative inline-flex shrink-0 items-center rounded-full border transition-colors duration-150',
-            isSm ? 'h-5 w-9 p-1' : 'h-6 w-11 p-1',
-            checked
-              ? 'border-[var(--color-primary)] bg-[var(--color-primary)]'
-              : 'border-[var(--color-border)] bg-[var(--color-surface-soft)]',
-          )}
-        >
-          <span
-            className={clsx(
-              'pointer-events-none absolute left-1 top-1/2 size-4 -translate-y-1/2 rounded-full shadow-sm transition-[transform,background-color] duration-150',
-              checked
-                ? 'bg-[var(--color-on-primary)]'
-                : 'bg-[var(--color-text-muted)]',
-              checked && (isSm ? 'translate-x-3' : 'translate-x-5'),
-            )}
-          />
+        <span aria-hidden="true" className={clsx('relative block rounded-full border transition-colors duration-200 motion-reduce:transition-none', isSm ? 'h-5 w-9' : 'h-6 w-11', checked ? 'border-primary-500 bg-primary-500' : 'border-app bg-surface-soft')}>
+          <span className={clsx('absolute left-0.5 top-0.5 rounded-full bg-white shadow-sm transition-transform duration-200 motion-reduce:transition-none', isSm ? 'size-3.5' : 'size-[18px]', checked && (isSm ? 'translate-x-4' : 'translate-x-5'))} />
         </span>
       </button>
     </div>

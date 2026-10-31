@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
+import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, RotateCcw, Archive, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
@@ -139,7 +140,7 @@ export default function CategoriesPage() {
       {categoriesQuery.isLoading ? (
         <div className="card">{t("products.loading")}</div>
       ) : categoriesQuery.isError ? (
-        <div role="alert" className="card text-red-500">{t("categories.loadError")}</div>
+        <div role="alert" className="card text-error">{t("categories.loadError")}</div>
       ) : categories.length ? (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {categories.map((category) => (
@@ -158,11 +159,11 @@ export default function CategoriesPage() {
                   {t(category.active === false ? "categories.inactive" : "categories.active")}
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-2 border-t border-app pt-3">
+              <div className="space-y-2 border-t border-app pt-3">
                 <span className="text-xs text-muted">
                   {t("categories.productsCount")}: {category._count?.products ?? 0}
                 </span>
-                <div className="flex gap-2">
+                <div className="grid grid-cols-2 gap-2 [&>button]:min-h-11 [&>button]:min-w-0">
                   <button type="button" onClick={() => navigate(`/products?category=${encodeURIComponent(category.slug)}`)} className="btn-ghost text-xs">
                     {t("categories.viewProducts")}
                   </button>
@@ -170,7 +171,7 @@ export default function CategoriesPage() {
                   {category.active === false ? (
                     <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: true })} className="btn-ghost" aria-label={t("categories.restore")}><RotateCcw size={16} /></button>
                   ) : (
-                    <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: false })} className="btn-ghost text-red-500" aria-label={t("categories.archive")}><Archive size={16} /></button>
+                    <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: false })} className="btn-ghost text-error" aria-label={t("categories.archive")}><Archive size={16} /></button>
                   )}
                 </div>
               </div>
@@ -231,9 +232,12 @@ export default function CategoriesPage() {
                 try {
                   const uploaded = await uploadMediaApi(file);
                   setValues((current) => ({ ...current, imageUrl: uploaded.url }));
-                  toast.success(t("categories.imageUploaded"));
-                } catch (error: any) {
-                  toast.error(error?.response?.data?.message || t("categories.imageUploadError"));
+                  toast.success("Изображение категории загружено");
+                } catch (error: unknown) {
+                  const message = axios.isAxiosError<{ message?: unknown }>(error) && typeof error.response?.data?.message === 'string'
+                    ? error.response.data.message
+                    : "Не удалось загрузить изображение";
+                  toast.error(message);
                 } finally {
                   setUploadingImage(false);
                   event.target.value = "";

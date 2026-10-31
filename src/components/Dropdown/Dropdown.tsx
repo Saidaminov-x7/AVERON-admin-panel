@@ -71,8 +71,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
     };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        event.preventDefault();
-        event.stopImmediatePropagation();
+        const target = event.target as Node;
+        if (!rootRef.current?.contains(target) && !panelRef.current?.contains(target)) return;
+        event.stopPropagation();
         setIsOpen(false);
         triggerRef.current?.focus();
         return;
@@ -103,10 +104,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
       items[nextIndex].focus();
     };
     document.addEventListener('pointerdown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown, true);
     return () => {
       document.removeEventListener('pointerdown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown, true);
     };
   }, [isOpen]);
 

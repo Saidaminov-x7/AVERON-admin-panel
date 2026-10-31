@@ -332,9 +332,9 @@ export default function ImportsPage() {
                         {' · '}{t('imports.variantsCount', 'Варианты')}: {variantCount}
                       </p>
                       <p className="mt-1 text-xs text-muted">{new Date(item.createdAt).toLocaleString(currencyLocale)}</p>
-                      {item.status === 'REJECTED' && item.rejectionReason && <p className="mt-1 text-sm text-red-600">{item.rejectionReason}</p>}
+                      {item.status === 'REJECTED' && item.rejectionReason && <p className="mt-1 text-sm text-error">{item.rejectionReason}</p>}
                     </div>
-                    <div className="flex flex-wrap gap-2 md:shrink-0">
+                    <div className="grid grid-cols-2 gap-2 md:shrink-0 [&>button]:min-h-11 [&>button]:min-w-0">
                       <Button variant="outline" size="sm" leftIcon={<Eye size={15} />} onClick={() => setDetailsItem(item)}>
                         {t('imports.details', 'Детали')}
                       </Button>
@@ -496,7 +496,7 @@ export default function ImportsPage() {
             </div>
             {uploadedImages.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{uploadedImages.map((image) => <div key={image.id} className="relative">
               <ImagePreview url={image.url} title={approveItem.originalTitle} />
-              <button type="button" aria-label={t('common.remove', 'Удалить')} className="absolute -right-2 -top-2 rounded-full bg-surface p-1 text-red-600 shadow" onClick={() => setUploadedImages((current) => current.filter(({ id }) => id !== image.id))}><X size={14} /></button>
+              <button type="button" aria-label={t('common.remove', 'Удалить')} className="absolute -right-2 -top-2 rounded-full bg-surface p-1 text-error shadow" onClick={() => setUploadedImages((current) => current.filter(({ id }) => id !== image.id))}><X size={14} /></button>
             </div>)}</div>}
           </div>
           <label className="flex items-start gap-2 rounded-xl border border-app p-3 text-sm">

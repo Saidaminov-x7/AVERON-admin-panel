@@ -8,7 +8,6 @@ import {
   BadgePercent,
   Bell,
   Check,
-  ChevronRight,
   ClipboardCheck,
   ExternalLink,
   Gauge,
@@ -250,8 +249,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
             <span className={compact ? "hidden" : ""}>AVERON</span>
             <span className={compact ? "admin-sidebar-compact-mark hidden lg:inline" : "hidden"}>A</span>
           </span>
-          {compact && <PanelLeftOpen className="admin-sidebar-compact-expand absolute inset-0 m-auto opacity-0 transition-opacity" size={17} aria-hidden="true" />}
-          {!compact && <span className="admin-mobile-brand-label ml-1 block text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</span>}
+          {!compact && <span className="mt-1 block text-[length:var(--font-size-caption)] font-bold tracking-[.18em] text-muted">ADMIN</span>}
         </button>
 
         <button
@@ -293,7 +291,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
         </button>
         {sections.map(({ titleKey, items }) => (
           <section key={titleKey} aria-label={t(titleKey)}>
-            <h2 className="admin-sidebar-section-title sr-only">
+            <h2 className={`admin-sidebar-section-title mb-2 px-3 text-[length:var(--font-size-caption)] font-bold tracking-[.12em] text-muted ${compact ? "lg:sr-only" : ""}`}>
               {t(titleKey)}
             </h2>
             <div className="admin-sidebar-items space-y-1">
@@ -310,7 +308,6 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
                   <span className="admin-mobile-link-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                   <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
                   <span className="admin-sidebar-label truncate">{t(labelKey)}</span>
-                  <ChevronRight className="admin-mobile-link-chevron" size={15} aria-hidden="true" />
                 </NavLink>
               ))}
             </div>
@@ -318,62 +315,65 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
         ))}
       </nav>
 
-      <div data-admin-mobile-utilities="" className="admin-sidebar-mobile-tools space-y-3 border-t border-app bg-surface px-4 py-4 lg:hidden">
+      <div data-admin-mobile-utilities="" className="admin-sidebar-mobile-tools space-y-3 border-t border-app bg-[var(--color-surface-soft)] px-4 pb-5 pt-4 lg:hidden">
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold text-muted">{t("common.language")}</span>
-          <div className="flex items-center gap-2">
-            <Dropdown
-              key={isMobileOpen ? "mobile-open" : "mobile-closed"}
-              portal
-              scrollable={false}
-              ariaLabel={t("common.language")}
-              className="w-11 shrink-0"
-              contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
-              trigger={(
-                <span className="flex h-11 w-11 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)]">
-                  <span>{(i18n.language.slice(0, 2) || "ru").toUpperCase()}</span>
-                </span>
-              )}
-            >
-              {languages.map(({ code }) => {
-                const active = i18n.language.slice(0, 2) === code;
-                return (
-                  <button
-                    key={code}
-                    type="button"
-                    role="menuitemradio"
-                    aria-checked={active}
-                    data-action-id={`admin.sidebar.language.${code}`}
-                    onClick={() => changeLanguage(code)}
-                    className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${active ? "bg-[var(--color-surface-soft)] font-semibold text-app" : "text-app hover:bg-[var(--color-surface-soft)]"}`}
-                  >
-                    <span className="flex items-center gap-3"><span className="w-7 text-[11px] font-semibold tracking-wide text-muted">{code.toUpperCase()}</span>{languageLabels[code]}</span>
-                    {active && <Check size={16} className="text-primary-500" />}
-                  </button>
-                );
-              })}
-            </Dropdown>
+          <span className="text-xs font-semibold text-muted">{t("common.languageAndTheme")}</span>
+          <div className="flex min-w-0 items-center gap-2">
+        <Dropdown
+          key={isMobileOpen ? "mobile-open" : "mobile-closed"}
+          portal
+          className="w-11 shrink-0"
+          contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-2"
+          trigger={(
+            <span className="flex h-11 w-11 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)]">
+                <LanguageFlag locale={i18n.language.startsWith("uz") ? "uz" : i18n.language.startsWith("en") ? "en" : "ru"} />
+                <span className="sr-only">{t("common.language")}</span>
+            </span>
+          )}
+        >
+          {languages.map(({ code, name }) => {
+            const active = i18n.language.slice(0, 2) === code;
+            return (
+              <button
+                key={code}
+                type="button"
+                role="menuitemradio"
+                aria-checked={active}
+                data-action-id={`admin.sidebar.language.${code}`}
+                onClick={() => changeLanguage(code)}
+                className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${active ? "bg-[var(--color-surface-soft)] font-semibold text-app" : "text-app hover:bg-[var(--color-surface-soft)]"}`}
+              >
+                <span className="flex items-center gap-3"><LanguageFlag locale={code} />{name}</span>
+                {active && <Check size={16} className="text-primary-500" />}
+              </button>
+            );
+          })}
+        </Dropdown>
             <ThemeToggle />
           </div>
         </div>
-        <div>
-          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
+        <div className="grid grid-cols-2 gap-2">
+          <NavLink to="/notifications" onClick={onCloseMobile} className="flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
+            <Bell size={17} />{t("header.notifications")}
+          </NavLink>
+          <NavLink to="/profile" onClick={onCloseMobile} className="flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
+            <UserRound size={17} />{t("header.account")}
+          </NavLink>
+          <a href={siteUrl} target="_blank" rel="noopener noreferrer" onClick={onCloseMobile} className="col-span-2 flex min-h-11 items-center gap-2 border-b border-app px-1 text-sm font-medium text-app">
             <ExternalLink size={17} />{t("header.goToSite")}
           </a>
         </div>
       </div>
 
-      <div data-admin-drawer-footer="" className={`admin-sidebar-account flex shrink-0 items-center gap-3 border-t border-app px-4 py-3 ${compact ? "lg:flex-col lg:gap-1 lg:px-0 lg:py-2" : ""}`}>
-        <NavLink to="/profile" onClick={onCloseMobile} aria-label={`${t("header.account")}: ${user?.name || t("sidebar.admin")}`} className={`admin-account-profile flex min-w-0 flex-1 items-center gap-3 text-left transition-colors hover:text-primary-600 ${compact ? "lg:flex-col lg:gap-1" : ""}`}>
-          <span className="admin-account-avatar flex size-11 shrink-0 items-center justify-center bg-app text-xs font-bold text-app" aria-hidden="true">
-            {(user?.name || "A").slice(0, 1).toUpperCase()}
-          </span>
-          <span className={`admin-sidebar-account-details min-w-0 flex-1 ${compact ? "lg:hidden" : ""}`}>
-              <span className="block truncate text-sm font-semibold">{user?.name || t("sidebar.admin")}</span>
-              <span className="block truncate text-xs text-muted">{user?.adminRole || "ADMIN"}</span>
-          </span>
-        </NavLink>
-        <button type="button" onClick={logout} className="admin-logout flex size-11 shrink-0 items-center justify-center text-muted transition-colors hover:bg-red-500/10 hover:text-red-600" aria-label={t("sidebar.logout")} title={t("sidebar.logout")}>
+      <div data-admin-drawer-footer="" className="admin-sidebar-account flex shrink-0 items-center gap-3 border-t border-app px-4 py-3">
+        <div className="admin-account-avatar flex size-9 shrink-0 items-center justify-center bg-app text-xs font-bold text-app" aria-hidden="true">
+          {(user?.name || "A").slice(0, 1).toUpperCase()}
+        </div>
+        <div className={`admin-sidebar-account-details min-w-0 flex-1 ${compact ? "lg:hidden" : ""}`}>
+            <p className="truncate text-sm font-semibold">{user?.name || t("sidebar.admin")}</p>
+            <p className="truncate text-xs text-muted">{user?.adminRole || "ADMIN"}</p>
+        </div>
+        <button type="button" onClick={logout} className="admin-logout flex size-9 shrink-0 items-center justify-center text-muted transition-colors hover:bg-surface-soft hover:text-error" aria-label={t("sidebar.logout")} title={t("sidebar.logout")}>
           <LogOut size={17} />
         </button>
       </div>

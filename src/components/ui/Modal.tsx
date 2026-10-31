@@ -23,7 +23,7 @@ const sizeClasses = {
   md: 'max-w-lg',
   lg: 'max-w-2xl',
   xl: 'max-w-3xl',
-  '2xl': 'max-w-6xl',
+  '2xl': 'max-w-5xl',
 };
 
 export function Modal({
@@ -134,7 +134,7 @@ export function Modal({
               <div className="col-start-1 row-start-1 min-w-0">
                 <div className="min-w-0">
                   <h3 id={`${dialogId}-title`} className="text-base font-bold text-app truncate">{title}</h3>
-                  {subtitle && <p id={`${dialogId}-description`} className="text-xs text-muted truncate mt-0.5">{subtitle}</p>}
+                  {subtitle && <p id={`${dialogId}-description`} className="text-xs text-muted truncate mt-1">{subtitle}</p>}
                 </div>
               </div>
               {headerContent && (
@@ -145,7 +145,7 @@ export function Modal({
               <button
                 type="button"
                 onClick={onClose}
-                className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-gray-100 hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/5 cursor-pointer transition-colors ${
+                className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-soft hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/5 cursor-pointer transition-colors ${
                   headerContent ? 'col-start-2 row-start-1 sm:col-start-3 sm:justify-self-end' : 'col-start-2 row-start-1'
                 }`}
                 aria-label={closeLabel}

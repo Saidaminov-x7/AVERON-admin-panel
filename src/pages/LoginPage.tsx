@@ -239,44 +239,7 @@ const LoginPage: React.FC = () => {
         <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <div className="flex min-w-0 items-center gap-2">
             <span className="text-xl font-black tracking-[0.2em] text-app">AVERON</span>
-            <span className="bg-[var(--color-primary)] px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-on-primary)]">ADMIN</span>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <Dropdown
-              align="right"
-              ariaLabel={t('login.languageAccessibleName', {
-                language: LOGIN_LANGUAGES.find(({ code }) => i18n.language?.startsWith(code))?.label ?? LOGIN_LANGUAGES[0].label,
-              })}
-              trigger={(
-                <span className="inline-flex size-11 items-center justify-center rounded border border-app bg-surface text-app transition-colors hover:border-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
-                  <span aria-hidden="true" className="text-sm font-semibold tracking-wide">{i18n.language?.startsWith('uz') ? 'UZ' : i18n.language?.startsWith('en') ? 'EN' : 'RU'}</span>
-                </span>
-              )}
-              contentClassName="!w-[46px] min-w-0 p-0 border border-app rounded bg-surface shadow-xl"
-            >
-              {LOGIN_LANGUAGES.map(({ code, label }) => {
-                const active = i18n.language?.startsWith(code);
-                return (
-                  <button
-                    key={code}
-                    type="button"
-                    role="menuitemradio"
-                    aria-label={label}
-                    aria-checked={Boolean(active)}
-                    onClick={() => {
-                      void i18n.changeLanguage(code);
-                      localStorage.setItem('i18nextLng', code);
-                    }}
-                    className={`flex h-11 w-full items-center justify-center !gap-0 !px-0 rounded-sm text-xs font-medium transition-colors ${
-                      active ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] font-semibold' : 'text-app hover:bg-[var(--color-surface-soft)]'
-                    }`}
-                  >
-                    <span aria-hidden="true" className="text-xs font-bold tracking-wide">{code.toUpperCase()}</span>
-                  </button>
-                );
-              })}
-            </Dropdown>
-            <ThemeToggle />
+            <span className="bg-primary-500 px-2 py-1 text-[length:var(--font-size-caption)] font-bold uppercase tracking-widest text-white">ADMIN</span>
           </div>
         </div>
       </header>
@@ -310,12 +273,14 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* Форма */}
-        <div className={`card${step !== 'credentials' ? ' login-confirmation-card' : ''}`}>
+        <div className={step === 'credentials' ? 'card' : 'card border-2 border-app bg-surface'}>
           {step === 'credentials' ? (
             <form onSubmit={handleCredentialsSubmit} className="space-y-4">
               {/* Email */}
               <div>
-                <label htmlFor="login-email" className="block text-sm font-medium text-app mb-1.5">{t('login.emailLabel')}</label>
+                <label htmlFor="login-email" className="block text-sm font-medium text-app mb-2">
+                  Email
+                </label>
                 <input
                   id="login-email"
                   type="email"
@@ -330,7 +295,9 @@ const LoginPage: React.FC = () => {
 
               {/* Пароль */}
               <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-app mb-1.5">{t('login.passwordLabel')}</label>
+                <label htmlFor="login-password" className="block text-sm font-medium text-app mb-2">
+                  Пароль
+                </label>
                 <div className="relative">
                   <input
                     id="login-password"
@@ -345,9 +312,8 @@ const LoginPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-1 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-sm text-muted transition-colors hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                    aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
-                    aria-pressed={showPassword}
+                    className="absolute right-1 top-1/2 grid size-11 -translate-y-1/2 place-items-center text-muted hover:text-app transition-colors"
+                    tabIndex={-1}
                   >
                     {showPassword ? (
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -364,23 +330,23 @@ const LoginPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex w-full items-center justify-start text-sm">
-                <label htmlFor="remember-me" className="inline-flex min-h-11 items-center gap-2.5 cursor-pointer select-none text-app">
+              <div className="flex items-center text-sm">
+                <label className="flex min-h-11 items-center gap-2 cursor-pointer select-none text-app">
                   <input
                     type="checkbox"
                     id="remember-me"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="m-0 size-4 shrink-0 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+                    className="rounded border-line text-primary-600 focus:ring-primary-500 w-4 h-4 cursor-pointer"
                   />
                   <span className="inline-flex items-center text-xs leading-none text-muted transition-colors hover:text-app">{t('login.rememberMe')}</span>
                 </label>
               </div>
 
               {/* Ошибка */}
-              {errorText && (
-                <div role="alert" className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5">
+              {error && (
+                <div className="flex items-start gap-2 p-3 bg-surface-soft dark:bg-surface-soft border border-line dark:border-line rounded-lg text-sm text-error dark:text-error">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-1">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
                     <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -395,8 +361,8 @@ const LoginPage: React.FC = () => {
                 id="login-submit"
                 disabled={loading}
                 className="
-                  w-full py-2.5 px-4 rounded-lg font-medium text-sm text-[var(--color-on-primary)]
-                  bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] active:scale-[.99]
+                  w-full py-3 px-4 rounded-lg font-medium text-sm text-white
+                  bg-primary-500 hover:bg-primary-600 active:bg-primary-700
                   disabled:opacity-60 disabled:cursor-not-allowed
                   transition-all duration-150
                   flex items-center justify-center gap-2
@@ -423,14 +389,16 @@ const LoginPage: React.FC = () => {
                   </svg>
                 </div>
                 <div className="leading-tight">
-                  <p className="font-semibold text-sm mb-0.5">{t('login.telegramTwoFactor')}</p>
-                  <p className="opacity-90">{infoText || t('login.telegramCheckMessages')}</p>
+                  <p className="font-semibold text-sm mb-1">Telegram 2FA</p>
+                  <p className="opacity-90">{infoMessage || 'Проверьте сообщения в Telegram-боте'}</p>
                 </div>
               </div>
 
               {/* Поле ввода 6-значного кода */}
               <div>
-                <label htmlFor="2fa-code" className="block text-sm font-medium text-app mb-1.5">{t('login.verificationCodeLabel')}</label>
+                <label htmlFor="2fa-code" className="block text-sm font-medium text-app mb-2">
+                  6-значный код подтверждения
+                </label>
                 <input
                   ref={codeInputRef}
                   id="2fa-code"
@@ -448,9 +416,9 @@ const LoginPage: React.FC = () => {
               </div>
 
               {/* Ошибка */}
-              {errorText && (
-                <div role="alert" className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5">
+              {error && (
+                <div className="flex items-start gap-2 p-3 bg-surface-soft dark:bg-surface-soft border border-line dark:border-line rounded-lg text-sm text-error dark:text-error">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-1">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="12" y1="8" x2="12" y2="12" />
                     <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -465,8 +433,8 @@ const LoginPage: React.FC = () => {
                 id="verify-2fa-submit"
                 disabled={loading || twoFactorCode.length !== 6}
                 className="
-                  w-full py-2.5 px-4 rounded-lg font-medium text-sm text-[var(--color-on-primary)]
-                  bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] active:scale-[.99]
+                  w-full py-3 px-4 rounded-lg font-medium text-sm text-white
+                  bg-primary-500 hover:bg-primary-600 active:bg-primary-700
                   disabled:opacity-60 disabled:cursor-not-allowed
                   transition-all duration-150
                   flex items-center justify-center gap-2
@@ -509,8 +477,8 @@ const LoginPage: React.FC = () => {
                 {t('login.totpInstructions')}
               </div>
               <div>
-                <label htmlFor="totp-code" className="mb-1.5 block text-sm font-medium text-app">
-                  {t('login.totpCodeLabel')}
+                <label htmlFor="totp-code" className="mb-2 block text-sm font-medium text-app">
+                  Код подтверждения
                 </label>
                 <input
                   ref={codeInputRef}
@@ -525,11 +493,11 @@ const LoginPage: React.FC = () => {
                   className="input text-center font-mono font-bold tracking-widest"
                 />
               </div>
-              {errorText && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">{errorText}</div>}
+              {error && <div role="alert" className="rounded-lg border border-line bg-surface-soft p-3 text-sm text-error dark:border-line dark:bg-surface-soft dark:text-error">{error}</div>}
               <button
                 type="submit"
                 disabled={loading || twoFactorCode.trim().length < 6}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-[var(--color-on-primary)] transition-colors hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary-500 px-4 py-3 text-sm font-medium text-white transition-all hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? t('login.checking') : t('login.confirmAndSignIn')}
               </button>
