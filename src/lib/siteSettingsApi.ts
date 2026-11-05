@@ -35,7 +35,6 @@ export interface SiteSettings {
   oneIdAuthEnabled?: boolean;
   openTelemetryEnabled?: boolean;
   maintenancePasswordEnabled?: boolean;
-  maintenanceBypassPassword?: string | null;
   mobilePinchZoomEnabled?: boolean;
 
   updatedAt: string;
@@ -45,6 +44,20 @@ export interface SiteSettings {
   } | null;
 }
 
+export type SiteSettingsUpdatePayload = Partial<SiteSettings> & {
+  maintenanceBypassPassword?: string | null;
+};
+
+export function withMaintenanceBypassPasswordUpdate(
+  payload: Partial<SiteSettings>,
+  newPassword: string,
+): SiteSettingsUpdatePayload {
+  const trimmedPassword = newPassword.trim();
+  return trimmedPassword
+    ? { ...payload, maintenanceBypassPassword: trimmedPassword }
+    : payload;
+}
+
 // Получить текущие настройки
 export const getSiteSettingsApi = async (): Promise<SiteSettings> => {
   const { data } = await api.get('/admin/site-settings');
@@ -52,7 +65,7 @@ export const getSiteSettingsApi = async (): Promise<SiteSettings> => {
 };
 
 // Обновить настройки
-export const updateSiteSettingsApi = async (payload: Partial<SiteSettings>): Promise<SiteSettings> => {
+export const updateSiteSettingsApi = async (payload: SiteSettingsUpdatePayload): Promise<SiteSettings> => {
   const { data } = await api.patch('/admin/site-settings', payload);
   return data;
 };

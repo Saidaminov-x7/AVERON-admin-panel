@@ -19,6 +19,7 @@ import Layout from '../../components/Layout';
 import {
   getSiteSettingsApi,
   updateSiteSettingsApi,
+  withMaintenanceBypassPasswordUpdate,
   uploadSiteLogoApi,
   deleteSiteLogoApi,
   getMediaUrl,
@@ -66,7 +67,6 @@ const GeneralSettingsPage: React.FC = () => {
       setContactPhone(settings.contactPhone === '+998 71 200-00-00' ? '' : settings.contactPhone || '');
       setMaintenanceMode(settings.maintenanceMode ?? false);
       setMaintenanceMessage(settings.maintenanceMessage || '');
-      setMaintenanceBypassPassword((settings as any).maintenanceBypassPassword || '');
       setMaintenancePasswordEnabled((settings as any).maintenancePasswordEnabled ?? false);
       setMobilePinchZoomEnabled((settings as any).mobilePinchZoomEnabled ?? true);
       setMaxProductPhotos(settings.maxProductPhotos ?? 15);
@@ -125,19 +125,18 @@ const GeneralSettingsPage: React.FC = () => {
     e.preventDefault();
 
     // 1. Обновляем основные настройки и навигацию
-    await mutation.mutateAsync({
+    await mutation.mutateAsync(withMaintenanceBypassPasswordUpdate({
       siteName,
       contactEmail,
       contactPhone,
       maintenanceMode,
       maintenanceMessage: maintenanceMessage.trim() || null,
       maintenancePasswordEnabled,
-      maintenanceBypassPassword: maintenanceBypassPassword.trim() || null,
       mobilePinchZoomEnabled,
       maxProductPhotos,
       maxProductPhotoSizeMb,
       navLinks,
-    });
+    }, maintenanceBypassPassword));
 
     // 2. Загружаем логотип при наличии нового файла (если еще не отправлен)
     if (logoFile) {

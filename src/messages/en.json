@@ -504,7 +504,7 @@
     "maintenanceMsgPlaceholder": "Site is temporarily unavailable...",
     "requirePasswordMaintenance": "Require password during maintenance",
     "bypassPassword": "Bypass password",
-    "bypassPasswordHint": "Password allows access to the site during maintenance mode",
+    "bypassPasswordHint": "Leave blank to keep the current password. Enter a new password to replace it. Access works only while maintenance mode is on.",
     "logoTitle": "Platform Logo",
     "logoDesc": "Uploaded logo will be displayed in the site header",
     "logoAlt": "Logo",
