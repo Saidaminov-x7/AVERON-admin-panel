@@ -504,7 +504,7 @@
     "maintenanceMsgPlaceholder": "Sayt vaqtincha mavjud emas...",
     "requirePasswordMaintenance": "Texnik xizmat paytida parol talab qilish",
     "bypassPassword": "Chetlab o'tish paroli",
-    "bypassPasswordHint": "Parol texnik xizmat rejimida saytga kirishga imkon beradi",
+    "bypassPasswordHint": "Joriy parolni saqlash uchun maydonni bo‘sh qoldiring. Almashtirish uchun yangi parol kiriting. Parol orqali kirish faqat texnik xizmat vaqtida ishlaydi.",
     "logoTitle": "Platforma logotipi",
     "logoDesc": "Yuklangan logotip sayt sarlavhasida ko'rsatiladi",
     "logoAlt": "Logotip",
