@@ -6,7 +6,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Upload, Trash2, Save, Globe, Mail, Phone, Plus, AlertTriangle, Image as ImageIcon } from 'lucide-react';
 import Layout from '../../components/Layout';
-import { getSiteSettingsApi, updateSiteSettingsApi, withMaintenanceBypassPasswordUpdate, uploadSiteLogoApi, deleteSiteLogoApi, getMediaUrl } from '../../lib/siteSettingsApi';
+import {
+  getSiteSettingsApi,
+  updateSiteSettingsApi,
+  withMaintenanceBypassPasswordUpdate,
+  uploadSiteLogoApi,
+  deleteSiteLogoApi,
+  getMediaUrl,
+} from '../../lib/siteSettingsApi';
 import { Button, Input, Textarea, Switch, Card, Select } from '../../components/ui';
 import { useTranslation } from 'react-i18next';
 
