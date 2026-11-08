@@ -2,7 +2,7 @@ import { useRef } from "react";
 import type { ChangeEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import { Bold, Italic, List, Strikethrough } from "lucide-react";
-import { Input, Textarea } from "../../components/ui";
+import { Input, Textarea, Button } from "../../components/ui";
 
 const inlineElements = ["p", "strong", "em", "del", "br"] as const;
 const blockElements = ["p", "strong", "em", "del", "br", "ul", "ol", "li"] as const;
@@ -80,7 +80,7 @@ export function ProductRichTextField({
     labelText: string,
     icon: React.ReactNode,
   ) => (
-    <button
+    <Button
       key={format}
       type="button"
       aria-label={labelText}
@@ -89,7 +89,7 @@ export function ProductRichTextField({
       className="inline-flex size-11 items-center justify-center rounded-md border border-app bg-surface text-muted transition-colors hover:bg-surface-secondary hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:size-9"
     >
       {icon}
-    </button>
+    </Button>
   );
 
   return (

@@ -240,7 +240,7 @@ export default function OrdersPage() {
 
       <Modal isOpen={Boolean(selectedOrderNumber)} onClose={() => { setSelectedOrderNumber(null); setStatusNote(''); }} title={`${copy.detailsTitle} ${selectedOrderNumber ? `#${selectedOrderNumber}` : ''}`} size="xl">
         {selectedOrderQuery.isLoading ? <div role="status" className="py-8 text-center text-muted">{copy.loading}</div> : selectedOrderQuery.isError || !order ? (
-          <div role="alert" className="py-8 text-center text-red-500">{copy.error}<button type="button" onClick={() => void selectedOrderQuery.refetch()} className="ml-3 underline">{copy.retry}</button></div>
+          <div role="alert" className="py-8 text-center text-red-500">{copy.error}<Button type="button" onClick={() => void selectedOrderQuery.refetch()} className="ml-3 underline">{copy.retry}</Button></div>
         ) : (
           <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -368,9 +368,9 @@ export default function OrdersPage() {
                 </label>
                 <div className="flex flex-wrap justify-end gap-3">
                   {order.status === 'CREATED' && (
-                    <button type="button" disabled={statusMutation.isPending} onClick={() => setCancelPending(true)} className="btn-ghost text-red-600 disabled:opacity-50"><Ban size={16} className="mr-2 inline" />{copy.cancel}</button>
+                    <Button type="button" disabled={statusMutation.isPending} onClick={() => setCancelPending(true)} className="btn-ghost text-red-600 disabled:opacity-50"><Ban size={16} className="mr-2 inline" />{copy.cancel}</Button>
                   )}
-                  <button
+                  <Button
                     type="button"
                     ref={statusSubmitRef}
                     disabled={statusMutation.isPending || statusNote.length > 500}
@@ -385,7 +385,7 @@ export default function OrdersPage() {
                     className="btn-primary disabled:opacity-50"
                   >
                     <Check size={16} className="mr-2 inline" />{statusLabels[nextStatus][locale]}
-                  </button>
+                  </Button>
                 </div>
               </section>
             )}

@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useRef } from 'react';
+import { Button } from './Button';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -142,7 +143,7 @@ export function Modal({
                   {headerContent}
                 </div>
               )}
-              <button
+              <Button size="icon" variant="ghost"
                 type="button"
                 onClick={onClose}
                 className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-gray-100 hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:hover:bg-white/5 cursor-pointer transition-colors ${
@@ -151,7 +152,7 @@ export function Modal({
                 aria-label={closeLabel}
               >
                 <X size={18} />
-              </button>
+              </Button>
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">{children}</div>
             {footer && (

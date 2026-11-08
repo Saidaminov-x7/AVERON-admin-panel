@@ -6,12 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import { Button, Modal, Select } from '../../components/ui';
-import {
-  getStaffListApi,
-  addStaffApi,
-  updateStaffRoleApi,
-  revokeStaffApi,
-} from '../../lib/staffApi';
+import { getStaffListApi, addStaffApi, updateStaffRoleApi, revokeStaffApi } from '../../lib/staffApi';
 import { useAuthStore } from '../../store/authStore';
 import type { AdminRoleType } from '../../store/authStore';
 
@@ -133,7 +128,7 @@ const StaffPage: React.FC = () => {
               {t('staffPage.description')}
             </p>
           </div>
-          <button
+          <Button
             onClick={() => setIsAddModalOpen(true)}
             className="btn-primary flex items-center gap-2 flex-shrink-0"
           >
@@ -142,7 +137,7 @@ const StaffPage: React.FC = () => {
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
             {t('staffPage.addStaff')}
-          </button>
+          </Button>
         </div>
 
         {/* Таблица сотрудников */}
@@ -247,13 +242,13 @@ const StaffPage: React.FC = () => {
                           {isPrimarySuperAdmin || isSelf ? (
                             <span className="text-xs text-muted italic">—</span>
                           ) : (
-                            <button
+                            <Button
                               onClick={() => handleRevoke(staff.id, staff.name)}
                               disabled={revokeMutation.isPending}
                               className="text-xs text-red-600 dark:text-red-400 hover:underline font-medium cursor-pointer"
                             >
                               {t('staffPage.revokeAccess')}
-                            </button>
+                            </Button>
                           )}
                         </td>
                       </tr>

@@ -15,12 +15,23 @@ function tokenValue(block, name) {
   return block.match(new RegExp(`--${name}:\\s*([^;]+);`))?.[1].trim() ?? null;
 }
 
-const sharedTokens = ['radius-control', 'radius-xs', 'radius-sm', 'radius-md', 'radius-lg'];
+const sharedTokens = [
+  'layout-max-width', 'color-primary', 'color-action-bg', 'color-button-hover', 'color-on-action',
+  'color-bg', 'color-surface', 'color-surface-soft', 'color-image-surface', 'color-text',
+  'color-text-secondary', 'color-border', 'color-border-hover', 'color-muted', 'color-success',
+  'color-warning', 'color-error', 'color-info', 'radius-xs', 'radius-sm', 'radius-md',
+  'radius-lg', 'radius-card', 'radius-control', 'font-family',
+];
 const storefrontRoot = tokenBlock(storefrontCss, ':root');
 const adminRoot = tokenBlock(adminCss, ':root');
 const storefrontDark = tokenBlock(storefrontCss, ':root.dark');
 const adminDark = tokenBlock(adminCss, '.dark');
 const mismatches = [];
+
+if (!storefrontRoot || !adminRoot || !storefrontDark || !adminDark) {
+  console.error('FAIL: could not parse one or more storefront/admin light and dark token blocks.');
+  process.exit(1);
+}
 
 for (const name of sharedTokens) {
   const expected = tokenValue(storefrontRoot, name);
@@ -31,13 +42,9 @@ for (const name of sharedTokens) {
   if (darkActual !== darkExpected) mismatches.push(`dark --${name}: expected ${darkExpected}, got ${darkActual}`);
 }
 
-for (const [name, expected] of [['color-bg', '#111315'], ['color-surface', '#181b1f'], ['color-surface-soft', '#20242a']]) {
-  if (tokenValue(adminDark, name) !== expected) mismatches.push(`dark --${name}: expected ${expected}, got ${tokenValue(adminDark, name)}`);
-}
-
 if (mismatches.length) {
   console.error(mismatches.join('\n'));
   process.exitCode = 1;
 } else {
-  console.log(`PASS: ${sharedTokens.length} light/dark radius tokens and 3 dark palette tokens match storefront.`);
+  console.log(`PASS: ${sharedTokens.length} light/dark brand, typography, layout, and radius tokens match storefront.`);
 }

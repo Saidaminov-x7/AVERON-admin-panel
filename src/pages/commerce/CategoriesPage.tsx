@@ -6,14 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import { Button, Input, Modal, Select } from "../../components/ui";
-import {
-  archiveProductCategory,
-  createProductCategory,
-  getProductCategories,
-  updateProductCategory,
-  type ProductCategory,
-  type ProductLocale,
-} from "../../lib/commerceApi";
+import { archiveProductCategory, createProductCategory, getProductCategories, updateProductCategory, type ProductCategory, type ProductLocale } from "../../lib/commerceApi";
 import { uploadMediaApi } from "../../lib/mediaApi";
 
 type CategoryValues = {

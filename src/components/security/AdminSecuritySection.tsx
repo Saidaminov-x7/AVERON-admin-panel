@@ -3,14 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Modal } from '../ui';
-import {
-  disableAdminTotpApi,
-  enableAdminTotpApi,
-  getAdminTotpStatusApi,
-  regenerateAdminRecoveryCodesApi,
-  setupAdminTotpApi,
-  type AdminTotpSetup,
-} from '../../lib/authApi';
+import { disableAdminTotpApi, enableAdminTotpApi, getAdminTotpStatusApi, regenerateAdminRecoveryCodesApi, setupAdminTotpApi, type AdminTotpSetup } from '../../lib/authApi';
 
 type DialogMode = 'setup' | 'recovery' | 'regenerate' | 'disable' | null;
 

@@ -8,42 +8,11 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useDebounce } from '../hooks/useDebounce';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Search,
-  Download,
-  RotateCcw,
-  CheckSquare,
-  Square,
-  Users,
-  Eye,
-  Mail,
-  Phone,
-  Lock,
-  Unlock,
-  Trash2,
-} from 'lucide-react';
+import { Search, Download, RotateCcw, CheckSquare, Square, Users, Eye, Mail, Phone, Lock, Unlock, Trash2 } from 'lucide-react';
 import Layout from '../components/Layout';
 import { updateUserQueryParams } from './userQueryParams';
-import {
-  getAdminUsersApi,
-  blockUserApi,
-  unblockUserApi,
-  exportUsersApi,
-  deleteUserApi,
-  type UserRole,
-  type AdminUser,
-} from '../lib/usersApi';
-import {
-  Button,
-  Modal,
-  Input,
-  Select,
-  Textarea,
-  Pagination,
-  Badge,
-  ConfirmDialog,
-  EmptyState,
-} from '../components/ui';
+import { getAdminUsersApi, blockUserApi, unblockUserApi, exportUsersApi, deleteUserApi, type UserRole, type AdminUser } from '../lib/usersApi';
+import { Button, Modal, Input, Select, Textarea, Pagination, Badge, ConfirmDialog, EmptyState } from '../components/ui';
 
 export const UsersPage: React.FC = () => {
   const { t } = useTranslation();
@@ -413,7 +382,7 @@ export const UsersPage: React.FC = () => {
                 <thead className="bg-gray-50 dark:bg-white/5 border-b border-app text-muted font-bold">
                   <tr>
                     <th className="p-3.5 w-10">
-                      <button
+                      <Button
                         type="button"
                         aria-label={t('users.selectAllVisible')}
                         aria-pressed={selectedIds.length === users.length && users.length > 0}
@@ -425,7 +394,7 @@ export const UsersPage: React.FC = () => {
                         ) : (
                           <Square size={16} />
                         )}
-                      </button>
+                      </Button>
                     </th>
                     <th className="p-3.5">{t('users.name', 'Пользователь')}</th>
                     <th className="p-3.5">{t('users.phone', 'Контакты')}</th>
@@ -454,7 +423,7 @@ export const UsersPage: React.FC = () => {
                           }`}
                         >
                           <td className="p-3.5">
-                            <button
+                            <Button
                               type="button"
                               aria-label={t('users.selectUser', { name: user.name || user.id })}
                               aria-pressed={isSelected}
@@ -466,7 +435,7 @@ export const UsersPage: React.FC = () => {
                               ) : (
                                 <Square size={16} />
                               )}
-                            </button>
+                            </Button>
                           </td>
 
                           <td className="p-3.5">

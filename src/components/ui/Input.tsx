@@ -1,4 +1,5 @@
 import React, { forwardRef, useCallback, useId, useRef } from 'react';
+import { Button } from './Button';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useTranslation } from 'react-i18next';
@@ -84,7 +85,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {clearable && onClear && String(value ?? '').length > 0 && (
-            <button
+            <Button size="icon" variant="ghost"
               type="button"
               aria-label={t('common.clearField')}
               title={t('common.clearField')}
@@ -96,7 +97,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               className="absolute right-0 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-none bg-transparent text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 disabled:cursor-not-allowed"
             >
               <X size={16} aria-hidden="true" />
-            </button>
+            </Button>
           )}
           {rightIcon && (
               <div className={`absolute ${clearable && onClear && String(value ?? '').length > 0 ? 'right-11' : 'right-3'} flex items-center text-muted`}>

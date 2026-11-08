@@ -2,6 +2,7 @@
 // Верхняя панель — поиск, переключатели языка/темы и переход на сайт
 
 import React from 'react';
+import { Button } from '../ui/Button';
 import { useTranslation } from 'react-i18next';
 import ThemeToggle from '../ThemeToggle/ThemeToggle';
 import Dropdown from '../Dropdown/Dropdown';
@@ -52,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
       {/* Правая часть */}
       <div className="admin-header-actions ml-auto flex shrink-0 items-center gap-2">
         {onToggleMobileMenu && (
-          <button
+          <Button size="icon" variant="ghost"
             ref={mobileMenuTriggerRef}
             type="button"
             onClick={onToggleMobileMenu}
@@ -71,11 +72,11 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                 <line x1="4" x2="20" y1="18" y2="18" />
               </svg>
             )}
-          </button>
+          </Button>
         )}
         <div className="hidden items-center gap-1.5 lg:flex sm:gap-2">
         {/* Поиск / Command Palette */}
-        <button
+        <Button variant="ghost"
           type="button"
           onClick={() => window.dispatchEvent(new CustomEvent('open-command-palette'))}
           id="header-search-btn"
@@ -94,7 +95,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           <kbd className="ml-auto text-[11px] font-mono px-1.5 py-0.5 bg-gray-200 dark:bg-white/10 text-muted opacity-80 group-hover:opacity-100">
             ⌘K
           </kbd>
-        </button>
+        </Button>
 
         {/* Языковой переключатель (RU / UZ / EN) через кастомный Dropdown */}
         <Dropdown
@@ -115,7 +116,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
           ] as const).map((lang) => {
             const active = (i18n.language?.slice(0, 2) || 'ru') === lang.code;
             return (
-              <button
+              <Button variant="ghost"
                 key={lang.code}
                 type="button"
                 data-action-id={`admin.header.select-language.${lang.code}`}
@@ -131,7 +132,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                   <span className="w-7 text-[11px] font-semibold tracking-wide text-muted">{lang.code.toUpperCase()}</span>
                   {({ ru: 'Русский', uz: 'Oʻzbek', en: 'English' } as const)[lang.code]}
                 </span>
-              </button>
+              </Button>
             );
           })}
         </Dropdown>

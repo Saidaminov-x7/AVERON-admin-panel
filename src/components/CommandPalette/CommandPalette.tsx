@@ -1,5 +1,6 @@
 // src/components/CommandPalette/CommandPalette.tsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Button } from '../ui/Button';
 import { Command } from 'cmdk';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -212,7 +213,7 @@ export const CommandPalette: React.FC = () => {
               autoFocus
             />
             {query && (
-              <button
+              <Button size="icon" variant="ghost"
                 type="button"
                 aria-label={t('select.clear')}
                 title={t('select.clear')}
@@ -223,7 +224,7 @@ export const CommandPalette: React.FC = () => {
                 className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-none text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
                 <X size={16} aria-hidden="true" />
-              </button>
+              </Button>
             )}
             <kbd className="hidden sm:inline-block px-2 py-0.5 text-[11px] font-mono rounded bg-gray-100 dark:bg-white/10 text-muted border border-app">
               ESC

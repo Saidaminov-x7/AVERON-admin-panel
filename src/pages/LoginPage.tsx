@@ -259,7 +259,7 @@ const LoginPage: React.FC = () => {
               {LOGIN_LANGUAGES.map(({ code, label }) => {
                 const active = i18n.language?.startsWith(code);
                 return (
-                  <button
+                  <Button
                     key={code}
                     type="button"
                     role="menuitemradio"
@@ -274,7 +274,7 @@ const LoginPage: React.FC = () => {
                     }`}
                   >
                     <span aria-hidden="true" className="text-xs font-bold tracking-wide">{code.toUpperCase()}</span>
-                  </button>
+                  </Button>
                 );
               })}
             </Dropdown>
@@ -344,7 +344,7 @@ const LoginPage: React.FC = () => {
                     autoComplete="current-password"
                     className="input pr-11"
                   />
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-1 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-sm text-muted transition-colors hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
@@ -362,7 +362,7 @@ const LoginPage: React.FC = () => {
                         <circle cx="12" cy="12" r="3" />
                       </svg>
                     )}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -475,22 +475,22 @@ const LoginPage: React.FC = () => {
 
               {/* Повторная отправка и назад */}
               <div className="flex items-center justify-between pt-2 text-xs">
-                <button
+                <Button
                   type="button"
                   onClick={handleBackToLogin}
                   className="text-muted hover:text-app transition-colors"
                 >
                   {t('login.backToPassword')}
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="button"
                   onClick={handleResendCode}
                   disabled={resendCooldown > 0 || loading}
                   className="text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {resendCooldown > 0 ? t('login.resendCountdown', { seconds: resendCooldown }) : t('login.resendCode')}
-                </button>
+                </Button>
               </div>
             </form>
           ) : (
@@ -523,9 +523,9 @@ const LoginPage: React.FC = () => {
               >
                 {loading ? t('login.checking') : t('login.confirmAndSignIn')}
               </Button>
-              <button type="button" onClick={handleBackToLogin} className="w-full pt-2 text-xs text-muted transition-colors hover:text-app">
+              <Button type="button" onClick={handleBackToLogin} className="w-full pt-2 text-xs text-muted transition-colors hover:text-app">
                 {t('login.backToPassword')}
-              </button>
+              </Button>
             </form>
           )}
         </div>

@@ -3,17 +3,10 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Layout from '../../components/Layout';
 import { Container } from '../../components/ui/Container';
+import { Button } from '../../components/ui/Button';
 import { getVisitorsStatsApi } from '../../lib/analyticsApi';
 
 const TrafficAnalyticsPage: React.FC = () => {
@@ -34,7 +27,7 @@ const TrafficAnalyticsPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {[7, 14, 30, 60, 90].map((d) => (
-              <button
+              <Button
                 key={d}
                 onClick={() => setDays(d)}
                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
@@ -44,7 +37,7 @@ const TrafficAnalyticsPage: React.FC = () => {
                 }`}
               >
                 {d} дней
-              </button>
+              </Button>
             ))}
           </div>
 

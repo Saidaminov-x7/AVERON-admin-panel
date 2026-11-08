@@ -2,6 +2,7 @@
 // Страница расширенной аналитики с поддержкой произвольного диапазона дат
 
 import React, { useState } from 'react';
+import { Button } from '../components/ui/Button';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -95,7 +96,7 @@ const AnalyticsPage: React.FC = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
             {PERIODS.map((p) => (
-              <button
+              <Button
                 key={p.value}
                 onClick={() => setPeriodDays(p.value)}
                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${periodDays === p.value
@@ -104,7 +105,7 @@ const AnalyticsPage: React.FC = () => {
                   }`}
               >
                 {p.label}
-              </button>
+              </Button>
             ))}
 
             {isCustom && (
@@ -129,7 +130,7 @@ const AnalyticsPage: React.FC = () => {
             )}
           </div>
 
-          <button
+          <Button
             type="button"
             onClick={() => void exportReport()}
             disabled={isExporting}
@@ -141,19 +142,19 @@ const AnalyticsPage: React.FC = () => {
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
             {isExporting ? t('analyticsPage.exporting') : t('analyticsPage.exportCsv')}
-          </button>
+          </Button>
         </div>
         {exportError && <p role="alert" className="text-sm text-red-600">{t('analyticsPage.exportError')}</p>}
         {isError && (
           <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">
             <span>{t('analyticsPage.loadError')}</span>
-            <button type="button" className="underline" onClick={() => void refetch()}>{t('analyticsPage.retry')}</button>
+            <Button variant="link" type="button" className="underline" onClick={() => void refetch()}>{t('analyticsPage.retry')}</Button>
           </div>
         )}
         {isJourneyError && (
           <div role="alert" className="flex flex-wrap items-center justify-between gap-3 border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-700">
             <span>{t('analyticsPage.journeyLoadError')}</span>
-            <button type="button" className="underline" onClick={() => void refetchJourney()}>{t('analyticsPage.retry')}</button>
+            <Button variant="link" type="button" className="underline" onClick={() => void refetchJourney()}>{t('analyticsPage.retry')}</Button>
           </div>
         )}
 
@@ -335,7 +336,7 @@ const AnalyticsPage: React.FC = () => {
         {isFunnelError ? (
           <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">
             <span>{t('analyticsPage.funnelError')}</span>
-            <button type="button" className="underline" onClick={() => void refetchFunnel()}>{t('analyticsPage.retry')}</button>
+            <Button variant="link" type="button" className="underline" onClick={() => void refetchFunnel()}>{t('analyticsPage.retry')}</Button>
           </div>
         ) : funnel && (
           <div className="card">

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Button } from '../ui/Button';
 import { createPortal } from 'react-dom';
 import { getDropdownPosition } from './dropdownPosition';
 
@@ -119,7 +120,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   return (
     <div className={`relative ${className}`} ref={rootRef}>
-      <button
+      <Button size="icon" variant="ghost"
         ref={triggerRef}
         type="button"
         aria-label={ariaLabel}
@@ -136,7 +137,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         className="w-full"
       >
         {trigger}
-      </button>
+      </Button>
 
       {isOpen && (() => {
         const panel = (

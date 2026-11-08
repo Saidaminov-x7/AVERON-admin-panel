@@ -135,7 +135,7 @@ const WebhooksPage: React.FC = () => {
                       </td>
                       <td className="p-3 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          <button
+                          <Button
                             type="button"
                             onClick={() => handleTestWebhook(w.id)}
                             disabled={testingId === w.id}
@@ -143,15 +143,15 @@ const WebhooksPage: React.FC = () => {
                             title="Тестовая отправка пинга"
                           >
                             {testingId === w.id ? 'Отправка...' : 'Тест'}
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
                             onClick={() => deleteMutation.mutate(w.id)}
                             className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                             title={t('common.delete', 'Удалить')}
                           >
                             <Trash2 size={15} />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>

@@ -5,36 +5,10 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import {
-  Image as ImageIcon,
-  Copy,
-  Trash2,
-  ExternalLink,
-  Plus,
-  Grid,
-  List,
-  RotateCcw,
-  Check,
-  CheckSquare,
-  Square,
-} from 'lucide-react';
+import { Image as ImageIcon, Copy, Trash2, ExternalLink, Plus, Grid, List, RotateCcw, Check, CheckSquare, Square } from 'lucide-react';
 import Layout from '../components/Layout';
-import {
-  getMediaListApi,
-  uploadMediaApi,
-  deleteMediaApi,
-  type MediaItem,
-} from '../lib/mediaApi';
-import {
-  Button,
-  Modal,
-  Pagination,
-  EmptyState,
-  ConfirmDialog,
-  FileUpload,
-  Badge,
-  Card,
-} from '../components/ui';
+import { getMediaListApi, uploadMediaApi, deleteMediaApi, type MediaItem } from '../lib/mediaApi';
+import { Button, Modal, Pagination, EmptyState, ConfirmDialog, FileUpload, Badge, Card } from '../components/ui';
 
 export const MediaLibraryPage: React.FC = () => {
   const { t } = useTranslation();
@@ -167,7 +141,7 @@ export const MediaLibraryPage: React.FC = () => {
         {/* Toolbar: Bulk actions, view modes & select all */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-3 rounded-2xl bg-surface border border-app shadow-xs">
           <div className="flex items-center gap-3">
-            <button
+            <Button
               type="button"
               onClick={handleSelectAll}
               className="flex items-center gap-2 text-xs font-semibold text-app hover:text-primary-600 cursor-pointer"
@@ -178,7 +152,7 @@ export const MediaLibraryPage: React.FC = () => {
                 <Square size={16} className="text-muted" />
               )}
               <span>{t('media.selectAll', 'Выбрать все')} ({items.length})</span>
-            </button>
+            </Button>
 
             {selectedIds.length > 0 && (
               <Button
@@ -193,7 +167,7 @@ export const MediaLibraryPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1.5 self-end sm:self-auto">
-            <button
+            <Button
               type="button"
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-xl border transition-colors ${
@@ -204,8 +178,8 @@ export const MediaLibraryPage: React.FC = () => {
               title={t('media.gridView', 'Сетка')}
             >
               <Grid size={16} />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-xl border transition-colors ${
@@ -216,7 +190,7 @@ export const MediaLibraryPage: React.FC = () => {
               title={t('media.listView', 'Список')}
             >
               <List size={16} />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -249,7 +223,7 @@ export const MediaLibraryPage: React.FC = () => {
                   }`}
                 >
                   {/* Select Checkbox */}
-                  <button
+                  <Button
                     type="button"
                     aria-label={t('media.selectFile', { id: item.id })}
                     aria-pressed={isSelected}
@@ -264,7 +238,7 @@ export const MediaLibraryPage: React.FC = () => {
                     ) : (
                       <Square size={14} />
                     )}
-                  </button>
+                  </Button>
 
                   {/* Thumbnail Image */}
                   <div
@@ -283,7 +257,7 @@ export const MediaLibraryPage: React.FC = () => {
                   <div className="p-2 flex items-center justify-between text-[11px] text-muted border-t border-app">
                     <span className="truncate">{formatFileSize(item.size)}</span>
                     <div className="flex items-center gap-1">
-                      <button
+                      <Button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -293,8 +267,8 @@ export const MediaLibraryPage: React.FC = () => {
                         title={t('media.copyLink', 'Скопировать ссылку')}
                       >
                         {isCopied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -304,7 +278,7 @@ export const MediaLibraryPage: React.FC = () => {
                         title={t('common.delete', 'Удалить')}
                       >
                         <Trash2 size={12} />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -320,7 +294,7 @@ export const MediaLibraryPage: React.FC = () => {
                 className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors gap-4"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <button
+                  <Button
                     type="button"
                     aria-label={t('media.selectFile', { id: item.id })}
                     aria-pressed={selectedIds.includes(item.id)}
@@ -332,7 +306,7 @@ export const MediaLibraryPage: React.FC = () => {
                     ) : (
                       <Square size={16} />
                     )}
-                  </button>
+                  </Button>
                   <img
                     src={item.url}
                     alt=""

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from '../../components/ui';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Eye, Send } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -108,14 +109,14 @@ export function TelegramPublicationPanel({
             <p className="mt-1 text-xs text-muted">{t(`products.telegram.status.${statusKey}`)}</p>
           )}
         </div>
-        <button
+        <Button
           type="button"
           onClick={() => setIsExpanded((open) => !open)}
           aria-expanded={isExpanded}
           className="btn-ghost inline-flex min-h-10 items-center gap-2 text-sm"
         >
           <Eye size={15} />{t("products.telegram.preview")}
-        </button>
+        </Button>
       </div>
 
       {publication?.publishedAt && (
@@ -165,14 +166,14 @@ export function TelegramPublicationPanel({
             />
           </label>
           <p className="text-xs text-muted">{t("products.telegram.canonicalDataHint")}</p>
-          <button
+          <Button
             type="button"
             onClick={() => previewMutation.mutate()}
             disabled={previewMutation.isPending || statusQuery.isLoading || statusQuery.isError}
             className="btn-secondary inline-flex min-h-10 items-center gap-2 text-sm"
           >
             <Eye size={15} />{previewMutation.isPending ? t("products.telegram.previewLoading") : t("products.telegram.preview")}
-          </button>
+          </Button>
           {previewMutation.isError && (
             <p role="alert" className="text-sm text-red-700 dark:text-red-300">{t("products.telegram.previewError")}</p>
           )}
@@ -188,7 +189,7 @@ export function TelegramPublicationPanel({
               </div>
             </article>
           )}
-          <button
+          <Button
             type="button"
             onClick={() => publishMutation.mutate()}
             disabled={
@@ -210,7 +211,7 @@ export function TelegramPublicationPanel({
               : publication?.status === "FAILED"
                 ? t("products.telegram.retry")
                 : t("products.telegram.publish")}
-          </button>
+          </Button>
           {publishMutation.isError && (
             <p role="alert" className="text-sm text-red-700 dark:text-red-300">
               {t("products.telegram.publishError")}

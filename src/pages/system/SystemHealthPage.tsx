@@ -1,5 +1,6 @@
 // src/pages/system/SystemHealthPage.tsx
 import React from 'react';
+import { Button } from '../../components/ui/Button';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
@@ -28,14 +29,14 @@ const SystemHealthPage: React.FC = () => {
           <p className="text-xs sm:text-sm text-muted">
             {t('system.healthSubtitle', 'Статус критических сервисов бэкенда, latency базы данных PostgreSQL, Redis и потребление оперативной памяти.')}
           </p>
-          <button
+          <Button
             type="button"
             onClick={() => refetch()}
             disabled={isFetching}
             className="btn btn-secondary flex items-center gap-2 disabled:opacity-60"
           >
             <RefreshCw size={16} className={isFetching ? 'animate-spin' : ''} /> {t('common.refresh', 'Обновить')}
-          </button>
+          </Button>
         </div>
 
         {isError && (

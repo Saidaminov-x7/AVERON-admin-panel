@@ -4,6 +4,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../hooks/useTheme';
+import { IconButton } from '../ui/Button';
 
 const SunIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -30,10 +31,11 @@ const ThemeToggle: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <button
+    <IconButton
+      variant="outline"
+      label={isDark ? t('header.switchToLightTheme') : t('header.switchToDarkTheme')}
       data-action-id="admin.theme.toggle"
       onClick={toggleTheme}
-      aria-label={isDark ? t('header.switchToLightTheme') : t('header.switchToDarkTheme')}
       title={isDark ? t('header.lightTheme') : t('header.darkTheme')}
       className={`
         relative flex h-11 w-11 items-center justify-center rounded-theme border border-app
@@ -42,7 +44,7 @@ const ThemeToggle: React.FC = () => {
       `}
     >
       {isDark ? <SunIcon /> : <MoonIcon />}
-    </button>
+    </IconButton>
   );
 };
 

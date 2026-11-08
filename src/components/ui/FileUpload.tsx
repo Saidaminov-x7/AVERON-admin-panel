@@ -131,7 +131,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 )}
                 <span className="text-[11px] font-medium text-app truncate w-full">{file.name}</span>
                 <span className="text-[10px] text-muted">{(file.size / 1024 / 1024).toFixed(2)} МБ</span>
-                <button
+                <Button variant="ghost"
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -140,7 +140,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                   className="absolute top-1.5 right-1.5 p-1 rounded-md bg-black/60 hover:bg-black text-white transition-colors"
                 >
                   <X size={12} />
-                </button>
+                </Button>
               </div>
             ))}
           </div>

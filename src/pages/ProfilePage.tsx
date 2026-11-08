@@ -7,12 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useAuthStore } from '../store/authStore';
-import {
-  getProfileApi,
-  updateProfileApi,
-  changePasswordApi,
-  uploadMediaApi,
-} from '../lib/profileApi';
+import { getProfileApi, updateProfileApi, changePasswordApi, uploadMediaApi } from '../lib/profileApi';
 import { logoutApi } from '../lib/authApi';
 import { AdminSecuritySection } from '../components/security/AdminSecuritySection';
 import { Button } from '../components/ui/Button';

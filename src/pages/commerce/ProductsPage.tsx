@@ -7,33 +7,11 @@ import { useLocation, useNavigate, useParams, useSearchParams } from "react-rout
 import Layout from "../../components/Layout";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { Button, Input, Pagination, Select } from "../../components/ui";
-import {
-  createManualProduct,
-  archiveProduct,
-  deleteProductPermanently,
-  restoreProduct,
-  getProductCategories,
-  getProductCountryDisplay,
-  getProducts,
-  isProductCountry,
-  publishProductToTelegram,
-  PRODUCT_COUNTRIES,
-  updateManualProduct,
-  type ProductCountry,
-  type ProductListItem,
-  type ProductPayload,
-  type ProductSource,
-  type ProductUpdatePayload,
-} from "../../lib/commerceApi";
+import { createManualProduct, archiveProduct, deleteProductPermanently, restoreProduct, getProductCategories, getProductCountryDisplay, getProducts, isProductCountry, publishProductToTelegram, PRODUCT_COUNTRIES, updateManualProduct, type ProductCountry, type ProductListItem, type ProductPayload, type ProductSource, type ProductUpdatePayload } from "../../lib/commerceApi";
 import { deleteUnattachedMediaApi, uploadProductPhotoApi } from "../../lib/mediaApi";
 import { getSiteSettingsApi } from "../../lib/siteSettingsApi";
 import { ProductFormModal, type ProductFormSubmission } from "./ProductFormModal";
-import {
-  formatCatalogPublishedAt,
-  getCatalogCategoryName,
-  getCatalogProductTitle,
-  toCatalogLocale,
-} from "./productCatalogPresentation";
+import { formatCatalogPublishedAt, getCatalogCategoryName, getCatalogProductTitle, toCatalogLocale } from "./productCatalogPresentation";
 
 const ALL_COUNTRIES = "ALL" as const;
 
@@ -470,9 +448,9 @@ export default function ProductsPage() {
       ) : isError && !data ? (
         <div className="card flex flex-wrap items-center justify-between gap-3 text-muted">
           <p>{t("products.loadError")}</p>
-          <button type="button" onClick={() => void refetch()} className="btn-ghost">
+          <Button type="button" onClick={() => void refetch()} className="btn-ghost">
             {t("common.refresh")}
-          </button>
+          </Button>
         </div>
       ) : products.length ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -543,22 +521,22 @@ export default function ProductsPage() {
                     </p>
                   ) : null}
                   <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-app pt-3">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => navigate(`/products/edit/${encodeURIComponent(product.slug)}`)}
                       className="btn-ghost inline-flex items-center gap-2 text-sm"
                     >
                       <Pencil size={14} />
                       {t("products.editProduct")}
-                    </button>
+                    </Button>
                     {product.status === "ARCHIVED" ? (
-                      <button type="button" disabled={restoreMutation.isPending} onClick={() => restoreMutation.mutate(product.id)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-app px-3 text-xs font-semibold hover:bg-app disabled:opacity-50"><RotateCcw size={14} />{t("products.restoreProduct")}</button>
+                      <Button type="button" disabled={restoreMutation.isPending} onClick={() => restoreMutation.mutate(product.id)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-app px-3 text-xs font-semibold hover:bg-app disabled:opacity-50"><RotateCcw size={14} />{t("products.restoreProduct")}</Button>
                     ) : (
-                      <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate(product.id)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-app px-3 text-xs font-semibold hover:bg-app disabled:opacity-50"><Archive size={14} />{t("products.archiveProduct")}</button>
+                      <Button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate(product.id)} className="inline-flex h-9 items-center gap-2 rounded-lg border border-app px-3 text-xs font-semibold hover:bg-app disabled:opacity-50"><Archive size={14} />{t("products.archiveProduct")}</Button>
                     )}
-                    <button type="button" disabled={permanentDeleteMutation.isPending} onClick={() => {
+                    <Button type="button" disabled={permanentDeleteMutation.isPending} onClick={() => {
                       if (window.confirm(t("products.deleteProductConfirm", { title }))) permanentDeleteMutation.mutate(product.id);
-                    }} className="inline-flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50" aria-label={t("products.deleteProductLabel", { title })}><Trash2 size={15} /></button>
+                    }} className="inline-flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50" aria-label={t("products.deleteProductLabel", { title })}><Trash2 size={15} /></Button>
                   </div>
                 </div>
               </article>
@@ -596,7 +574,7 @@ export default function ProductsPage() {
       ) : null}
       {isEditorRoute && identifier && editorProductQuery.isError ? (
         <div className="card flex flex-wrap items-center justify-between gap-3" role="alert">
-          <div className="card">{t("products.loadError")} <button type="button" onClick={() => navigate("/products")} className="btn-ghost">{t("common.back")}</button></div>
+          <div className="card">{t("products.loadError")} <Button type="button" onClick={() => navigate("/products")} className="btn-ghost">{t("common.back")}</Button></div>
         </div>
       ) : null}
       {isFormOpen && (

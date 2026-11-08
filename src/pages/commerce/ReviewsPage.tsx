@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
 import { api } from '../../lib/axios';
 
@@ -122,12 +123,12 @@ export default function ReviewsPage() {
               containerClassName="min-w-0 flex-1"
               className="font-normal"
             />
-            <button type="submit" className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-l-0 border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" aria-label={t('commerceReviews.search')}><Search size={17} /></button>
+            <Button type="submit" className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-l-0 border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" aria-label={t('commerceReviews.search')}><Search size={17} /></Button>
           </form>
         </section>
 
         {query.isLoading ? <p role="status" className="py-10 text-center">{t('commerceReviews.loading')}</p>
-          : query.isError ? <div role="alert" className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-rose-900">{t('commerceReviews.loadError')} <button type="button" onClick={() => void query.refetch()} className="ml-2 inline-flex min-h-9 items-center gap-2 rounded border border-current px-3"><RefreshCw size={15} />{t('common.refresh')}</button></div>
+          : query.isError ? <div role="alert" className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-rose-900">{t('commerceReviews.loadError')} <Button type="button" onClick={() => void query.refetch()} className="ml-2 inline-flex min-h-9 items-center gap-2 rounded border border-current px-3"><RefreshCw size={15} />{t('common.refresh')}</Button></div>
             : query.data?.items.length ? (
               <div className="space-y-3">
                 {query.data.items.map((review) => (
@@ -156,8 +157,8 @@ export default function ReviewsPage() {
                     </li>)}</ul>}
                     {review.moderatedAt && <p className="mt-2 text-xs text-muted">{t('commerceReviews.moderated')}: {dateLabel(review.moderatedAt)}</p>}
                     {(review.status === 'PENDING' || review.status === 'PUBLISHED') && <div className="mt-4 flex flex-wrap gap-2 border-t border-app pt-3">
-                      {review.status === 'PENDING' && <button type="button" disabled={moderation.isPending} onClick={() => moderation.mutate({ id: review.id, nextStatus: 'PUBLISHED' })} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-emerald-700 px-4 text-sm font-bold text-white hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:opacity-50"><Check size={16} />{t('commerceReviews.publish')}</button>}
-                      <button type="button" disabled={moderation.isPending} onClick={() => moderation.mutate({ id: review.id, nextStatus: 'REJECTED' })} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-rose-300 px-4 text-sm font-bold text-rose-800 hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 disabled:opacity-50"><X size={16} />{t('commerceReviews.reject')}</button>
+                      {review.status === 'PENDING' && <Button type="button" disabled={moderation.isPending} onClick={() => moderation.mutate({ id: review.id, nextStatus: 'PUBLISHED' })} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-emerald-700 px-4 text-sm font-bold text-white hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:opacity-50"><Check size={16} />{t('commerceReviews.publish')}</Button>}
+                      <Button type="button" disabled={moderation.isPending} onClick={() => moderation.mutate({ id: review.id, nextStatus: 'REJECTED' })} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-rose-300 px-4 text-sm font-bold text-rose-800 hover:bg-rose-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 disabled:opacity-50"><X size={16} />{t('commerceReviews.reject')}</Button>
                     </div>}
                   </article>
                 ))}
@@ -165,9 +166,9 @@ export default function ReviewsPage() {
             ) : <p className="rounded-xl border border-app p-8 text-center text-sm text-muted">{t('commerceReviews.empty')}</p>}
 
         {(query.data?.pagination.pages ?? 0) > 1 && <nav className="flex items-center justify-center gap-3" aria-label={t('commerceReviews.pagination')}>
-          <button type="button" disabled={page <= 1} onClick={() => setPage((value) => value - 1)} className="min-h-10 rounded-lg border border-app px-3 disabled:opacity-40">{t('common.back')}</button>
+          <Button type="button" disabled={page <= 1} onClick={() => setPage((value) => value - 1)} className="min-h-10 rounded-lg border border-app px-3 disabled:opacity-40">{t('common.back')}</Button>
           <span className="text-sm">{t('common.page')} {page} / {query.data?.pagination.pages}</span>
-          <button type="button" disabled={page >= (query.data?.pagination.pages ?? 1)} onClick={() => setPage((value) => value + 1)} className="min-h-10 rounded-lg border border-app px-3 disabled:opacity-40">{t('common.next')}</button>
+          <Button type="button" disabled={page >= (query.data?.pagination.pages ?? 1)} onClick={() => setPage((value) => value + 1)} className="min-h-10 rounded-lg border border-app px-3 disabled:opacity-40">{t('common.next')}</Button>
         </nav>}
       </main>
     </Layout>

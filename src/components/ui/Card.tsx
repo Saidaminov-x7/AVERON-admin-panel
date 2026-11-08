@@ -28,16 +28,16 @@ export const Card: React.FC<CardProps> = ({
   }[padding];
 
   const variantStyles = {
-    default: 'bg-surface border border-app shadow-xs',
-    flat: 'bg-surface/50 border-0',
+    default: 'bg-surface border border-app',
+    flat: 'bg-surface border-0',
     bordered: 'bg-surface border border-app',
-    elevated: 'bg-surface border border-app shadow-md hover:shadow-lg transition-shadow',
+    elevated: 'bg-surface border border-app shadow-sm',
   }[variant];
 
   return (
     <div
       className={twMerge(
-        clsx('rounded-theme font-theme transition-colors', variantStyles, paddingStyles),
+        clsx('rounded-[var(--radius-card)] font-theme transition-colors', variantStyles, paddingStyles),
         className,
       )}
       {...props}
