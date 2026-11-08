@@ -25,11 +25,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <div
       className={twMerge(
-        'flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-2xl border border-dashed border-app bg-surface/50',
+        'flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-none border border-dashed border-app bg-surface',
         className,
       )}
     >
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-muted mb-4 shadow-xs">
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-none bg-[var(--color-surface-soft)] text-muted">
         {icon || <Inbox size={28} strokeWidth={1.5} />}
       </div>
       <h3 className="text-base font-bold text-app">{title}</h3>
@@ -44,7 +44,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           size="sm"
           onClick={onAction}
           icon={actionIcon}
-          className="mt-2 shadow-xs"
+          className="mt-2"
         >
           {actionLabel}
         </Button>

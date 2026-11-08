@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from '../components/ui/Button';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Layout from '../components/Layout';
 import { Select } from '../components/ui/Select';
@@ -100,7 +101,7 @@ const SettingsPage: React.FC = () => {
             </div>
             {/* Toggle switch */}
             {!isLoading && (
-              <button
+              <Button
                 id="maintenance-toggle"
                 onClick={() => setMaintenanceMode((v) => !v)}
                 className={`
@@ -114,7 +115,7 @@ const SettingsPage: React.FC = () => {
                   inline-block w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200
                   ${maintenanceMode ? 'translate-x-6' : 'translate-x-0.5'}
                 `}/>
-              </button>
+              </Button>
             )}
           </div>
 
@@ -148,7 +149,7 @@ const SettingsPage: React.FC = () => {
 
           {/* Кнопка сохранения */}
           <div className="flex items-center gap-3 mt-4">
-            <button
+            <Button
               id="save-settings-btn"
               onClick={handleSave}
               disabled={mutation.isPending}
@@ -163,7 +164,7 @@ const SettingsPage: React.FC = () => {
                   Сохранение...
                 </>
               ) : 'Сохранить настройки'}
-            </button>
+            </Button>
             {saved && (
               <span className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                 ✓ Сохранено!
@@ -198,13 +199,13 @@ const SettingsPage: React.FC = () => {
                   alt="Логотип"
                   className="h-16 w-auto rounded-lg border border-app object-contain"
                 />
-                <button
+                <Button
                   onClick={handleDeleteLogo}
                   disabled={deleteLogoMutation.isPending}
                   className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center text-xs hover:bg-red-600 disabled:opacity-50"
                 >
                   ×
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="h-16 w-32 rounded-lg border border-app flex items-center justify-center text-muted text-sm">
@@ -224,13 +225,13 @@ const SettingsPage: React.FC = () => {
               Выбрать файл
             </label>
             {logoFile && (
-              <button
+              <Button
                 onClick={handleUploadLogo}
                 disabled={uploadLogoMutation.isPending}
                 className="btn-primary disabled:opacity-50"
               >
                 {uploadLogoMutation.isPending ? 'Загрузка...' : 'Загрузить логотип'}
-              </button>
+              </Button>
             )}
           </div>
           {uploadLogoMutation.isError && (
@@ -281,7 +282,7 @@ const SettingsPage: React.FC = () => {
                   className="text-sm"
                   containerClassName="w-28"
                 />
-                <button
+                <Button
                   onClick={() => {
                     const newLinks = [...navLinks];
                     newLinks.splice(index, 1);
@@ -296,19 +297,19 @@ const SettingsPage: React.FC = () => {
                     <path d="M14 11v6" />
                     <path d="M9 6V4h6v2" />
                   </svg>
-                </button>
+                </Button>
               </div>
             ))}
 
             {navLinks.length < 10 && (
-              <button
+              <Button
                 onClick={() => {
                   setNavLinks([...navLinks, { label: '', href: '', position: 'header' }]);
                 }}
                 className="w-full min-h-11 p-2 text-sm text-app hover:bg-[var(--color-surface-soft)] hover:text-app rounded-none border border-dashed border-app transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
                 + Добавить ссылку
-              </button>
+              </Button>
             )}
           </div>
         </div>

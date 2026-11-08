@@ -8,6 +8,8 @@ import { useAuthStore } from '../store/authStore';
 import { loginApi, verify2faApi, resend2faApi, verifyAdminTotpLoginApi } from '../lib/authApi';
 import Dropdown from '../components/Dropdown/Dropdown';
 import ThemeToggle from '../components/ThemeToggle/ThemeToggle';
+import { Button } from '../components/ui/Button';
+import { Container } from '../components/ui/Container';
 
 const REMEMBER_EMAIL_KEY = 'admin_remembered_email';
 const LOGIN_LANGUAGES = [
@@ -236,7 +238,7 @@ const LoginPage: React.FC = () => {
   return (
     <div className="averon-admin-shell min-h-screen bg-app">
       <header className="h-20 border-b border-app bg-surface">
-        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
+        <Container padded={false} className="flex h-full items-center justify-between px-5 sm:px-8 lg:px-12">
           <div className="flex min-w-0 items-center gap-2">
             <span className="text-xl font-black tracking-[0.2em] text-app">AVERON</span>
             <span className="bg-[var(--color-primary)] px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-[var(--color-on-primary)]">ADMIN</span>
@@ -257,7 +259,7 @@ const LoginPage: React.FC = () => {
               {LOGIN_LANGUAGES.map(({ code, label }) => {
                 const active = i18n.language?.startsWith(code);
                 return (
-                  <button
+                  <Button
                     key={code}
                     type="button"
                     role="menuitemradio"
@@ -272,16 +274,16 @@ const LoginPage: React.FC = () => {
                     }`}
                   >
                     <span aria-hidden="true" className="text-xs font-bold tracking-wide">{code.toUpperCase()}</span>
-                  </button>
+                  </Button>
                 );
               })}
             </Dropdown>
             <ThemeToggle />
           </div>
-        </div>
+        </Container>
       </header>
 
-      <main className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-[1440px] items-stretch lg:grid-cols-[minmax(0,1fr)_520px]">
+      <Container as="main" padded={false} className="grid min-h-[calc(100vh-5rem)] items-stretch lg:grid-cols-[minmax(0,1fr)_520px]">
         <section className="hidden border-r border-app bg-surface-soft px-12 py-16 lg:flex lg:flex-col lg:justify-between">
           <div>
             <p className="mb-5 text-xs font-bold uppercase tracking-[0.18em] text-muted">{t('login.heroKicker')}</p>
@@ -342,7 +344,7 @@ const LoginPage: React.FC = () => {
                     autoComplete="current-password"
                     className="input pr-11"
                   />
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-1 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-sm text-muted transition-colors hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
@@ -360,7 +362,7 @@ const LoginPage: React.FC = () => {
                         <circle cx="12" cy="12" r="3" />
                       </svg>
                     )}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -390,17 +392,11 @@ const LoginPage: React.FC = () => {
               )}
 
               {/* Кнопка входа */}
-              <button
+              <Button
                 type="submit"
                 id="login-submit"
                 disabled={loading}
-                className="
-                  w-full py-2.5 px-4 rounded-lg font-medium text-sm text-[var(--color-on-primary)]
-                  bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] active:scale-[.99]
-                  disabled:opacity-60 disabled:cursor-not-allowed
-                  transition-all duration-150
-                  flex items-center justify-center gap-2
-                "
+                className="w-full"
               >
                 {loading ? (
                   <>
@@ -411,7 +407,7 @@ const LoginPage: React.FC = () => {
                     {t('login.checking')}
                   </>
                 ) : t('login.signIn')}
-              </button>
+              </Button>
             </form>
           ) : step === 'telegram' ? (
             <form onSubmit={handle2faSubmit} className="space-y-4">
@@ -460,17 +456,11 @@ const LoginPage: React.FC = () => {
               )}
 
               {/* Кнопка подтверждения */}
-              <button
+              <Button
                 type="submit"
                 id="verify-2fa-submit"
                 disabled={loading || twoFactorCode.length !== 6}
-                className="
-                  w-full py-2.5 px-4 rounded-lg font-medium text-sm text-[var(--color-on-primary)]
-                  bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] active:scale-[.99]
-                  disabled:opacity-60 disabled:cursor-not-allowed
-                  transition-all duration-150
-                  flex items-center justify-center gap-2
-                "
+                className="w-full"
               >
                 {loading ? (
                   <>
@@ -481,26 +471,26 @@ const LoginPage: React.FC = () => {
                     {t('login.confirming')}
                   </>
                 ) : t('login.confirmAndSignIn')}
-              </button>
+              </Button>
 
               {/* Повторная отправка и назад */}
               <div className="flex items-center justify-between pt-2 text-xs">
-                <button
+                <Button
                   type="button"
                   onClick={handleBackToLogin}
                   className="text-muted hover:text-app transition-colors"
                 >
                   {t('login.backToPassword')}
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="button"
                   onClick={handleResendCode}
                   disabled={resendCooldown > 0 || loading}
                   className="text-primary-600 hover:text-primary-700 dark:text-primary-400 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {resendCooldown > 0 ? t('login.resendCountdown', { seconds: resendCooldown }) : t('login.resendCode')}
-                </button>
+                </Button>
               </div>
             </form>
           ) : (
@@ -526,16 +516,16 @@ const LoginPage: React.FC = () => {
                 />
               </div>
               {errorText && <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">{errorText}</div>}
-              <button
+              <Button
                 type="submit"
                 disabled={loading || twoFactorCode.trim().length < 6}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-[var(--color-on-primary)] transition-colors hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full"
               >
                 {loading ? t('login.checking') : t('login.confirmAndSignIn')}
-              </button>
-              <button type="button" onClick={handleBackToLogin} className="w-full pt-2 text-xs text-muted transition-colors hover:text-app">
+              </Button>
+              <Button type="button" onClick={handleBackToLogin} className="w-full pt-2 text-xs text-muted transition-colors hover:text-app">
                 {t('login.backToPassword')}
-              </button>
+              </Button>
             </form>
           )}
         </div>
@@ -545,7 +535,7 @@ const LoginPage: React.FC = () => {
         </p>
       </div>
         </section>
-      </main>
+      </Container>
     </div>
   );
 };

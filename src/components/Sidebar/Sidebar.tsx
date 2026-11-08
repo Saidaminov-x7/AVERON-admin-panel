@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { Button } from '../ui/Button';
 import type { ComponentType, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -230,7 +231,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
       aria-label={t("header.mobileNavigation")}
     >
       <div className="admin-sidebar-brand sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-app bg-surface px-5">
-        <button
+        <Button variant="ghost"
           type="button"
           onClick={() => {
             if (compact) {
@@ -252,9 +253,9 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
           </span>
           {compact && <PanelLeftOpen className="admin-sidebar-compact-expand absolute inset-0 m-auto opacity-0 transition-opacity" size={17} aria-hidden="true" />}
           {!compact && <span className="admin-mobile-brand-label ml-1 block text-[9px] font-bold tracking-[.18em] text-muted">ADMIN</span>}
-        </button>
+        </Button>
 
-        <button
+        <Button size="icon" variant="ghost"
           type="button"
           onClick={toggleCollapsed}
           data-action-id="admin.sidebar.toggle-collapse"
@@ -264,10 +265,10 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
           className={`admin-sidebar-collapse hidden size-11 items-center justify-center border border-app bg-surface text-muted transition-colors hover:bg-app hover:text-app ${compact ? "lg:hidden" : "lg:flex"}`}
         >
           {compact ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
-        </button>
+        </Button>
 
         {onCloseMobile && (
-          <button
+          <Button size="icon" variant="ghost"
             type="button"
             onClick={onCloseMobile}
             aria-label={t("common.close")}
@@ -275,11 +276,11 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
             className="flex size-11 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-app lg:hidden"
           >
             <X size={19} />
-          </button>
+          </Button>
         )}
       </div>
       <nav ref={navRef} className="admin-sidebar-nav min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-5" aria-label={t("header.mobileNavigation")}>
-        <button
+        <Button variant="ghost"
           type="button"
           data-action-id="admin.sidebar.mobile-search"
           onClick={() => {
@@ -290,7 +291,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
         >
           <Search size={17} aria-hidden="true" />
           <span>{t("common.search")}</span>
-        </button>
+        </Button>
         {sections.map(({ titleKey, items }) => (
           <section key={titleKey} aria-label={t(titleKey)}>
             <h2 className="admin-sidebar-section-title sr-only">
@@ -338,7 +339,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
               {languages.map(({ code }) => {
                 const active = i18n.language.slice(0, 2) === code;
                 return (
-                  <button
+                  <Button variant="ghost"
                     key={code}
                     type="button"
                     role="menuitemradio"
@@ -349,7 +350,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
                   >
                     <span className="flex items-center gap-3"><span className="w-7 text-[11px] font-semibold tracking-wide text-muted">{code.toUpperCase()}</span>{languageLabels[code]}</span>
                     {active && <Check size={16} className="text-primary-500" />}
-                  </button>
+                  </Button>
                 );
               })}
             </Dropdown>
@@ -373,9 +374,9 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
               <span className="block truncate text-xs text-muted">{user?.adminRole || "ADMIN"}</span>
           </span>
         </NavLink>
-        <button type="button" onClick={logout} className="admin-logout flex size-11 shrink-0 items-center justify-center text-muted transition-colors hover:bg-red-500/10 hover:text-red-600" aria-label={t("sidebar.logout")} title={t("sidebar.logout")}>
+        <Button size="icon" variant="ghost" type="button" onClick={logout} className="admin-logout flex size-11 shrink-0 items-center justify-center text-muted transition-colors hover:bg-red-500/10 hover:text-red-600" aria-label={t("sidebar.logout")} title={t("sidebar.logout")}>
           <LogOut size={17} />
-        </button>
+        </Button>
       </div>
       {!compact && (
         <div

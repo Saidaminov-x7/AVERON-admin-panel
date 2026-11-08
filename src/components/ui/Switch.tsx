@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import { Button } from './Button';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -49,7 +50,7 @@ export const Switch: React.FC<SwitchProps> = ({
           {description && <span id={descriptionId} className="text-muted block mt-0.5">{description}</span>}
         </div>
       )}
-      <button
+      <Button size="icon" variant="ghost"
         type="button"
         role="switch"
         aria-label={ariaLabel}
@@ -85,7 +86,7 @@ export const Switch: React.FC<SwitchProps> = ({
             )}
           />
         </span>
-      </button>
+      </Button>
     </div>
   );
 };

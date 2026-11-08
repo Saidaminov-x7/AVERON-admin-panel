@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Canvas, useLoader } from '@react-three/fiber';
 import { BufferGeometry, CatmullRomCurve3, Float32BufferAttribute, MeshStandardMaterial, TubeGeometry, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { IconButton } from '../ui/Button';
 
 type PreviewTransform = { scale: number; positionX: number; positionY: number; positionZ: number };
 
@@ -128,9 +129,9 @@ export function FittingAssetPreview({ url, transform, labels }: { url: string; t
       </PreviewErrorBoundary>
     </div>
     <div className="flex items-center gap-3 p-3">
-      <button type="button" aria-label={labels.left} onClick={() => adjust(rotation - 0.16)} className="grid size-10 place-items-center rounded-md border border-app text-app">‹</button>
+      <IconButton type="button" variant="outline" label={labels.left} onClick={() => adjust(rotation - 0.16)} className="grid size-11 place-items-center text-app">‹</IconButton>
       <input aria-label="Model rotation" type="range" min={-60} max={60} value={rotation * 180 / Math.PI} onChange={(event) => adjust(Number(event.target.value) * Math.PI / 180)} className="min-w-0 flex-1" />
-      <button type="button" aria-label={labels.right} onClick={() => adjust(rotation + 0.16)} className="grid size-10 place-items-center rounded-md border border-app text-app">›</button>
+      <IconButton type="button" variant="outline" label={labels.right} onClick={() => adjust(rotation + 0.16)} className="grid size-11 place-items-center text-app">›</IconButton>
       <span className="w-10 text-right text-xs tabular-nums text-muted">{Math.round(rotation * 180 / Math.PI)}°</span>
     </div>
     {!modelLoaded && !modelFailed && <p role="status" className="px-3 py-2 text-center text-xs text-muted">{labels.loading}</p>}

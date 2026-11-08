@@ -1,5 +1,6 @@
 // src/pages/ErrorLogsPage.tsx
 import React, { useState } from 'react';
+import { Button } from '../components/ui/Button';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
@@ -49,7 +50,7 @@ const ErrorLogsPage: React.FC = () => {
         <div className="card p-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex rounded-xl border border-app overflow-hidden text-xs font-semibold">
-              <button
+              <Button
                 type="button"
                 onClick={() => { setResolvedFilter('unresolved'); setPage(1); }}
                 className={`px-3 py-1.5 transition-colors cursor-pointer ${
@@ -57,8 +58,8 @@ const ErrorLogsPage: React.FC = () => {
                 }`}
               >
                 {t('common.pending', 'Нерешённые')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => { setResolvedFilter('resolved'); setPage(1); }}
                 className={`px-3 py-1.5 transition-colors cursor-pointer ${
@@ -66,8 +67,8 @@ const ErrorLogsPage: React.FC = () => {
                 }`}
               >
                 {t('reports.resolved', 'Решённые')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => { setResolvedFilter('all'); setPage(1); }}
                 className={`px-3 py-1.5 transition-colors cursor-pointer ${
@@ -75,7 +76,7 @@ const ErrorLogsPage: React.FC = () => {
                 }`}
               >
                 {t('common.all', 'Все')}
-              </button>
+              </Button>
             </div>
 
             <div className="w-56">
@@ -175,7 +176,7 @@ const ErrorLogsPage: React.FC = () => {
                     </div>
 
                     {!err.resolved && (
-                      <button
+                      <Button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -185,7 +186,7 @@ const ErrorLogsPage: React.FC = () => {
                         className="btn-ghost text-xs py-1 px-2.5 flex-shrink-0 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 cursor-pointer"
                       >
                         {t('reports.resolved', 'Решено')}
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -201,22 +202,22 @@ const ErrorLogsPage: React.FC = () => {
               {t('common.page', 'Страница')} {data.meta.page} {t('common.of', 'из')} {data.meta.totalPages}
             </div>
             <div className="flex gap-2">
-              <button
+              <Button
                 type="button"
                 disabled={page <= 1}
                 onClick={() => setPage((p) => p - 1)}
                 className="btn-ghost py-1 px-3 disabled:opacity-40"
               >
                 {t('common.back', 'Назад')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 disabled={page >= data.meta.totalPages}
                 onClick={() => setPage((p) => p + 1)}
                 className="btn-ghost py-1 px-3 disabled:opacity-40"
               >
                 {t('common.next', 'Вперёд')}
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -248,26 +249,26 @@ const ErrorLogsPage: React.FC = () => {
             footer={
               <>
                 {!selectedError.resolved ? (
-                  <button
+                  <Button
                     type="button"
                     onClick={() => resolveMutation.mutate(selectedError.id)}
                     disabled={resolveMutation.isPending}
                     className="btn-primary text-xs py-2 px-4 cursor-pointer"
                   >
                     {t('system.markAsResolved', 'Пометить как решённую')}
-                  </button>
+                  </Button>
                 ) : (
                   <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
                     <CheckCircle size={14} /> {t('system.errorResolved', 'Ошибка помечена как решённая')}
                   </span>
                 )}
-                <button
+                <Button
                   type="button"
                   onClick={() => setSelectedError(null)}
                   className="btn-ghost text-xs py-2 px-4 cursor-pointer"
                 >
                   {t('common.cancel', 'Закрыть')}
-                </button>
+                </Button>
               </>
             }
           >

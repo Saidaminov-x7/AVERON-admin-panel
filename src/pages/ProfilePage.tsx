@@ -7,15 +7,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useAuthStore } from '../store/authStore';
-import {
-  getProfileApi,
-  updateProfileApi,
-  changePasswordApi,
-  uploadMediaApi,
-} from '../lib/profileApi';
+import { getProfileApi, updateProfileApi, changePasswordApi, uploadMediaApi } from '../lib/profileApi';
 import { logoutApi } from '../lib/authApi';
 import { AdminSecuritySection } from '../components/security/AdminSecuritySection';
 import { Button } from '../components/ui/Button';
+import { Container } from '../components/ui/Container';
 
 const ProfilePage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -152,17 +148,19 @@ const ProfilePage: React.FC = () => {
   if (isLoading) {
     return (
       <Layout title={t('profile.title')}>
-        <div className="max-w-4xl mx-auto space-y-6">
+        {/* Keep profile loading cards at the same readable width as the form. */}
+        <Container padded={false} maxWidth="56rem" className="space-y-6">
           <div className="card h-48 animate-pulse bg-gray-100 dark:bg-white/5" />
           <div className="card h-64 animate-pulse bg-gray-100 dark:bg-white/5" />
-        </div>
+        </Container>
       </Layout>
     );
   }
 
   return (
       <Layout title={t('profile.title')}>
-      <div className="max-w-4xl mx-auto space-y-6">
+      {/* Profile forms use a narrower measure for readable field labels. */}
+      <Container padded={false} maxWidth="56rem" className="space-y-6">
         {/* Карточка информации о роли и статусе */}
         <div className="card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
@@ -381,7 +379,7 @@ const ProfilePage: React.FC = () => {
             </Button>
           </form>
         </div>
-      </div>
+      </Container>
     </Layout>
   );
 };

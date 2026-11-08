@@ -5,23 +5,9 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
 import { CountryFlag } from '../../components/commerce/CountryFlag';
-import {
-  approveImport,
-  getImports,
-  isProductCountry,
-  PRODUCT_COUNTRIES,
-  rejectImport,
-  type ImportedProduct,
-  type ProductCountry,
-  type ProductLocale,
-} from '../../lib/commerceApi';
+import { approveImport, getImports, isProductCountry, PRODUCT_COUNTRIES, rejectImport, type ImportedProduct, type ProductCountry, type ProductLocale } from '../../lib/commerceApi';
 import { uploadProductPhotoApi, type MediaItem } from '../../lib/mediaApi';
-import {
-  applyProductAiSuggestions,
-  getProductAiSuggestionsApi,
-  type ProductAiSuggestions,
-  type ProductLocalizedContent,
-} from '../../lib/productAiApi';
+import { applyProductAiSuggestions, getProductAiSuggestionsApi, type ProductAiSuggestions, type ProductLocalizedContent } from '../../lib/productAiApi';
 import { useAdminCapabilities } from '../../hooks/useAdminCapabilities';
 import { useDebounce } from '../../hooks/useDebounce';
 import { EmptyState, Input, Button, Select, Textarea, Modal, Pagination } from '../../components/ui';
@@ -496,7 +482,7 @@ export default function ImportsPage() {
             </div>
             {uploadedImages.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{uploadedImages.map((image) => <div key={image.id} className="relative">
               <ImagePreview url={image.url} title={approveItem.originalTitle} />
-              <button type="button" aria-label={t('common.remove', 'Удалить')} className="absolute -right-2 -top-2 rounded-full bg-surface p-1 text-red-600 shadow" onClick={() => setUploadedImages((current) => current.filter(({ id }) => id !== image.id))}><X size={14} /></button>
+              <Button type="button" aria-label={t('common.remove', 'Удалить')} className="absolute -right-2 -top-2 rounded-full bg-surface p-1 text-red-600 shadow" onClick={() => setUploadedImages((current) => current.filter(({ id }) => id !== image.id))}><X size={14} /></Button>
             </div>)}</div>}
           </div>
           <label className="flex items-start gap-2 rounded-xl border border-app p-3 text-sm">

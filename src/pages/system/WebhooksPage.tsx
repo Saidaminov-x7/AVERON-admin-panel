@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import Layout from '../../components/Layout';
+import { Container } from '../../components/ui/Container';
 import { Button, Modal, Select } from '../../components/ui';
 import { getWebhooksApi, createWebhookApi, deleteWebhookApi } from '../../lib/extendedAdminApi';
 import { Webhook, Plus, Trash2 } from 'lucide-react';
@@ -74,18 +75,18 @@ const WebhooksPage: React.FC = () => {
 
   return (
     <Layout title={t('system.webhooksTitle', 'Webhooks & Telegram-алерты')}>
-      <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      <Container padded={false} className="space-y-6 pb-12">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <p className="text-xs sm:text-sm text-muted">
             Настройте отправку мгновенных HTTP вебхуков или оповещений в Telegram-чат модераторов при обнаружении скама, жалобах и критических ошибках.
           </p>
-          <button
+          <Button
             type="button"
             onClick={() => setIsOpenModal(true)}
-            className="btn btn-primary flex items-center gap-2"
+            className="flex items-center gap-2"
           >
             <Plus size={16} /> {t('system.addWebhook', 'Добавить вебхук')}
-          </button>
+          </Button>
         </div>
 
         {/* Список вебхуков */}
@@ -134,7 +135,7 @@ const WebhooksPage: React.FC = () => {
                       </td>
                       <td className="p-3 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          <button
+                          <Button
                             type="button"
                             onClick={() => handleTestWebhook(w.id)}
                             disabled={testingId === w.id}
@@ -142,15 +143,15 @@ const WebhooksPage: React.FC = () => {
                             title="Тестовая отправка пинга"
                           >
                             {testingId === w.id ? 'Отправка...' : 'Тест'}
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
                             onClick={() => deleteMutation.mutate(w.id)}
                             className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                             title={t('common.delete', 'Удалить')}
                           >
                             <Trash2 size={15} />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -220,7 +221,7 @@ const WebhooksPage: React.FC = () => {
 
               </form>
         </Modal>
-      </div>
+      </Container>
     </Layout>
   );
 };

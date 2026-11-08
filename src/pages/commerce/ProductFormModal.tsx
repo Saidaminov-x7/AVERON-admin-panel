@@ -9,47 +9,12 @@ import { CountryFlag } from "../../components/commerce/CountryFlag";
 import { LanguageFlag } from "../../components/ui/LanguageFlag";
 import { Dropdown } from "../../components/Dropdown";
 import { useAdminCapabilities } from "../../hooks/useAdminCapabilities";
-import {
-  applyProductAiSuggestions,
-  getProductAiSuggestionsApi,
-  hasAiProductFillCapability,
-  hasImageEmbeddingsCapability,
-  toProductAiCountry,
-  type ProductAiSuggestionsResponse,
-} from "../../lib/productAiApi";
+import { applyProductAiSuggestions, getProductAiSuggestionsApi, hasAiProductFillCapability, hasImageEmbeddingsCapability, toProductAiCountry, type ProductAiSuggestionsResponse } from "../../lib/productAiApi";
 import { uploadProductPhotoApi } from "../../lib/mediaApi";
-import {
-  getProductImageEmbeddingApi,
-  reindexProductImageEmbeddingApi,
-} from "../../lib/productImageEmbeddingApi";
-import {
-  getProductCountryDisplay,
-  isProductCountry,
-  PRODUCT_COUNTRIES,
-  type ProductCategory,
-  type ProductCountry,
-  type ProductListItem,
-  type ProductLocale,
-} from "../../lib/commerceApi";
-import {
-  fileIdentity,
-  formatPhotoSize,
-  getFirstProductValidationStep,
-  normalizeProductSizes,
-  PRODUCT_VALIDATION_FIELDS,
-  reorderItem,
-  validateProductDraft,
-  type ProductValidationCode,
-  type ProductValidationField,
-} from "./productFormValidation";
-import {
-  calculateProductPhotoCropRect,
-  cropProductPhoto,
-  DEFAULT_PRODUCT_PHOTO_CROP,
-  productPhotoCropSignature,
-  type ProductPhotoCrop,
-  type ProductPhotoOrientation,
-} from "./productImageCrop";
+import { getProductImageEmbeddingApi, reindexProductImageEmbeddingApi } from "../../lib/productImageEmbeddingApi";
+import { getProductCountryDisplay, isProductCountry, PRODUCT_COUNTRIES, type ProductCategory, type ProductCountry, type ProductListItem, type ProductLocale } from "../../lib/commerceApi";
+import { fileIdentity, formatPhotoSize, getFirstProductValidationStep, normalizeProductSizes, PRODUCT_VALIDATION_FIELDS, reorderItem, validateProductDraft, type ProductValidationCode, type ProductValidationField } from "./productFormValidation";
+import { calculateProductPhotoCropRect, cropProductPhoto, DEFAULT_PRODUCT_PHOTO_CROP, productPhotoCropSignature, type ProductPhotoCrop, type ProductPhotoOrientation } from "./productImageCrop";
 import { ProductRichTextField } from "./ProductRichTextField";
 
 const ProductFittingRoomPanel = lazy(() => import("./ProductFittingRoomPanel").then((module) => ({ default: module.ProductFittingRoomPanel })));
@@ -829,10 +794,10 @@ export function ProductFormModal({
       {locales.map((locale) => {
         const error = errors[localeErrorKeys[locale]];
         const complete = values.translations[locale].title.trim().length >= 2;
-        return <button key={locale} type="button" role="menuitemradio" aria-checked={activeLocale === locale} aria-label={t("products.contentTabLabel", { language: localeName(locale), status: error ? t("products.translationError") : complete ? t("products.translationComplete") : t("products.translationIncomplete") })} onClick={() => setActiveLocale(locale)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${activeLocale === locale ? "bg-[var(--color-surface-soft)] font-semibold text-app" : "text-app hover:bg-[var(--color-surface-soft)]"}`}>
+        return <Button key={locale} type="button" role="menuitemradio" aria-checked={activeLocale === locale} aria-label={t("products.contentTabLabel", { language: localeName(locale), status: error ? t("products.translationError") : complete ? t("products.translationComplete") : t("products.translationIncomplete") })} onClick={() => setActiveLocale(locale)} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${activeLocale === locale ? "bg-[var(--color-surface-soft)] font-semibold text-app" : "text-app hover:bg-[var(--color-surface-soft)]"}`}>
           <span className="flex items-center gap-3"><LanguageFlag locale={locale} className="h-4 w-6" />{localeName(locale)}</span>
           {error ? <span aria-hidden="true" className="text-red-500">!</span> : complete ? <span aria-hidden="true" className="text-emerald-600">✓</span> : null}
-        </button>;
+        </Button>;
       })}
     </Dropdown>
     <div role="tablist" aria-label={t("products.contentLanguage")} className="hidden">
@@ -840,7 +805,7 @@ export function ProductFormModal({
         const error = errors[localeErrorKeys[locale]];
         const complete = values.translations[locale].title.trim().length >= 2;
         return (
-          <button
+          <Button
             key={locale}
             type="button"
             role="tab"
@@ -860,7 +825,7 @@ export function ProductFormModal({
           >
             <LanguageFlag locale={locale} className="h-4 w-6" />
             {error ? <span aria-hidden="true" className="text-red-500">!</span> : complete ? <span aria-hidden="true" className="text-emerald-600">✓</span> : null}
-          </button>
+          </Button>
         );
       })}
     </div>
@@ -894,7 +859,7 @@ export function ProductFormModal({
     >
       <form id={formId} noValidate onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-3">
-          <div role="group" className="-mx-3 flex gap-0.5 sm:mx-0" aria-label={t("products.stepNavigation")}>{steps.map((step, index) => <button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={t("products.stepButtonLabel", { number: index + 1, name: t(step) })} aria-current={index === currentStep ? "step" : undefined} className="group flex min-h-11 min-w-11 flex-1 items-center justify-center rounded-full bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500"><span className={`h-1 w-full rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-neutral-200 dark:bg-neutral-700 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-600"}`} /></button>)}</div>
+          <div role="group" className="-mx-3 flex gap-0.5 sm:mx-0" aria-label={t("products.stepNavigation")}>{steps.map((step, index) => <Button key={step} type="button" onClick={() => setCurrentStep(index)} aria-label={t("products.stepButtonLabel", { number: index + 1, name: t(step) })} aria-current={index === currentStep ? "step" : undefined} className="group flex min-h-11 min-w-11 flex-1 items-center justify-center rounded-full bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-500"><span className={`h-1 w-full rounded-full transition-colors ${index <= currentStep ? "bg-primary-600" : "bg-neutral-200 dark:bg-neutral-700 group-hover:bg-neutral-300 dark:group-hover:bg-neutral-600"}`} /></Button>)}</div>
           <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs text-muted"><span>{t("products.stepProgress", { current: currentStep + 1, total: steps.length })}</span><span className="font-medium text-app">{t(steps[currentStep])}</span></div>
         </div>
         <div className="rounded-xl border border-app bg-surface-secondary p-4">
@@ -1141,10 +1106,10 @@ export function ProductFormModal({
                 <div className="relative col-start-2 sm:col-start-auto">
                   <input aria-label={t("products.hexColor", { name })} value={hexInput} maxLength={7} onChange={(event) => { const next = event.target.value.startsWith("#") ? event.target.value : `#${event.target.value}`; if (/^#[0-9a-fA-F]{0,6}$/.test(next)) updateRow(rawName, next); }} onBlur={() => { if (!/^#[0-9a-fA-F]{6}$/.test(hexInput)) updateRow(rawName, "#808080"); }} className="h-10 w-full rounded-md border border-app bg-surface px-2 font-mono text-sm uppercase text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" />
                 </div>
-                <button type="button" aria-label={t("products.removeColor", { name })} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-red-500/10 hover:text-red-600 sm:row-span-1"><Trash2 size={16} /></button>
+                <Button type="button" aria-label={t("products.removeColor", { name })} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-red-500/10 hover:text-red-600 sm:row-span-1"><Trash2 size={16} /></Button>
               </div>;
             })}
-            <button type="button" onClick={() => updateValue("colorsText", [values.colorsText, " | #808080"].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold text-app transition-colors hover:bg-app"><span aria-hidden="true">+</span> {t("products.addColor")}</button>
+            <Button type="button" onClick={() => updateValue("colorsText", [values.colorsText, " | #808080"].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold text-app transition-colors hover:bg-app"><span aria-hidden="true">+</span> {t("products.addColor")}</Button>
           </div>
         </section>
 
@@ -1221,7 +1186,7 @@ export function ProductFormModal({
                         <p className="text-xs font-semibold text-app">{t("products.photoCrop")}</p>
                         <div role="group" aria-label={t("products.photoOrientation")} className="grid grid-cols-3 gap-1">
                           {photoOrientations.map(({ value, label }) => (
-                            <button
+                            <Button
                               key={value}
                               type="button"
                               aria-pressed={photo.crop.orientation === value}
@@ -1233,7 +1198,7 @@ export function ProductFormModal({
                               }`}
                             >
                               {label}
-                            </button>
+                            </Button>
                           ))}
                         </div>
                         <label className="block text-xs text-muted">
@@ -1283,10 +1248,10 @@ export function ProductFormModal({
                     )}
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex gap-1">
-                        <button type="button" disabled={index === 0} onClick={() => movePhoto(index, -1)} aria-label={t("products.movePhotoUp")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveUp size={16} /></button>
-                        <button type="button" disabled={index === photos.length - 1} onClick={() => movePhoto(index, 1)} aria-label={t("products.movePhotoDown")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveDown size={16} /></button>
+                        <Button type="button" disabled={index === 0} onClick={() => movePhoto(index, -1)} aria-label={t("products.movePhotoUp")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveUp size={16} /></Button>
+                        <Button type="button" disabled={index === photos.length - 1} onClick={() => movePhoto(index, 1)} aria-label={t("products.movePhotoDown")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveDown size={16} /></Button>
                       </div>
-                      <button type="button" onClick={() => removePhoto(photo)} aria-label={t("products.removePhoto")} className="rounded-lg p-2 text-red-500 hover:bg-red-500/10"><Trash2 size={16} /></button>
+                      <Button type="button" onClick={() => removePhoto(photo)} aria-label={t("products.removePhoto")} className="rounded-lg p-2 text-red-500 hover:bg-red-500/10"><Trash2 size={16} /></Button>
                     </div>
                   </div>
                 </li>

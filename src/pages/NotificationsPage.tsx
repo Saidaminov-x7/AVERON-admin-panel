@@ -5,11 +5,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import Layout from "../components/Layout";
 import { Button } from "../components/ui";
-import {
-  getNotificationsApi,
-  markAllNotificationsReadApi,
-  markNotificationReadApi,
-} from "../lib/notificationsApi";
+import { getNotificationsApi, markAllNotificationsReadApi, markNotificationReadApi } from "../lib/notificationsApi";
 
 export default function NotificationsPage() {
   const { t, i18n } = useTranslation();
@@ -50,7 +46,7 @@ export default function NotificationsPage() {
         <ul className="space-y-3">
           {notificationsQuery.data.items.map((item) => (
             <li key={item.id}>
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   if (!item.isRead) markRead.mutate(item.id);
@@ -66,7 +62,7 @@ export default function NotificationsPage() {
                   </span>
                   <span className="mt-1 block text-sm text-muted">{item.message}</span>
                 </span>
-              </button>
+              </Button>
             </li>
           ))}
         </ul>

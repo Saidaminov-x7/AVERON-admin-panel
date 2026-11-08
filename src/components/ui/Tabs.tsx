@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from './Button';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -35,7 +36,7 @@ export function Tabs<T extends string = string>({
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
           return (
-            <button
+            <Button variant="ghost"
               key={tab.id}
               type="button"
               disabled={tab.disabled}
@@ -52,7 +53,7 @@ export function Tabs<T extends string = string>({
               {tab.icon}
               <span>{tab.label}</span>
               {tab.badge}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -65,7 +66,7 @@ export function Tabs<T extends string = string>({
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
           return (
-            <button
+            <Button variant="ghost"
               key={tab.id}
               type="button"
               disabled={tab.disabled}
@@ -82,7 +83,7 @@ export function Tabs<T extends string = string>({
               {tab.icon}
               <span>{tab.label}</span>
               {tab.badge}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -100,7 +101,7 @@ export function Tabs<T extends string = string>({
       {tabs.map((tab) => {
         const isActive = tab.id === activeTab;
         return (
-          <button
+          <Button variant="ghost"
             key={tab.id}
             type="button"
             disabled={tab.disabled}
@@ -117,7 +118,7 @@ export function Tabs<T extends string = string>({
             {tab.icon}
             <span>{tab.label}</span>
             {tab.badge}
-          </button>
+          </Button>
         );
       })}
     </div>

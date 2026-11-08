@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, useId } from 'react';
+import { Button } from './Button';
 import { createPortal } from 'react-dom';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -197,7 +198,7 @@ export const Select: React.FC<SelectProps> = ({
       {/* Keep the clear action as a separate keyboard-accessible control. */}
       <div className="relative">
       {/* Trigger button */}
-      <button
+      <Button size="icon" variant="ghost"
         ref={triggerRef}
         type="button"
         id={selectId}
@@ -244,9 +245,9 @@ export const Select: React.FC<SelectProps> = ({
             className={clsx('transition-transform duration-150', isOpen && 'rotate-180 text-primary-500')}
           />
         </div>
-      </button>
+      </Button>
       {clearable && selectedOption && !disabled && (
-        <button
+        <Button size="icon" variant="ghost"
           type="button"
           aria-label={`${label ? `${label}: ` : ''}${t('select.clear')}`}
           title={t('select.clear')}
@@ -258,7 +259,7 @@ export const Select: React.FC<SelectProps> = ({
           className="absolute right-10 top-1/2 z-10 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-none bg-surface text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
         >
           <X size={14} aria-hidden="true" />
-        </button>
+        </Button>
       )}
       </div>
 
@@ -291,7 +292,7 @@ export const Select: React.FC<SelectProps> = ({
                   className="w-full h-11 pl-8 pr-11 text-xs rounded-none bg-gray-50 dark:bg-white/5 border border-app text-app outline-none focus:border-primary-500"
                 />
                 {search && (
-                  <button
+                  <Button size="icon" variant="ghost"
                     type="button"
                     aria-label={t('common.clearField')}
                     title={t('common.clearField')}
@@ -302,7 +303,7 @@ export const Select: React.FC<SelectProps> = ({
                     className="absolute right-0 top-1/2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-none text-muted transition-colors hover:bg-[var(--color-surface-soft)] hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500"
                   >
                     <X size={14} aria-hidden="true" />
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -315,7 +316,7 @@ export const Select: React.FC<SelectProps> = ({
               filteredOptions.map((option) => {
                 const isSelected = option.value === value;
                 return (
-                  <button
+                  <Button variant="ghost"
                     ref={option.value === filteredOptions[0]?.value ? firstOptionRef : undefined}
                     key={option.value}
                     type="button"
@@ -350,7 +351,7 @@ export const Select: React.FC<SelectProps> = ({
                       )}
                     </div>
                     {isSelected && <Check size={14} className="shrink-0 ml-2" />}
-                  </button>
+                  </Button>
                 );
               })
             )}

@@ -19,13 +19,14 @@ vi.mock('react-i18next', () => ({
 }));
 
 describe('shared admin control visual and semantic contract', () => {
-  it('renders square primary and checkbox controls with neutral brand tokens', () => {
+  it('renders storefront button tokens and square checkbox controls', () => {
     const button = renderToStaticMarkup(createElement(Button, null, 'Save'));
     const checkbox = renderToStaticMarkup(createElement(Checkbox, { label: 'Enabled', checked: true }));
 
-    expect(button).toContain('rounded-none');
-    expect(button).toContain('bg-[var(--color-primary)]');
-    expect(button).toContain('text-[var(--color-on-primary)]');
+    expect(button).toContain('rounded-[var(--radius-control)]');
+    expect(button).toContain('bg-[var(--color-action-bg)]');
+    expect(button).toContain('text-[var(--color-on-action)]');
+    expect(button).toContain('focus-visible:ring-2');
     expect(checkbox).toContain('rounded-none');
     expect(checkbox).toContain('h-11 w-11');
     expect(checkbox).toContain('h-[18px] w-[18px]');

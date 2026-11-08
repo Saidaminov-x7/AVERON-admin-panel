@@ -4,17 +4,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import {
-  Upload,
-  Trash2,
-  Save,
-  Globe,
-  Mail,
-  Phone,
-  Plus,
-  AlertTriangle,
-  Image as ImageIcon,
-} from 'lucide-react';
+import { Upload, Trash2, Save, Globe, Mail, Phone, Plus, AlertTriangle, Image as ImageIcon } from 'lucide-react';
 import Layout from '../../components/Layout';
 import {
   getSiteSettingsApi,

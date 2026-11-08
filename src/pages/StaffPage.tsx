@@ -4,40 +4,13 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import {
-  UserPlus,
-  Shield,
-  ShieldAlert,
-  ShieldCheck,
-  RotateCcw,
-  Trash2,
-  Edit2,
-  Mail,
-  Phone,
-  Calendar,
-  Lock,
-  History,
-} from 'lucide-react';
+import { UserPlus, Shield, ShieldAlert, ShieldCheck, RotateCcw, Trash2, Edit2, Mail, Phone, Calendar, Lock, History } from 'lucide-react';
 import Layout from '../components/Layout';
+import { Container } from '../components/ui/Container';
 import { useAuthStore, type AdminRoleType, type AdminUser } from '../store/authStore';
-import {
-  getStaffListApi,
-  addStaffApi,
-  updateStaffRoleApi,
-  revokeStaffApi,
-} from '../lib/staffApi';
+import { getStaffListApi, addStaffApi, updateStaffRoleApi, revokeStaffApi } from '../lib/staffApi';
 import { getAuditLogsApi, type AuditLogItem } from '../lib/auditLogApi';
-import {
-  Button,
-  Modal,
-  Input,
-  Select,
-  Badge,
-  Card,
-  ConfirmDialog,
-  EmptyState,
-  Tabs,
-} from '../components/ui';
+import { Button, Modal, Input, Select, Badge, Card, ConfirmDialog, EmptyState, Tabs } from '../components/ui';
 
 const ROLE_OPTIONS = [
   { value: 'SUPER_ADMIN', label: 'Супер-администратор (Полный доступ)' },
@@ -160,7 +133,7 @@ export const StaffPage: React.FC = () => {
 
   return (
     <Layout title="Сотрудники и роли">
-      <div className="space-y-6 animate-fade-in max-w-6xl mx-auto pb-12">
+      <Container padded={false} className="space-y-6 animate-fade-in pb-12">
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -493,7 +466,7 @@ export const StaffPage: React.FC = () => {
           variant="danger"
           loading={revokeMutation.isPending}
         />
-      </div>
+      </Container>
     </Layout>
   );
 };

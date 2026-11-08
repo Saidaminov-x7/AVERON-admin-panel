@@ -6,6 +6,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
+import { Container } from '../components/ui/Container';
+import { Button } from '../components/ui/Button';
 import { getAdminUserByIdApi, blockUserApi, unblockUserApi, getUserActivityApi, getUserSessionsApi, revokeUserSessionApi } from '../lib/usersApi';
 import { getUserAuditLogsApi } from '../lib/auditLogApi';
 import { getUserAiSessionsApi } from '../lib/extendedAdminApi';
@@ -74,9 +76,9 @@ const UserProfilePage: React.FC = () => {
       <Layout title={t('users.userMissing')}>
         <div className="card p-8 text-center max-w-md mx-auto">
           <h2 className="text-xl font-semibold text-app mb-4">{t('users.userMissing')}</h2>
-          <button className="btn-primary" onClick={() => navigate('/users')}>
+          <Button className="btn-primary" onClick={() => navigate('/users')}>
             {t('common.back', 'Вернуться к списку')}
-          </button>
+          </Button>
         </div>
       </Layout>
     );
@@ -97,15 +99,16 @@ const UserProfilePage: React.FC = () => {
 
   return (
     <Layout title={`${t('users.profile', 'Профиль пользователя')}: ${user.name}`}>
-      <div className="max-w-4xl mx-auto space-y-6 pb-12">
+      {/* User details are deliberately constrained for readable audit content. */}
+      <Container padded={false} maxWidth="56rem" className="space-y-6 pb-12">
         {/* Хлебные крошки и кнопка назад */}
         <div className="flex items-center gap-4">
-          <button
+          <Button
             onClick={() => navigate('/users')}
             className="flex items-center gap-2 text-sm text-muted hover:text-app transition-colors cursor-pointer"
           >
             <ArrowLeft size={16} /> {t('common.back', 'Назад к списку')}
-          </button>
+          </Button>
         </div>
 
         {/* Карточка профиля */}
@@ -152,21 +155,21 @@ const UserProfilePage: React.FC = () => {
 
               <div className="flex gap-2 mt-6">
                 {user.isBlocked ? (
-                  <button
+                  <Button variant="ghost"
                     className="btn-ghost gap-1 cursor-pointer text-emerald-600"
                     onClick={() => unblockMutation.mutate()}
                     disabled={unblockMutation.isPending}
                   >
                     <Unlock size={16} /> {t('users.unblock', 'Разблокировать')}
-                  </button>
+                  </Button>
                 ) : (
-                  <button
+                  <Button variant="danger"
                     className="btn-danger gap-1 cursor-pointer"
                     onClick={() => blockMutation.mutate('')}
                     disabled={blockMutation.isPending}
                   >
                     <Lock size={16} /> {t('users.block', 'Заблокировать')}
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -195,7 +198,7 @@ const UserProfilePage: React.FC = () => {
               tabs[nextIndex].click();
             }}
           >
-            <button
+            <Button
               type="button"
               role="tab"
               id="user-profile-tab-info"
@@ -208,8 +211,8 @@ const UserProfilePage: React.FC = () => {
               }`}
             >
               {t('users.userInfo')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               role="tab"
               id="user-profile-tab-ai"
@@ -222,8 +225,8 @@ const UserProfilePage: React.FC = () => {
               }`}
             >
               <MessageSquare size={14} /> {t('users.aiHistory')} ({userAiSessionsData?.aiSessions?.length || 0})
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               role="tab"
               id="user-profile-tab-activity"
@@ -236,8 +239,8 @@ const UserProfilePage: React.FC = () => {
               }`}
             >
               {t('dashboard.recentActivity', 'Активность')} ({userActivity?.items?.length || 0})
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               role="tab"
               id="user-profile-tab-history"
@@ -250,8 +253,8 @@ const UserProfilePage: React.FC = () => {
               }`}
             >
               {t('auditLog.title', 'Админ-аудит')} ({auditLogs?.length || 0})
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               role="tab"
               id="user-profile-tab-sessions"
@@ -262,7 +265,7 @@ const UserProfilePage: React.FC = () => {
               className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${activeTab === 'sessions' ? 'border-primary-500 text-primary-500' : 'border-transparent text-muted hover:text-app'}`}
             >
               <MonitorSmartphone size={14}/> {t('users.sessions')} ({sessions.length})
-            </button>
+            </Button>
           </nav>
         </div>
 
@@ -442,16 +445,16 @@ const UserProfilePage: React.FC = () => {
                     <p className="truncate text-sm font-semibold text-app">{session.userAgent || t('users.unknownDevice')}</p>
                     <p className="mt-1 text-xs text-muted">{session.ipAddress || t('users.hiddenIp')} · {format(new Date(session.lastSeenAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</p>
                   </div>
-                  <button type="button" onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app text-muted hover:text-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" title={t('users.endSession')} aria-label={t('users.endSession')}>
+                  <Button type="button" onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app text-muted hover:text-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" title={t('users.endSession')} aria-label={t('users.endSession')}>
                     <X size={16} />
-                  </button>
+                  </Button>
                 </div>
               ))}
               {!isSessionsLoading && !sessions.length ? <div className="py-8 text-center text-muted">{t('users.noActiveSessions')}</div> : null}
             </div>
           </div>
         )}
-      </div>
+      </Container>
     </Layout>
   );
 };

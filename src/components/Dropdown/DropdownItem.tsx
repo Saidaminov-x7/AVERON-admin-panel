@@ -3,6 +3,7 @@
 
 import React from 'react';
 
+import { Button } from '../ui/Button';
 interface DropdownItemProps {
   children: React.ReactNode;
   onClick?: () => void;
@@ -12,7 +13,7 @@ interface DropdownItemProps {
 
 const DropdownItem: React.FC<DropdownItemProps> = ({ children, onClick, className = '', disabled = false }) => {
   return (
-    <button
+    <Button variant="ghost"
       type="button"
       onClick={onClick}
       disabled={disabled}
@@ -23,7 +24,7 @@ const DropdownItem: React.FC<DropdownItemProps> = ({ children, onClick, classNam
       `}
     >
       {children}
-    </button>
+    </Button>
   );
 };
 

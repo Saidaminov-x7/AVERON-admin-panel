@@ -6,15 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { ru, enUS } from 'date-fns/locale';
-import {
-  ShieldCheck,
-  RotateCcw,
-  Search,
-  Activity,
-  User as UserIcon,
-  Info,
-  Trash2,
-} from 'lucide-react';
+import { ShieldCheck, RotateCcw, Search, Activity, User as UserIcon, Info, Trash2 } from 'lucide-react';
 import Layout from '../components/Layout';
 import { Card, Badge, Skeleton, EmptyState, Pagination, Input, Select, Button, Modal } from '../components/ui';
 import { clearAuditLogsApi, getAuditLogsApi, type AuditLogItem } from '../lib/auditLogApi';
@@ -240,13 +232,13 @@ export const AuditLogPage: React.FC = () => {
                       {/* Детали */}
                       <td className="py-3 px-4">
                         {log.meta && Object.keys(log.meta).length > 0 ? (
-                          <button
+                          <Button
                             type="button"
                             onClick={() => setSelectedMeta({ action: log.action, meta: log.meta! })}
                             className="inline-flex items-center gap-1 text-[11px] font-medium text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
                           >
                             <Info size={12} /> {t('common.details', 'Детали')}
-                          </button>
+                          </Button>
                         ) : (
                           <span className="text-muted text-[11px]">—</span>
                         )}

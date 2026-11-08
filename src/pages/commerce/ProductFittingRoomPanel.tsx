@@ -3,15 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 import { Button, Input, Select } from '../../components/ui';
-import {
-  deleteFittingAsset,
-  listFittingAssets,
-  reviewFittingAsset,
-  updateFittingAsset,
-  uploadFittingAsset,
-  type AdminFittingAsset,
-  type FittingLayer,
-} from '../../lib/fittingRoomApi';
+import { deleteFittingAsset, listFittingAssets, reviewFittingAsset, updateFittingAsset, uploadFittingAsset, type AdminFittingAsset, type FittingLayer } from '../../lib/fittingRoomApi';
 
 const layers: FittingLayer[] = ['BASE_TOP', 'MID_LAYER', 'OUTERWEAR', 'BOTTOM', 'FOOTWEAR', 'ACCESSORY'];
 const FittingAssetPreview = lazy(() => import('../../components/commerce/FittingAssetPreview').then((module) => ({ default: module.FittingAssetPreview })));

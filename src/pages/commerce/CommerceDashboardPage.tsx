@@ -1,15 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import {
-  AlertTriangle,
-  CircleDollarSign,
-  ClipboardCheck,
-  PackageCheck,
-  RefreshCw,
-  ShoppingBag,
-  TrendingUp,
-  Users,
-} from 'lucide-react';
+import { AlertTriangle, CircleDollarSign, ClipboardCheck, PackageCheck, RefreshCw, ShoppingBag, TrendingUp, Users } from 'lucide-react';
 import Layout from '../../components/Layout';
 import { Button, Card } from '../../components/ui';
 import { getCommerceDashboard } from '../../lib/commerceApi';
