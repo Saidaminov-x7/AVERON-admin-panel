@@ -3,6 +3,8 @@
 
 import React, { useState } from 'react';
 import Layout from '../../components/Layout';
+import { Button } from '../../components/ui/Button';
+import { Container } from '../../components/ui/Container';
 import { api } from '../../lib/axios';
 
 const reportTypes = [
@@ -59,7 +61,8 @@ const ExportReportsPage: React.FC = () => {
 
   return (
     <Layout title="Экспорт отчётов">
-      <div className="max-w-4xl mx-auto space-y-6">
+      {/* Narrow width keeps the report configuration form readable. */}
+      <Container padded={false} maxWidth="56rem" className="space-y-6">
         <div className="card">
           <h3 className="text-base font-bold text-app mb-1">Параметры выгрузки данных</h3>
           <p className="text-xs text-muted mb-6">
@@ -127,10 +130,12 @@ const ExportReportsPage: React.FC = () => {
           {/* Кнопка скачивания */}
           <div className="flex justify-end">
             {error && <p className="mr-4 self-center text-sm text-red-500">{error}</p>}
-            <button
+            <Button
+              type="button"
               onClick={handleDownload}
               disabled={isDownloading || !dateFrom || !dateTo || dateFrom > dateTo}
-              className="btn-primary flex items-center gap-2 px-6"
+              loading={isDownloading}
+              className="flex items-center gap-2 px-6"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
@@ -138,10 +143,10 @@ const ExportReportsPage: React.FC = () => {
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
               {isDownloading ? 'Формирование...' : 'Сформировать и скачать CSV'}
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
+      </Container>
     </Layout>
   );
 };

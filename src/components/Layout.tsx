@@ -5,6 +5,7 @@ import Header from './Header/Header';
 import { CommandPalette } from './CommandPalette/CommandPalette';
 import { useTranslation } from 'react-i18next';
 import { resetRouteScroll } from './resetRouteScroll';
+import { Container } from './ui/Container';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -192,9 +193,9 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
 
         {/* Контент страницы */}
         <main ref={mainScrollRef} className="admin-scroll safe-bottom flex-1 overflow-x-hidden overflow-y-auto animate-fade-in">
-          <div className="admin-page-frame mx-auto w-full space-y-4 sm:space-y-6">
+          <Container padded={false} className="admin-page-frame space-y-4 sm:space-y-6">
             {children}
-          </div>
+          </Container>
         </main>
       </div>
     </div>

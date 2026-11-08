@@ -37,13 +37,13 @@
   --color-info:        #436d91;
   --radius:            0;
   --radius-card:       0;
-  --radius-control:    0.125rem;
+  --radius-control:    0;
   --radius-xs:         0;
-  --radius-sm:         0;
-  --radius-md:         0;
-  --radius-lg:         0;
+  --radius-sm:         0.0625rem;
+  --radius-md:         0.125rem;
+  --radius-lg:         0.1875rem;
   --border-radius:     var(--radius-card);
-  --font-family:       Inter, "Segoe UI", system-ui, sans-serif;
+  --font-family:       var(--font-inter, Inter), Arial, sans-serif;
   --font-size-display: clamp(2.5rem, 5vw, 4rem);
   --font-size-h1:      2rem;
   --font-size-h2:      1.5rem;
@@ -110,14 +110,7 @@
   --color-warning:     #e1b966;
   --color-error:       #ff8d83;
   --color-info:        #93b9d7;
-  --radius:            0.125rem;
-  --radius-control:    0.125rem;
-  --radius-xs:         0;
-  --radius-sm:         0;
-  --radius-md:         0;
-  --radius-lg:         0;
-  --border-radius:     0;
-  --font-family:       Inter, "Segoe UI", system-ui, sans-serif;
+  --font-family:       var(--font-inter, Inter), Arial, sans-serif;
   --shadow-drawer:     -18px 0 48px rgb(0 0 0 / .38);
 }
 

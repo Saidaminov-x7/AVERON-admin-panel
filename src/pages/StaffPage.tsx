@@ -19,6 +19,7 @@ import {
   History,
 } from 'lucide-react';
 import Layout from '../components/Layout';
+import { Container } from '../components/ui/Container';
 import { useAuthStore, type AdminRoleType, type AdminUser } from '../store/authStore';
 import {
   getStaffListApi,
@@ -160,7 +161,7 @@ export const StaffPage: React.FC = () => {
 
   return (
     <Layout title="Сотрудники и роли">
-      <div className="space-y-6 animate-fade-in max-w-6xl mx-auto pb-12">
+      <Container padded={false} className="space-y-6 animate-fade-in pb-12">
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -493,7 +494,7 @@ export const StaffPage: React.FC = () => {
           variant="danger"
           loading={revokeMutation.isPending}
         />
-      </div>
+      </Container>
     </Layout>
   );
 };

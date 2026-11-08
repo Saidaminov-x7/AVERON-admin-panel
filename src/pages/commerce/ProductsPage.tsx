@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Layout from "../../components/Layout";
 import { CountryFlag } from "../../components/commerce/CountryFlag";
-import { Input, Pagination, Select } from "../../components/ui";
+import { Button, Input, Pagination, Select } from "../../components/ui";
 import {
   createManualProduct,
   archiveProduct,
@@ -383,14 +383,14 @@ export default function ProductsPage() {
           <p className="text-xs font-bold tracking-widest text-primary-500">{t("products.sectionLabel")}</p>
           <h1 className="truncate text-2xl font-black">{t("products.catalog")}</h1>
         </div>
-        <button
+        <Button
           type="button"
           onClick={() => navigate("/products/new")}
-          className="btn-primary shrink-0"
+          className="shrink-0"
         >
           <Plus size={18} />
           {t("products.add")}
-        </button>
+        </Button>
       </div>
 
       <div className="mt-5 grid gap-3 rounded-2xl border border-app bg-surface p-4 sm:grid-cols-2 xl:grid-cols-5 2xl:grid-cols-8">
@@ -413,7 +413,7 @@ export default function ProductsPage() {
             onClear={() => { setSearchDraft(""); updateCatalogQuery("q", ""); }}
             onChange={(event) => setSearchDraft(event.target.value)}
           />
-          <button type="submit" className="btn-primary h-10">{t("products.searchAction")}</button>
+          <Button type="submit" size="sm">{t("products.searchAction")}</Button>
         </form>
         <Select
           label={t("products.countryFilterLabel")}

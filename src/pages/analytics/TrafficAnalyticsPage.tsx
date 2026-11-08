@@ -13,6 +13,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import Layout from '../../components/Layout';
+import { Container } from '../../components/ui/Container';
 import { getVisitorsStatsApi } from '../../lib/analyticsApi';
 
 const TrafficAnalyticsPage: React.FC = () => {
@@ -28,7 +29,7 @@ const TrafficAnalyticsPage: React.FC = () => {
 
   return (
     <Layout title="Посещаемость сайта">
-      <div className="space-y-6 max-w-7xl mx-auto">
+      <Container padded={false} className="space-y-6">
         {/* Переключатель периода */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -153,7 +154,7 @@ const TrafficAnalyticsPage: React.FC = () => {
             </table>
           </div>
         </div>
-      </div>
+      </Container>
     </Layout>
   );
 };

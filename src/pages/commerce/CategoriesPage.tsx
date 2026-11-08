@@ -163,14 +163,14 @@ export default function CategoriesPage() {
                   {t("categories.productsCount")}: {category._count?.products ?? 0}
                 </span>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => navigate(`/products?category=${encodeURIComponent(category.slug)}`)} className="btn-ghost text-xs">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => navigate(`/products?category=${encodeURIComponent(category.slug)}`)}>
                     {t("categories.viewProducts")}
-                  </button>
-                  <button type="button" onClick={() => openEdit(category)} className="btn-ghost" aria-label={t("categories.edit")}><Pencil size={16} /></button>
+                  </Button>
+                  <Button type="button" variant="ghost" size="icon" onClick={() => openEdit(category)} aria-label={t("categories.edit")}><Pencil size={16} /></Button>
                   {category.active === false ? (
-                    <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: true })} className="btn-ghost" aria-label={t("categories.restore")}><RotateCcw size={16} /></button>
+                    <Button type="button" variant="ghost" size="icon" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: true })} aria-label={t("categories.restore")}><RotateCcw size={16} /></Button>
                   ) : (
-                    <button type="button" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: false })} className="btn-ghost text-red-500" aria-label={t("categories.archive")}><Archive size={16} /></button>
+                    <Button type="button" variant="ghost" size="icon" disabled={archiveMutation.isPending} onClick={() => archiveMutation.mutate({ category, active: false })} className="text-red-500" aria-label={t("categories.archive")}><Archive size={16} /></Button>
                   )}
                 </div>
               </div>

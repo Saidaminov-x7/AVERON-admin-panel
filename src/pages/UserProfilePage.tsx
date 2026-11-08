@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
+import { Container } from '../components/ui/Container';
 import { getAdminUserByIdApi, blockUserApi, unblockUserApi, getUserActivityApi, getUserSessionsApi, revokeUserSessionApi } from '../lib/usersApi';
 import { getUserAuditLogsApi } from '../lib/auditLogApi';
 import { getUserAiSessionsApi } from '../lib/extendedAdminApi';
@@ -97,7 +98,8 @@ const UserProfilePage: React.FC = () => {
 
   return (
     <Layout title={`${t('users.profile', 'Профиль пользователя')}: ${user.name}`}>
-      <div className="max-w-4xl mx-auto space-y-6 pb-12">
+      {/* User details are deliberately constrained for readable audit content. */}
+      <Container padded={false} maxWidth="56rem" className="space-y-6 pb-12">
         {/* Хлебные крошки и кнопка назад */}
         <div className="flex items-center gap-4">
           <button
@@ -451,7 +453,7 @@ const UserProfilePage: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
+      </Container>
     </Layout>
   );
 };

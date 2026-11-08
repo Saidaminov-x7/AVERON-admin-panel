@@ -9,6 +9,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
+import { Button } from '../../components/ui/Button';
 import { getOrder, getOrders, updateOrderShipping, updateOrderStatus } from '../../lib/commerceApi';
 import type { CommerceDeliveryStatus, CommerceOrderTransition } from '../../lib/commerceApi';
 import { filterCommerceOrders } from './orderFilters';
@@ -212,7 +213,7 @@ export default function OrdersPage() {
         ) : ordersQuery.isError ? (
           <div role="alert" className="card flex flex-wrap items-center justify-between gap-3 text-red-500">
             <p>{copy.error}</p>
-            <button type="button" onClick={() => void ordersQuery.refetch()} className="btn-ghost inline-flex items-center gap-2"><RefreshCw size={16} />{copy.retry}</button>
+            <Button type="button" variant="ghost" size="sm" onClick={() => void ordersQuery.refetch()}><RefreshCw size={16} />{copy.retry}</Button>
           </div>
         ) : orders.length === 0 ? (
           <EmptyState icon={<ShoppingCart size={32} />} title={search || statusFilter ? copy.emptyTitle : t('orders.emptyTitle', copy.emptyTitle)} description={t('orders.emptyDesc', copy.emptyDesc)} />
@@ -229,7 +230,7 @@ export default function OrdersPage() {
                   <td className="px-4 py-3"><span className={statusStyles[item.status] ?? 'badge-neutral'}>{statusLabels[item.status]?.[locale] ?? item.status}</span></td>
                   <td className="px-4 py-3 text-right font-semibold text-app">{formatUzs(item.totalRevenue, locale)}</td>
                   <td className="px-4 py-3 text-muted text-xs">{new Date(item.createdAt).toLocaleDateString(locale === 'en' ? 'en-US' : locale === 'uz' ? 'uz-UZ' : 'ru-RU')}</td>
-                  <td className="px-4 py-3 text-right"><button type="button" onClick={() => setSelectedOrderNumber(item.orderNumber)} className="btn-ghost inline-flex items-center gap-2"><Eye size={16} />{copy.details}</button></td>
+                  <td className="px-4 py-3 text-right"><Button type="button" variant="ghost" size="sm" onClick={() => setSelectedOrderNumber(item.orderNumber)}><Eye size={16} />{copy.details}</Button></td>
                 </tr>
               ))}</tbody>
             </table>
@@ -340,9 +341,9 @@ export default function OrdersPage() {
                     <input name="note" maxLength={500} className="input w-full" />
                   </label>
                   <div className="sm:col-span-2 flex justify-end">
-                    <button ref={shippingSubmitRef} type="submit" disabled={shippingMutation.isPending} className="btn-primary disabled:opacity-50">
+                    <Button ref={shippingSubmitRef} type="submit" disabled={shippingMutation.isPending} loading={shippingMutation.isPending}>
                       {shippingMutation.isPending ? fulfillment.updateShipping : fulfillment.saveShipping}
-                    </button>
+                    </Button>
                   </div>
                 </form>
               </section>
