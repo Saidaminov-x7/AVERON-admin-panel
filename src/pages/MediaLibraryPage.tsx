@@ -431,7 +431,9 @@ export const MediaLibraryPage: React.FC = () => {
                 <img
                   src={selectedImage.url}
                   alt=""
-                  className="max-h-72 w-auto object-contain rounded-xl shadow-md"
+                  width={selectedImage.width && selectedImage.width > 0 ? selectedImage.width : 640}
+                  height={selectedImage.height && selectedImage.height > 0 ? selectedImage.height : 480}
+                  className="max-h-72 max-w-full w-auto object-contain rounded-xl shadow-md"
                 />
               </div>
 

@@ -179,7 +179,7 @@ export function TelegramPublicationPanel({
           )}
           {preview && (
             <article className="max-w-md overflow-hidden rounded-xl border border-stone-200 bg-white text-stone-900 dark:border-white/10">
-              {preview.imageUrl && <img src={preview.imageUrl} alt={preview.title} className="max-h-72 w-full object-cover" />}
+              {preview.imageUrl && <img src={preview.imageUrl} alt={preview.title} width={640} height={360} className="aspect-video max-h-72 w-full object-cover" />}
               <div className="space-y-2 p-3">
                 <h4 className="font-bold">{preview.title}</h4>
                 <p className="whitespace-pre-wrap break-words text-sm">{preview.captionText}</p>
