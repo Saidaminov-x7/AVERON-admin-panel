@@ -1,6 +1,7 @@
 import React from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
+import uiStyles from './themeStyles.module.css';
 
 type ButtonVariant = 'primary' | 'default' | 'ghost' | 'danger' | 'outline' | 'link';
 type ButtonSize = 'sm' | 'md' | 'default' | 'lg' | 'icon';
@@ -60,7 +61,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         aria-busy={loading || undefined}
           className={twMerge([
-          'inline-flex items-center justify-center rounded-[var(--radius-control)] border border-transparent font-theme text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ring-offset-[var(--color-bg)] disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none',
+          `inline-flex items-center justify-center rounded-[var(--radius-control)] border border-transparent ${uiStyles.fontTheme} text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ring-offset-[var(--color-bg)] disabled:opacity-50 disabled:pointer-events-none cursor-pointer select-none`,
           variantClasses[variant],
           sizeClasses[size],
           className,

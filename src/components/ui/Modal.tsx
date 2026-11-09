@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
+import uiStyles from './themeStyles.module.css';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -123,7 +124,7 @@ export function Modal({
             aria-describedby={subtitle ? `${dialogId}-description` : undefined}
             tabIndex={-1}
             onKeyDown={presentation === 'page' ? undefined : handleDialogKeyDown}
-            className={`flex ${presentation === 'page' ? '' : 'w-full'} min-h-0 flex-col font-theme bg-surface outline-none overflow-hidden ${panelClass}`}
+            className={`flex ${presentation === 'page' ? '' : 'w-full'} min-h-0 flex-col ${uiStyles.fontTheme} bg-surface outline-none overflow-hidden ${panelClass}`}
             initial={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}
             animate={{ opacity: 1, transform: 'scale(1)' }}
             exit={{ opacity: 0, transform: prefersReducedMotion ? 'scale(1)' : 'scale(0.96)' }}

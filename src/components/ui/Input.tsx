@@ -5,6 +5,7 @@ import { twMerge } from 'tailwind-merge';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { fieldContainerClass, fieldControlClass, fieldErrorClass, fieldLabelClass, fieldMessageClass } from './fieldStyles';
+import uiStyles from './themeStyles.module.css';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -74,7 +75,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className={twMerge(
               clsx(
                 fieldControlClass,
-                'h-10 font-theme',
+                'h-10',
+                uiStyles.fontTheme,
                 leftIcon ? 'pl-9' : '',
                 rightIcon ? (clearable && onClear && String(value ?? '').length > 0 ? 'pr-20' : 'pr-9') : '',
                 !rightIcon && clearable && onClear && String(value ?? '').length > 0 ? 'pr-11' : '',
