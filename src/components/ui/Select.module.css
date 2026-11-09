@@ -1,0 +1,12 @@
+.menu {
+  border: 1px solid var(--color-border);
+  border-radius: 0 !important;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 12px 32px rgb(20 20 20 / .12);
+}
+
+.menu :where(button, [role="menuitem"], [role="menuitemradio"], [role="option"]) {
+  border-radius: 0 !important;
+  min-height: 44px;
+}

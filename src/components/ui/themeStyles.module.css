@@ -1,0 +1,3 @@
+.fontTheme {
+  font-family: var(--font-family, Calibri, system-ui, sans-serif) !important;
+}

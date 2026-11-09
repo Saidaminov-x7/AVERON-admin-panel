@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, useId } from 'react';
 import { Button } from './Button';
 import { createPortal } from 'react-dom';
+import styles from './Select.module.css';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { ChevronDown, Check, Search, X } from 'lucide-react';
@@ -270,7 +271,7 @@ export const Select: React.FC<SelectProps> = ({
           id={menuId}
           role="listbox"
           onKeyDown={handleOptionsKeyDown}
-          className="averon-admin-menu fixed z-[100] flex flex-col overflow-hidden rounded-theme animate-fade-in"
+          className={`${styles.menu} fixed z-[100] flex flex-col overflow-hidden rounded-theme animate-fade-in`}
           style={{
             left: menuPosition?.left ?? 0,
             top: menuPosition?.top ?? 0,

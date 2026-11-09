@@ -1,6 +1,7 @@
 import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import uiStyles from './themeStyles.module.css';
 
 export interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   variant?: 'default' | 'flat' | 'bordered' | 'elevated';
@@ -37,7 +38,7 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       className={twMerge(
-        clsx('rounded-[var(--radius-card)] font-theme transition-colors', variantStyles, paddingStyles),
+        clsx('rounded-[var(--radius-card)] transition-colors', uiStyles.fontTheme, variantStyles, paddingStyles),
         className,
       )}
       {...props}
