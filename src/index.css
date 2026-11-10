@@ -14,14 +14,14 @@
   --color-surface:     #ffffff;
   --color-surface-soft: #f5f5f5;
   --color-image-surface: #f3f3f3;
-  --color-border:      #dddddd;
+  --color-border:      #767676;
   --color-border-hover: #999999;
   --color-text:        #111111;
-  --color-text-muted:  #767676;
+  --color-text-muted:  #6b6b6b;
   --color-text-secondary: #4a4a4a;
-  --color-muted:       #767676;
+  --color-muted:       #6b6b6b;
   --color-sidebar-bg:  #ffffff;
-  --color-sidebar-border: #dddddd;
+  --color-sidebar-border: #767676;
   --color-primary:     #1a1a1a;
   --color-secondary:   #404040;
   --color-button-hover: #111111;
@@ -32,9 +32,9 @@
   --color-on-primary:  #ffffff;
   --color-overlay:     rgb(0 0 0 / .58);
   --color-success:     #24734b;
-  --color-warning:     #9a6417;
+  --color-warning:     #8f5b12;
   --color-error:       #b42318;
-  --color-info:        #436d91;
+  --color-info:        #3f6688;
   --radius:            0;
   --radius-card:       0;
   --radius-control:    0;
@@ -88,14 +88,14 @@
   --color-surface:     #181b1f;
   --color-surface-soft: #20242a;
   --color-image-surface: #20242a;
-  --color-border:      #3a3a3a;
+  --color-border:      #80858b;
   --color-border-hover: #737373;
   --color-text:        #f2f3f3;
   --color-text-muted:  #a3a3a3;
   --color-text-secondary: #c3c7cb;
   --color-muted:       #a3a3a3;
   --color-sidebar-bg:  #181b1f;
-  --color-sidebar-border: #3a3a3a;
+  --color-sidebar-border: #80858b;
   --color-primary:     #f1f1f1;
   --color-secondary:   #cfcfcf;
   --color-button-hover: #d5d8dd;
@@ -226,13 +226,18 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-primary) 3%, var(--c
   opacity: 1;
 }
 .averon-admin-shell :where(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):not([type="range"]), textarea, select):focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--color-primary) 42%, transparent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 1px;
   border-color: var(--color-primary);
 }
 .averon-admin-shell :where(input, textarea, select):disabled {
   cursor: not-allowed;
-  opacity: .6;
+  opacity: 1;
+}
+.averon-admin-shell :where(button, [role="button"]):disabled {
+  opacity: 1 !important;
+  background-color: var(--color-surface-soft);
+  color: var(--color-text-secondary);
 }
 .averon-admin-shell :where(button, [role="button"]) {
   border-radius: 0 !important;
@@ -403,7 +408,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--color-primary) 3%, var(--c
   }
   .input:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 12%, transparent);
+    box-shadow: 0 0 0 2px var(--color-primary);
   }
 
   /* Select */
