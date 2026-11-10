@@ -247,7 +247,7 @@ const LoginPage: React.FC = () => {
             <Dropdown
               align="right"
               ariaLabel={t('login.languageAccessibleName', {
-                language: LOGIN_LANGUAGES.find(({ code }) => i18n.language?.startsWith(code))?.label ?? LOGIN_LANGUAGES[0].label,
+                language: `${(i18n.language?.slice(0, 2) || 'ru').toUpperCase()} ${LOGIN_LANGUAGES.find(({ code }) => i18n.language?.startsWith(code))?.label ?? LOGIN_LANGUAGES[0].label}`,
               })}
               trigger={(
                 <span className="inline-flex size-11 items-center justify-center rounded border border-app bg-surface text-app transition-colors hover:border-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">

@@ -540,6 +540,12 @@ button, [role="button"], summary { user-select: none; }
   }
 }
 
+@media (min-width: 1024px) {
+  .averon-admin-shell .admin-mobile-navigation .admin-mobile-link-index {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;

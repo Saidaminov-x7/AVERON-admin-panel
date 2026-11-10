@@ -92,7 +92,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
             <SearchIcon />
           </span>
           <span className="truncate text-xs md:text-sm">{t('common.search', 'Поиск по панели...')}</span>
-          <kbd className="ml-auto text-[11px] font-mono px-1.5 py-0.5 bg-gray-200 dark:bg-white/10 text-muted opacity-80 group-hover:opacity-100">
+          <kbd className="ml-auto text-[11px] font-mono px-1.5 py-0.5 bg-gray-200 dark:bg-white/10 text-muted group-hover:opacity-100">
             ⌘K
           </kbd>
         </Button>

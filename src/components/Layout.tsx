@@ -194,7 +194,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, persistent = false }) 
         />
 
         {/* Контент страницы */}
-        <main ref={mainScrollRef} className="admin-scroll safe-bottom flex-1 overflow-x-hidden overflow-y-auto animate-fade-in">
+        <main ref={mainScrollRef} tabIndex={0} className="admin-scroll safe-bottom flex-1 overflow-x-hidden overflow-y-auto animate-fade-in">
           <Container padded={false} className="admin-page-frame space-y-4 sm:space-y-6">
             {children}
           </Container>
