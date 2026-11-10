@@ -28,12 +28,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm build
-      - name: Start production preview
-        run: nohup pnpm preview -- --host 127.0.0.1 > server.log 2>&1 < /dev/null &
-      - name: Wait for production preview
-        run: node scripts/wait-for-server.mjs http://127.0.0.1:4173/login
       - name: Scan login, product list, and product form
-        run: pnpm test:axe
+        run: |
+          pnpm preview -- --host 127.0.0.1 > server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          node scripts/wait-for-server.mjs http://127.0.0.1:4173/login
+          pnpm test:axe
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # actions/upload-artifact v4.6.2
         with:
