@@ -10,6 +10,7 @@
     "check:no-native-select": "node scripts/check-no-native-select.mjs",
     "lint": "oxlint src scripts",
     "test": "vitest run",
+    "test:axe": "node scripts/axe-ci.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -42,6 +43,8 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.11.0",
+    "@playwright/test": "1.58.2",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

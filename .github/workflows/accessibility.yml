@@ -1,0 +1,58 @@
+name: Accessibility
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admin-a11y-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  axe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # actions/checkout v6.0.2
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # pnpm/action-setup v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@249970729cb0ef3589644e289664e5dc5ba9c38 # actions/setup-node v6.5.0
+        with:
+          node-version: 22.x
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build
+      - name: Start production preview
+        run: pnpm preview -- --host 127.0.0.1 > server.log 2>&1 &
+      - name: Wait for production preview
+        run: node scripts/wait-for-server.mjs http://127.0.0.1:4173/login
+      - name: Scan login, product list, and product form
+        run: pnpm test:axe
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # actions/upload-artifact v4.6.2
+        with:
+          name: admin-axe-reports
+          path: artifacts/axe/*.json
+          if-no-files-found: warn
+
+  chunk-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # actions/checkout v6.0.2
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # pnpm/action-setup v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@249970729cb0ef3589644e289664e5dc5ba9c38 # actions/setup-node v6.5.0
+        with:
+          node-version: 22.x
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Enforce Vite chunk gzip budget
+        run: node scripts/check-chunk-budget.mjs
