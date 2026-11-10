@@ -242,7 +242,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
             onCloseMobile?.();
           }}
           className={`flex items-center text-left ${compact ? "admin-sidebar-compact-toggle group relative lg:flex lg:size-11 lg:items-center lg:justify-center" : ""}`}
-          aria-label={t(compact ? "common.expand" : "sidebar.dashboard")}
+          aria-label={compact ? `${t("common.expand")} A` : undefined}
           title={compact ? t("common.expand") : undefined}
           aria-pressed={compact ? collapsed : undefined}
           data-action-id={compact ? "admin.sidebar.toggle-collapse" : undefined}
@@ -305,7 +305,6 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
                   end={to === "/"}
                   onClick={onCloseMobile}
                   title={compact ? t(labelKey) : undefined}
-                  aria-label={t(labelKey)}
                   className={({ isActive }) => `admin-drawer-link flex min-h-11 items-center gap-3 px-3 py-2 text-sm transition-colors ${isActive ? "is-active" : ""}`}
                 >
                   <span className="admin-mobile-link-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
@@ -327,7 +326,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
               key={isMobileOpen ? "mobile-open" : "mobile-closed"}
               portal
               scrollable={false}
-              ariaLabel={t("common.language")}
+              ariaLabel={`${(i18n.language.slice(0, 2) || "ru").toUpperCase()} ${t("common.language")}`}
               className="w-11 shrink-0"
               contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
               trigger={(
@@ -365,7 +364,7 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
       </div>
 
       <div data-admin-drawer-footer="" className={`admin-sidebar-account flex shrink-0 items-center gap-3 border-t border-app px-4 py-3 ${compact ? "lg:flex-col lg:gap-1 lg:px-0 lg:py-2" : ""}`}>
-        <NavLink to="/profile" onClick={onCloseMobile} aria-label={`${t("header.account")}: ${user?.name || t("sidebar.admin")}`} className={`admin-account-profile flex min-w-0 flex-1 items-center gap-3 text-left transition-colors hover:text-primary-600 ${compact ? "lg:flex-col lg:gap-1" : ""}`}>
+        <NavLink to="/profile" onClick={onCloseMobile} aria-label={compact ? `${user?.name || t("sidebar.admin")} ${user?.adminRole || "ADMIN"}` : undefined} className={`admin-account-profile flex min-w-0 flex-1 items-center gap-3 text-left transition-colors hover:text-primary-600 ${compact ? "lg:flex-col lg:gap-1" : ""}`}>
           <span className="admin-account-avatar flex size-11 shrink-0 items-center justify-center bg-app text-xs font-bold text-app" aria-hidden="true">
             {(user?.name || "A").slice(0, 1).toUpperCase()}
           </span>

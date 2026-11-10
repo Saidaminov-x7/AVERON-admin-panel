@@ -481,7 +481,7 @@ export default function ProductsPage() {
                       <span className="text-xs">AVERON</span>
                     </div>
                   )}
-                  <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm ${product.status === "PUBLISHED" ? "bg-emerald-600 text-white" : product.status === "DRAFT" ? "bg-sky-600 text-white" : "bg-neutral-700 text-white"}`}>
+                  <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-sm ${product.status === "PUBLISHED" ? "bg-emerald-800 text-white" : product.status === "DRAFT" ? "bg-sky-700 text-white" : "bg-neutral-700 text-white"}`}>
                     {t(`products.status.${product.status.toLowerCase()}`)}
                   </span>
                 </div>
@@ -536,7 +536,7 @@ export default function ProductsPage() {
                     )}
                     <Button type="button" disabled={permanentDeleteMutation.isPending} onClick={() => {
                       if (window.confirm(t("products.deleteProductConfirm", { title }))) permanentDeleteMutation.mutate(product.id);
-                    }} className="inline-flex size-9 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50" aria-label={t("products.deleteProductLabel", { title })}><Trash2 size={15} /></Button>
+                    }} className="inline-flex size-11 items-center justify-center rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 disabled:opacity-50" aria-label={t("products.deleteProductLabel", { title })}><Trash2 size={15} /></Button>
                   </div>
                 </div>
               </article>

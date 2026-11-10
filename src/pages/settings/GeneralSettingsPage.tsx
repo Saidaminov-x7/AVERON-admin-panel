@@ -158,7 +158,7 @@ const GeneralSettingsPage: React.FC = () => {
       <div className="w-full space-y-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card
-            title={t('settings.productMediaTitle')}
+            title={<h2 className="text-base font-bold text-app tracking-tight">{t('settings.productMediaTitle')}</h2>}
             description={t('settings.productMediaDescription')}
           >
             <div className="grid gap-4 pt-2 sm:grid-cols-2">

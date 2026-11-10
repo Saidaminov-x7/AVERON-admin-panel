@@ -200,6 +200,8 @@ export function ProductFormModal({
   onSubmit,
 }: ProductFormModalProps) {
   const { t, i18n } = useTranslation();
+  const SectionHeading = presentation === "page" ? "h3" : "h4";
+  const SubsectionHeading = presentation === "page" ? "h4" : "h5";
   const queryClient = useQueryClient();
   const formId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -783,10 +785,10 @@ export function ProductFormModal({
       align="right"
       className="w-full sm:w-auto"
       contentClassName="w-56 p-1"
-      ariaLabel={`${t("products.contentLanguage")}: ${localeName(activeLocale)}`}
       trigger={(
         <span className="flex h-11 w-full min-w-44 items-center justify-between gap-3 rounded-theme border border-app bg-surface px-3 text-sm font-semibold text-app transition-colors hover:bg-[var(--color-surface-soft)] sm:w-auto">
           <span className="flex min-w-0 items-center gap-2"><LanguageFlag locale={activeLocale} className="h-4 w-6" /><span className="truncate">{localeName(activeLocale)}</span></span>
+          <span className="sr-only">{t("products.contentLanguage")}</span>
           <ChevronDown size={16} className="shrink-0 text-muted" aria-hidden="true" />
         </span>
       )}
@@ -882,7 +884,7 @@ export function ProductFormModal({
           </div>
         )}
         <section className={`${currentStep === 0 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
-          <h4 className="text-sm font-bold text-app">{t("products.mainInformation")}</h4>
+          <SectionHeading className="text-sm font-bold text-app">{t("products.mainInformation")}</SectionHeading>
           <div className="grid gap-4 md:grid-cols-2">
             <Select
               label={t("products.countryLabel")}
@@ -907,7 +909,7 @@ export function ProductFormModal({
         <section className={`${currentStep === 0 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h4 className="text-sm font-bold text-app">{t("products.localizedContent")}</h4>
+              <SectionHeading className="text-sm font-bold text-app">{t("products.localizedContent")}</SectionHeading>
               <p className="mt-1 text-xs text-muted">{t("products.localizedContentHint")}</p>
             </div>
             {hasAiProductFillCapability(capabilitiesQuery.data) && !capabilitiesQuery.isError && (
@@ -934,7 +936,7 @@ export function ProductFormModal({
             <div role="region" aria-label={t("products.aiFill.preview")} className="space-y-3 rounded-xl border border-primary-500/30 bg-primary-500/5 p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h5 className="text-sm font-semibold text-app">{t("products.aiFill.preview")}</h5>
+                  <SubsectionHeading className="text-sm font-semibold text-app">{t("products.aiFill.preview")}</SubsectionHeading>
                   <p className="mt-1 text-xs text-muted">{t("products.aiFill.previewHint")}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -1052,7 +1054,7 @@ export function ProductFormModal({
 
         <section className={`${currentStep === 1 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <div>
-            <h4 className="text-sm font-bold text-app">{t("products.priceSection")}</h4>
+            <SectionHeading className="text-sm font-bold text-app">{t("products.priceSection")}</SectionHeading>
             <p className="mt-1 text-xs text-muted">{t("products.priceSectionHint")}</p>
           </div>
           <p className="text-sm text-muted">{t("products.sizeStockHint")}</p>
@@ -1082,7 +1084,7 @@ export function ProductFormModal({
 
         <section className={`${currentStep === 2 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <div>
-            <h4 className="text-sm font-bold text-app">{t("products.colorsTitle")}</h4>
+            <SectionHeading className="text-sm font-bold text-app">{t("products.colorsTitle")}</SectionHeading>
             <p className="mt-1 text-xs text-muted">{t("products.colorsHint")}</p>
           </div>
           <div className="space-y-2">
@@ -1115,7 +1117,7 @@ export function ProductFormModal({
 
         <section className={`${currentStep === 3 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
           <div>
-            <h4 className="text-sm font-bold text-app">{t("products.photoSection")}</h4>
+            <SectionHeading className="text-sm font-bold text-app">{t("products.photoSection")}</SectionHeading>
             <p className="mt-1 text-xs text-muted">
               {t("products.photoCount", { count: photos.length, max: Math.min(15, maxProductPhotos) })} · {t("products.photoSizeLimit", { size: maxProductPhotoSizeMb })}
             </p>
@@ -1274,7 +1276,7 @@ export function ProductFormModal({
         {product && hasImageEmbeddingsCapability(capabilitiesQuery.data) && !capabilitiesQuery.isError && (
           <section className={`${currentStep === 3 ? "" : "hidden "}space-y-3 rounded-xl border border-app p-4`}>
             <div>
-              <h4 className="text-sm font-bold text-app">{t("products.imageEmbeddings.title")}</h4>
+              <SectionHeading className="text-sm font-bold text-app">{t("products.imageEmbeddings.title")}</SectionHeading>
               <p className="mt-1 text-xs text-muted">{t("products.imageEmbeddings.hint")}</p>
             </div>
             {imageEmbeddingQuery.isLoading ? (
@@ -1331,7 +1333,7 @@ export function ProductFormModal({
 
         {(product?.source === "MANUAL" || !product) && (
           <section className={`${currentStep === 2 ? "" : "hidden "}space-y-4`}>
-            <h4 className="text-sm font-bold text-app">{t("products.additionalInformation")}</h4>
+            <SectionHeading className="text-sm font-bold text-app">{t("products.additionalInformation")}</SectionHeading>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-app">
@@ -1381,7 +1383,7 @@ export function ProductFormModal({
         {(product?.source === "MANUAL" || !product) && (
           <section className={`${currentStep === 2 ? "" : "hidden "}space-y-4 rounded-xl border border-app bg-surface p-5`}>
             <div>
-              <h4 className="text-sm font-bold text-app">{t("products.stockByVariantTitle")}</h4>
+              <SectionHeading className="text-sm font-bold text-app">{t("products.stockByVariantTitle")}</SectionHeading>
               <p className="mt-1 text-xs text-muted">{t("products.stockByVariantHint")}</p>
             </div>
             {(() => {
@@ -1417,7 +1419,7 @@ export function ProductFormModal({
         )}
         {product && (
           <section className={`${currentStep === 5 ? "" : "hidden "}space-y-3 rounded-xl border border-app bg-surface-muted p-4`}>
-            <h4 className="text-sm font-bold text-app">{t("products.sourceInformation")}</h4>
+            <SectionHeading className="text-sm font-bold text-app">{t("products.sourceInformation")}</SectionHeading>
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
                 <dt className="text-xs text-muted">{t("products.sourceProvider")}</dt>
@@ -1452,7 +1454,7 @@ export function ProductFormModal({
           </Suspense>
         </section>}
         <section className={`${currentStep === 5 ? "" : "hidden "}space-y-3 rounded-xl border border-app p-4`}>
-          <h4 className="text-sm font-bold text-app">{t("products.publicationSection")}</h4>
+          <SectionHeading className="text-sm font-bold text-app">{t("products.publicationSection")}</SectionHeading>
           <div className="flex items-center justify-between gap-4 py-2">
             <Switch checked={values.publish} onChange={(checked) => updateValue("publish", checked)} label={t("products.publishLabel")} description={t("products.publishDescription")} containerClassName="w-full" />
           </div>
