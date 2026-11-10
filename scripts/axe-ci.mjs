@@ -25,10 +25,10 @@ try {
     if (url.pathname.includes('/products')) return route.fulfill({ json: { items: [], total: 0, page: 1, limit: 25, totalPages: 0 } });
     return route.fulfill({ json: {} });
   });
-  for (const [pageName, path, expected] of [
-    ['login', '/login', 'Войти'],
-    ['products', '/products', 'Товары'],
-    ['product-form', '/products/new', 'Название'],
+  for (const [pageName, path, target] of [
+    ['login', '/login', '#login-email'],
+    ['products', '/products', 'h1'],
+    ['product-form', '/products/new', '[role="tabpanel"] input, [role="tabpanel"] textarea'],
   ]) {
     const page = await context.newPage();
     let pageError = null;
@@ -36,7 +36,7 @@ try {
     try {
       const response = await page.goto(`${baseURL}${path}`, { waitUntil: 'networkidle' });
       if (!response?.ok()) throw new Error(`HTTP ${response?.status() ?? 'no response'}`);
-      await page.getByText(expected, { exact: false }).first().waitFor({ state: 'visible', timeout: 10000 });
+      await page.locator(target).first().waitFor({ state: 'visible', timeout: 10000 });
       if (pageError) throw new Error(`uncaught page error: ${pageError}`);
       const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
       await writeFile(`${reportDir}/${pageName}.json`, `${JSON.stringify({ page: pageName, url: path, violations: results.violations, passes: results.passes.length, incomplete: results.incomplete.length }, null, 2)}\n`);
