@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Search, ShoppingCart, RefreshCw, Eye, Check, Ban } from 'lucide-react';
 import { toast } from 'sonner';
@@ -158,6 +158,9 @@ export default function OrdersPage() {
     () => filterCommerceOrders(ordersQuery.data ?? [], search, statusFilter),
     [ordersQuery.data, search, statusFilter],
   );
+  const openOrder = useCallback((orderNumber: string) => {
+    setSelectedOrderNumber(orderNumber);
+  }, []);
 
   const order = selectedOrderQuery.data;
   // Reset the editable delivery status when the selected order changes.
@@ -230,7 +233,7 @@ export default function OrdersPage() {
                   <td className="px-4 py-3"><span className={statusStyles[item.status] ?? 'badge-neutral'}>{statusLabels[item.status]?.[locale] ?? item.status}</span></td>
                   <td className="px-4 py-3 text-right font-semibold text-app">{formatUzs(item.totalRevenue, locale)}</td>
                   <td className="px-4 py-3 text-muted text-xs">{new Date(item.createdAt).toLocaleDateString(locale === 'en' ? 'en-US' : locale === 'uz' ? 'uz-UZ' : 'ru-RU')}</td>
-                  <td className="px-4 py-3 text-right"><Button type="button" variant="ghost" size="sm" onClick={() => setSelectedOrderNumber(item.orderNumber)}><Eye size={16} />{copy.details}</Button></td>
+                  <td className="px-4 py-3 text-right"><Button type="button" variant="ghost" size="sm" onClick={() => openOrder(item.orderNumber)}><Eye size={16} />{copy.details}</Button></td>
                 </tr>
               ))}</tbody>
             </table>
