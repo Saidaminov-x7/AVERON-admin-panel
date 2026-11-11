@@ -9,7 +9,6 @@ import {
   BadgePercent,
   Bell,
   Check,
-  ChevronRight,
   ClipboardCheck,
   ExternalLink,
   Gauge,
@@ -310,7 +309,6 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
                   <span className="admin-mobile-link-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                   <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
                   <span className="admin-sidebar-label truncate">{t(labelKey)}</span>
-                  <ChevronRight className="admin-mobile-link-chevron" size={15} aria-hidden="true" />
                 </NavLink>
               ))}
             </div>
