@@ -172,8 +172,8 @@ export const MediaLibraryPage: React.FC = () => {
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-xl border transition-colors ${
                 viewMode === 'grid'
-                  ? 'bg-primary-500 text-white border-primary-500'
-                  : 'bg-surface border-app text-muted hover:text-app'
+                  ? 'bg-primary-500 text-white border-primary-500 hover:bg-primary-500'
+                  : 'bg-surface border-app text-muted hover:bg-[var(--color-surface-soft)] hover:text-app'
               }`}
               title={t('media.gridView', 'Сетка')}
             >
@@ -184,8 +184,8 @@ export const MediaLibraryPage: React.FC = () => {
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-xl border transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-primary-500 text-white border-primary-500'
-                  : 'bg-surface border-app text-muted hover:text-app'
+                  ? 'bg-primary-500 text-white border-primary-500 hover:bg-primary-500'
+                  : 'bg-surface border-app text-muted hover:bg-[var(--color-surface-soft)] hover:text-app'
               }`}
               title={t('media.listView', 'Список')}
             >
@@ -234,7 +234,7 @@ export const MediaLibraryPage: React.FC = () => {
                     className="absolute top-2 left-2 z-10 p-1 rounded-lg bg-black/50 text-white backdrop-blur-xs hover:bg-black transition-colors"
                   >
                     {isSelected ? (
-                      <CheckSquare size={14} className="text-primary-400" />
+                      <CheckSquare size={14} className="text-white" />
                     ) : (
                       <Square size={14} />
                     )}
@@ -259,6 +259,7 @@ export const MediaLibraryPage: React.FC = () => {
                     <div className="flex items-center gap-1">
                       <Button
                         type="button"
+                        variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleCopyUrl(item.url, item.id);
@@ -270,6 +271,7 @@ export const MediaLibraryPage: React.FC = () => {
                       </Button>
                       <Button
                         type="button"
+                        variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation();
                           setDeleteConfirmId(item.id);
@@ -296,6 +298,7 @@ export const MediaLibraryPage: React.FC = () => {
                 <div className="flex items-center gap-3 min-w-0">
                   <Button
                     type="button"
+                    variant="ghost"
                     aria-label={t('media.selectFile', { id: item.id })}
                     aria-pressed={selectedIds.includes(item.id)}
                     onClick={() => handleToggleSelect(item.id)}
