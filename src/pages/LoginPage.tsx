@@ -11,7 +11,6 @@ import ThemeToggle from '../components/ThemeToggle/ThemeToggle';
 import { Button } from '../components/ui/Button';
 import { Container } from '../components/ui/Container';
 
-const REMEMBER_EMAIL_KEY = 'admin_remembered_email';
 const LOGIN_LANGUAGES = [
   { code: 'ru', label: 'Русский' },
   { code: 'uz', label: 'Oʻzbek' },
@@ -28,7 +27,6 @@ const LoginPage: React.FC = () => {
   const [step, setStep] = useState<'credentials' | 'telegram' | 'totp'>('credentials');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // 2FA state
@@ -42,17 +40,9 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const codeInputRef = useRef<HTMLInputElement>(null);
 
-  // Загружаем сохранённый email при монтировании
-  // localStorage is only available in the browser; restore the opt-in saved email after mount.
-  // oxlint-disable react/set-state-in-effect
   useEffect(() => {
-    const saved = localStorage.getItem(REMEMBER_EMAIL_KEY);
-    if (saved) {
-      setEmail(saved);
-      setRememberMe(true);
-    }
+    localStorage.removeItem('admin_remembered_email');
   }, []);
-  // oxlint-enable react/set-state-in-effect
 
   // Таймер для повторной отправки кода
   useEffect(() => {
@@ -109,12 +99,6 @@ const LoginPage: React.FC = () => {
 
         setAuth(data.accessToken, data.user);
 
-        if (rememberMe) {
-          localStorage.setItem(REMEMBER_EMAIL_KEY, email);
-        } else {
-          localStorage.removeItem(REMEMBER_EMAIL_KEY);
-        }
-
         navigate('/', { replace: true });
       }
     } catch (err: unknown) {
@@ -159,12 +143,6 @@ const LoginPage: React.FC = () => {
 
       setAuth(data.accessToken, data.user);
 
-      if (rememberMe) {
-        localStorage.setItem(REMEMBER_EMAIL_KEY, email);
-      } else {
-        localStorage.removeItem(REMEMBER_EMAIL_KEY);
-      }
-
       navigate('/', { replace: true });
     } catch (err: unknown) {
       const errorObj = err as { response?: { status?: number; data?: { message?: string } }; message?: string };
@@ -191,8 +169,6 @@ const LoginPage: React.FC = () => {
         return;
       }
       setAuth(data.accessToken, data.user);
-      if (rememberMe) localStorage.setItem(REMEMBER_EMAIL_KEY, email);
-      else localStorage.removeItem(REMEMBER_EMAIL_KEY);
       navigate('/', { replace: true });
     } catch (err: unknown) {
       const errorObj = err as { response?: { data?: { message?: string } } };
@@ -364,19 +340,6 @@ const LoginPage: React.FC = () => {
                     )}
                   </Button>
                 </div>
-              </div>
-
-              <div className="flex w-full items-center justify-start text-sm">
-                <label htmlFor="remember-me" className="inline-flex min-h-11 items-center gap-2.5 cursor-pointer select-none text-app">
-                  <input
-                    type="checkbox"
-                    id="remember-me"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="m-0 size-4 shrink-0 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
-                  />
-                  <span className="inline-flex items-center text-xs leading-none text-muted transition-colors hover:text-app">{t('login.rememberMe')}</span>
-                </label>
               </div>
 
               {/* Ошибка */}

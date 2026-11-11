@@ -23,10 +23,7 @@ async page => {
     if (await page.locator('input[type="text"]').count() !== 1 || await visibility.getAttribute('aria-pressed') !== 'true') throw new Error(`Show password: ${locale} ${width}`);
     await page.keyboard.press('Space');
     if (await page.locator('input[type="password"]').count() !== 1 || await visibility.getAttribute('aria-pressed') !== 'false') throw new Error(`Hide password: ${locale} ${width}`);
-    const remember = page.locator('input[type="checkbox"]');
-    await remember.check();
-    if (!await remember.isChecked()) throw new Error(`Remember-me check: ${locale} ${width}`);
-    await remember.uncheck();
+    if (await page.locator('#remember-me').count()) throw new Error(`Nonfunctional remember-me control: ${locale} ${width}`);
     const before = loginRequests;
     await page.locator('form button[type="submit"]').click();
     if (loginRequests !== before || await email.evaluate(element => element.validity.valid)) throw new Error(`Required email validation: ${locale} ${width}`);
