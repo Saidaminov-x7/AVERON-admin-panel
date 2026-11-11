@@ -58,6 +58,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   const formattedTotal = totalItems === undefined
     ? null
     : new Intl.NumberFormat(i18n.language).format(totalItems);
+  const availablePageSizes = [...new Set([pageSize, ...pageSizeOptions])].sort((a, b) => a - b);
 
   return (
     <div
@@ -80,7 +81,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                 ariaLabel={t('common.itemsPerPage')}
                 value={String(pageSize)}
                 onChange={(value) => onPageSizeChange(Number(value))}
-                options={pageSizeOptions.map((option) => ({ value: String(option), label: String(option) }))}
+                options={availablePageSizes.map((option) => ({ value: String(option), label: String(option) }))}
                 className="h-11 text-xs py-1"
               />
             </div>
