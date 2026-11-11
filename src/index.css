@@ -1032,16 +1032,6 @@ html body a[class*="button"],
     font-variant-numeric: tabular-nums;
   }
 
-  .averon-admin-shell .admin-mobile-navigation .admin-mobile-link-chevron {
-    flex: 0 0 auto;
-    color: var(--color-text-muted);
-    transition: transform var(--duration-ui) var(--ease-out-ui);
-  }
-
-  .averon-admin-shell .admin-mobile-navigation .admin-drawer-link:hover .admin-mobile-link-chevron {
-    transform: translateX(2px);
-  }
-
   .averon-admin-shell .admin-mobile-navigation .admin-drawer-link:hover,
   .averon-admin-shell .admin-mobile-navigation .admin-drawer-link.is-active {
     border-color: var(--color-border) !important;
