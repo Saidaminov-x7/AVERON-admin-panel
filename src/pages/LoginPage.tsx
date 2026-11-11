@@ -231,6 +231,7 @@ const LoginPage: React.FC = () => {
                 </span>
               )}
               contentClassName="!w-[46px] min-w-0 p-0 border border-app rounded bg-surface shadow-xl"
+              matchTriggerWidth
             >
               {LOGIN_LANGUAGES.map(({ code, label }) => {
                 const active = i18n.language?.startsWith(code);

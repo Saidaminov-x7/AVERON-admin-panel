@@ -12,6 +12,7 @@ interface DropdownProps {
   ariaLabel?: string;
   scrollable?: boolean;
   portal?: boolean;
+  matchTriggerWidth?: boolean;
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
@@ -23,9 +24,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
   ariaLabel,
   scrollable = true,
   portal = false,
+  matchTriggerWidth = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState<{ top: number; left: number; maxHeight: number; maxWidth: number } | null>(null);
+  const [position, setPosition] = useState<{ top: number; left: number; maxHeight: number; maxWidth: number; width?: number } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -41,17 +43,18 @@ export const Dropdown: React.FC<DropdownProps> = ({
     const drawer = portal ? triggerElement.closest<HTMLElement>('.admin-mobile-navigation') : null;
     const drawerFooter = drawer?.querySelector<HTMLElement>('[data-admin-drawer-footer]');
     const drawerFooterTop = drawerFooter?.getBoundingClientRect().top;
-    setPosition(getDropdownPosition({
+    const nextPosition = getDropdownPosition({
       anchor: { top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left },
-      panelWidth: panelRect.width,
+      panelWidth: matchTriggerWidth ? rect.width : panelRect.width,
       panelHeight: panelElement.scrollHeight + panelElement.offsetHeight - panelElement.clientHeight,
       viewportWidth: window.innerWidth,
       viewportHeight: typeof drawerFooterTop === 'number' && drawerFooterTop > 0
         ? Math.min(window.innerHeight, drawerFooterTop)
         : window.innerHeight,
       align,
-    }));
-  }, [align, portal]);
+    });
+    setPosition({ ...nextPosition, ...(matchTriggerWidth ? { width: rect.width } : {}) });
+  }, [align, matchTriggerWidth, portal]);
 
   useLayoutEffect(() => {
     if (!isOpen) return;
@@ -152,6 +155,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
             left: position?.left ?? 0,
             maxHeight: position?.maxHeight ?? 'calc(100vh - 1rem)',
             maxWidth: position?.maxWidth ?? 'calc(100vw - 1rem)',
+            width: position?.width,
             visibility: position ? 'visible' : 'hidden',
           }}
           onClick={() => {

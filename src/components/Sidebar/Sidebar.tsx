@@ -8,7 +8,6 @@ import {
   BarChart2,
   BadgePercent,
   Bell,
-  Check,
   ClipboardCheck,
   ExternalLink,
   Gauge,
@@ -88,8 +87,6 @@ const languages = [
   { code: "uz", name: "Oʻzbekcha" },
   { code: "en", name: "English" },
 ] as const;
-
-const languageLabels = { ru: "Русский", uz: "Oʻzbekcha", en: "English" } as const;
 
 function readCollapsedPreference() {
   try {
@@ -324,9 +321,10 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
               key={isMobileOpen ? "mobile-open" : "mobile-closed"}
               portal
               scrollable={false}
+              matchTriggerWidth
               ariaLabel={`${(i18n.language.slice(0, 2) || "ru").toUpperCase()} ${t("common.language")}`}
               className="w-11 shrink-0"
-              contentClassName="w-[min(15rem,calc(100vw-2.5rem))] p-1.5"
+              contentClassName="min-w-0 p-0"
               trigger={(
                 <span className="flex h-11 w-11 items-center justify-center border border-app bg-surface text-app transition-colors hover:bg-[var(--color-surface-soft)]">
                   <span>{(i18n.language.slice(0, 2) || "ru").toUpperCase()}</span>
@@ -340,13 +338,13 @@ export default function Sidebar({ onCloseMobile, isMobileOpen = false }: { onClo
                     key={code}
                     type="button"
                     role="menuitemradio"
+                    aria-label={code.toUpperCase()}
                     aria-checked={active}
                     data-action-id={`admin.sidebar.language.${code}`}
                     onClick={() => changeLanguage(code)}
-                    className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${active ? "bg-[var(--color-surface-soft)] font-semibold text-app" : "text-app hover:bg-[var(--color-surface-soft)]"}`}
+                    className={`flex min-h-11 w-full items-center justify-center gap-0 rounded-lg !px-0 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${active ? "bg-[var(--color-surface-soft)] font-semibold text-app" : "text-app hover:bg-[var(--color-surface-soft)]"}`}
                   >
-                    <span className="flex items-center gap-3"><span className="w-7 text-[11px] font-semibold tracking-wide text-muted">{code.toUpperCase()}</span>{languageLabels[code]}</span>
-                    {active && <Check size={16} className="text-primary-500" />}
+                    <span aria-hidden="true">{code.toUpperCase()}</span>
                   </Button>
                 );
               })}
