@@ -384,6 +384,7 @@ export const UsersPage: React.FC = () => {
                     <th className="p-3.5 w-10">
                       <Button
                         type="button"
+                        variant="ghost"
                         aria-label={t('users.selectAllVisible')}
                         aria-pressed={selectedIds.length === users.length && users.length > 0}
                         onClick={handleSelectAll}
@@ -425,6 +426,7 @@ export const UsersPage: React.FC = () => {
                           <td className="p-3.5">
                             <Button
                               type="button"
+                              variant="ghost"
                               aria-label={t('users.selectUser', { name: user.name || user.id })}
                               aria-pressed={isSelected}
                               onClick={() => handleToggleSelect(user.id)}

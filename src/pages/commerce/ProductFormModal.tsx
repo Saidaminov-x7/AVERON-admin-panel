@@ -1108,7 +1108,7 @@ export function ProductFormModal({
                 <div className="relative col-start-2 sm:col-start-auto">
                   <input aria-label={t("products.hexColor", { name })} value={hexInput} maxLength={7} onChange={(event) => { const next = event.target.value.startsWith("#") ? event.target.value : `#${event.target.value}`; if (/^#[0-9a-fA-F]{0,6}$/.test(next)) updateRow(rawName, next); }} onBlur={() => { if (!/^#[0-9a-fA-F]{6}$/.test(hexInput)) updateRow(rawName, "#808080"); }} className="h-10 w-full rounded-md border border-app bg-surface px-2 font-mono text-sm uppercase text-app outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20" />
                 </div>
-                <Button type="button" aria-label={t("products.removeColor", { name })} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-muted transition-colors hover:bg-red-500/10 hover:text-red-600 sm:row-span-1"><Trash2 size={16} /></Button>
+                <Button type="button" variant="ghost" aria-label={t("products.removeColor", { name })} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-[var(--color-error)] transition-colors hover:bg-red-500/10 hover:text-[var(--color-error)] sm:row-span-1"><Trash2 size={16} /></Button>
               </div>;
             })}
             <Button type="button" onClick={() => updateValue("colorsText", [values.colorsText, " | #808080"].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold text-app transition-colors hover:bg-app"><span aria-hidden="true">+</span> {t("products.addColor")}</Button>
@@ -1250,10 +1250,10 @@ export function ProductFormModal({
                     )}
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex gap-1">
-                        <Button type="button" disabled={index === 0} onClick={() => movePhoto(index, -1)} aria-label={t("products.movePhotoUp")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveUp size={16} /></Button>
-                        <Button type="button" disabled={index === photos.length - 1} onClick={() => movePhoto(index, 1)} aria-label={t("products.movePhotoDown")} className="rounded-lg p-2 text-muted hover:bg-app disabled:opacity-40"><MoveDown size={16} /></Button>
+                        <Button type="button" variant="ghost" disabled={index === 0} onClick={() => movePhoto(index, -1)} aria-label={t("products.movePhotoUp")} className="rounded-lg p-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-soft)] hover:text-app disabled:opacity-100"><MoveUp size={16} /></Button>
+                        <Button type="button" variant="ghost" disabled={index === photos.length - 1} onClick={() => movePhoto(index, 1)} aria-label={t("products.movePhotoDown")} className="rounded-lg p-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-soft)] hover:text-app disabled:opacity-100"><MoveDown size={16} /></Button>
                       </div>
-                      <Button type="button" onClick={() => removePhoto(photo)} aria-label={t("products.removePhoto")} className="rounded-lg p-2 text-red-500 hover:bg-red-500/10"><Trash2 size={16} /></Button>
+                      <Button type="button" variant="ghost" onClick={() => removePhoto(photo)} aria-label={t("products.removePhoto")} className="rounded-lg p-2 text-red-500 hover:bg-red-500/10"><Trash2 size={16} /></Button>
                     </div>
                   </div>
                 </li>

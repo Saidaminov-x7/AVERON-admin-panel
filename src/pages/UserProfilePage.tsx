@@ -445,7 +445,7 @@ const UserProfilePage: React.FC = () => {
                     <p className="truncate text-sm font-semibold text-app">{session.userAgent || t('users.unknownDevice')}</p>
                     <p className="mt-1 text-xs text-muted">{session.ipAddress || t('users.hiddenIp')} · {format(new Date(session.lastSeenAt), 'd MMM yyyy, HH:mm', { locale: currentLocale })}</p>
                   </div>
-                  <Button type="button" onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app text-muted hover:text-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" title={t('users.endSession')} aria-label={t('users.endSession')}>
+                  <Button type="button" onClick={() => revokeSession.mutate(session.id)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-app bg-surface text-muted hover:bg-surface hover:text-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500" title={t('users.endSession')} aria-label={t('users.endSession')}>
                     <X size={16} />
                   </Button>
                 </div>

@@ -323,7 +323,7 @@ const LoginPage: React.FC = () => {
                   <Button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-1 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-sm text-muted transition-colors hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                    className="absolute right-1 top-1/2 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-sm bg-transparent text-muted transition-colors hover:bg-transparent hover:text-app focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                     aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
                     aria-pressed={showPassword}
                   >
