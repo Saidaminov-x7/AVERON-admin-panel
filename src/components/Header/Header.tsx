@@ -101,13 +101,14 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
         <Dropdown
           align="right"
           scrollable={false}
+          matchTriggerWidth
           trigger={
             <div data-action-id="admin.header.language-indicator" className="flex items-center justify-between gap-1.5 h-11 px-3 text-xs font-semibold bg-surface border border-app text-app hover:border-primary-500 transition-colors cursor-pointer select-none">
               <span>{(i18n.language?.slice(0, 2) || 'ru').toUpperCase()}</span>
               <span className="sr-only">{t('common.language', 'Язык')}</span>
             </div>
           }
-          contentClassName="w-32 p-1 border border-app rounded bg-surface shadow-xl"
+          contentClassName="min-w-0 p-0 border border-app rounded bg-surface shadow-xl"
         >
           {([
             { code: 'ru', label: 'Русский' },
@@ -119,6 +120,9 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
               <Button variant="ghost"
                 key={lang.code}
                 type="button"
+                role="menuitemradio"
+                aria-label={lang.code.toUpperCase()}
+                aria-checked={active}
                 data-action-id={`admin.header.select-language.${lang.code}`}
                 onClick={() => {
                   i18n.changeLanguage(lang.code);
@@ -128,10 +132,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
                   active ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] font-semibold' : 'text-app hover:bg-[var(--color-surface-soft)]'
                 }`}
               >
-                <span className="flex items-center gap-2">
-                  <span className="w-7 text-[11px] font-semibold tracking-wide text-muted">{lang.code.toUpperCase()}</span>
-                  {({ ru: 'Русский', uz: 'Oʻzbek', en: 'English' } as const)[lang.code]}
-                </span>
+                <span aria-hidden="true">{lang.code.toUpperCase()}</span>
               </Button>
             );
           })}
