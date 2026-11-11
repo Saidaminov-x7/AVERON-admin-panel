@@ -5,6 +5,7 @@ import { Button } from './Button';
 import { Checkbox } from './Checkbox';
 import { Input } from './Input';
 import { Select } from './Select';
+import { Pagination } from './Pagination';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -62,5 +63,18 @@ describe('shared admin control visual and semantic contract', () => {
     expect(markup).toContain('title="Clear field"');
     expect(markup).toContain('type="search"');
     expect(markup).toContain('rounded-none');
+  });
+
+  it.each([15, 24])('shows the selected page size %s when it is outside the standard options', (pageSize) => {
+    const markup = renderToStaticMarkup(createElement(Pagination, {
+      currentPage: 1,
+      totalPages: 3,
+      pageSize,
+      onPageChange: () => undefined,
+      onPageSizeChange: () => undefined,
+    }));
+
+    expect(markup).toContain(`>${pageSize}</span>`);
+    expect(markup).not.toContain('Choose...');
   });
 });

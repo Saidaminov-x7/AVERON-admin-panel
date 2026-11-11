@@ -283,7 +283,7 @@ export const AuditLogPage: React.FC = () => {
           title={`${t('auditLog.details', 'Детали действия')}: ${selectedMeta?.action || ''}`}
         >
           <div className="p-4">
-            <pre className="p-3.5 rounded-xl bg-gray-900 text-emerald-400 dark:bg-black/90 dark:text-emerald-400 text-xs font-mono overflow-x-auto max-h-96 border border-app">
+            <pre className="p-3.5 rounded-xl bg-surface text-app text-xs font-mono overflow-x-auto max-h-96 border border-app">
               {JSON.stringify(selectedMeta?.meta, null, 2)}
             </pre>
           </div>
