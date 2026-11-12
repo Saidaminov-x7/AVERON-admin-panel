@@ -38,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
   return (
     <header
       className="
-        averon-admin-topbar h-16 w-full
+        averon-admin-topbar min-h-16 w-full
         bg-surface border-b border-app
         flex-shrink-0 transition-colors duration-200 relative z-30
       "
@@ -47,7 +47,7 @@ const Header: React.FC<HeaderProps> = ({ title, onToggleMobileMenu, isMobileMenu
       {/* Заголовок страницы + Гамбургер на мобилке */}
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <span className="shrink-0 text-sm font-black tracking-[.18em] text-app lg:hidden">AVERON</span>
-        {title && <h1 className="min-w-0 truncate border-l border-app pl-3 text-sm font-semibold text-app sm:text-xl lg:border-0 lg:pl-0">{title}</h1>}
+        {title && <h1 className="min-w-0 break-words border-l border-app py-1 pl-3 text-[13px] font-semibold leading-snug text-app sm:text-xl lg:border-0 lg:pl-0">{title}</h1>}
       </div>
 
       {/* Правая часть */}

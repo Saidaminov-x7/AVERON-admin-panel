@@ -52,6 +52,7 @@ const ErrorLogsPage: React.FC = () => {
             <div className="flex rounded-xl border border-app overflow-hidden text-xs font-semibold">
               <Button
                 type="button"
+                variant={resolvedFilter === 'unresolved' ? 'primary' : 'outline'}
                 onClick={() => { setResolvedFilter('unresolved'); setPage(1); }}
                 className={`px-3 py-1.5 transition-colors cursor-pointer ${
                   resolvedFilter === 'unresolved' ? 'bg-primary-500 text-white' : 'text-muted hover:text-app'
@@ -61,6 +62,7 @@ const ErrorLogsPage: React.FC = () => {
               </Button>
               <Button
                 type="button"
+                variant={resolvedFilter === 'resolved' ? 'primary' : 'outline'}
                 onClick={() => { setResolvedFilter('resolved'); setPage(1); }}
                 className={`px-3 py-1.5 transition-colors cursor-pointer ${
                   resolvedFilter === 'resolved' ? 'bg-primary-500 text-white' : 'text-muted hover:text-app'
@@ -70,6 +72,7 @@ const ErrorLogsPage: React.FC = () => {
               </Button>
               <Button
                 type="button"
+                variant={resolvedFilter === 'all' ? 'primary' : 'outline'}
                 onClick={() => { setResolvedFilter('all'); setPage(1); }}
                 className={`px-3 py-1.5 transition-colors cursor-pointer ${
                   resolvedFilter === 'all' ? 'bg-primary-500 text-white' : 'text-muted hover:text-app'
@@ -178,6 +181,7 @@ const ErrorLogsPage: React.FC = () => {
                     {!err.resolved && (
                       <Button
                         type="button"
+                        variant="ghost"
                         onClick={(e) => {
                           e.stopPropagation();
                           resolveMutation.mutate(err.id);

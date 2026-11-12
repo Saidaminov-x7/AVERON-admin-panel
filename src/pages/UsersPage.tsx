@@ -299,7 +299,7 @@ export const UsersPage: React.FC = () => {
         {/* Filters Toolbar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-2xl bg-surface border border-app shadow-xs">
           <Input
-            placeholder={t('users.searchPlaceholder', 'Поиск по имени, email, телефону или ID...')}
+            label={t('users.searchPlaceholder', 'Поиск по имени, email, телефону или ID...')}
             value={searchInput}
             clearable
             onClear={() => {
@@ -442,7 +442,7 @@ export const UsersPage: React.FC = () => {
 
                           <td className="p-3.5">
                             <div className="flex items-center gap-3">
-                              <div className="h-9 w-9 rounded-full bg-primary-50 dark:bg-primary-950/40 text-primary-600 font-bold flex items-center justify-center shrink-0">
+                              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-soft font-bold text-app">
                                 {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                               </div>
                               <div>

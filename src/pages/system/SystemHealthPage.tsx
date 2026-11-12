@@ -21,6 +21,7 @@ const SystemHealthPage: React.FC = () => {
     const m = Math.floor((seconds % 3600) / 60);
     return `${d}${t('system.unitDay', 'д')} ${h}${t('system.unitHour', 'ч')} ${m}${t('system.unitMin', 'м')}`;
   };
+  const isServiceHealthy = (status?: string) => ['UP', 'OK'].includes(status?.toUpperCase() ?? '');
 
   return (
     <Layout title={t('system.healthTitle', 'Мониторинг здоровья инфраструктуры')}>
@@ -52,8 +53,8 @@ const SystemHealthPage: React.FC = () => {
         )}
 
         {/* Общий статус */}
-        <div className="card p-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="card flex flex-col items-stretch gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-4">
             <div
               className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
                 data?.status === 'HEALTHY'
@@ -72,9 +73,9 @@ const SystemHealthPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="text-right">
+          <div className="self-end text-right sm:self-auto">
             <div className="text-xs text-muted">{t('system.uptime', 'Аптайм сервера')}</div>
-            <div className="text-lg font-mono font-bold text-primary-600 dark:text-primary-400">
+            <div className="whitespace-nowrap text-right text-lg font-mono font-bold text-primary-600 dark:text-primary-400">
               {data ? formatUptime(data.uptimeSeconds) : '...'}
             </div>
           </div>
@@ -87,7 +88,7 @@ const SystemHealthPage: React.FC = () => {
               <span className="text-xs font-semibold uppercase flex items-center gap-1.5">
                 <Server size={16} className="text-emerald-500" /> Backend API
               </span>
-              <span className={`px-2 py-0.5 rounded text-xs font-bold ${data?.backend.status === 'UP' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40' : 'bg-rose-100 text-rose-600 dark:bg-rose-950/40'}`}>
+              <span className={`px-2 py-0.5 rounded text-xs font-bold ${isServiceHealthy(data?.backend.status) ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300'}`}>
                 {data?.backend.status ?? 'DOWN'}
               </span>
             </div>
@@ -103,9 +104,9 @@ const SystemHealthPage: React.FC = () => {
               </span>
               <span
                 className={`px-2 py-0.5 rounded text-xs font-bold ${
-                  data?.database.status === 'UP'
-                    ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40'
-                    : 'bg-rose-100 text-rose-600 dark:bg-rose-950/40'
+                  isServiceHealthy(data?.database.status)
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
+                    : 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300'
                 }`}
               >
                 {data?.database.status ?? 'DOWN'}
@@ -125,9 +126,9 @@ const SystemHealthPage: React.FC = () => {
               </span>
               <span
                 className={`px-2 py-0.5 rounded text-xs font-bold ${
-                  data?.redis.status === 'UP'
-                    ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40'
-                    : 'bg-rose-100 text-rose-600 dark:bg-rose-950/40'
+                  isServiceHealthy(data?.redis.status)
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
+                    : 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300'
                 }`}
               >
                 {data?.redis.status ?? 'DOWN'}

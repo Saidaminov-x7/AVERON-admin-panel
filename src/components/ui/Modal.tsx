@@ -157,7 +157,7 @@ export function Modal({
                 <X size={18} />
               </Button>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">{children}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 pb-16 sm:p-6 sm:pb-20">{children}</div>
             {footer && (
               <div className={`${presentation === 'page' ? 'admin-page-footer' : ''} sticky bottom-0 z-20 flex flex-wrap shrink-0 items-center justify-end gap-3 border-t border-app bg-surface/95 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur sm:flex-nowrap sm:p-5`}>
                 {footer}
