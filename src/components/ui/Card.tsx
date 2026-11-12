@@ -44,8 +44,8 @@ export const Card: React.FC<CardProps> = ({
       {...props}
     >
       {(title || description || headerAction) && (
-        <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-app">
-          <div>
+        <div className="mb-4 flex flex-col items-stretch gap-2 border-b border-app pb-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <div className="min-w-0">
             {title && typeof title === 'string' ? (
               <h3 className="text-base font-bold text-app tracking-tight">{title}</h3>
             ) : (
@@ -55,7 +55,7 @@ export const Card: React.FC<CardProps> = ({
               <p className="text-xs text-muted mt-0.5">{description}</p>
             )}
           </div>
-          {headerAction && <div className="shrink-0">{headerAction}</div>}
+          {headerAction && <div className="shrink-0 self-end sm:self-auto">{headerAction}</div>}
         </div>
       )}
       {children}

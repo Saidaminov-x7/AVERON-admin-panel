@@ -137,10 +137,10 @@ export const AuditLogPage: React.FC = () => {
         </div>
 
         {/* Фильтры */}
-        <Card className="border-app bg-surface p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+<Card className="border-app bg-surface p-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Input
-              placeholder={t('auditLog.searchPlaceholder', 'Поиск по пользователю, ресурсу или ID...')}
+              label={t('auditLog.searchPlaceholder', 'Поиск по пользователю, ресурсу или ID...')}
               value={searchInput}
               clearable
               onClear={() => {
@@ -234,8 +234,9 @@ export const AuditLogPage: React.FC = () => {
                         {log.meta && Object.keys(log.meta).length > 0 ? (
                           <Button
                             type="button"
+                            variant="outline"
                             onClick={() => setSelectedMeta({ action: log.action, meta: log.meta! })}
-                            className="inline-flex items-center gap-1 text-[11px] font-medium text-primary-600 dark:text-primary-400 hover:underline cursor-pointer"
+                            className="inline-flex items-center gap-1 text-[11px] font-medium text-app hover:underline cursor-pointer"
                           >
                             <Info size={12} /> {t('common.details', 'Детали')}
                           </Button>

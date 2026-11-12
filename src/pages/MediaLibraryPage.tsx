@@ -142,6 +142,7 @@ export const MediaLibraryPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-3 rounded-2xl bg-surface border border-app shadow-xs">
           <div className="flex items-center gap-3">
             <Button
+              variant="outline"
               type="button"
               onClick={handleSelectAll}
               className="flex items-center gap-2 text-xs font-semibold text-app hover:text-primary-600 cursor-pointer"
@@ -293,7 +294,7 @@ export const MediaLibraryPage: React.FC = () => {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors gap-4"
+                className="flex flex-col items-stretch gap-3 p-3 transition-colors hover:bg-gray-50 dark:hover:bg-white/5 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <Button
@@ -323,13 +324,13 @@ export const MediaLibraryPage: React.FC = () => {
                     >
                       {item.url.split('/').pop()}
                     </p>
-                    <p className="text-[11px] text-muted font-mono mt-0.5">
+                    <p className="mt-0.5 break-words text-[11px] font-mono text-muted sm:truncate">
                       {formatFileSize(item.size)} • {item.mimeType} • {new Date(item.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 self-end sm:self-auto">
                   <Button
                     variant="ghost"
                     size="sm"

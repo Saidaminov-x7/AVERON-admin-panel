@@ -21,7 +21,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary: 'bg-[var(--color-action-bg)] text-[var(--color-on-action)] hover:bg-[var(--color-button-hover)]',
   default: 'bg-[var(--color-action-bg)] text-[var(--color-on-action)] hover:bg-[var(--color-button-hover)]',
   ghost: 'border border-transparent bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-soft)] hover:text-app',
-  danger: 'border border-transparent bg-[var(--color-error)] text-white hover:brightness-90',
+  danger: 'border border-transparent bg-[var(--color-error)] text-[var(--color-on-error)] hover:brightness-90',
   outline: 'border border-app bg-surface text-app hover:bg-[var(--color-surface-soft)]',
   link: 'h-auto min-w-0 p-0 text-app underline-offset-4 hover:underline',
 };

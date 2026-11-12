@@ -98,6 +98,7 @@ const AnalyticsPage: React.FC = () => {
             {PERIODS.map((p) => (
               <Button
                 key={p.value}
+                variant={periodDays === p.value ? 'primary' : 'outline'}
                 onClick={() => setPeriodDays(p.value)}
                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${periodDays === p.value
                     ? 'bg-primary-500 text-white shadow-sm'
@@ -131,6 +132,7 @@ const AnalyticsPage: React.FC = () => {
           </div>
 
           <Button
+            variant="outline"
             type="button"
             onClick={() => void exportReport()}
             disabled={isExporting}

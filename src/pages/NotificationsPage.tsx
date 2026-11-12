@@ -52,7 +52,7 @@ export default function NotificationsPage() {
                   if (!item.isRead) markRead.mutate(item.id);
                   if (item.link) navigate(item.link);
                 }}
-                className={`card flex w-full items-start gap-3 text-left transition-colors hover:border-primary-500/40 ${item.isRead ? "" : "border-primary-500/30 bg-primary-500/5"}`}
+                className={`card h-auto min-h-[4rem] w-full items-start justify-start whitespace-normal py-4 text-left leading-relaxed transition-colors hover:border-primary-500/40 ${item.isRead ? "" : "border-primary-500/30 bg-primary-500/5"}`}
               >
                 <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${item.isRead ? "bg-transparent" : "bg-primary-500"}`} />
                 <span className="min-w-0 flex-1">

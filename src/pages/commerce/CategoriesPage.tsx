@@ -151,11 +151,11 @@ export default function CategoriesPage() {
                   {t(category.active === false ? "categories.inactive" : "categories.active")}
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-2 border-t border-app pt-3">
-                <span className="text-xs text-muted">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-app pt-3">
+                <span className="min-w-0 flex-1 text-xs text-muted">
                   {t("categories.productsCount")}: {category._count?.products ?? 0}
                 </span>
-                <div className="flex gap-2">
+                <div className="flex min-w-0 flex-wrap justify-end gap-1">
                   <Button type="button" variant="ghost" size="sm" onClick={() => navigate(`/products?category=${encodeURIComponent(category.slug)}`)}>
                     {t("categories.viewProducts")}
                   </Button>

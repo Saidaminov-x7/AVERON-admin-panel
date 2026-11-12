@@ -351,7 +351,7 @@ export default function ImportsPage() {
         title={t('imports.detailsTitle', 'Снимок источника')}
         subtitle={detailsItem?.originalTitle}
       >
-        {detailsItem && <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
+        {detailsItem && <div className="space-y-4 pr-1">
           <div className="flex flex-wrap gap-2 text-sm">
             <span className="badge-info">{sourceProvider(detailsItem)}</span>
             {isProductCountry(detailsItem.normalizedPayload?.country) && <span className="inline-flex items-center gap-1 rounded-full border border-app px-2 py-1"><CountryFlag country={detailsItem.normalizedPayload.country} /> {detailsItem.normalizedPayload.country}</span>}
@@ -421,7 +421,7 @@ export default function ImportsPage() {
           </Button>
         </div>}
       >
-        {approveItem && <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
+        {approveItem && <div className="space-y-4 pr-1">
           <div className="rounded-xl border border-app bg-surface-muted p-3 text-sm">
             <p><strong>{t('imports.source', 'Источник')}:</strong> {sourceProvider(approveItem)} · {approveItem.sourcePriceCny == null ? '—' : `¥${approveItem.sourcePriceCny}`}</p>
             <p className="mt-1 break-all"><a href={approveItem.sourceUrl} target="_blank" rel="noreferrer" className="text-primary-600 underline">{approveItem.sourceUrl}</a></p>

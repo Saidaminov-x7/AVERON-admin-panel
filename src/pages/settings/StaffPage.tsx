@@ -143,7 +143,7 @@ const StaffPage: React.FC = () => {
         {/* Таблица сотрудников */}
         <div className="card overflow-hidden p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[720px] text-left text-sm">
               <thead className="bg-gray-50 dark:bg-white/5 border-b border-app text-xs uppercase text-muted font-semibold">
                 <tr>
                   <th className="px-6 py-3.5">{t('staffPage.employee')}</th>
