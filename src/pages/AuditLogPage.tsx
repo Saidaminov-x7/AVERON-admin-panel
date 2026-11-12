@@ -137,7 +137,7 @@ export const AuditLogPage: React.FC = () => {
         </div>
 
         {/* Фильтры */}
-        <Card className="border-stone-300/70 bg-surface p-4 dark:border-stone-700/80">
+        <Card className="border-app bg-surface p-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <Input
               placeholder={t('auditLog.searchPlaceholder', 'Поиск по пользователю, ресурсу или ID...')}
@@ -177,11 +177,11 @@ export const AuditLogPage: React.FC = () => {
             description={debouncedSearch || actionFilter ? t('auditLog.noResultsFilter', 'Попробуйте изменить параметры поиска или фильтр') : t('auditLog.emptyLog', 'Журнал действий пока пуст')}
           />
         ) : (
-          <Card className="overflow-hidden border-stone-300/70 bg-surface p-0 shadow-xs dark:border-stone-700/80">
+          <Card className="overflow-hidden border-app bg-surface p-0 shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-stone-200 dark:border-stone-800 bg-gray-50/60 dark:bg-white/[0.02] text-muted font-semibold uppercase tracking-wider">
+                  <tr className="border-b border-app bg-surface-soft text-muted font-semibold uppercase tracking-wider">
                     <th className="py-3.5 px-4">{t('auditLog.actor', 'Инициатор')}</th>
                     <th className="py-3.5 px-4">{t('auditLog.action', 'Действие')}</th>
                     <th className="py-3.5 px-4">{t('auditLog.resource', 'Объект / Ресурс')}</th>
@@ -189,7 +189,7 @@ export const AuditLogPage: React.FC = () => {
                     <th className="py-3.5 px-4 text-right">{t('auditLog.timestamp', 'Время')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-200 dark:divide-stone-800">
+                <tbody className="divide-y divide-app">
                   {paginatedLogs.map((log: AuditLogItem) => (
                     <tr
                       key={log.id}
