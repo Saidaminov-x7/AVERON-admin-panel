@@ -266,7 +266,7 @@ export const UsersPage: React.FC = () => {
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-app tracking-tight flex items-center gap-2.5">
               <span>{t('users.subtitle', 'База пользователей')}</span>
-              <Badge variant="primary" size="sm">
+              <Badge variant="primary" size="sm" className="shrink-0 whitespace-nowrap">
                 {t('users.totalRecords', { count: total, defaultValue: `Всего: ${total} записей` })}
               </Badge>
             </h1>

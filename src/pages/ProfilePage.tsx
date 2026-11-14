@@ -200,7 +200,7 @@ const ProfilePage: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold text-app">{profile?.name}</h2>
-                <span className="inline-flex items-center rounded-full bg-surface-soft px-2.5 py-1 text-xs font-semibold leading-tight text-app">
+                <span className="inline-flex items-center rounded-full bg-surface-soft px-2.5 py-1 text-xs font-semibold leading-tight !text-[var(--color-text)]">
                   {t(roleKeys[profile?.adminRole || 'SUPER_ADMIN'] || 'profile.roleAdmin')}
                 </span>
               </div>
