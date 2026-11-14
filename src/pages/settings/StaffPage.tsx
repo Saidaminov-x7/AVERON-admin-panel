@@ -143,7 +143,7 @@ const StaffPage: React.FC = () => {
         {/* Таблица сотрудников */}
         <div className="card overflow-hidden p-0">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-sm">
+            <table className="w-full min-w-[900px] text-left text-sm" style={{ minWidth: 900 }}>
               <thead className="bg-gray-50 dark:bg-white/5 border-b border-app text-xs uppercase text-muted font-semibold">
                 <tr>
                   <th className="px-6 py-3.5">{t('staffPage.employee')}</th>
@@ -243,9 +243,10 @@ const StaffPage: React.FC = () => {
                             <span className="text-xs text-muted italic">—</span>
                           ) : (
                             <Button
+                              variant="danger"
                               onClick={() => handleRevoke(staff.id, staff.name)}
                               disabled={revokeMutation.isPending}
-                              className="text-xs text-red-600 dark:text-red-400 hover:underline font-medium cursor-pointer"
+                              className="text-xs hover:underline font-medium cursor-pointer"
                             >
                               {t('staffPage.revokeAccess')}
                             </Button>

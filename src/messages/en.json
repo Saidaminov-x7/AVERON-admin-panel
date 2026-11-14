@@ -1,4 +1,6 @@
 {
+  "commandPalette": { "routes": "Sections" },
+  "select": { "choose": "Choose...", "clear": "Clear selection", "searchPlaceholder": "Search...", "noOptions": "No results found" },
   "login": {
     "languageLabel": "Language",
     "languageAccessibleName": "Interface language: {{language}}",
@@ -65,6 +67,7 @@
     "disableTitle": "Disable two-factor protection",
     "scanInstructions": "Scan the QR code with your authenticator app, then enter the current six-digit code.",
     "qrAlt": "Authenticator-app setup QR code",
+    "qrUnavailable": "QR code unavailable. You can set up the app manually with the secret key below.",
     "manualKey": "Manual setup key",
     "codeLabel": "Verification code",
     "setupExpires": "Setup expires in {{seconds}} seconds.",

@@ -391,7 +391,7 @@ export default function ProductsPage() {
             onClear={() => { setSearchDraft(""); updateCatalogQuery("q", ""); }}
             onChange={(event) => setSearchDraft(event.target.value)}
           />
-          <Button type="submit" size="sm">{t("products.searchAction")}</Button>
+          <Button type="submit" size="sm" variant="outline">{t("products.searchAction")}</Button>
         </form>
         <Select
           label={t("products.countryFilterLabel")}

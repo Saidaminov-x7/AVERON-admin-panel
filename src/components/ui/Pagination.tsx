@@ -80,6 +80,7 @@ export const Pagination: React.FC<PaginationProps> = ({
               <Select
                 ariaLabel={t('common.itemsPerPage')}
                 value={String(pageSize)}
+                placeholder={String(pageSize)}
                 onChange={(value) => onPageSizeChange(Number(value))}
                 options={availablePageSizes.map((option) => ({ value: String(option), label: String(option) }))}
                 className="h-11 text-xs py-1"

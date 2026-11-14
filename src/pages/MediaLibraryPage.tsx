@@ -145,7 +145,7 @@ export const MediaLibraryPage: React.FC = () => {
               variant="outline"
               type="button"
               onClick={handleSelectAll}
-              className="flex items-center gap-2 text-xs font-semibold text-app hover:text-primary-600 cursor-pointer"
+              className="flex items-center gap-2 text-xs font-semibold !text-[var(--color-text)] hover:!text-primary-600 cursor-pointer"
             >
               {selectedIds.length === items.length && items.length > 0 ? (
                 <CheckSquare size={16} className="text-primary-500" />

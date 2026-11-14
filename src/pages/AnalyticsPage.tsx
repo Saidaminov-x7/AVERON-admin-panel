@@ -136,7 +136,7 @@ const AnalyticsPage: React.FC = () => {
             type="button"
             onClick={() => void exportReport()}
             disabled={isExporting}
-            className="px-4 py-2 text-xs font-semibold rounded-lg border border-app text-app hover:bg-gray-100 dark:hover:bg-white/5 flex items-center gap-2 transition-colors cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold rounded-lg border border-app text-app disabled:!text-[var(--color-text-secondary)] disabled:opacity-70 hover:bg-gray-100 dark:hover:bg-white/5 flex items-center gap-2 transition-colors cursor-pointer"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
