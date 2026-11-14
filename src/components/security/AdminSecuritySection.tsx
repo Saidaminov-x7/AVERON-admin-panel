@@ -12,6 +12,7 @@ export function AdminSecuritySection() {
   const queryClient = useQueryClient();
   const [mode, setMode] = useState<DialogMode>(null);
   const [setup, setSetup] = useState<AdminTotpSetup | null>(null);
+  const [qrImageError, setQrImageError] = useState(false);
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
@@ -36,6 +37,7 @@ export function AdminSecuritySection() {
     mutationFn: setupAdminTotpApi,
     onSuccess: (data) => {
       setSetup(data);
+      setQrImageError(false);
       setMode('setup');
       setError('');
     },
@@ -155,8 +157,12 @@ export function AdminSecuritySection() {
           {mode === 'setup' && setup && (
             <>
               <p className="text-sm text-muted">{t('security.scanInstructions')}</p>
-              <div className="flex justify-center rounded-xl bg-white p-3">
-                <img src={setup.qrCodeDataUrl} alt={t('security.qrAlt')} className="h-60 w-60 max-w-full object-contain" />
+              <div className="flex min-h-60 items-center justify-center rounded-xl bg-white p-3">
+                {setup.qrCodeDataUrl && !qrImageError ? (
+                  <img src={setup.qrCodeDataUrl} alt={t('security.qrAlt')} onError={() => setQrImageError(true)} className="h-60 w-60 max-w-full object-contain" />
+                ) : (
+                  <p className="max-w-60 text-center text-sm text-gray-700" role="status">{t('security.qrUnavailable')}</p>
+                )}
               </div>
               <Input label={t('security.manualKey')} value={setup.secret} readOnly />
               <Input
