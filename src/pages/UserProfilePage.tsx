@@ -208,7 +208,7 @@ const UserProfilePage: React.FC = () => {
               aria-selected={activeTab === 'info'}
               tabIndex={activeTab === 'info' ? 0 : -1}
               onClick={() => setActiveTab('info')}
-              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
+              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer !text-[var(--color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                 activeTab === 'info' ? 'border-primary-500 bg-surface-soft text-app' : 'border-transparent text-muted hover:text-app'
               }`}
             >
@@ -223,7 +223,7 @@ const UserProfilePage: React.FC = () => {
               aria-selected={activeTab === 'ai'}
               tabIndex={activeTab === 'ai' ? 0 : -1}
               onClick={() => setActiveTab('ai')}
-              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
+              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 !text-[var(--color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                 activeTab === 'ai' ? 'border-primary-500 bg-surface-soft text-app' : 'border-transparent text-muted hover:text-app'
               }`}
             >
@@ -238,7 +238,7 @@ const UserProfilePage: React.FC = () => {
               aria-selected={activeTab === 'activity'}
               tabIndex={activeTab === 'activity' ? 0 : -1}
               onClick={() => setActiveTab('activity')}
-              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
+              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer !text-[var(--color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                 activeTab === 'activity' ? 'border-primary-500 bg-surface-soft text-app' : 'border-transparent text-muted hover:text-app'
               }`}
             >
@@ -253,7 +253,7 @@ const UserProfilePage: React.FC = () => {
               aria-selected={activeTab === 'history'}
               tabIndex={activeTab === 'history' ? 0 : -1}
               onClick={() => setActiveTab('history')}
-              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
+              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer !text-[var(--color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
                 activeTab === 'history' ? 'border-primary-500 bg-surface-soft text-app' : 'border-transparent text-muted hover:text-app'
               }`}
             >
@@ -268,7 +268,7 @@ const UserProfilePage: React.FC = () => {
               aria-selected={activeTab === 'sessions'}
               tabIndex={activeTab === 'sessions' ? 0 : -1}
               onClick={() => setActiveTab('sessions')}
-              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${activeTab === 'sessions' ? 'border-primary-500 bg-surface-soft text-app' : 'border-transparent text-muted hover:text-app'}`}
+              className={`min-h-11 min-w-0 whitespace-normal break-words px-2 py-2 text-center leading-snug border-b-2 font-medium text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 !text-[var(--color-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${activeTab === 'sessions' ? 'border-primary-500 bg-surface-soft text-app' : 'border-transparent text-muted hover:text-app'}`}
             >
               <MonitorSmartphone size={14}/> {t('users.sessions')} ({sessions.length})
             </Button>

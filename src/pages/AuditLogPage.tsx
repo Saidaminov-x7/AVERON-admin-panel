@@ -236,7 +236,7 @@ export const AuditLogPage: React.FC = () => {
                             type="button"
                             variant="outline"
                             onClick={() => setSelectedMeta({ action: log.action, meta: log.meta! })}
-                            className="inline-flex items-center gap-1 text-[11px] font-medium text-app hover:underline cursor-pointer"
+                            className="inline-flex items-center gap-1 text-[11px] font-medium !text-[var(--color-text)] hover:underline cursor-pointer"
                           >
                             <Info size={12} /> {t('common.details', 'Детали')}
                           </Button>

@@ -1111,7 +1111,7 @@ export function ProductFormModal({
                 <Button type="button" variant="ghost" aria-label={t("products.removeColor", { name })} onClick={() => updateValue("colorsText", values.colorsText.split("\n").filter((_, index) => index !== rowIndex).join("\n"))} className="row-span-2 inline-flex size-10 items-center justify-center rounded-md text-[var(--color-error)] transition-colors hover:bg-red-500/10 hover:text-[var(--color-error)] sm:row-span-1"><Trash2 size={16} /></Button>
               </div>;
             })}
-              <Button type="button" onClick={() => updateValue("colorsText", [values.colorsText, " | #808080"].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold transition-colors hover:bg-app"><span aria-hidden="true">+</span> {t("products.addColor")}</Button>
+              <Button type="button" variant="outline" onClick={() => updateValue("colorsText", [values.colorsText, " | #808080"].filter(Boolean).join("\n"))} className="inline-flex min-h-10 items-center gap-2 rounded-md border border-dashed border-app px-3 text-sm font-semibold !text-[var(--color-text)] transition-colors hover:bg-app"><span aria-hidden="true">+</span> {t("products.addColor")}</Button>
           </div>
         </section>
 
