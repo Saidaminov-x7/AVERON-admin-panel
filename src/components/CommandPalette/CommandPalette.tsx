@@ -247,7 +247,7 @@ export const CommandPalette: React.FC = () => {
             {/* Группа: Разделы платформы */}
             {filteredRoutes.length > 0 && (
               <Command.Group
-                heading={t('commandPalette.routes')}
+                heading={t('commandPalette.routes', 'Разделы')}
                 className="text-xs font-semibold text-muted px-2 py-1 select-none"
               >
                 <div className="space-y-1 mt-1">

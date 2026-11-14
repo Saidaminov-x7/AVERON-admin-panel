@@ -1,4 +1,6 @@
 {
+  "commandPalette": { "routes": "Bo‘limlar" },
+  "select": { "choose": "Tanlang...", "clear": "Tanlovni tozalash", "searchPlaceholder": "Qidirish...", "noOptions": "Natijalar topilmadi" },
   "login": {
     "languageLabel": "Til",
     "languageAccessibleName": "Interfeys tili: {{language}}",
@@ -65,6 +67,7 @@
     "disableTitle": "Ikki bosqichli himoyani o'chirish",
     "scanInstructions": "QR-kodni autentifikator ilovasida skanerlang, so'ng joriy olti xonali kodni kiriting.",
     "qrAlt": "Autentifikator ilovasini sozlash QR-kodi",
+    "qrUnavailable": "QR-kod mavjud emas. Quyidagi maxfiy kalit orqali ilovani qo‘lda sozlashingiz mumkin.",
     "manualKey": "Qo'lda sozlash kaliti",
     "codeLabel": "Tasdiqlash kodi",
     "setupExpires": "Sozlash {{seconds}} soniya davomida amal qiladi.",
